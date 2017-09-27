@@ -46,9 +46,18 @@
 	font-size: .88em;
 }
 
-.avatar_block.-color_primary {color: #3e4d66; color: var(--color_primary);}
-.avatar_block.-color_marginal {color: #9fa6b3; color: var(--color_primary_50);}
-.avatar_block.-color_accent {color: #f82969; color: var(--color_accent);}
-.avatar_block.-color_accent_alt {color: #ff5f9e; color: var(--color_accent_alt);}
-.-state_admin .avatar_block.-color_accent {color: #00dc88}
-.-state_admin .avatar_block.-color_accent_alt {color: #23d792}
+@supports (--custom_properties: 1) {
+	.avatar_block.-color_primary {color: var(--color_primary)}
+	.avatar_block.-color_marginal {color: var(--color_primary_50)}
+	.avatar_block.-color_accent {color: var(--color_accent)}
+	.avatar_block.-color_accent_alt {color: var(--color_accent_alt)}
+}
+
+@supports not (--custom_properties: 0) {
+	.avatar_block.-color_primary {color: #3e4d66}
+	.avatar_block.-color_marginal {color: #9fa6b3}
+	.avatar_block.-color_accent {color: #f82969}
+	.avatar_block.-color_accent_alt {color: #ff5f9e}
+	.-state_admin .avatar_block.-color_accent {color: #00dc88}
+	.-state_admin .avatar_block.-color_accent_alt {color: #23d792}
+}

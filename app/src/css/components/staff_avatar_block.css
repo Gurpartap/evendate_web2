@@ -15,7 +15,6 @@
 	width: 36px;
 	font-size: 1.3em;
 	color: #9fa6b3;
-	color: var(--color_primary_50);
 	opacity: 0;
 	cursor: pointer;
 }
@@ -25,10 +24,7 @@
 
 .staff_avatar_block:hover > .staff_avatar_remove {opacity: 1}
 
-.staff_avatar_remove:hover {
-	color: #00dc88;
-	color: var(--color_franklin);
-}
+.staff_avatar_remove:hover {color: #00dc88}
 
 
 
@@ -42,4 +38,9 @@
 	display: flex;
 	align-items: center;
 	width: 200%;
+}
+
+@supports (--custom_properties: 1) {
+	.staff_avatar_remove {color: var(--color_primary_50)}
+	.staff_avatar_remove:hover {color: var(--color_accent)}
 }

@@ -7,7 +7,6 @@
 	width: 30px;
 	height: 30px;
 	color: #9fa6b3;
-	color: var(--color_primary_50);
 	text-align: center;
 }
 
@@ -23,3 +22,7 @@ a.social_link.-color_facebook {color: #3b5998}
 }
 
 .social_link > .fa_icon {width: 1em}
+
+@supports (--custom_properties: 1) {
+	.social_link {color: var(--color_primary_50)}
+}

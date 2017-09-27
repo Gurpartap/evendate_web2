@@ -28,18 +28,38 @@ OrderAppInspector = extending(AbstractAppInspector, (function() {
 		this.$content = tmpl('order-app-inspector', {
 			orderer: AbstractAppInspector.build.avatarBlock(this.order.user),
 			payment_info: (function(){
+				var pairs = [];
 				
 				switch (self.order.status_type_code) {
 					case OneOrder.ORDER_STATUSES.PAYED:
 					case OneOrder.ORDER_STATUSES.PAYED_LEGAL_ENTITY: {
-						
-						return __APP.BUILD.pairList({
-							'Сумма заказа': formatCurrency(self.order.sum, ' ', '.', '', '₽'),
-							'Скидка с промокода': self.order.promocode ? formatCurrency(self.order.promocode.effort, ' ', '.', '', self.order.promocode.is_fixed ? '₽' : '%') : '—',
-							'Итоговая сумма': formatCurrency(self.order.final_sum, ' ', '.', '', '₽'),
-							'Способ оплаты': OneOrder.PAYMENT_PROVIDERS[self.order.payment_type].toLowerCase(),
-							'Комиссия за способ оплаты': formatCurrency(self.order.final_sum - self.order.shop_sum_amount, ' ', '.', '', '₽')
+						pairs.push({
+							key: 'Сумма заказа',
+							value: formatCurrency(self.order.sum, ' ', '.', '', '₽')
 						});
+						
+						if (self.order.promocode) {
+							pairs.push({
+								key: 'Промокод',
+								value: self.order.promocode.code
+							},  {
+								key: 'Скидка с промокода',
+								value: formatCurrency(self.order.promocode.effort, ' ', '.', '', self.order.promocode.is_fixed ? '₽' : '%')
+							});
+						}
+						
+						pairs.push({
+							key: 'Итоговая сумма',
+							value: formatCurrency(self.order.final_sum, ' ', '.', '', '₽')
+						},  {
+							key: 'Способ оплаты',
+							value: OneOrder.PAYMENT_PROVIDERS[self.order.payment_type].toLowerCase()
+						},  {
+							key: 'Комиссия за способ оплаты',
+							value: formatCurrency(self.order.final_sum - self.order.shop_sum_amount, ' ', '.', '', '₽')
+						});
+						
+						return __APP.BUILD.pairList(pairs);
 					}
 					default: {
 						

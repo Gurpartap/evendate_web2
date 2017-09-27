@@ -9,7 +9,6 @@
 	font-size: 1.5em;
 	font-weight: 500;
 	color: #f82969;
-	color: var(--color_accent);
 	text-align: left;
 }
 
@@ -37,7 +36,6 @@
 .order_ticket_type_title,
 .order_ticket_type_description {
 	color: #2e3b50;
-	color: var(--color_dark_primary);
 }
 
 .order_ticket_type_description {
@@ -49,7 +47,6 @@
 	font-size: 0.875em;
 	font-weight: bold;
 	color: #f82969;
-	color: var(--color_accent);
 }
 
 .order_ticket_type_sum {
@@ -83,4 +80,14 @@
 
 .order_page_contact {
 
+}
+
+@supports (--custom_properties: 1) {
+	.order_page_subtitle {color: var(--color_accent)}
+
+	.order_ticket_type_sum,
+	.order_ticket_type_title,
+	.order_ticket_type_description {color: var(--color_dark_primary)}
+
+	.order_ticket_type_price {color: var(--color_accent)}
 }

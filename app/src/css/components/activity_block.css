@@ -31,13 +31,9 @@
 .activity_block_bottom {
 	margin: 0;
 	color: #657184;
-	color: var(--color_primary_80);
 }
 
-.activity_block_creator {
-	color: #3e4d66;
-	color: var(--color_primary);
-}
+.activity_block_creator {color: #3e4d66}
 
 .activity_block .avatar_badge {
 	position: absolute;
@@ -54,7 +50,18 @@
 }
 
 
-.activity_block.-type_fave .avatar_badge {background-color: #f82969; background-color: var(--color_bubblegum);}
-.activity_block.-type_subscribe .avatar_badge {background-color: #00dc88; background-color: var(--color_franklin);}
+.activity_block.-type_fave .avatar_badge {background-color: #f82969}
+.activity_block.-type_subscribe .avatar_badge {background-color: #00dc88}
 .activity_block.-type_unfave .avatar_badge,
-.activity_block.-type_unsubscribe .avatar_badge {background-color: #9fa6b3; background-color: var(--color_primary_50);}
+.activity_block.-type_unsubscribe .avatar_badge {background-color: #9fa6b3}
+
+@supports (--custom_properties: 1) {
+	.activity_block_top,
+	.activity_block_bottom {color: var(--color_primary_80)}
+	.activity_block_creator {color: var(--color_primary)}
+
+	.activity_block.-type_fave .avatar_badge {background-color: var(--color_bubblegum)}
+	.activity_block.-type_subscribe .avatar_badge {background-color: var(--color_franklin)}
+	.activity_block.-type_unfave .avatar_badge,
+	.activity_block.-type_unsubscribe .avatar_badge {background-color: var(--color_primary_50)}
+}

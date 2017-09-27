@@ -1,7 +1,4 @@
-.progress_bar {
-	color: #657184;
-	color: var(--color_primary_80);
-}
+.progress_bar {color: #657184}
 
 .progress_bar_strip {
 	width: 100%;
@@ -46,8 +43,21 @@
 .progress_bar.-with_label[data-abs_number=""][data-percentage]:after,
 .progress_bar.-with_label:not([data-abs_number]):not([data-abs_of])[data-percentage]:after {content: attr(data-percentage) '/100%'}
 
-.progress_bar.-color_primary {color: #3e4d66; color: var(--color_primary);}
-.progress_bar.-color_accent {color: #f82969; color: var(--color_accent);}
-.-state_admin .progress_bar.-color_accent {color: #00dc88}
-.progress_bar.-color_error {color: #ff5f9e; color: var(--color_bubblegum_alt);}
-.progress_bar.-color_neutral {color: #9fa6b3; color: var(--color_primary_50);}
+
+@supports (--custom_properties: 1) {
+	.progress_bar {color: var(--color_primary_80)}
+
+	.progress_bar.-color_primary {color: var(--color_primary)}
+	.progress_bar.-color_accent {color: var(--color_accent)}
+	.progress_bar.-color_error {color: var(--color_bubblegum_alt)}
+	.progress_bar.-color_neutral {color: var(--color_primary_50)}
+}
+
+@supports not (--custom_properties: 0) {
+
+	.progress_bar.-color_primary {color: #3e4d66}
+	.progress_bar.-color_accent {color: #f82969}
+	.-state_admin .progress_bar.-color_accent {color: #00dc88}
+	.progress_bar.-color_error {color: #ff5f9e}
+	.progress_bar.-color_neutral {color: #9fa6b3}
+}

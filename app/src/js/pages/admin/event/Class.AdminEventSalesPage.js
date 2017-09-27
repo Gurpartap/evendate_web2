@@ -105,10 +105,10 @@ AdminEventSalesPage = extending(AdminEventPage, (function() {
 		
 		this.$wrapper.html(tmpl('admin-event-sales-page', {
 			title: this.event.title,
-			sum_amount: formatCurrency(this.event.sum_amount),
-			sold_count: formatCurrency(this.event.sold_count),
-			orders_count: formatCurrency(this.event.orders_count),
-			checked_out_count: formatCurrency(this.event.checked_out_count),
+			sold_count: this.event.sold_count,
+			sum_amount: this.event.sum_amount,
+			orders_count: this.event.orders_count,
+			checked_out_count: this.event.checked_out_count,
 			total_income: formatCurrency(this.event.total_income, ' ', '.', '', '₽'),
 			withdraw_available: formatCurrency(this.event.withdraw_available, ' ', '.', '', '₽'),
 			processing_commission_value: formatCurrency(this.event.processing_commission_value, ' ', '.', '', '₽'),

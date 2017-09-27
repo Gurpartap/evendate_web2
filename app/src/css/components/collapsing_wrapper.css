@@ -5,7 +5,6 @@
 
 .collapsing_wrapper.-inset {
 	background-color: #f9f9fa;
-	background-color: var(--color_background_gray);
 	box-shadow: inset 0 5px 3px -3px #ccc, inset 0 -5px 3px -3px #ccc;
 }
 .collapsing_wrapper.-inset,
@@ -55,7 +54,7 @@
 	cursor: pointer;
 }
 .collapsing_button:hover,
-.collapsing_wrapper.-fading:not(.-opened):hover + .collapsing_button {color: #f82969; color: var(--color_bubblegum);}
+.collapsing_wrapper.-fading:not(.-opened):hover + .collapsing_button {color: #f82969}
 
 .collapsing_wrapper.-fading.-opened + .collapsing_button {
 	-webkit-transform: rotateZ(180deg);
@@ -63,4 +62,11 @@
 	-ms-transform: rotateZ(180deg);
 	-o-transform: rotateZ(180deg);
 	transform: rotateZ(180deg);
+}
+
+@supports (--custom_properties: 1) {
+	.collapsing_wrapper.-inset {background-color: var(--color_background_gray)}
+
+	.collapsing_button:hover,
+	.collapsing_wrapper.-fading:not(.-opened):hover + .collapsing_button {color: var(--color_bubblegum)}
 }

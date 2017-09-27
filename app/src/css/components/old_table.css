@@ -2,7 +2,7 @@
 .statistics_table.-table_fixed {table-layout: fixed}
 
 .statistics_table > thead {box-shadow: 0 4px 8px 0 rgba(0,0,0,0.06)}
-.statistics_table tr:nth-child(even) {background-color: #f9f9fa; background-color: var(--color_background_gray);}
+.statistics_table tr:nth-child(even) {background-color: #f9f9fa;}
 
 .statistics_table th,
 .statistics_table td {
@@ -14,7 +14,6 @@
 	font-size: .9375em;
 	font-weight: 600;
 	color: #657184;
-	color: var(--color_primary_80);
 }
 
 .statistics_table td {
@@ -34,7 +33,7 @@
 
 .statistics_table .sort-up,
 .statistics_table .sort-down,
-.statistics_table .-highlighted {color: #2e3b50; color: var(--color_dark_primary);}
+.statistics_table .-highlighted {color: #2e3b50}
 
 .statistics_table .sort-header {cursor: pointer}
 
@@ -51,10 +50,7 @@
 	visibility: hidden;
 }
 .statistics_table .sort-up > span:before,
-.statistics_table .sort-down > span:before {
-	color: #00dc88;
-	color: var(--color_franklin);
-}
+.statistics_table .sort-down > span:before {color: #00dc88}
 .statistics_table .sort-up > span:before,
 .statistics_table .sort-down > span:before,
 .statistics_table .sort-down:hover > span:before,
@@ -73,4 +69,17 @@
 .statistics_table .sort-header.sort-down[data-sort-order="desc"] > span:before {
 	border-top: 0 solid;
 	border-bottom: 4px solid;
+}
+
+@supports (--custom_properties: 1) {
+	.statistics_table tr:nth-child(even) {background-color: var(--color_background_gray)}
+
+	.statistics_table th {color: var(--color_primary_80)}
+
+	.statistics_table .sort-up,
+	.statistics_table .sort-down,
+	.statistics_table .-highlighted {color: var(--color_dark_primary)}
+
+	.statistics_table .sort-up > span:before,
+	.statistics_table .sort-down > span:before {color: var(--color_franklin)}
 }

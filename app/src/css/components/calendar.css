@@ -1,6 +1,7 @@
 .calendar_wrapper {
-	min-height: -webkit-calc(2.4em * 7 + 3em); /* To make calendar with similar height either with 5 or 6 weeks */
-	min-height: calc((2.4em * 7) + 3em); /* 2.4em - cell height, 5px - cell spacing and 3em for header height */
+	/* min-height: -webkit-calc(2.4em * 7 + 3em);  To make calendar with similar height either with 5 or 6 weeks */
+	/* min-height: calc((2.4em * 7) + 3em); 2.4em - cell height, 5px - cell spacing and 3em for header height */
+	margin-bottom: 6px;
 	cursor: default;
 }
 
@@ -13,7 +14,6 @@
 	padding: 0 7px;
 	font-weight: 500;
 	color: #f82969;
-	color: var(--color_accent);
 	text-align: center;
 }
 
@@ -64,7 +64,6 @@
 .calendar_cell.-active {
 	color: #fff;
 	background-color: #657184;
-	background-color: var(--color_primary_80);
 }
 .-weekday_selection .calendar_weekday {cursor: pointer}
 
@@ -73,3 +72,8 @@
 .calendar_day.-disabled,
 .event_calendar_day.not_this_month,
 .event_calendar_day.-disabled {opacity: .5}
+
+@supports (--custom_properties: 1) {
+	.calendar_header {color: var(--color_accent)}
+	.calendar_cell.-active {background-color: var(--color_primary_80)}
+}

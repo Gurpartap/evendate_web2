@@ -45,7 +45,6 @@
 	font-size: 14px;
 	font-weight: 500;
 	color: #9fa6b3;
-	color: var(--color_primary_50);
 }
 
 .organization_card_bottom {
@@ -77,4 +76,8 @@
 .chart_wrapper {
 	height: 460px;
 	margin-bottom: 60px;
+}
+
+@supports (--custom_properties: 1) {
+	.organization_card_field {color: var(--color_primary_50)}
 }

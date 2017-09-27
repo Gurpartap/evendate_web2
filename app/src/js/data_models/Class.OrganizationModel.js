@@ -29,6 +29,8 @@ OrganizationModel = extending(OneEntity, (function() {
 	 * @property {?string} city_id
 	 * @property {?string} country_id
 	 * @property {?boolean} is_private
+	 * @property {?string} brand_color
+	 * @property {?string} brand_color_accent
 	 */
 	function OrganizationModel(data) {
 		this.organization_id = null;
@@ -49,6 +51,8 @@ OrganizationModel = extending(OneEntity, (function() {
 		this.city_id = null;
 		this.country_id = null;
 		this.is_private = null;
+		this.brand_color = null;
+		this.brand_color_accent = null;
 		
 		if (data) {
 			setData(this, data);
@@ -103,6 +107,7 @@ OrganizationModel = extending(OneEntity, (function() {
 	 * @returns {OrganizationModel}
 	 */
 	OrganizationModel.prototype.setData = function(data) {
+		
 		return setData(this, data);
 	};
 	/**
@@ -110,6 +115,7 @@ OrganizationModel = extending(OneEntity, (function() {
 	 * @returns {string}
 	 */
 	OrganizationModel.prototype.toString = function() {
+		
 		return JSON.stringify(this);
 	};
 	

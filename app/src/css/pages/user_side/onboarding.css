@@ -7,7 +7,6 @@
 	margin: 0;
 	text-align: center;
 	background-color: #3e4d66;
-	background-color: var(--color_primary);
 	z-index: 200;
 }
 
@@ -24,7 +23,6 @@
 	width: 360px;
 	height: 526px;
 	background-color: #f9f9fa;
-	background-color: var(--color_background_gray);
 	border-radius: 4px;
 }
 
@@ -40,14 +38,12 @@
 	font-size: 24px;
 	font-weight: 500;
 	color: #4a4a4a;
-	color: var(--color_text);
 	line-height: 32px;
 }
 
 .text_onboarding {
 	font-size: .88em;
 	color: #4a4a4a;
-	color: var(--color_text);
 	line-height:20px;
 }
 
@@ -105,13 +101,11 @@
 	width: 32px;
 	border-radius: 50%;
 	background-color: #c5c9d1;
-	background-color: var(--color_primary_30);
 	border: none;
 }
 .recommendations_item_onboarding_inside.-active .check_box_img_onboarding {
 	color: #fff;
 	background-color: #f82969;
-	background-color: var(--color_bubblegum);
 }
 .recommendations_item_onboarding_inside.-active .fa-plus:before {content: "\f00c"}
 
@@ -133,3 +127,13 @@
 }
 
 /* /bot_part */
+
+@supports (--custom_properties: 1) {
+	.-state_onboarding_page #main_section .page_wrapper {background-color: var(--color_primary)}
+	.page_onboarding {background-color: var(--color_background_gray)}
+	.header_text_onboarding {color: var(--color_text)}
+
+	.text_onboarding {color: var(--color_text)}
+	.check_box_img_onboarding {background-color: var(--color_primary_30);}
+	.recommendations_item_onboarding_inside.-active .check_box_img_onboarding {background-color: var(--color_bubblegum)}
+}

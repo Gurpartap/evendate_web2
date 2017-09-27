@@ -65406,6 +65406,16 @@ module.exports = Fuse;
     }(Highcharts));
 }));
 
+/*!
+ * Cropper v2.3.4
+ * https://github.com/fengyuanchen/cropper
+ *
+ * Copyright (c) 2014-2016 Fengyuan Chen and contributors
+ * Released under the MIT license
+ *
+ * Date: 2016-09-03T05:50:45.412Z
+ */
+!function(t){"function"==typeof define&&define.amd?define(["jquery"],t):t("object"==typeof exports?require("jquery"):jQuery)}(function(t){"use strict";function i(t){return"number"==typeof t&&!isNaN(t)}function e(t){return"undefined"==typeof t}function s(t,e){var s=[];return i(e)&&s.push(e),s.slice.apply(t,s)}function a(t,i){var e=s(arguments,2);return function(){return t.apply(i,e.concat(s(arguments)))}}function o(t){var i=t.match(/^(https?:)\/\/([^\:\/\?#]+):?(\d*)/i);return i&&(i[1]!==C.protocol||i[2]!==C.hostname||i[3]!==C.port)}function h(t){var i="timestamp="+(new Date).getTime();return t+(t.indexOf("?")===-1?"?":"&")+i}function n(t){return t?' crossOrigin="'+t+'"':""}function r(t,i){var e;return t.naturalWidth&&!mt?i(t.naturalWidth,t.naturalHeight):(e=document.createElement("img"),e.onload=function(){i(this.width,this.height)},void(e.src=t.src))}function p(t){var e=[],s=t.rotate,a=t.scaleX,o=t.scaleY;return i(s)&&0!==s&&e.push("rotate("+s+"deg)"),i(a)&&1!==a&&e.push("scaleX("+a+")"),i(o)&&1!==o&&e.push("scaleY("+o+")"),e.length?e.join(" "):"none"}function l(t,i){var e,s,a=Ct(t.degree)%180,o=(a>90?180-a:a)*Math.PI/180,h=bt(o),n=Bt(o),r=t.width,p=t.height,l=t.aspectRatio;return i?(e=r/(n+h/l),s=e/l):(e=r*n+p*h,s=r*h+p*n),{width:e,height:s}}function c(e,s){var a,o,h,n=t("<canvas>")[0],r=n.getContext("2d"),p=0,c=0,d=s.naturalWidth,g=s.naturalHeight,u=s.rotate,f=s.scaleX,m=s.scaleY,v=i(f)&&i(m)&&(1!==f||1!==m),w=i(u)&&0!==u,x=w||v,C=d*Ct(f||1),b=g*Ct(m||1);return v&&(a=C/2,o=b/2),w&&(h=l({width:C,height:b,degree:u}),C=h.width,b=h.height,a=C/2,o=b/2),n.width=C,n.height=b,x&&(p=-d/2,c=-g/2,r.save(),r.translate(a,o)),w&&r.rotate(u*Math.PI/180),v&&r.scale(f,m),r.drawImage(e,$t(p),$t(c),$t(d),$t(g)),x&&r.restore(),n}function d(i){var e=i.length,s=0,a=0;return e&&(t.each(i,function(t,i){s+=i.pageX,a+=i.pageY}),s/=e,a/=e),{pageX:s,pageY:a}}function g(t,i,e){var s,a="";for(s=i,e+=i;s<e;s++)a+=Lt(t.getUint8(s));return a}function u(t){var i,e,s,a,o,h,n,r,p,l,c=new D(t),d=c.byteLength;if(255===c.getUint8(0)&&216===c.getUint8(1))for(p=2;p<d;){if(255===c.getUint8(p)&&225===c.getUint8(p+1)){n=p;break}p++}if(n&&(e=n+4,s=n+10,"Exif"===g(c,e,4)&&(h=c.getUint16(s),o=18761===h,(o||19789===h)&&42===c.getUint16(s+2,o)&&(a=c.getUint32(s+4,o),a>=8&&(r=s+a)))),r)for(d=c.getUint16(r,o),l=0;l<d;l++)if(p=r+12*l+2,274===c.getUint16(p,o)){p+=8,i=c.getUint16(p,o),mt&&c.setUint16(p,1,o);break}return i}function f(t){var i,e=t.replace(G,""),s=atob(e),a=s.length,o=new B(a),h=new y(o);for(i=0;i<a;i++)h[i]=s.charCodeAt(i);return o}function m(t){var i,e=new y(t),s=e.length,a="";for(i=0;i<s;i++)a+=Lt(e[i]);return"data:image/jpeg;base64,"+$(a)}function v(i,e){this.$element=t(i),this.options=t.extend({},v.DEFAULTS,t.isPlainObject(e)&&e),this.isLoaded=!1,this.isBuilt=!1,this.isCompleted=!1,this.isRotated=!1,this.isCropped=!1,this.isDisabled=!1,this.isReplaced=!1,this.isLimited=!1,this.wheeling=!1,this.isImg=!1,this.originalUrl="",this.canvas=null,this.cropBox=null,this.init()}var w=t(window),x=t(document),C=window.location,b=window.navigator,B=window.ArrayBuffer,y=window.Uint8Array,D=window.DataView,$=window.btoa,L="cropper",T="cropper-modal",X="cropper-hide",Y="cropper-hidden",k="cropper-invisible",M="cropper-move",W="cropper-crop",H="cropper-disabled",R="cropper-bg",z="mousedown touchstart pointerdown MSPointerDown",O="mousemove touchmove pointermove MSPointerMove",P="mouseup touchend touchcancel pointerup pointercancel MSPointerUp MSPointerCancel",E="wheel mousewheel DOMMouseScroll",U="dblclick",I="load."+L,F="error."+L,j="resize."+L,A="build."+L,S="built."+L,N="cropstart."+L,_="cropmove."+L,q="cropend."+L,K="crop."+L,Z="zoom."+L,Q=/^(e|w|s|n|se|sw|ne|nw|all|crop|move|zoom)$/,V=/^data:/,G=/^data:([^;]+);base64,/,J=/^data:image\/jpeg.*;base64,/,tt="preview",it="action",et="e",st="w",at="s",ot="n",ht="se",nt="sw",rt="ne",pt="nw",lt="all",ct="crop",dt="move",gt="zoom",ut="none",ft=t.isFunction(t("<canvas>")[0].getContext),mt=b&&/(Macintosh|iPhone|iPod|iPad).*AppleWebKit/i.test(b.userAgent),vt=Number,wt=Math.min,xt=Math.max,Ct=Math.abs,bt=Math.sin,Bt=Math.cos,yt=Math.sqrt,Dt=Math.round,$t=Math.floor,Lt=String.fromCharCode;v.prototype={constructor:v,init:function(){var t,i=this.$element;if(i.is("img")){if(this.isImg=!0,this.originalUrl=t=i.attr("src"),!t)return;t=i.prop("src")}else i.is("canvas")&&ft&&(t=i[0].toDataURL());this.load(t)},trigger:function(i,e){var s=t.Event(i,e);return this.$element.trigger(s),s},load:function(i){var e,s,a=this.options,n=this.$element;if(i&&(n.one(A,a.build),!this.trigger(A).isDefaultPrevented())){if(this.url=i,this.image={},!a.checkOrientation||!B)return this.clone();if(e=t.proxy(this.read,this),V.test(i))return J.test(i)?e(f(i)):this.clone();s=new XMLHttpRequest,s.onerror=s.onabort=t.proxy(function(){this.clone()},this),s.onload=function(){e(this.response)},a.checkCrossOrigin&&o(i)&&n.prop("crossOrigin")&&(i=h(i)),s.open("get",i),s.responseType="arraybuffer",s.send()}},read:function(t){var i=this.options,e=u(t),s=this.image,a=0,o=1,h=1;if(e>1)switch(this.url=m(t),e){case 2:o=-1;break;case 3:a=-180;break;case 4:h=-1;break;case 5:a=90,h=-1;break;case 6:a=90;break;case 7:a=90,o=-1;break;case 8:a=-90}i.rotatable&&(s.rotate=a),i.scalable&&(s.scaleX=o,s.scaleY=h),this.clone()},clone:function(){var i,e,s=this.options,a=this.$element,r=this.url,p="";s.checkCrossOrigin&&o(r)&&(p=a.prop("crossOrigin"),p?i=r:(p="anonymous",i=h(r))),this.crossOrigin=p,this.crossOriginUrl=i,this.$clone=e=t("<img"+n(p)+' src="'+(i||r)+'">'),this.isImg?a[0].complete?this.start():a.one(I,t.proxy(this.start,this)):e.one(I,t.proxy(this.start,this)).one(F,t.proxy(this.stop,this)).addClass(X).insertAfter(a)},start:function(){var i=this.$element,e=this.$clone;this.isImg||(e.off(F,this.stop),i=e),r(i[0],t.proxy(function(i,e){t.extend(this.image,{naturalWidth:i,naturalHeight:e,aspectRatio:i/e}),this.isLoaded=!0,this.build()},this))},stop:function(){this.$clone.remove(),this.$clone=null},build:function(){var i,e,s,a=this.options,o=this.$element,h=this.$clone;this.isLoaded&&(this.isBuilt&&this.unbuild(),this.$container=o.parent(),this.$cropper=i=t(v.TEMPLATE),this.$canvas=i.find(".cropper-canvas").append(h),this.$dragBox=i.find(".cropper-drag-box"),this.$cropBox=e=i.find(".cropper-crop-box"),this.$viewBox=i.find(".cropper-view-box"),this.$face=s=e.find(".cropper-face"),o.addClass(Y).after(i),this.isImg||h.removeClass(X),this.initPreview(),this.bind(),a.aspectRatio=xt(0,a.aspectRatio)||NaN,a.viewMode=xt(0,wt(3,Dt(a.viewMode)))||0,a.autoCrop?(this.isCropped=!0,a.modal&&this.$dragBox.addClass(T)):e.addClass(Y),a.guides||e.find(".cropper-dashed").addClass(Y),a.center||e.find(".cropper-center").addClass(Y),a.cropBoxMovable&&s.addClass(M).data(it,lt),a.highlight||s.addClass(k),a.background&&i.addClass(R),a.cropBoxResizable||e.find(".cropper-line, .cropper-point").addClass(Y),this.setDragMode(a.dragMode),this.render(),this.isBuilt=!0,this.setData(a.data),o.one(S,a.built),this.completing=setTimeout(t.proxy(function(){this.trigger(S),this.trigger(K,this.getData()),this.isCompleted=!0},this),0))},unbuild:function(){this.isBuilt&&(this.isCompleted||clearTimeout(this.completing),this.isBuilt=!1,this.isCompleted=!1,this.initialImage=null,this.initialCanvas=null,this.initialCropBox=null,this.container=null,this.canvas=null,this.cropBox=null,this.unbind(),this.resetPreview(),this.$preview=null,this.$viewBox=null,this.$cropBox=null,this.$dragBox=null,this.$canvas=null,this.$container=null,this.$cropper.remove(),this.$cropper=null)},render:function(){this.initContainer(),this.initCanvas(),this.initCropBox(),this.renderCanvas(),this.isCropped&&this.renderCropBox()},initContainer:function(){var t=this.options,i=this.$element,e=this.$container,s=this.$cropper;s.addClass(Y),i.removeClass(Y),s.css(this.container={width:xt(e.width(),vt(t.minContainerWidth)||200),height:xt(e.height(),vt(t.minContainerHeight)||100)}),i.addClass(Y),s.removeClass(Y)},initCanvas:function(){var i,e=this.options.viewMode,s=this.container,a=s.width,o=s.height,h=this.image,n=h.naturalWidth,r=h.naturalHeight,p=90===Ct(h.rotate),l=p?r:n,c=p?n:r,d=l/c,g=a,u=o;o*d>a?3===e?g=o*d:u=a/d:3===e?u=a/d:g=o*d,i={naturalWidth:l,naturalHeight:c,aspectRatio:d,width:g,height:u},i.oldLeft=i.left=(a-g)/2,i.oldTop=i.top=(o-u)/2,this.canvas=i,this.isLimited=1===e||2===e,this.limitCanvas(!0,!0),this.initialImage=t.extend({},h),this.initialCanvas=t.extend({},i)},limitCanvas:function(t,i){var e,s,a,o,h=this.options,n=h.viewMode,r=this.container,p=r.width,l=r.height,c=this.canvas,d=c.aspectRatio,g=this.cropBox,u=this.isCropped&&g;t&&(e=vt(h.minCanvasWidth)||0,s=vt(h.minCanvasHeight)||0,n&&(n>1?(e=xt(e,p),s=xt(s,l),3===n&&(s*d>e?e=s*d:s=e/d)):e?e=xt(e,u?g.width:0):s?s=xt(s,u?g.height:0):u&&(e=g.width,s=g.height,s*d>e?e=s*d:s=e/d)),e&&s?s*d>e?s=e/d:e=s*d:e?s=e/d:s&&(e=s*d),c.minWidth=e,c.minHeight=s,c.maxWidth=1/0,c.maxHeight=1/0),i&&(n?(a=p-c.width,o=l-c.height,c.minLeft=wt(0,a),c.minTop=wt(0,o),c.maxLeft=xt(0,a),c.maxTop=xt(0,o),u&&this.isLimited&&(c.minLeft=wt(g.left,g.left+g.width-c.width),c.minTop=wt(g.top,g.top+g.height-c.height),c.maxLeft=g.left,c.maxTop=g.top,2===n&&(c.width>=p&&(c.minLeft=wt(0,a),c.maxLeft=xt(0,a)),c.height>=l&&(c.minTop=wt(0,o),c.maxTop=xt(0,o))))):(c.minLeft=-c.width,c.minTop=-c.height,c.maxLeft=p,c.maxTop=l))},renderCanvas:function(t){var i,e,s=this.canvas,a=this.image,o=a.rotate,h=a.naturalWidth,n=a.naturalHeight;this.isRotated&&(this.isRotated=!1,e=l({width:a.width,height:a.height,degree:o}),i=e.width/e.height,i!==s.aspectRatio&&(s.left-=(e.width-s.width)/2,s.top-=(e.height-s.height)/2,s.width=e.width,s.height=e.height,s.aspectRatio=i,s.naturalWidth=h,s.naturalHeight=n,o%180&&(e=l({width:h,height:n,degree:o}),s.naturalWidth=e.width,s.naturalHeight=e.height),this.limitCanvas(!0,!1))),(s.width>s.maxWidth||s.width<s.minWidth)&&(s.left=s.oldLeft),(s.height>s.maxHeight||s.height<s.minHeight)&&(s.top=s.oldTop),s.width=wt(xt(s.width,s.minWidth),s.maxWidth),s.height=wt(xt(s.height,s.minHeight),s.maxHeight),this.limitCanvas(!1,!0),s.oldLeft=s.left=wt(xt(s.left,s.minLeft),s.maxLeft),s.oldTop=s.top=wt(xt(s.top,s.minTop),s.maxTop),this.$canvas.css({width:s.width,height:s.height,left:s.left,top:s.top}),this.renderImage(),this.isCropped&&this.isLimited&&this.limitCropBox(!0,!0),t&&this.output()},renderImage:function(i){var e,s=this.canvas,a=this.image;a.rotate&&(e=l({width:s.width,height:s.height,degree:a.rotate,aspectRatio:a.aspectRatio},!0)),t.extend(a,e?{width:e.width,height:e.height,left:(s.width-e.width)/2,top:(s.height-e.height)/2}:{width:s.width,height:s.height,left:0,top:0}),this.$clone.css({width:a.width,height:a.height,marginLeft:a.left,marginTop:a.top,transform:p(a)}),i&&this.output()},initCropBox:function(){var i=this.options,e=this.canvas,s=i.aspectRatio,a=vt(i.autoCropArea)||.8,o={width:e.width,height:e.height};s&&(e.height*s>e.width?o.height=o.width/s:o.width=o.height*s),this.cropBox=o,this.limitCropBox(!0,!0),o.width=wt(xt(o.width,o.minWidth),o.maxWidth),o.height=wt(xt(o.height,o.minHeight),o.maxHeight),o.width=xt(o.minWidth,o.width*a),o.height=xt(o.minHeight,o.height*a),o.oldLeft=o.left=e.left+(e.width-o.width)/2,o.oldTop=o.top=e.top+(e.height-o.height)/2,this.initialCropBox=t.extend({},o)},limitCropBox:function(t,i){var e,s,a,o,h=this.options,n=h.aspectRatio,r=this.container,p=r.width,l=r.height,c=this.canvas,d=this.cropBox,g=this.isLimited;t&&(e=vt(h.minCropBoxWidth)||0,s=vt(h.minCropBoxHeight)||0,e=wt(e,p),s=wt(s,l),a=wt(p,g?c.width:p),o=wt(l,g?c.height:l),n&&(e&&s?s*n>e?s=e/n:e=s*n:e?s=e/n:s&&(e=s*n),o*n>a?o=a/n:a=o*n),d.minWidth=wt(e,a),d.minHeight=wt(s,o),d.maxWidth=a,d.maxHeight=o),i&&(g?(d.minLeft=xt(0,c.left),d.minTop=xt(0,c.top),d.maxLeft=wt(p,c.left+c.width)-d.width,d.maxTop=wt(l,c.top+c.height)-d.height):(d.minLeft=0,d.minTop=0,d.maxLeft=p-d.width,d.maxTop=l-d.height))},renderCropBox:function(){var t=this.options,i=this.container,e=i.width,s=i.height,a=this.cropBox;(a.width>a.maxWidth||a.width<a.minWidth)&&(a.left=a.oldLeft),(a.height>a.maxHeight||a.height<a.minHeight)&&(a.top=a.oldTop),a.width=wt(xt(a.width,a.minWidth),a.maxWidth),a.height=wt(xt(a.height,a.minHeight),a.maxHeight),this.limitCropBox(!1,!0),a.oldLeft=a.left=wt(xt(a.left,a.minLeft),a.maxLeft),a.oldTop=a.top=wt(xt(a.top,a.minTop),a.maxTop),t.movable&&t.cropBoxMovable&&this.$face.data(it,a.width===e&&a.height===s?dt:lt),this.$cropBox.css({width:a.width,height:a.height,left:a.left,top:a.top}),this.isCropped&&this.isLimited&&this.limitCanvas(!0,!0),this.isDisabled||this.output()},output:function(){this.preview(),this.isCompleted&&this.trigger(K,this.getData())},initPreview:function(){var i,e=n(this.crossOrigin),s=e?this.crossOriginUrl:this.url;this.$preview=t(this.options.preview),this.$clone2=i=t("<img"+e+' src="'+s+'">'),this.$viewBox.html(i),this.$preview.each(function(){var i=t(this);i.data(tt,{width:i.width(),height:i.height(),html:i.html()}),i.html("<img"+e+' src="'+s+'" style="display:block;width:100%;height:auto;min-width:0!important;min-height:0!important;max-width:none!important;max-height:none!important;image-orientation:0deg!important;">')})},resetPreview:function(){this.$preview.each(function(){var i=t(this),e=i.data(tt);i.css({width:e.width,height:e.height}).html(e.html).removeData(tt)})},preview:function(){var i=this.image,e=this.canvas,s=this.cropBox,a=s.width,o=s.height,h=i.width,n=i.height,r=s.left-e.left-i.left,l=s.top-e.top-i.top;this.isCropped&&!this.isDisabled&&(this.$clone2.css({width:h,height:n,marginLeft:-r,marginTop:-l,transform:p(i)}),this.$preview.each(function(){var e=t(this),s=e.data(tt),c=s.width,d=s.height,g=c,u=d,f=1;a&&(f=c/a,u=o*f),o&&u>d&&(f=d/o,g=a*f,u=d),e.css({width:g,height:u}).find("img").css({width:h*f,height:n*f,marginLeft:-r*f,marginTop:-l*f,transform:p(i)})}))},bind:function(){var i=this.options,e=this.$element,s=this.$cropper;t.isFunction(i.cropstart)&&e.on(N,i.cropstart),t.isFunction(i.cropmove)&&e.on(_,i.cropmove),t.isFunction(i.cropend)&&e.on(q,i.cropend),t.isFunction(i.crop)&&e.on(K,i.crop),t.isFunction(i.zoom)&&e.on(Z,i.zoom),s.on(z,t.proxy(this.cropStart,this)),i.zoomable&&i.zoomOnWheel&&s.on(E,t.proxy(this.wheel,this)),i.toggleDragModeOnDblclick&&s.on(U,t.proxy(this.dblclick,this)),x.on(O,this._cropMove=a(this.cropMove,this)).on(P,this._cropEnd=a(this.cropEnd,this)),i.responsive&&w.on(j,this._resize=a(this.resize,this))},unbind:function(){var i=this.options,e=this.$element,s=this.$cropper;t.isFunction(i.cropstart)&&e.off(N,i.cropstart),t.isFunction(i.cropmove)&&e.off(_,i.cropmove),t.isFunction(i.cropend)&&e.off(q,i.cropend),t.isFunction(i.crop)&&e.off(K,i.crop),t.isFunction(i.zoom)&&e.off(Z,i.zoom),s.off(z,this.cropStart),i.zoomable&&i.zoomOnWheel&&s.off(E,this.wheel),i.toggleDragModeOnDblclick&&s.off(U,this.dblclick),x.off(O,this._cropMove).off(P,this._cropEnd),i.responsive&&w.off(j,this._resize)},resize:function(){var i,e,s,a=this.options.restore,o=this.$container,h=this.container;!this.isDisabled&&h&&(s=o.width()/h.width,1===s&&o.height()===h.height||(a&&(i=this.getCanvasData(),e=this.getCropBoxData()),this.render(),a&&(this.setCanvasData(t.each(i,function(t,e){i[t]=e*s})),this.setCropBoxData(t.each(e,function(t,i){e[t]=i*s})))))},dblclick:function(){this.isDisabled||(this.$dragBox.hasClass(W)?this.setDragMode(dt):this.setDragMode(ct))},wheel:function(i){var e=i.originalEvent||i,s=vt(this.options.wheelZoomRatio)||.1,a=1;this.isDisabled||(i.preventDefault(),this.wheeling||(this.wheeling=!0,setTimeout(t.proxy(function(){this.wheeling=!1},this),50),e.deltaY?a=e.deltaY>0?1:-1:e.wheelDelta?a=-e.wheelDelta/120:e.detail&&(a=e.detail>0?1:-1),this.zoom(-a*s,i)))},cropStart:function(i){var e,s,a=this.options,o=i.originalEvent,h=o&&o.touches,n=i;if(!this.isDisabled){if(h){if(e=h.length,e>1){if(!a.zoomable||!a.zoomOnTouch||2!==e)return;n=h[1],this.startX2=n.pageX,this.startY2=n.pageY,s=gt}n=h[0]}if(s=s||t(n.target).data(it),Q.test(s)){if(this.trigger(N,{originalEvent:o,action:s}).isDefaultPrevented())return;i.preventDefault(),this.action=s,this.cropping=!1,this.startX=n.pageX||o&&o.pageX,this.startY=n.pageY||o&&o.pageY,s===ct&&(this.cropping=!0,this.$dragBox.addClass(T))}}},cropMove:function(t){var i,e=this.options,s=t.originalEvent,a=s&&s.touches,o=t,h=this.action;if(!this.isDisabled){if(a){if(i=a.length,i>1){if(!e.zoomable||!e.zoomOnTouch||2!==i)return;o=a[1],this.endX2=o.pageX,this.endY2=o.pageY}o=a[0]}if(h){if(this.trigger(_,{originalEvent:s,action:h}).isDefaultPrevented())return;t.preventDefault(),this.endX=o.pageX||s&&s.pageX,this.endY=o.pageY||s&&s.pageY,this.change(o.shiftKey,h===gt?t:null)}}},cropEnd:function(t){var i=t.originalEvent,e=this.action;this.isDisabled||e&&(t.preventDefault(),this.cropping&&(this.cropping=!1,this.$dragBox.toggleClass(T,this.isCropped&&this.options.modal)),this.action="",this.trigger(q,{originalEvent:i,action:e}))},change:function(t,i){var e,s,a=this.options,o=a.aspectRatio,h=this.action,n=this.container,r=this.canvas,p=this.cropBox,l=p.width,c=p.height,d=p.left,g=p.top,u=d+l,f=g+c,m=0,v=0,w=n.width,x=n.height,C=!0;switch(!o&&t&&(o=l&&c?l/c:1),this.isLimited&&(m=p.minLeft,v=p.minTop,w=m+wt(n.width,r.width,r.left+r.width),x=v+wt(n.height,r.height,r.top+r.height)),s={x:this.endX-this.startX,y:this.endY-this.startY},o&&(s.X=s.y*o,s.Y=s.x/o),h){case lt:d+=s.x,g+=s.y;break;case et:if(s.x>=0&&(u>=w||o&&(g<=v||f>=x))){C=!1;break}l+=s.x,o&&(c=l/o,g-=s.Y/2),l<0&&(h=st,l=0);break;case ot:if(s.y<=0&&(g<=v||o&&(d<=m||u>=w))){C=!1;break}c-=s.y,g+=s.y,o&&(l=c*o,d+=s.X/2),c<0&&(h=at,c=0);break;case st:if(s.x<=0&&(d<=m||o&&(g<=v||f>=x))){C=!1;break}l-=s.x,d+=s.x,o&&(c=l/o,g+=s.Y/2),l<0&&(h=et,l=0);break;case at:if(s.y>=0&&(f>=x||o&&(d<=m||u>=w))){C=!1;break}c+=s.y,o&&(l=c*o,d-=s.X/2),c<0&&(h=ot,c=0);break;case rt:if(o){if(s.y<=0&&(g<=v||u>=w)){C=!1;break}c-=s.y,g+=s.y,l=c*o}else s.x>=0?u<w?l+=s.x:s.y<=0&&g<=v&&(C=!1):l+=s.x,s.y<=0?g>v&&(c-=s.y,g+=s.y):(c-=s.y,g+=s.y);l<0&&c<0?(h=nt,c=0,l=0):l<0?(h=pt,l=0):c<0&&(h=ht,c=0);break;case pt:if(o){if(s.y<=0&&(g<=v||d<=m)){C=!1;break}c-=s.y,g+=s.y,l=c*o,d+=s.X}else s.x<=0?d>m?(l-=s.x,d+=s.x):s.y<=0&&g<=v&&(C=!1):(l-=s.x,d+=s.x),s.y<=0?g>v&&(c-=s.y,g+=s.y):(c-=s.y,g+=s.y);l<0&&c<0?(h=ht,c=0,l=0):l<0?(h=rt,l=0):c<0&&(h=nt,c=0);break;case nt:if(o){if(s.x<=0&&(d<=m||f>=x)){C=!1;break}l-=s.x,d+=s.x,c=l/o}else s.x<=0?d>m?(l-=s.x,d+=s.x):s.y>=0&&f>=x&&(C=!1):(l-=s.x,d+=s.x),s.y>=0?f<x&&(c+=s.y):c+=s.y;l<0&&c<0?(h=rt,c=0,l=0):l<0?(h=ht,l=0):c<0&&(h=pt,c=0);break;case ht:if(o){if(s.x>=0&&(u>=w||f>=x)){C=!1;break}l+=s.x,c=l/o}else s.x>=0?u<w?l+=s.x:s.y>=0&&f>=x&&(C=!1):l+=s.x,s.y>=0?f<x&&(c+=s.y):c+=s.y;l<0&&c<0?(h=pt,c=0,l=0):l<0?(h=nt,l=0):c<0&&(h=rt,c=0);break;case dt:this.move(s.x,s.y),C=!1;break;case gt:this.zoom(function(t,i,e,s){var a=yt(t*t+i*i),o=yt(e*e+s*s);return(o-a)/a}(Ct(this.startX-this.startX2),Ct(this.startY-this.startY2),Ct(this.endX-this.endX2),Ct(this.endY-this.endY2)),i),this.startX2=this.endX2,this.startY2=this.endY2,C=!1;break;case ct:if(!s.x||!s.y){C=!1;break}e=this.$cropper.offset(),d=this.startX-e.left,g=this.startY-e.top,l=p.minWidth,c=p.minHeight,s.x>0?h=s.y>0?ht:rt:s.x<0&&(d-=l,h=s.y>0?nt:pt),s.y<0&&(g-=c),this.isCropped||(this.$cropBox.removeClass(Y),this.isCropped=!0,this.isLimited&&this.limitCropBox(!0,!0))}C&&(p.width=l,p.height=c,p.left=d,p.top=g,this.action=h,this.renderCropBox()),this.startX=this.endX,this.startY=this.endY},crop:function(){this.isBuilt&&!this.isDisabled&&(this.isCropped||(this.isCropped=!0,this.limitCropBox(!0,!0),this.options.modal&&this.$dragBox.addClass(T),this.$cropBox.removeClass(Y)),this.setCropBoxData(this.initialCropBox))},reset:function(){this.isBuilt&&!this.isDisabled&&(this.image=t.extend({},this.initialImage),this.canvas=t.extend({},this.initialCanvas),this.cropBox=t.extend({},this.initialCropBox),this.renderCanvas(),this.isCropped&&this.renderCropBox())},clear:function(){this.isCropped&&!this.isDisabled&&(t.extend(this.cropBox,{left:0,top:0,width:0,height:0}),this.isCropped=!1,this.renderCropBox(),this.limitCanvas(!0,!0),this.renderCanvas(),this.$dragBox.removeClass(T),this.$cropBox.addClass(Y))},replace:function(t,i){!this.isDisabled&&t&&(this.isImg&&this.$element.attr("src",t),i?(this.url=t,this.$clone.attr("src",t),this.isBuilt&&this.$preview.find("img").add(this.$clone2).attr("src",t)):(this.isImg&&(this.isReplaced=!0),this.options.data=null,this.load(t)))},enable:function(){this.isBuilt&&(this.isDisabled=!1,this.$cropper.removeClass(H))},disable:function(){this.isBuilt&&(this.isDisabled=!0,this.$cropper.addClass(H))},destroy:function(){var t=this.$element;this.isLoaded?(this.isImg&&this.isReplaced&&t.attr("src",this.originalUrl),this.unbuild(),t.removeClass(Y)):this.isImg?t.off(I,this.start):this.$clone&&this.$clone.remove(),t.removeData(L)},move:function(t,i){var s=this.canvas;this.moveTo(e(t)?t:s.left+vt(t),e(i)?i:s.top+vt(i))},moveTo:function(t,s){var a=this.canvas,o=!1;e(s)&&(s=t),t=vt(t),s=vt(s),this.isBuilt&&!this.isDisabled&&this.options.movable&&(i(t)&&(a.left=t,o=!0),i(s)&&(a.top=s,o=!0),o&&this.renderCanvas(!0))},zoom:function(t,i){var e=this.canvas;t=vt(t),t=t<0?1/(1-t):1+t,this.zoomTo(e.width*t/e.naturalWidth,i)},zoomTo:function(t,i){var e,s,a,o,h,n=this.options,r=this.canvas,p=r.width,l=r.height,c=r.naturalWidth,g=r.naturalHeight;if(t=vt(t),t>=0&&this.isBuilt&&!this.isDisabled&&n.zoomable){if(s=c*t,a=g*t,i&&(e=i.originalEvent),this.trigger(Z,{originalEvent:e,oldRatio:p/c,ratio:s/c}).isDefaultPrevented())return;e?(o=this.$cropper.offset(),h=e.touches?d(e.touches):{pageX:i.pageX||e.pageX||0,pageY:i.pageY||e.pageY||0},r.left-=(s-p)*((h.pageX-o.left-r.left)/p),r.top-=(a-l)*((h.pageY-o.top-r.top)/l)):(r.left-=(s-p)/2,r.top-=(a-l)/2),r.width=s,r.height=a,this.renderCanvas(!0)}},rotate:function(t){this.rotateTo((this.image.rotate||0)+vt(t))},rotateTo:function(t){t=vt(t),i(t)&&this.isBuilt&&!this.isDisabled&&this.options.rotatable&&(this.image.rotate=t%360,this.isRotated=!0,this.renderCanvas(!0))},scale:function(t,s){var a=this.image,o=!1;e(s)&&(s=t),t=vt(t),s=vt(s),this.isBuilt&&!this.isDisabled&&this.options.scalable&&(i(t)&&(a.scaleX=t,o=!0),i(s)&&(a.scaleY=s,o=!0),o&&this.renderImage(!0))},scaleX:function(t){var e=this.image.scaleY;this.scale(t,i(e)?e:1)},scaleY:function(t){var e=this.image.scaleX;this.scale(i(e)?e:1,t)},getData:function(i){var e,s,a=this.options,o=this.image,h=this.canvas,n=this.cropBox;return this.isBuilt&&this.isCropped?(s={x:n.left-h.left,y:n.top-h.top,width:n.width,height:n.height},e=o.width/o.naturalWidth,t.each(s,function(t,a){a/=e,s[t]=i?Dt(a):a})):s={x:0,y:0,width:0,height:0},a.rotatable&&(s.rotate=o.rotate||0),a.scalable&&(s.scaleX=o.scaleX||1,s.scaleY=o.scaleY||1),s},setData:function(e){var s,a,o,h=this.options,n=this.image,r=this.canvas,p={};t.isFunction(e)&&(e=e.call(this.element)),this.isBuilt&&!this.isDisabled&&t.isPlainObject(e)&&(h.rotatable&&i(e.rotate)&&e.rotate!==n.rotate&&(n.rotate=e.rotate,this.isRotated=s=!0),h.scalable&&(i(e.scaleX)&&e.scaleX!==n.scaleX&&(n.scaleX=e.scaleX,a=!0),i(e.scaleY)&&e.scaleY!==n.scaleY&&(n.scaleY=e.scaleY,a=!0)),s?this.renderCanvas():a&&this.renderImage(),o=n.width/n.naturalWidth,i(e.x)&&(p.left=e.x*o+r.left),i(e.y)&&(p.top=e.y*o+r.top),i(e.width)&&(p.width=e.width*o),i(e.height)&&(p.height=e.height*o),this.setCropBoxData(p))},getContainerData:function(){return this.isBuilt?this.container:{}},getImageData:function(){return this.isLoaded?this.image:{}},getCanvasData:function(){var i=this.canvas,e={};return this.isBuilt&&t.each(["left","top","width","height","naturalWidth","naturalHeight"],function(t,s){e[s]=i[s]}),e},setCanvasData:function(e){var s=this.canvas,a=s.aspectRatio;t.isFunction(e)&&(e=e.call(this.$element)),this.isBuilt&&!this.isDisabled&&t.isPlainObject(e)&&(i(e.left)&&(s.left=e.left),i(e.top)&&(s.top=e.top),i(e.width)?(s.width=e.width,s.height=e.width/a):i(e.height)&&(s.height=e.height,s.width=e.height*a),this.renderCanvas(!0))},getCropBoxData:function(){var t,i=this.cropBox;return this.isBuilt&&this.isCropped&&(t={left:i.left,top:i.top,width:i.width,height:i.height}),t||{}},setCropBoxData:function(e){var s,a,o=this.cropBox,h=this.options.aspectRatio;t.isFunction(e)&&(e=e.call(this.$element)),this.isBuilt&&this.isCropped&&!this.isDisabled&&t.isPlainObject(e)&&(i(e.left)&&(o.left=e.left),i(e.top)&&(o.top=e.top),i(e.width)&&(s=!0,o.width=e.width),i(e.height)&&(a=!0,o.height=e.height),h&&(s?o.height=o.width/h:a&&(o.width=o.height*h)),this.renderCropBox())},getCroppedCanvas:function(i){var e,s,a,o,h,n,r,p,l,d,g;if(this.isBuilt&&ft)return this.isCropped?(t.isPlainObject(i)||(i={}),g=this.getData(),e=g.width,s=g.height,p=e/s,t.isPlainObject(i)&&(h=i.width,n=i.height,h?(n=h/p,r=h/e):n&&(h=n*p,r=n/s)),a=$t(h||e),o=$t(n||s),l=t("<canvas>")[0],l.width=a,l.height=o,d=l.getContext("2d"),i.fillColor&&(d.fillStyle=i.fillColor,d.fillRect(0,0,a,o)),d.drawImage.apply(d,function(){var t,i,a,o,h,n,p=c(this.$clone[0],this.image),l=p.width,d=p.height,u=this.canvas,f=[p],m=g.x+u.naturalWidth*(Ct(g.scaleX||1)-1)/2,v=g.y+u.naturalHeight*(Ct(g.scaleY||1)-1)/2;return m<=-e||m>l?m=t=a=h=0:m<=0?(a=-m,m=0,t=h=wt(l,e+m)):m<=l&&(a=0,t=h=wt(e,l-m)),t<=0||v<=-s||v>d?v=i=o=n=0:v<=0?(o=-v,v=0,i=n=wt(d,s+v)):v<=d&&(o=0,i=n=wt(s,d-v)),f.push($t(m),$t(v),$t(t),$t(i)),r&&(a*=r,o*=r,h*=r,n*=r),h>0&&n>0&&f.push($t(a),$t(o),$t(h),$t(n)),f}.call(this)),l):c(this.$clone[0],this.image)},setAspectRatio:function(t){var i=this.options;this.isDisabled||e(t)||(i.aspectRatio=xt(0,t)||NaN,this.isBuilt&&(this.initCropBox(),this.isCropped&&this.renderCropBox()))},setDragMode:function(t){var i,e,s=this.options;this.isLoaded&&!this.isDisabled&&(i=t===ct,e=s.movable&&t===dt,t=i||e?t:ut,this.$dragBox.data(it,t).toggleClass(W,i).toggleClass(M,e),s.cropBoxMovable||this.$face.data(it,t).toggleClass(W,i).toggleClass(M,e))}},v.DEFAULTS={viewMode:0,dragMode:"crop",aspectRatio:NaN,data:null,preview:"",responsive:!0,restore:!0,checkCrossOrigin:!0,checkOrientation:!0,modal:!0,guides:!0,center:!0,highlight:!0,background:!0,autoCrop:!0,autoCropArea:.8,movable:!0,rotatable:!0,scalable:!0,zoomable:!0,zoomOnTouch:!0,zoomOnWheel:!0,wheelZoomRatio:.1,cropBoxMovable:!0,cropBoxResizable:!0,toggleDragModeOnDblclick:!0,minCanvasWidth:0,minCanvasHeight:0,minCropBoxWidth:0,minCropBoxHeight:0,minContainerWidth:200,minContainerHeight:100,build:null,built:null,cropstart:null,cropmove:null,cropend:null,crop:null,zoom:null},v.setDefaults=function(i){t.extend(v.DEFAULTS,i)},v.TEMPLATE='<div class="cropper-container"><div class="cropper-wrap-box"><div class="cropper-canvas"></div></div><div class="cropper-drag-box"></div><div class="cropper-crop-box"><span class="cropper-view-box"></span><span class="cropper-dashed dashed-h"></span><span class="cropper-dashed dashed-v"></span><span class="cropper-center"></span><span class="cropper-face"></span><span class="cropper-line line-e" data-action="e"></span><span class="cropper-line line-n" data-action="n"></span><span class="cropper-line line-w" data-action="w"></span><span class="cropper-line line-s" data-action="s"></span><span class="cropper-point point-e" data-action="e"></span><span class="cropper-point point-n" data-action="n"></span><span class="cropper-point point-w" data-action="w"></span><span class="cropper-point point-s" data-action="s"></span><span class="cropper-point point-ne" data-action="ne"></span><span class="cropper-point point-nw" data-action="nw"></span><span class="cropper-point point-sw" data-action="sw"></span><span class="cropper-point point-se" data-action="se"></span></div></div>',v.other=t.fn.cropper,t.fn.cropper=function(i){var a,o=s(arguments,1);return this.each(function(){var e,s,h=t(this),n=h.data(L);if(!n){if(/destroy/.test(i))return;e=t.extend({},h.data(),t.isPlainObject(i)&&i),h.data(L,n=new v(this,e))}"string"==typeof i&&t.isFunction(s=n[i])&&(a=s.apply(n,o))}),e(a)?this:a},t.fn.cropper.Constructor=v,t.fn.cropper.setDefaults=v.setDefaults,t.fn.cropper.noConflict=function(){return t.fn.cropper=v.other,this}});
 /*
  * jQuery.appear
  * https://github.com/bas2k/jquery.appear/
@@ -65557,16 +65567,6 @@ module.exports = Fuse;
 	});
 
 })(jQuery);
-/*!
- * Cropper v2.3.4
- * https://github.com/fengyuanchen/cropper
- *
- * Copyright (c) 2014-2016 Fengyuan Chen and contributors
- * Released under the MIT license
- *
- * Date: 2016-09-03T05:50:45.412Z
- */
-!function(t){"function"==typeof define&&define.amd?define(["jquery"],t):t("object"==typeof exports?require("jquery"):jQuery)}(function(t){"use strict";function i(t){return"number"==typeof t&&!isNaN(t)}function e(t){return"undefined"==typeof t}function s(t,e){var s=[];return i(e)&&s.push(e),s.slice.apply(t,s)}function a(t,i){var e=s(arguments,2);return function(){return t.apply(i,e.concat(s(arguments)))}}function o(t){var i=t.match(/^(https?:)\/\/([^\:\/\?#]+):?(\d*)/i);return i&&(i[1]!==C.protocol||i[2]!==C.hostname||i[3]!==C.port)}function h(t){var i="timestamp="+(new Date).getTime();return t+(t.indexOf("?")===-1?"?":"&")+i}function n(t){return t?' crossOrigin="'+t+'"':""}function r(t,i){var e;return t.naturalWidth&&!mt?i(t.naturalWidth,t.naturalHeight):(e=document.createElement("img"),e.onload=function(){i(this.width,this.height)},void(e.src=t.src))}function p(t){var e=[],s=t.rotate,a=t.scaleX,o=t.scaleY;return i(s)&&0!==s&&e.push("rotate("+s+"deg)"),i(a)&&1!==a&&e.push("scaleX("+a+")"),i(o)&&1!==o&&e.push("scaleY("+o+")"),e.length?e.join(" "):"none"}function l(t,i){var e,s,a=Ct(t.degree)%180,o=(a>90?180-a:a)*Math.PI/180,h=bt(o),n=Bt(o),r=t.width,p=t.height,l=t.aspectRatio;return i?(e=r/(n+h/l),s=e/l):(e=r*n+p*h,s=r*h+p*n),{width:e,height:s}}function c(e,s){var a,o,h,n=t("<canvas>")[0],r=n.getContext("2d"),p=0,c=0,d=s.naturalWidth,g=s.naturalHeight,u=s.rotate,f=s.scaleX,m=s.scaleY,v=i(f)&&i(m)&&(1!==f||1!==m),w=i(u)&&0!==u,x=w||v,C=d*Ct(f||1),b=g*Ct(m||1);return v&&(a=C/2,o=b/2),w&&(h=l({width:C,height:b,degree:u}),C=h.width,b=h.height,a=C/2,o=b/2),n.width=C,n.height=b,x&&(p=-d/2,c=-g/2,r.save(),r.translate(a,o)),w&&r.rotate(u*Math.PI/180),v&&r.scale(f,m),r.drawImage(e,$t(p),$t(c),$t(d),$t(g)),x&&r.restore(),n}function d(i){var e=i.length,s=0,a=0;return e&&(t.each(i,function(t,i){s+=i.pageX,a+=i.pageY}),s/=e,a/=e),{pageX:s,pageY:a}}function g(t,i,e){var s,a="";for(s=i,e+=i;s<e;s++)a+=Lt(t.getUint8(s));return a}function u(t){var i,e,s,a,o,h,n,r,p,l,c=new D(t),d=c.byteLength;if(255===c.getUint8(0)&&216===c.getUint8(1))for(p=2;p<d;){if(255===c.getUint8(p)&&225===c.getUint8(p+1)){n=p;break}p++}if(n&&(e=n+4,s=n+10,"Exif"===g(c,e,4)&&(h=c.getUint16(s),o=18761===h,(o||19789===h)&&42===c.getUint16(s+2,o)&&(a=c.getUint32(s+4,o),a>=8&&(r=s+a)))),r)for(d=c.getUint16(r,o),l=0;l<d;l++)if(p=r+12*l+2,274===c.getUint16(p,o)){p+=8,i=c.getUint16(p,o),mt&&c.setUint16(p,1,o);break}return i}function f(t){var i,e=t.replace(G,""),s=atob(e),a=s.length,o=new B(a),h=new y(o);for(i=0;i<a;i++)h[i]=s.charCodeAt(i);return o}function m(t){var i,e=new y(t),s=e.length,a="";for(i=0;i<s;i++)a+=Lt(e[i]);return"data:image/jpeg;base64,"+$(a)}function v(i,e){this.$element=t(i),this.options=t.extend({},v.DEFAULTS,t.isPlainObject(e)&&e),this.isLoaded=!1,this.isBuilt=!1,this.isCompleted=!1,this.isRotated=!1,this.isCropped=!1,this.isDisabled=!1,this.isReplaced=!1,this.isLimited=!1,this.wheeling=!1,this.isImg=!1,this.originalUrl="",this.canvas=null,this.cropBox=null,this.init()}var w=t(window),x=t(document),C=window.location,b=window.navigator,B=window.ArrayBuffer,y=window.Uint8Array,D=window.DataView,$=window.btoa,L="cropper",T="cropper-modal",X="cropper-hide",Y="cropper-hidden",k="cropper-invisible",M="cropper-move",W="cropper-crop",H="cropper-disabled",R="cropper-bg",z="mousedown touchstart pointerdown MSPointerDown",O="mousemove touchmove pointermove MSPointerMove",P="mouseup touchend touchcancel pointerup pointercancel MSPointerUp MSPointerCancel",E="wheel mousewheel DOMMouseScroll",U="dblclick",I="load."+L,F="error."+L,j="resize."+L,A="build."+L,S="built."+L,N="cropstart."+L,_="cropmove."+L,q="cropend."+L,K="crop."+L,Z="zoom."+L,Q=/^(e|w|s|n|se|sw|ne|nw|all|crop|move|zoom)$/,V=/^data:/,G=/^data:([^;]+);base64,/,J=/^data:image\/jpeg.*;base64,/,tt="preview",it="action",et="e",st="w",at="s",ot="n",ht="se",nt="sw",rt="ne",pt="nw",lt="all",ct="crop",dt="move",gt="zoom",ut="none",ft=t.isFunction(t("<canvas>")[0].getContext),mt=b&&/(Macintosh|iPhone|iPod|iPad).*AppleWebKit/i.test(b.userAgent),vt=Number,wt=Math.min,xt=Math.max,Ct=Math.abs,bt=Math.sin,Bt=Math.cos,yt=Math.sqrt,Dt=Math.round,$t=Math.floor,Lt=String.fromCharCode;v.prototype={constructor:v,init:function(){var t,i=this.$element;if(i.is("img")){if(this.isImg=!0,this.originalUrl=t=i.attr("src"),!t)return;t=i.prop("src")}else i.is("canvas")&&ft&&(t=i[0].toDataURL());this.load(t)},trigger:function(i,e){var s=t.Event(i,e);return this.$element.trigger(s),s},load:function(i){var e,s,a=this.options,n=this.$element;if(i&&(n.one(A,a.build),!this.trigger(A).isDefaultPrevented())){if(this.url=i,this.image={},!a.checkOrientation||!B)return this.clone();if(e=t.proxy(this.read,this),V.test(i))return J.test(i)?e(f(i)):this.clone();s=new XMLHttpRequest,s.onerror=s.onabort=t.proxy(function(){this.clone()},this),s.onload=function(){e(this.response)},a.checkCrossOrigin&&o(i)&&n.prop("crossOrigin")&&(i=h(i)),s.open("get",i),s.responseType="arraybuffer",s.send()}},read:function(t){var i=this.options,e=u(t),s=this.image,a=0,o=1,h=1;if(e>1)switch(this.url=m(t),e){case 2:o=-1;break;case 3:a=-180;break;case 4:h=-1;break;case 5:a=90,h=-1;break;case 6:a=90;break;case 7:a=90,o=-1;break;case 8:a=-90}i.rotatable&&(s.rotate=a),i.scalable&&(s.scaleX=o,s.scaleY=h),this.clone()},clone:function(){var i,e,s=this.options,a=this.$element,r=this.url,p="";s.checkCrossOrigin&&o(r)&&(p=a.prop("crossOrigin"),p?i=r:(p="anonymous",i=h(r))),this.crossOrigin=p,this.crossOriginUrl=i,this.$clone=e=t("<img"+n(p)+' src="'+(i||r)+'">'),this.isImg?a[0].complete?this.start():a.one(I,t.proxy(this.start,this)):e.one(I,t.proxy(this.start,this)).one(F,t.proxy(this.stop,this)).addClass(X).insertAfter(a)},start:function(){var i=this.$element,e=this.$clone;this.isImg||(e.off(F,this.stop),i=e),r(i[0],t.proxy(function(i,e){t.extend(this.image,{naturalWidth:i,naturalHeight:e,aspectRatio:i/e}),this.isLoaded=!0,this.build()},this))},stop:function(){this.$clone.remove(),this.$clone=null},build:function(){var i,e,s,a=this.options,o=this.$element,h=this.$clone;this.isLoaded&&(this.isBuilt&&this.unbuild(),this.$container=o.parent(),this.$cropper=i=t(v.TEMPLATE),this.$canvas=i.find(".cropper-canvas").append(h),this.$dragBox=i.find(".cropper-drag-box"),this.$cropBox=e=i.find(".cropper-crop-box"),this.$viewBox=i.find(".cropper-view-box"),this.$face=s=e.find(".cropper-face"),o.addClass(Y).after(i),this.isImg||h.removeClass(X),this.initPreview(),this.bind(),a.aspectRatio=xt(0,a.aspectRatio)||NaN,a.viewMode=xt(0,wt(3,Dt(a.viewMode)))||0,a.autoCrop?(this.isCropped=!0,a.modal&&this.$dragBox.addClass(T)):e.addClass(Y),a.guides||e.find(".cropper-dashed").addClass(Y),a.center||e.find(".cropper-center").addClass(Y),a.cropBoxMovable&&s.addClass(M).data(it,lt),a.highlight||s.addClass(k),a.background&&i.addClass(R),a.cropBoxResizable||e.find(".cropper-line, .cropper-point").addClass(Y),this.setDragMode(a.dragMode),this.render(),this.isBuilt=!0,this.setData(a.data),o.one(S,a.built),this.completing=setTimeout(t.proxy(function(){this.trigger(S),this.trigger(K,this.getData()),this.isCompleted=!0},this),0))},unbuild:function(){this.isBuilt&&(this.isCompleted||clearTimeout(this.completing),this.isBuilt=!1,this.isCompleted=!1,this.initialImage=null,this.initialCanvas=null,this.initialCropBox=null,this.container=null,this.canvas=null,this.cropBox=null,this.unbind(),this.resetPreview(),this.$preview=null,this.$viewBox=null,this.$cropBox=null,this.$dragBox=null,this.$canvas=null,this.$container=null,this.$cropper.remove(),this.$cropper=null)},render:function(){this.initContainer(),this.initCanvas(),this.initCropBox(),this.renderCanvas(),this.isCropped&&this.renderCropBox()},initContainer:function(){var t=this.options,i=this.$element,e=this.$container,s=this.$cropper;s.addClass(Y),i.removeClass(Y),s.css(this.container={width:xt(e.width(),vt(t.minContainerWidth)||200),height:xt(e.height(),vt(t.minContainerHeight)||100)}),i.addClass(Y),s.removeClass(Y)},initCanvas:function(){var i,e=this.options.viewMode,s=this.container,a=s.width,o=s.height,h=this.image,n=h.naturalWidth,r=h.naturalHeight,p=90===Ct(h.rotate),l=p?r:n,c=p?n:r,d=l/c,g=a,u=o;o*d>a?3===e?g=o*d:u=a/d:3===e?u=a/d:g=o*d,i={naturalWidth:l,naturalHeight:c,aspectRatio:d,width:g,height:u},i.oldLeft=i.left=(a-g)/2,i.oldTop=i.top=(o-u)/2,this.canvas=i,this.isLimited=1===e||2===e,this.limitCanvas(!0,!0),this.initialImage=t.extend({},h),this.initialCanvas=t.extend({},i)},limitCanvas:function(t,i){var e,s,a,o,h=this.options,n=h.viewMode,r=this.container,p=r.width,l=r.height,c=this.canvas,d=c.aspectRatio,g=this.cropBox,u=this.isCropped&&g;t&&(e=vt(h.minCanvasWidth)||0,s=vt(h.minCanvasHeight)||0,n&&(n>1?(e=xt(e,p),s=xt(s,l),3===n&&(s*d>e?e=s*d:s=e/d)):e?e=xt(e,u?g.width:0):s?s=xt(s,u?g.height:0):u&&(e=g.width,s=g.height,s*d>e?e=s*d:s=e/d)),e&&s?s*d>e?s=e/d:e=s*d:e?s=e/d:s&&(e=s*d),c.minWidth=e,c.minHeight=s,c.maxWidth=1/0,c.maxHeight=1/0),i&&(n?(a=p-c.width,o=l-c.height,c.minLeft=wt(0,a),c.minTop=wt(0,o),c.maxLeft=xt(0,a),c.maxTop=xt(0,o),u&&this.isLimited&&(c.minLeft=wt(g.left,g.left+g.width-c.width),c.minTop=wt(g.top,g.top+g.height-c.height),c.maxLeft=g.left,c.maxTop=g.top,2===n&&(c.width>=p&&(c.minLeft=wt(0,a),c.maxLeft=xt(0,a)),c.height>=l&&(c.minTop=wt(0,o),c.maxTop=xt(0,o))))):(c.minLeft=-c.width,c.minTop=-c.height,c.maxLeft=p,c.maxTop=l))},renderCanvas:function(t){var i,e,s=this.canvas,a=this.image,o=a.rotate,h=a.naturalWidth,n=a.naturalHeight;this.isRotated&&(this.isRotated=!1,e=l({width:a.width,height:a.height,degree:o}),i=e.width/e.height,i!==s.aspectRatio&&(s.left-=(e.width-s.width)/2,s.top-=(e.height-s.height)/2,s.width=e.width,s.height=e.height,s.aspectRatio=i,s.naturalWidth=h,s.naturalHeight=n,o%180&&(e=l({width:h,height:n,degree:o}),s.naturalWidth=e.width,s.naturalHeight=e.height),this.limitCanvas(!0,!1))),(s.width>s.maxWidth||s.width<s.minWidth)&&(s.left=s.oldLeft),(s.height>s.maxHeight||s.height<s.minHeight)&&(s.top=s.oldTop),s.width=wt(xt(s.width,s.minWidth),s.maxWidth),s.height=wt(xt(s.height,s.minHeight),s.maxHeight),this.limitCanvas(!1,!0),s.oldLeft=s.left=wt(xt(s.left,s.minLeft),s.maxLeft),s.oldTop=s.top=wt(xt(s.top,s.minTop),s.maxTop),this.$canvas.css({width:s.width,height:s.height,left:s.left,top:s.top}),this.renderImage(),this.isCropped&&this.isLimited&&this.limitCropBox(!0,!0),t&&this.output()},renderImage:function(i){var e,s=this.canvas,a=this.image;a.rotate&&(e=l({width:s.width,height:s.height,degree:a.rotate,aspectRatio:a.aspectRatio},!0)),t.extend(a,e?{width:e.width,height:e.height,left:(s.width-e.width)/2,top:(s.height-e.height)/2}:{width:s.width,height:s.height,left:0,top:0}),this.$clone.css({width:a.width,height:a.height,marginLeft:a.left,marginTop:a.top,transform:p(a)}),i&&this.output()},initCropBox:function(){var i=this.options,e=this.canvas,s=i.aspectRatio,a=vt(i.autoCropArea)||.8,o={width:e.width,height:e.height};s&&(e.height*s>e.width?o.height=o.width/s:o.width=o.height*s),this.cropBox=o,this.limitCropBox(!0,!0),o.width=wt(xt(o.width,o.minWidth),o.maxWidth),o.height=wt(xt(o.height,o.minHeight),o.maxHeight),o.width=xt(o.minWidth,o.width*a),o.height=xt(o.minHeight,o.height*a),o.oldLeft=o.left=e.left+(e.width-o.width)/2,o.oldTop=o.top=e.top+(e.height-o.height)/2,this.initialCropBox=t.extend({},o)},limitCropBox:function(t,i){var e,s,a,o,h=this.options,n=h.aspectRatio,r=this.container,p=r.width,l=r.height,c=this.canvas,d=this.cropBox,g=this.isLimited;t&&(e=vt(h.minCropBoxWidth)||0,s=vt(h.minCropBoxHeight)||0,e=wt(e,p),s=wt(s,l),a=wt(p,g?c.width:p),o=wt(l,g?c.height:l),n&&(e&&s?s*n>e?s=e/n:e=s*n:e?s=e/n:s&&(e=s*n),o*n>a?o=a/n:a=o*n),d.minWidth=wt(e,a),d.minHeight=wt(s,o),d.maxWidth=a,d.maxHeight=o),i&&(g?(d.minLeft=xt(0,c.left),d.minTop=xt(0,c.top),d.maxLeft=wt(p,c.left+c.width)-d.width,d.maxTop=wt(l,c.top+c.height)-d.height):(d.minLeft=0,d.minTop=0,d.maxLeft=p-d.width,d.maxTop=l-d.height))},renderCropBox:function(){var t=this.options,i=this.container,e=i.width,s=i.height,a=this.cropBox;(a.width>a.maxWidth||a.width<a.minWidth)&&(a.left=a.oldLeft),(a.height>a.maxHeight||a.height<a.minHeight)&&(a.top=a.oldTop),a.width=wt(xt(a.width,a.minWidth),a.maxWidth),a.height=wt(xt(a.height,a.minHeight),a.maxHeight),this.limitCropBox(!1,!0),a.oldLeft=a.left=wt(xt(a.left,a.minLeft),a.maxLeft),a.oldTop=a.top=wt(xt(a.top,a.minTop),a.maxTop),t.movable&&t.cropBoxMovable&&this.$face.data(it,a.width===e&&a.height===s?dt:lt),this.$cropBox.css({width:a.width,height:a.height,left:a.left,top:a.top}),this.isCropped&&this.isLimited&&this.limitCanvas(!0,!0),this.isDisabled||this.output()},output:function(){this.preview(),this.isCompleted&&this.trigger(K,this.getData())},initPreview:function(){var i,e=n(this.crossOrigin),s=e?this.crossOriginUrl:this.url;this.$preview=t(this.options.preview),this.$clone2=i=t("<img"+e+' src="'+s+'">'),this.$viewBox.html(i),this.$preview.each(function(){var i=t(this);i.data(tt,{width:i.width(),height:i.height(),html:i.html()}),i.html("<img"+e+' src="'+s+'" style="display:block;width:100%;height:auto;min-width:0!important;min-height:0!important;max-width:none!important;max-height:none!important;image-orientation:0deg!important;">')})},resetPreview:function(){this.$preview.each(function(){var i=t(this),e=i.data(tt);i.css({width:e.width,height:e.height}).html(e.html).removeData(tt)})},preview:function(){var i=this.image,e=this.canvas,s=this.cropBox,a=s.width,o=s.height,h=i.width,n=i.height,r=s.left-e.left-i.left,l=s.top-e.top-i.top;this.isCropped&&!this.isDisabled&&(this.$clone2.css({width:h,height:n,marginLeft:-r,marginTop:-l,transform:p(i)}),this.$preview.each(function(){var e=t(this),s=e.data(tt),c=s.width,d=s.height,g=c,u=d,f=1;a&&(f=c/a,u=o*f),o&&u>d&&(f=d/o,g=a*f,u=d),e.css({width:g,height:u}).find("img").css({width:h*f,height:n*f,marginLeft:-r*f,marginTop:-l*f,transform:p(i)})}))},bind:function(){var i=this.options,e=this.$element,s=this.$cropper;t.isFunction(i.cropstart)&&e.on(N,i.cropstart),t.isFunction(i.cropmove)&&e.on(_,i.cropmove),t.isFunction(i.cropend)&&e.on(q,i.cropend),t.isFunction(i.crop)&&e.on(K,i.crop),t.isFunction(i.zoom)&&e.on(Z,i.zoom),s.on(z,t.proxy(this.cropStart,this)),i.zoomable&&i.zoomOnWheel&&s.on(E,t.proxy(this.wheel,this)),i.toggleDragModeOnDblclick&&s.on(U,t.proxy(this.dblclick,this)),x.on(O,this._cropMove=a(this.cropMove,this)).on(P,this._cropEnd=a(this.cropEnd,this)),i.responsive&&w.on(j,this._resize=a(this.resize,this))},unbind:function(){var i=this.options,e=this.$element,s=this.$cropper;t.isFunction(i.cropstart)&&e.off(N,i.cropstart),t.isFunction(i.cropmove)&&e.off(_,i.cropmove),t.isFunction(i.cropend)&&e.off(q,i.cropend),t.isFunction(i.crop)&&e.off(K,i.crop),t.isFunction(i.zoom)&&e.off(Z,i.zoom),s.off(z,this.cropStart),i.zoomable&&i.zoomOnWheel&&s.off(E,this.wheel),i.toggleDragModeOnDblclick&&s.off(U,this.dblclick),x.off(O,this._cropMove).off(P,this._cropEnd),i.responsive&&w.off(j,this._resize)},resize:function(){var i,e,s,a=this.options.restore,o=this.$container,h=this.container;!this.isDisabled&&h&&(s=o.width()/h.width,1===s&&o.height()===h.height||(a&&(i=this.getCanvasData(),e=this.getCropBoxData()),this.render(),a&&(this.setCanvasData(t.each(i,function(t,e){i[t]=e*s})),this.setCropBoxData(t.each(e,function(t,i){e[t]=i*s})))))},dblclick:function(){this.isDisabled||(this.$dragBox.hasClass(W)?this.setDragMode(dt):this.setDragMode(ct))},wheel:function(i){var e=i.originalEvent||i,s=vt(this.options.wheelZoomRatio)||.1,a=1;this.isDisabled||(i.preventDefault(),this.wheeling||(this.wheeling=!0,setTimeout(t.proxy(function(){this.wheeling=!1},this),50),e.deltaY?a=e.deltaY>0?1:-1:e.wheelDelta?a=-e.wheelDelta/120:e.detail&&(a=e.detail>0?1:-1),this.zoom(-a*s,i)))},cropStart:function(i){var e,s,a=this.options,o=i.originalEvent,h=o&&o.touches,n=i;if(!this.isDisabled){if(h){if(e=h.length,e>1){if(!a.zoomable||!a.zoomOnTouch||2!==e)return;n=h[1],this.startX2=n.pageX,this.startY2=n.pageY,s=gt}n=h[0]}if(s=s||t(n.target).data(it),Q.test(s)){if(this.trigger(N,{originalEvent:o,action:s}).isDefaultPrevented())return;i.preventDefault(),this.action=s,this.cropping=!1,this.startX=n.pageX||o&&o.pageX,this.startY=n.pageY||o&&o.pageY,s===ct&&(this.cropping=!0,this.$dragBox.addClass(T))}}},cropMove:function(t){var i,e=this.options,s=t.originalEvent,a=s&&s.touches,o=t,h=this.action;if(!this.isDisabled){if(a){if(i=a.length,i>1){if(!e.zoomable||!e.zoomOnTouch||2!==i)return;o=a[1],this.endX2=o.pageX,this.endY2=o.pageY}o=a[0]}if(h){if(this.trigger(_,{originalEvent:s,action:h}).isDefaultPrevented())return;t.preventDefault(),this.endX=o.pageX||s&&s.pageX,this.endY=o.pageY||s&&s.pageY,this.change(o.shiftKey,h===gt?t:null)}}},cropEnd:function(t){var i=t.originalEvent,e=this.action;this.isDisabled||e&&(t.preventDefault(),this.cropping&&(this.cropping=!1,this.$dragBox.toggleClass(T,this.isCropped&&this.options.modal)),this.action="",this.trigger(q,{originalEvent:i,action:e}))},change:function(t,i){var e,s,a=this.options,o=a.aspectRatio,h=this.action,n=this.container,r=this.canvas,p=this.cropBox,l=p.width,c=p.height,d=p.left,g=p.top,u=d+l,f=g+c,m=0,v=0,w=n.width,x=n.height,C=!0;switch(!o&&t&&(o=l&&c?l/c:1),this.isLimited&&(m=p.minLeft,v=p.minTop,w=m+wt(n.width,r.width,r.left+r.width),x=v+wt(n.height,r.height,r.top+r.height)),s={x:this.endX-this.startX,y:this.endY-this.startY},o&&(s.X=s.y*o,s.Y=s.x/o),h){case lt:d+=s.x,g+=s.y;break;case et:if(s.x>=0&&(u>=w||o&&(g<=v||f>=x))){C=!1;break}l+=s.x,o&&(c=l/o,g-=s.Y/2),l<0&&(h=st,l=0);break;case ot:if(s.y<=0&&(g<=v||o&&(d<=m||u>=w))){C=!1;break}c-=s.y,g+=s.y,o&&(l=c*o,d+=s.X/2),c<0&&(h=at,c=0);break;case st:if(s.x<=0&&(d<=m||o&&(g<=v||f>=x))){C=!1;break}l-=s.x,d+=s.x,o&&(c=l/o,g+=s.Y/2),l<0&&(h=et,l=0);break;case at:if(s.y>=0&&(f>=x||o&&(d<=m||u>=w))){C=!1;break}c+=s.y,o&&(l=c*o,d-=s.X/2),c<0&&(h=ot,c=0);break;case rt:if(o){if(s.y<=0&&(g<=v||u>=w)){C=!1;break}c-=s.y,g+=s.y,l=c*o}else s.x>=0?u<w?l+=s.x:s.y<=0&&g<=v&&(C=!1):l+=s.x,s.y<=0?g>v&&(c-=s.y,g+=s.y):(c-=s.y,g+=s.y);l<0&&c<0?(h=nt,c=0,l=0):l<0?(h=pt,l=0):c<0&&(h=ht,c=0);break;case pt:if(o){if(s.y<=0&&(g<=v||d<=m)){C=!1;break}c-=s.y,g+=s.y,l=c*o,d+=s.X}else s.x<=0?d>m?(l-=s.x,d+=s.x):s.y<=0&&g<=v&&(C=!1):(l-=s.x,d+=s.x),s.y<=0?g>v&&(c-=s.y,g+=s.y):(c-=s.y,g+=s.y);l<0&&c<0?(h=ht,c=0,l=0):l<0?(h=rt,l=0):c<0&&(h=nt,c=0);break;case nt:if(o){if(s.x<=0&&(d<=m||f>=x)){C=!1;break}l-=s.x,d+=s.x,c=l/o}else s.x<=0?d>m?(l-=s.x,d+=s.x):s.y>=0&&f>=x&&(C=!1):(l-=s.x,d+=s.x),s.y>=0?f<x&&(c+=s.y):c+=s.y;l<0&&c<0?(h=rt,c=0,l=0):l<0?(h=ht,l=0):c<0&&(h=pt,c=0);break;case ht:if(o){if(s.x>=0&&(u>=w||f>=x)){C=!1;break}l+=s.x,c=l/o}else s.x>=0?u<w?l+=s.x:s.y>=0&&f>=x&&(C=!1):l+=s.x,s.y>=0?f<x&&(c+=s.y):c+=s.y;l<0&&c<0?(h=pt,c=0,l=0):l<0?(h=nt,l=0):c<0&&(h=rt,c=0);break;case dt:this.move(s.x,s.y),C=!1;break;case gt:this.zoom(function(t,i,e,s){var a=yt(t*t+i*i),o=yt(e*e+s*s);return(o-a)/a}(Ct(this.startX-this.startX2),Ct(this.startY-this.startY2),Ct(this.endX-this.endX2),Ct(this.endY-this.endY2)),i),this.startX2=this.endX2,this.startY2=this.endY2,C=!1;break;case ct:if(!s.x||!s.y){C=!1;break}e=this.$cropper.offset(),d=this.startX-e.left,g=this.startY-e.top,l=p.minWidth,c=p.minHeight,s.x>0?h=s.y>0?ht:rt:s.x<0&&(d-=l,h=s.y>0?nt:pt),s.y<0&&(g-=c),this.isCropped||(this.$cropBox.removeClass(Y),this.isCropped=!0,this.isLimited&&this.limitCropBox(!0,!0))}C&&(p.width=l,p.height=c,p.left=d,p.top=g,this.action=h,this.renderCropBox()),this.startX=this.endX,this.startY=this.endY},crop:function(){this.isBuilt&&!this.isDisabled&&(this.isCropped||(this.isCropped=!0,this.limitCropBox(!0,!0),this.options.modal&&this.$dragBox.addClass(T),this.$cropBox.removeClass(Y)),this.setCropBoxData(this.initialCropBox))},reset:function(){this.isBuilt&&!this.isDisabled&&(this.image=t.extend({},this.initialImage),this.canvas=t.extend({},this.initialCanvas),this.cropBox=t.extend({},this.initialCropBox),this.renderCanvas(),this.isCropped&&this.renderCropBox())},clear:function(){this.isCropped&&!this.isDisabled&&(t.extend(this.cropBox,{left:0,top:0,width:0,height:0}),this.isCropped=!1,this.renderCropBox(),this.limitCanvas(!0,!0),this.renderCanvas(),this.$dragBox.removeClass(T),this.$cropBox.addClass(Y))},replace:function(t,i){!this.isDisabled&&t&&(this.isImg&&this.$element.attr("src",t),i?(this.url=t,this.$clone.attr("src",t),this.isBuilt&&this.$preview.find("img").add(this.$clone2).attr("src",t)):(this.isImg&&(this.isReplaced=!0),this.options.data=null,this.load(t)))},enable:function(){this.isBuilt&&(this.isDisabled=!1,this.$cropper.removeClass(H))},disable:function(){this.isBuilt&&(this.isDisabled=!0,this.$cropper.addClass(H))},destroy:function(){var t=this.$element;this.isLoaded?(this.isImg&&this.isReplaced&&t.attr("src",this.originalUrl),this.unbuild(),t.removeClass(Y)):this.isImg?t.off(I,this.start):this.$clone&&this.$clone.remove(),t.removeData(L)},move:function(t,i){var s=this.canvas;this.moveTo(e(t)?t:s.left+vt(t),e(i)?i:s.top+vt(i))},moveTo:function(t,s){var a=this.canvas,o=!1;e(s)&&(s=t),t=vt(t),s=vt(s),this.isBuilt&&!this.isDisabled&&this.options.movable&&(i(t)&&(a.left=t,o=!0),i(s)&&(a.top=s,o=!0),o&&this.renderCanvas(!0))},zoom:function(t,i){var e=this.canvas;t=vt(t),t=t<0?1/(1-t):1+t,this.zoomTo(e.width*t/e.naturalWidth,i)},zoomTo:function(t,i){var e,s,a,o,h,n=this.options,r=this.canvas,p=r.width,l=r.height,c=r.naturalWidth,g=r.naturalHeight;if(t=vt(t),t>=0&&this.isBuilt&&!this.isDisabled&&n.zoomable){if(s=c*t,a=g*t,i&&(e=i.originalEvent),this.trigger(Z,{originalEvent:e,oldRatio:p/c,ratio:s/c}).isDefaultPrevented())return;e?(o=this.$cropper.offset(),h=e.touches?d(e.touches):{pageX:i.pageX||e.pageX||0,pageY:i.pageY||e.pageY||0},r.left-=(s-p)*((h.pageX-o.left-r.left)/p),r.top-=(a-l)*((h.pageY-o.top-r.top)/l)):(r.left-=(s-p)/2,r.top-=(a-l)/2),r.width=s,r.height=a,this.renderCanvas(!0)}},rotate:function(t){this.rotateTo((this.image.rotate||0)+vt(t))},rotateTo:function(t){t=vt(t),i(t)&&this.isBuilt&&!this.isDisabled&&this.options.rotatable&&(this.image.rotate=t%360,this.isRotated=!0,this.renderCanvas(!0))},scale:function(t,s){var a=this.image,o=!1;e(s)&&(s=t),t=vt(t),s=vt(s),this.isBuilt&&!this.isDisabled&&this.options.scalable&&(i(t)&&(a.scaleX=t,o=!0),i(s)&&(a.scaleY=s,o=!0),o&&this.renderImage(!0))},scaleX:function(t){var e=this.image.scaleY;this.scale(t,i(e)?e:1)},scaleY:function(t){var e=this.image.scaleX;this.scale(i(e)?e:1,t)},getData:function(i){var e,s,a=this.options,o=this.image,h=this.canvas,n=this.cropBox;return this.isBuilt&&this.isCropped?(s={x:n.left-h.left,y:n.top-h.top,width:n.width,height:n.height},e=o.width/o.naturalWidth,t.each(s,function(t,a){a/=e,s[t]=i?Dt(a):a})):s={x:0,y:0,width:0,height:0},a.rotatable&&(s.rotate=o.rotate||0),a.scalable&&(s.scaleX=o.scaleX||1,s.scaleY=o.scaleY||1),s},setData:function(e){var s,a,o,h=this.options,n=this.image,r=this.canvas,p={};t.isFunction(e)&&(e=e.call(this.element)),this.isBuilt&&!this.isDisabled&&t.isPlainObject(e)&&(h.rotatable&&i(e.rotate)&&e.rotate!==n.rotate&&(n.rotate=e.rotate,this.isRotated=s=!0),h.scalable&&(i(e.scaleX)&&e.scaleX!==n.scaleX&&(n.scaleX=e.scaleX,a=!0),i(e.scaleY)&&e.scaleY!==n.scaleY&&(n.scaleY=e.scaleY,a=!0)),s?this.renderCanvas():a&&this.renderImage(),o=n.width/n.naturalWidth,i(e.x)&&(p.left=e.x*o+r.left),i(e.y)&&(p.top=e.y*o+r.top),i(e.width)&&(p.width=e.width*o),i(e.height)&&(p.height=e.height*o),this.setCropBoxData(p))},getContainerData:function(){return this.isBuilt?this.container:{}},getImageData:function(){return this.isLoaded?this.image:{}},getCanvasData:function(){var i=this.canvas,e={};return this.isBuilt&&t.each(["left","top","width","height","naturalWidth","naturalHeight"],function(t,s){e[s]=i[s]}),e},setCanvasData:function(e){var s=this.canvas,a=s.aspectRatio;t.isFunction(e)&&(e=e.call(this.$element)),this.isBuilt&&!this.isDisabled&&t.isPlainObject(e)&&(i(e.left)&&(s.left=e.left),i(e.top)&&(s.top=e.top),i(e.width)?(s.width=e.width,s.height=e.width/a):i(e.height)&&(s.height=e.height,s.width=e.height*a),this.renderCanvas(!0))},getCropBoxData:function(){var t,i=this.cropBox;return this.isBuilt&&this.isCropped&&(t={left:i.left,top:i.top,width:i.width,height:i.height}),t||{}},setCropBoxData:function(e){var s,a,o=this.cropBox,h=this.options.aspectRatio;t.isFunction(e)&&(e=e.call(this.$element)),this.isBuilt&&this.isCropped&&!this.isDisabled&&t.isPlainObject(e)&&(i(e.left)&&(o.left=e.left),i(e.top)&&(o.top=e.top),i(e.width)&&(s=!0,o.width=e.width),i(e.height)&&(a=!0,o.height=e.height),h&&(s?o.height=o.width/h:a&&(o.width=o.height*h)),this.renderCropBox())},getCroppedCanvas:function(i){var e,s,a,o,h,n,r,p,l,d,g;if(this.isBuilt&&ft)return this.isCropped?(t.isPlainObject(i)||(i={}),g=this.getData(),e=g.width,s=g.height,p=e/s,t.isPlainObject(i)&&(h=i.width,n=i.height,h?(n=h/p,r=h/e):n&&(h=n*p,r=n/s)),a=$t(h||e),o=$t(n||s),l=t("<canvas>")[0],l.width=a,l.height=o,d=l.getContext("2d"),i.fillColor&&(d.fillStyle=i.fillColor,d.fillRect(0,0,a,o)),d.drawImage.apply(d,function(){var t,i,a,o,h,n,p=c(this.$clone[0],this.image),l=p.width,d=p.height,u=this.canvas,f=[p],m=g.x+u.naturalWidth*(Ct(g.scaleX||1)-1)/2,v=g.y+u.naturalHeight*(Ct(g.scaleY||1)-1)/2;return m<=-e||m>l?m=t=a=h=0:m<=0?(a=-m,m=0,t=h=wt(l,e+m)):m<=l&&(a=0,t=h=wt(e,l-m)),t<=0||v<=-s||v>d?v=i=o=n=0:v<=0?(o=-v,v=0,i=n=wt(d,s+v)):v<=d&&(o=0,i=n=wt(s,d-v)),f.push($t(m),$t(v),$t(t),$t(i)),r&&(a*=r,o*=r,h*=r,n*=r),h>0&&n>0&&f.push($t(a),$t(o),$t(h),$t(n)),f}.call(this)),l):c(this.$clone[0],this.image)},setAspectRatio:function(t){var i=this.options;this.isDisabled||e(t)||(i.aspectRatio=xt(0,t)||NaN,this.isBuilt&&(this.initCropBox(),this.isCropped&&this.renderCropBox()))},setDragMode:function(t){var i,e,s=this.options;this.isLoaded&&!this.isDisabled&&(i=t===ct,e=s.movable&&t===dt,t=i||e?t:ut,this.$dragBox.data(it,t).toggleClass(W,i).toggleClass(M,e),s.cropBoxMovable||this.$face.data(it,t).toggleClass(W,i).toggleClass(M,e))}},v.DEFAULTS={viewMode:0,dragMode:"crop",aspectRatio:NaN,data:null,preview:"",responsive:!0,restore:!0,checkCrossOrigin:!0,checkOrientation:!0,modal:!0,guides:!0,center:!0,highlight:!0,background:!0,autoCrop:!0,autoCropArea:.8,movable:!0,rotatable:!0,scalable:!0,zoomable:!0,zoomOnTouch:!0,zoomOnWheel:!0,wheelZoomRatio:.1,cropBoxMovable:!0,cropBoxResizable:!0,toggleDragModeOnDblclick:!0,minCanvasWidth:0,minCanvasHeight:0,minCropBoxWidth:0,minCropBoxHeight:0,minContainerWidth:200,minContainerHeight:100,build:null,built:null,cropstart:null,cropmove:null,cropend:null,crop:null,zoom:null},v.setDefaults=function(i){t.extend(v.DEFAULTS,i)},v.TEMPLATE='<div class="cropper-container"><div class="cropper-wrap-box"><div class="cropper-canvas"></div></div><div class="cropper-drag-box"></div><div class="cropper-crop-box"><span class="cropper-view-box"></span><span class="cropper-dashed dashed-h"></span><span class="cropper-dashed dashed-v"></span><span class="cropper-center"></span><span class="cropper-face"></span><span class="cropper-line line-e" data-action="e"></span><span class="cropper-line line-n" data-action="n"></span><span class="cropper-line line-w" data-action="w"></span><span class="cropper-line line-s" data-action="s"></span><span class="cropper-point point-e" data-action="e"></span><span class="cropper-point point-n" data-action="n"></span><span class="cropper-point point-w" data-action="w"></span><span class="cropper-point point-s" data-action="s"></span><span class="cropper-point point-ne" data-action="ne"></span><span class="cropper-point point-nw" data-action="nw"></span><span class="cropper-point point-sw" data-action="sw"></span><span class="cropper-point point-se" data-action="se"></span></div></div>',v.other=t.fn.cropper,t.fn.cropper=function(i){var a,o=s(arguments,1);return this.each(function(){var e,s,h=t(this),n=h.data(L);if(!n){if(/destroy/.test(i))return;e=t.extend({},h.data(),t.isPlainObject(i)&&i),h.data(L,n=new v(this,e))}"string"==typeof i&&t.isFunction(s=n[i])&&(a=s.apply(n,o))}),e(a)?this:a},t.fn.cropper.Constructor=v,t.fn.cropper.setDefaults=v.setDefaults,t.fn.cropper.noConflict=function(){return t.fn.cropper=v.other,this}});
 /*
  * jQuery Easing v1.3 - http://gsgd.co.uk/sandbox/jquery/easing/
  *
@@ -69572,4000 +69572,21 @@ var j=i.match(new RegExp("[-"+b.escapeRegex(f.negationSymbol.front)+"]","g"));if
 /*! jquery-placepicker 20-04-2016 */
 +function(a,b){function c(c,d){function e(){var a='<div class="input-group"><span class="input-group-btn"><button type="button" data-toggle="collapse" href="#'+d.mapContainerId+'" class="btn btn-default"><span class="glyphicon glyphicon-globe"></span></button></span></div>';return a}function f(){if(d.mapContainerId){var b=a(c),f=b.parent(),g=f.children().index(c);b.replaceWith(e()),f.children().eq(g).append(c)}}function g(a){if(a){var b={query:a};w&&w.textSearch(b,function(a,b){if(b===google.maps.places.PlacesServiceStatus.OK)for(var c=0;c<a.length;c++)return void o(a[c])})}}function h(a){v.geocode({latLng:a},function(a,b){if(b===google.maps.GeocoderStatus.OK&&a[0]){var c=a[0];o(c,!1)}})}function i(){return q=a(d.map).get(0),q||d.mapContainerId&&(q=a("#"+d.mapContainerId+" .placepicker-map").get(0)),q?!0:!1}function j(){i()&&(r=new google.maps.Map(q,d.mapOptions),t.bindTo("bounds",r),google.maps.event.addListener(r,"click",function(a){var b=a.latLng;s.setPosition(b),r.panTo(b),c.blur(),h(b)}),s=new google.maps.Marker({map:r}),w=new google.maps.places.PlacesService(r),a(q).parent().on("show.bs.collapse",function(b){a(b.target).css("display","block").find("img[src*='gstatic.com/'], img[src*='googleapis.com/']").css("max-width","none"),c.value?u.resize():u.geoLocation(),a(b.target).css("display","")}))}function k(){t=new google.maps.places.Autocomplete(c,d.autoCompleteOptions),google.maps.event.addListener(t,"place_changed",function(){var a=t.getPlace();a.geometry&&o(a)})}function l(){u.resize.call(u)}function m(){function b(b,e){if("keydown"===b){var f=e;e=function(b){var d=a(".pac-item-selected").length>0;if((13===b.which||13===b.keyCode)&&!d){var e=a.Event("keydown",{keyCode:40,which:40});f.apply(c,[e])}f.apply(c,[b])}}d.apply(c,[b,e])}var d=c.addEventListener?c.addEventListener:c.attachEvent;c.addEventListener=b,c.attachEvent=b}function n(){if(v=new google.maps.Geocoder,m(),f(),k(),j(),c.value)g(c.value);else{var e=d.latitude||a(d.latitudeInput).prop("value"),h=d.longitude||a(d.longitudeInput).prop("value");e&&h&&u.setLocation(e,h)}a(b).on("resize",l),a(c).on("keypress",function(a){d.preventSubmit&&13===a.keyCode&&(a.preventDefault(),a.stopImmediatePropagation())})}function o(b,e){e="undefined"==typeof e?!0:!1,x=b,u.resize();var f=b.geometry.location;e&&p(f),a(d.latitudeInput).prop("value",f.lat()),a(d.longitudeInput).prop("value",f.lng()),e||(c.value=b.formatted_address),"function"==typeof d.placeChanged&&d.placeChanged.call(u,b)}function p(a){if(r){r.setCenter(a);var b=d.icon||d.placesIcon&&place.icon?place.icon:null;if(b){var c={url:b,size:new google.maps.Size(71,71),origin:new google.maps.Point(0,0),anchor:new google.maps.Point(17,34),scaledSize:new google.maps.Size(35,35)};s.setIcon(c)}s.setPosition(a),s.setVisible(!0)}}var q,r,s,t,u=this,v=null,w=null,x=null,y=null;this.setValue=function(a){c.value=a,g(a)},this.getValue=function(){return c.value},this.setLocation=function(a,b){var c=new google.maps.LatLng(a,b);this.setLatLng(c)},this.getLocation=function(){var a=this.getLatLng();return{latitude:a&&a.lat()||d.latitude,longitude:a&&a.lng()||d.longitude}},this.setLatLng=function(a){y=a,h(y)},this.getLatLng=function(){return x&&x.geometry?x.geometry.location:y},this.getMap=function(){return r},this.reload=function(){r&&g(c.value)},this.resize=function(){if(r){var a=r.getCenter();google.maps.event.trigger(r,"resize"),r.setCenter(a)}},this.geoLocation=function(a){navigator.geolocation?navigator.geolocation.getCurrentPosition(function(b){var c=new google.maps.LatLng(b.coords.latitude,b.coords.longitude);p(c),h(c),a&&a(c)},function(){a&&a(null)}):a&&a(null)},n.call(this)}var d="placepicker",e={map:"",mapOptions:{zoom:15},places:{icons:!1},autoCompleteOptions:{},placeChanged:null,location:null,preventSubmit:!0},f=c;a.fn[d]=function(b){return this.each(function(){return a(this).data(d)||a(this).data(d,new f(this,a.extend({},e,b,a(this).data()))),a(this)})}}(jQuery,window);
 /**
- * DaData.ru Suggestions jQuery plugin, version 17.5.0
+ * jQuery CSS Customizable Scrollbar
  *
- * DaData.ru Suggestions jQuery plugin is freely distributable under the terms of MIT-style license
- * Built on DevBridge Autocomplete for jQuery (https://github.com/devbridge/jQuery-Autocomplete)
- * For details, see https://github.com/hflabs/suggestions-jquery
- */
-(function (global, factory) {
-	typeof exports === 'object' && typeof module !== 'undefined' ? factory(require('jquery')) :
-	typeof define === 'function' && define.amd ? define(['jquery'], factory) :
-	(factory(global.$));
-}(this, (function ($) { 'use strict';
-
-$ = 'default' in $ ? $['default'] : $;
-
-var KEYS = {
-        ENTER: 13,
-        ESC:   27,
-        TAB:   9,
-        SPACE: 32,
-        UP:    38,
-        DOWN:  40
-    };
-var EVENT_NS = '.suggestions';
-var DATA_ATTR_KEY = 'suggestions';
-var WORD_DELIMITERS = '\\s"\'~\\*\\.,:\\|\\[\\]\\(\\)\\{\\}<>№';
-var WORD_SPLITTER = new RegExp('[' + WORD_DELIMITERS + ']+', 'g');
-var WORD_PARTS_DELIMITERS = '\\-\\+\\/\\\\\\?!@#$%^&';
-var WORD_PARTS_SPLITTER = new RegExp('[' + WORD_PARTS_DELIMITERS + ']+', 'g');
-
-var utils = (function () {
-    var uniqueId = 0;
-    return {
-        escapeRegExChars: function (value) {
-            return value.replace(/[\-\[\]\/\{\}\(\)\*\+\?\.\\\^\$\|]/g, "\\$&");
-        },
-        escapeHtml: function (str) {
-            var map = {
-                '&': '&amp;',
-                '<': '&lt;',
-                '>': '&gt;',
-                '"': '&quot;',
-                "'": '&#x27;',
-                '/': '&#x2F;'
-            };
-
-            if (str) {
-                $.each(map, function(ch, html){
-                    str = str.replace(new RegExp(ch, 'g'), html);
-                });
-            }
-            return str;
-        },
-        getDefaultType: function () {
-            return ($.support.cors ? 'POST' : 'GET');
-        },
-        getDefaultContentType: function () {
-            return ($.support.cors ? 'application/json' : 'application/x-www-form-urlencoded');
-        },
-        fixURLProtocol: function(url){
-            return $.support.cors ? url : url.replace(/^https?:/, location.protocol);
-        },
-        addUrlParams: function (url, params) {
-            return url + (/\?/.test(url) ? '&' : '?') + $.param(params);
-        },
-        serialize: function (data) {
-            if ($.support.cors) {
-                return JSON.stringify(data, function (key, value) {
-                    return value === null ? undefined : value;
-                });
-            } else {
-                data = this.compactObject(data);
-                return $.param(data, true);
-            }
-        },
-        compact: function (array) {
-            return $.grep(array, function (el) {
-                return !!el;
-            });
-        },
-        delay: function (handler, delay) {
-            return setTimeout(handler, delay || 0);
-        },
-        uniqueId: function (prefix) {
-            return (prefix || '') + ++uniqueId;
-        },
-        slice: function(obj, start) {
-            return Array.prototype.slice.call(obj, start);
-        },
-        indexBy: function (data, field, indexField) {
-            var result = {};
-
-            $.each(data, function (i, obj) {
-                var key = obj[field],
-                    val = {};
-
-                if (indexField) {
-                    val[indexField] = i;
-                }
-
-                result[key] = $.extend(true, val, obj);
-            });
-
-            return result;
-        },
-
-        /**
-         * Compares two objects, but only fields that are set in both
-         * @param a
-         * @param b
-         * @returns {boolean}
-         */
-        areSame: function self(a, b) {
-            var same = true;
-
-            if (typeof a != typeof b) {
-                return false;
-            }
-
-            if (typeof a == 'object' && a != null && b != null) {
-                $.each(a, function (i, value) {
-                    return same = self(value, b[i]);
-                });
-                return same;
-            }
-
-            return a === b;
-        },
-
-        /**
-         * Returns array1 minus array2
-         */
-        arrayMinus: function(array1, array2) {
-            return array2 ? $.grep(array1, function(el, i){
-                return $.inArray(el, array2) === -1;
-            }) : array1;
-        },
-        /**
-         * Returns array1 minus array2
-         * if value in array1 in enclosed by value in array2, it is considered a match
-         */
-        arrayMinusWithPartialMatching: function(array1, array2) {
-            return array2 ? $.grep(array1, function(el, i){
-                return !array2.some(function(el2) {
-                    return el2.indexOf(el) === 0;
-                })
-            }) : array1;
-        },
-        /**
-         * Пересечение массивов: ([1,2,3,4], [2,4,5,6]) => [2,4]
-         * Исходные массивы не меняются
-         * @param {Array} array1
-         * @param {Array} array2
-         * @returns {Array}
-         */
-        arraysIntersection: function(array1, array2) {
-            var result = [];
-            if (!$.isArray(array1) || !$.isArray(array2)) {
-                return result;
-            }
-            $.each(array1, function(index, item) {
-                if ($.inArray(item, array2) >= 0) {
-                    result.push(item);
-                }
-            });
-            return result;
-        },
-        getWords: function(str, stopwords) {
-            // Split numbers and letters written together
-            str = str.replace(/(\d+)([а-яА-ЯёЁ]{2,})/g, '$1 $2')
-                .replace(/([а-яА-ЯёЁ]+)(\d+)/g, '$1 $2');
-
-            var words = this.compact(str.split(WORD_SPLITTER)),
-                lastWord = words.pop(),
-                goodWords = this.arrayMinus(words, stopwords);
-
-            goodWords.push(lastWord);
-            return goodWords;
-        },
-        /**
-         * Returns normalized string without stopwords
-         */
-        normalize: function(str, stopwords) {
-            var that = this;
-            return that.getWords(str, stopwords).join(' ');
-        },
-        /**
-         * Returns true if str1 includes str2 plus something else, false otherwise.
-         */
-        stringEncloses: function(str1, str2) {
-            return str1.length > str2.length && str1.indexOf(str2) !== -1;
-        },
-        fieldsNotEmpty: function(obj, fields){
-            if (!$.isPlainObject(obj)) {
-                return false;
-            }
-            var result = true;
-            $.each(fields, function (i, field) {
-                return result = !!(obj[field]);
-            });
-            return result;
-        },
-        getDeepValue: function self(obj, name) {
-            var path = name.split('.'),
-                step = path.shift();
-
-            return obj && (path.length ? self(obj[step], path.join('.')) : obj[step]);
-        },
-        reWordExtractor: function () {
-            return new RegExp('([^' + WORD_DELIMITERS + ']*)([' + WORD_DELIMITERS + ']*)', 'g');
-        },
-        formatToken: function (token) {
-            return token && token.toLowerCase().replace(/[ёЁ]/g, 'е');
-        },
-        withSubTokens: function (tokens) {
-            var result = [];
-
-            $.each(tokens, function (i, token) {
-                var subtokens = token.split(WORD_PARTS_SPLITTER);
-
-                result.push(token);
-
-                if (subtokens.length > 1) {
-                    result = result.concat(utils.compact(subtokens));
-                }
-            });
-
-            return result;
-        },
-
-        /**
-         * Возвращает массив с ключами переданного объекта
-         * Используется нативный Object.keys если он есть
-         * @param {Object} obj
-         * @returns {Array}
-         */
-        objectKeys: function(obj) {
-            if (Object.keys) {
-                return Object.keys(obj);
-            }
-            var keys = [];
-            $.each(obj, function(name) {
-                keys.push(name);
-            });
-            return keys;
-        },
-
-        /**
-         * Возвращает копию объекта без пустых элементов
-         * @param obj
-         */
-        compactObject: function(obj) {
-            var copy = $.extend(true, {}, obj);
-
-            $.each(copy, function (key, val) {
-                if (val === null || val === undefined || val === '') {
-                    delete copy[key];
-                }
-            });
-
-            return copy;
-        }
-
-    };
-}());
-
-/**
- * Matchers return index of suitable suggestion
- * Context inside is optionally set in types.js
- */
-var matchers = function() {
-
-    /**
-     * Factory to create same parent checker function
-     * @param preprocessFn called on each value before comparison
-     * @returns {Function} same parent checker function
-     */
-    function sameParentChecker (preprocessFn) {
-        return function (suggestions) {
-            if (suggestions.length === 0) {
-                return false;
-            }
-            if (suggestions.length === 1) {
-                return true;
-            }
-
-            var parentValue = preprocessFn(suggestions[0].value),
-                aliens = $.grep(suggestions, function (suggestion) {
-                    return preprocessFn(suggestion.value).indexOf(parentValue) === 0;
-                }, true);
-
-            return aliens.length === 0;
-        }
-    }
-
-    /**
-     * Default same parent checker. Compares raw values.
-     * @type {Function}
-     */
-    var haveSameParent = sameParentChecker(function(val) { return val; });
-
-    /**
-     * Same parent checker for addresses. Strips house and extension before comparison.
-     * @type {Function}
-     */
-    var haveSameParentAddress = sameParentChecker(function(val) {
-        return val.replace(/, (?:д|вл|двлд|к) .+$/, '');
-    });
-
-    return {
-
-        /**
-         * Matches query against suggestions, removing all the stopwords.
-         */
-        matchByNormalizedQuery: function (query, suggestions) {
-            var queryLowerCase = query.toLowerCase(),
-                stopwords = this && this.stopwords,
-                normalizedQuery = utils.normalize(queryLowerCase, stopwords),
-                matches = [];
-
-            $.each(suggestions, function(i, suggestion) {
-                var suggestedValue = suggestion.value.toLowerCase();
-                // if query encloses suggestion, than it has already been selected
-                // so we should not select it anymore
-                if (utils.stringEncloses(queryLowerCase, suggestedValue)) {
-                    return false;
-                }
-                // if there is suggestion that contains query as its part
-                // than we should ignore all other matches, even full ones
-                if (suggestedValue.indexOf(normalizedQuery) > 0) {
-                    return false;
-                }
-                if (normalizedQuery === utils.normalize(suggestedValue, stopwords)) {
-                    matches.push(i);
-                }
-            });
-
-            return matches.length === 1 ? matches[0] : -1;
-        },
-
-        /**
-         * Matches query against suggestions word-by-word (with respect to stopwords).
-         * Matches if query words are a subset of suggested words.
-         */
-        matchByWords: function (query, suggestions) {
-            var stopwords = this && this.stopwords,
-                queryLowerCase = query.toLowerCase(),
-                queryTokens,
-                matches = [];
-
-            if (haveSameParent(suggestions)) {
-                queryTokens = utils.withSubTokens(utils.getWords(queryLowerCase, stopwords));
-
-                $.each(suggestions, function(i, suggestion) {
-                    var suggestedValue = suggestion.value.toLowerCase();
-
-                    if (utils.stringEncloses(queryLowerCase, suggestedValue)) {
-                        return false;
-                    }
-
-                    // check if query words are a subset of suggested words
-                    var suggestionWords = utils.withSubTokens(utils.getWords(suggestedValue, stopwords));
-
-                    if (utils.arrayMinus(queryTokens, suggestionWords).length === 0) {
-                        matches.push(i);
-                    }
-                });
-            }
-
-            return matches.length === 1 ? matches[0] : -1;
-        },
-
-        matchByWordsAddress: function (query, suggestions) {
-            var stopwords = this && this.stopwords,
-                queryLowerCase = query.toLowerCase(),
-                queryTokens,
-                index = -1;
-
-            if (haveSameParentAddress(suggestions)) {
-                queryTokens = utils.withSubTokens(utils.getWords(queryLowerCase, stopwords));
-
-                $.each(suggestions, function(i, suggestion) {
-                    var suggestedValue = suggestion.value.toLowerCase();
-
-                    if (utils.stringEncloses(queryLowerCase, suggestedValue)) {
-                        return false;
-                    }
-
-                    // check if query words are a subset of suggested words
-                    var suggestionWords = utils.withSubTokens(utils.getWords(suggestedValue, stopwords));
-
-                    if (utils.arrayMinus(queryTokens, suggestionWords).length === 0) {
-                        index = i;
-                        return false;
-                    }
-                });
-            }
-
-            return index;
-        },
-
-        /**
-         * Matches query against values contained in suggestion fields
-         * for cases, when there is only one suggestion
-         * only considers fields specified in fieldsStopwords map
-         * uses partial matching:
-         *   "0445" vs { value: "ALFA-BANK", data: { "bic": "044525593" }} is a match
-         */
-        matchByFields: function (query, suggestions) {
-            var stopwords = this && this.stopwords,
-                fieldsStopwords = this && this.fieldsStopwords,
-                tokens = utils.withSubTokens(utils.getWords(query.toLowerCase(), stopwords)),
-                suggestionWords = [];
-
-            if (suggestions.length === 1) {
-                if (fieldsStopwords) {
-                    $.each(fieldsStopwords, function (field, stopwords) {
-                        var fieldValue = utils.getDeepValue(suggestions[0], field),
-                            fieldWords = fieldValue && utils.withSubTokens(utils.getWords(fieldValue.toLowerCase(), stopwords));
-
-                        if (fieldWords && fieldWords.length) {
-                            suggestionWords = suggestionWords.concat(fieldWords);
-                        }
-                    });
-                }
-
-                if (utils.arrayMinusWithPartialMatching(tokens, suggestionWords).length === 0) {
-                    return 0;
-                }
-            }
-
-            return -1;
-        }
-
-    };
-
-}();
-
-var DEFAULT_OPTIONS = {
-    autoSelectFirst: false,
-    // основной url, может быть переопределен
-    serviceUrl: 'https://suggestions.dadata.ru/suggestions/api/4_1/rs',
-    // url, который заменяет serviceUrl + method + type
-    // то есть, если он задан, то для всех запросов будет использоваться именно он
-    // если не поддерживается cors то к url будут добавлены параметры ?token=...&version=...
-    // и заменен протокол на протокол текущей страницы
-    url: null,
-    onSearchStart: $.noop,
-    onSearchComplete: $.noop,
-    onSearchError: $.noop,
-    onSuggestionsFetch: null,
-    onSelect: null,
-    onSelectNothing: null,
-    onInvalidateSelection: null,
-    minChars: 1,
-    deferRequestBy: 100,
-    params: {},
-    paramName: 'query',
-    timeout: 3000,
-    formatResult: null,
-    formatSelected: null,
-    noCache: false,
-    containerClass: 'suggestions-suggestions',
-    tabDisabled: false,
-    triggerSelectOnSpace: false,
-    triggerSelectOnEnter: true,
-    triggerSelectOnBlur: true,
-    preventBadQueries: false,
-    hint: 'Выберите вариант или продолжите ввод',
-    noSuggestionsHint: {
-        NAME:       'Неизвестное ФИО',
-        ADDRESS:    'Неизвестный адрес',
-        EMAIL:      'Неизвестная эл. почта',
-        PARTY:      'Неизвестная организация',
-        BANK:       'Неизвестный банк'
-    },
-    type: null,
-    requestMode: 'suggest',
-    count: 5,
-    $helpers: null,
-    headers: null,
-    scrollOnFocus: true,
-    mobileWidth: 980,
-    initializeInterval: 100
-};
-
-/**
- * Type is a bundle of properties:
- * - urlSuffix Mandatory. String
- * - matchers Mandatory. Array of functions (with optional data bound as a context) that find appropriate suggestion to select
- * - `fieldNames` Map fields of suggestion.data to their displayable names
- * - `unformattableTokens` Array of strings which should not be highlighted
- * - `dataComponents` Array of 'bound's can be set as `bounds` option. Order is important.
+ * Copyright 2015, Yuriy Khabarov
+ * Dual licensed under the MIT or GPL Version 2 licenses.
  *
- * flags:
- * - `alwaysContinueSelecting` Forbids to hide dropdown after selecting
- * - `geoEnabled` Makes to detect client's location for passing it to all requests
- * - `enrichmentEnabled` Makes to send additional request when a suggestion is selected
+ * If you found bug, please contact me via email <13real008@gmail.com>
  *
- * and methods:
- * - `isDataComplete` Checks if suggestion.data can be operated as full data of it's type
- * - `composeValue` returns string value based on suggestion.data
- * - `formatResult` returns html of a suggestion. Overrides default method
- * - `formatResultInn` returns html of suggestion.data.inn
- * - `isQueryRequestable` checks if query is appropriated for requesting server
- * - `formatSelected` returns string to be inserted in textbox
+ * Compressed by http://jscompress.com/
+ *
+ * @author Yuriy Khabarov aka Gromo
+ * @version 0.2.10
+ * @url https://github.com/gromo/jquery.scrollbar/
+ *
  */
-
-var ADDRESS_STOPWORDS = ['ао', 'аобл', 'дом', 'респ', 'а/я', 'аал', 'автодорога', 'аллея', 'арбан', 'аул', 'б-р', 'берег', 'бугор', 'вал', 'вл', 'волость', 'въезд', 'высел', 'г', 'городок', 'гск', 'д', 'двлд', 'днп', 'дор', 'дп', 'ж/д_будка', 'ж/д_казарм', 'ж/д_оп', 'ж/д_платф', 'ж/д_пост', 'ж/д_рзд', 'ж/д_ст', 'жилзона', 'жилрайон', 'жт', 'заезд', 'заимка', 'зона', 'к', 'казарма', 'канал', 'кв', 'кв-л', 'км', 'кольцо', 'комн', 'кордон', 'коса', 'кп', 'край', 'линия', 'лпх', 'м', 'массив', 'местность', 'мкр', 'мост', 'н/п', 'наб', 'нп', 'обл', 'округ', 'остров', 'оф', 'п', 'п/о', 'п/р', 'п/ст', 'парк', 'пгт', 'пер', 'переезд', 'пл', 'пл-ка', 'платф', 'погост', 'полустанок', 'починок', 'пр-кт', 'проезд', 'промзона', 'просек', 'просека', 'проселок', 'проток', 'протока', 'проулок', 'р-н', 'рзд', 'россия', 'рп', 'ряды', 'с', 'с/а', 'с/мо', 'с/о', 'с/п', 'с/с', 'сад', 'сквер', 'сл', 'снт', 'спуск', 'ст', 'ст-ца', 'стр', 'тер', 'тракт', 'туп', 'у', 'ул', 'уч-к', 'ф/х', 'ферма', 'х', 'ш', 'бульвар', 'владение', 'выселки', 'гаражно-строительный', 'город', 'деревня', 'домовладение', 'дорога', 'квартал', 'километр', 'комната', 'корпус', 'литер', 'леспромхоз', 'местечко', 'микрорайон', 'набережная', 'область', 'переулок', 'платформа', 'площадка', 'площадь', 'поселение', 'поселок', 'проспект', 'разъезд', 'район', 'республика', 'село', 'сельсовет', 'слобода', 'сооружение', 'станица', 'станция', 'строение', 'территория', 'тупик', 'улица', 'улус', 'участок', 'хутор', 'шоссе'];
-
-/**
- * Компоненты адреса
- * @type {*[]}
- * id {String} Наименование типа
- * fields {Array of Strings}
- * forBounds {Boolean} может использоваться в ограничениях
- * forLocations {Boolean}
- * kladrFormat {Object}
- * fiasType {String} Наименование соответствующего ФИАС типа
- */
-var ADDRESS_COMPONENTS = [
-    {
-        id: 'kladr_id',
-        fields: ['kladr_id'],
-        forBounds: false,
-        forLocations: true
-    },
-    {
-        id: 'postal_code',
-        fields: ['postal_code'],
-        forBounds: false,
-        forLocations: true
-    },
-    {
-        id: 'country',
-        fields: ['country'],
-        forBounds: false,
-        forLocations: true
-    },
-    {
-        id: 'region_fias_id',
-        fields: ['region_fias_id'],
-        forBounds: false,
-        forLocations: true
-    },
-    {
-        id: 'region_type_full',
-        fields: ['region_type_full'],
-        forBounds: false,
-        forLocations: true,
-        kladrFormat: { digits: 2, zeros: 11 },
-        fiasType: 'region_fias_id'
-    },
-    {
-        id: 'region',
-        fields: ['region', 'region_type', 'region_type_full', 'region_with_type'],
-        forBounds: true,
-        forLocations: true,
-        kladrFormat: { digits: 2, zeros: 11 },
-        fiasType: 'region_fias_id'
-    },
-    {
-        id: 'area_fias_id',
-        fields: ['area_fias_id'],
-        forBounds: false,
-        forLocations: true
-    },
-    {
-        id: 'area_type_full',
-        fields: ['area_type_full'],
-        forBounds: false,
-        forLocations: true,
-        kladrFormat: { digits: 5, zeros: 8 },
-        fiasType: 'area_fias_id'
-    },
-    {
-        id: 'area',
-        fields: ['area', 'area_type', 'area_type_full', 'area_with_type'],
-        forBounds: true,
-        forLocations: true,
-        kladrFormat: { digits: 5, zeros: 8 },
-        fiasType: 'area_fias_id'
-    },
-    {
-        id: 'city_fias_id',
-        fields: ['city_fias_id'],
-        forBounds: false,
-        forLocations: true
-    },
-    {
-        id: 'city_type_full',
-        fields: ['city_type_full'],
-        forBounds: false,
-        forLocations: true,
-        kladrFormat: { digits: 8, zeros: 5 },
-        fiasType: 'city_fias_id'
-    },
-    {
-        id: 'city',
-        fields: ['city', 'city_type', 'city_type_full', 'city_with_type'],
-        forBounds: true,
-        forLocations: true,
-        kladrFormat: { digits: 8, zeros: 5 },
-        fiasType: 'city_fias_id'
-    },
-    {
-        id: 'city_district_fias_id',
-        fields: ['city_district_fias_id'],
-        forBounds: false,
-        forLocations: true
-    },
-    {
-        id: 'city_district_type_full',
-        fields: ['city_district_type_full'],
-        forBounds: false,
-        forLocations: true,
-        kladrFormat: { digits: 11, zeros: 2 },
-        fiasType: 'city_district_fias_id'
-    },
-    {
-        id: 'city_district',
-        fields: ['city_district', 'city_district_type', 'city_district_type_full', 'city_district_with_type'],
-        forBounds: true,
-        forLocations: true,
-        kladrFormat: { digits: 11, zeros: 2 },
-        fiasType: 'city_district_fias_id'
-    },
-    {
-        id: 'settlement_fias_id',
-        fields: ['settlement_fias_id'],
-        forBounds: false,
-        forLocations: true
-    },
-    {
-        id: 'settlement_type_full',
-        fields: ['settlement_type_full'],
-        forBounds: false,
-        forLocations: true,
-        kladrFormat: { digits: 11, zeros: 2 },
-        fiasType: 'settlement_fias_id'
-    },
-    {
-        id: 'settlement',
-        fields: ['settlement', 'settlement_type', 'settlement_type_full', 'settlement_with_type'],
-        forBounds: true,
-        forLocations: true,
-        kladrFormat: { digits: 11, zeros: 2 },
-        fiasType: 'settlement_fias_id'
-    },
-    {
-        id: 'street_fias_id',
-        fields: ['street_fias_id'],
-        forBounds: false,
-        forLocations: true
-    },
-    {
-        id: 'street_type_full',
-        fields: ['street_type_full'],
-        forBounds: false,
-        forLocations: true,
-        kladrFormat: { digits: 15, zeros: 2 },
-        fiasType: 'street_fias_id'
-    },
-    {
-        id: 'street',
-        fields: ['street', 'street_type', 'street_type_full', 'street_with_type'],
-        forBounds: true,
-        forLocations: true,
-        kladrFormat: { digits: 15, zeros: 2 },
-        fiasType: 'street_fias_id'
-    },
-    {
-        id: 'house',
-        fields: ['house', 'house_type', 'house_type_full',
-            'block', 'block_type'],
-        forBounds: true,
-        forLocations: false,
-        kladrFormat: { digits: 19 }
-    }
-
-];
-
-var rHasMatch = /<strong>/;
-
-var innPartsLengths = {
-    'LEGAL': [2, 2, 5, 1],
-    'INDIVIDUAL': [2, 2, 6, 2]
-};
-
-function valueStartsWith (suggestion, field) {
-    var fieldValue = suggestion.data && suggestion.data[field];
-
-    return fieldValue &&
-        new RegExp('^' + utils.escapeRegExChars(fieldValue) + '([' + WORD_DELIMITERS + ']|$)','i')
-            .test(suggestion.value);
-}
-
-function chooseFormattedField (formattedMain, formattedAlt) {
-    return rHasMatch.test(formattedAlt) && !rHasMatch.test(formattedMain)
-        ? formattedAlt
-        : formattedMain;
-}
-
-function formattedField (main, alt, currentValue, suggestion, options) {
-    var that = this,
-        formattedMain = that.highlightMatches(main, currentValue, suggestion, options),
-        formattedAlt = that.highlightMatches(alt, currentValue, suggestion, options);
-
-    return chooseFormattedField(formattedMain, formattedAlt);
-}
-
-var types = {};
-
-types['NAME'] = {
-    urlSuffix: 'fio',
-    matchers: [matchers.matchByNormalizedQuery, matchers.matchByWords],
-    // names for labels, describing which fields are displayed
-    fieldNames: {
-        surname: 'фамилия',
-        name: 'имя',
-        patronymic: 'отчество'
-    },
-    // try to suggest even if a suggestion has been selected manually
-    alwaysContinueSelecting: true,
-    isDataComplete: function (suggestion) {
-        var that = this,
-            params = that.options.params,
-            data = suggestion.data,
-            fields;
-
-        if ($.isFunction(params)) {
-            params = params.call(that.element, suggestion.value);
-        }
-        if (params && params.parts) {
-            fields = $.map(params.parts, function (part) {
-                return part.toLowerCase();
-            });
-        } else {
-            // when NAME is first, patronymic is mot mandatory
-            fields = ['surname', 'name'];
-            // when SURNAME is first, it is
-            if (valueStartsWith(suggestion, 'surname')) {
-                fields.push('patronymic');
-            }
-        }
-        return utils.fieldsNotEmpty(data, fields);
-    },
-    composeValue: function (data) {
-        return utils.compact([data.surname, data.name, data.patronymic]).join(' ');
-    }
-};
-
-types['ADDRESS'] = {
-    urlSuffix: 'address',
-    matchers: [
-        $.proxy(matchers.matchByNormalizedQuery, { stopwords: ADDRESS_STOPWORDS }),
-        $.proxy(matchers.matchByWordsAddress, { stopwords: ADDRESS_STOPWORDS })
-    ],
-    dataComponents: ADDRESS_COMPONENTS,
-    dataComponentsById: utils.indexBy(ADDRESS_COMPONENTS, 'id', 'index'),
-    unformattableTokens: ADDRESS_STOPWORDS,
-    enrichmentEnabled: true,
-    geoEnabled: true,
-    isDataComplete: function (suggestion) {
-        var fields = [this.bounds.to || 'flat'],
-            data = suggestion.data;
-
-        return !$.isPlainObject(data) || utils.fieldsNotEmpty(data, fields);
-    },
-    composeValue: function (data, options) {
-        var region = data.region_with_type || utils.compact([data.region, data.region_type]).join(' ') || data.region_type_full,
-            area = data.area_with_type || utils.compact([data.area_type, data.area]).join(' ') || data.area_type_full,
-            city = data.city_with_type || utils.compact([data.city_type, data.city]).join(' ') || data.city_type_full,
-            settelement = data.settlement_with_type || utils.compact([data.settlement_type, data.settlement]).join(' ') || data.settlement_type_full,
-            cityDistrict = data.city_district_with_type || utils.compact([data.city_district_type, data.city_district]).join(' ') || data.city_district_type_full,
-            street = data.street_with_type || utils.compact([data.street_type, data.street]).join(' ') || data.street_type_full,
-            house = utils.compact([data.house_type, data.house, data.block_type, data.block]).join(' '),
-            flat = utils.compact([data.flat_type, data.flat]).join(' '),
-            postal_box = data.postal_box && ('а/я ' + data.postal_box),
-            result;
-
-        // если регион совпадает с городом
-        // например г Москва, г Москва
-        // то не показываем регион
-        if (region === city) {
-            region = '';
-        }
-
-        // иногда не показываем район
-        if (!(options && options.saveCityDistrict)) {
-            if (options && options.excludeCityDistrict) {
-                // если район явно запрещен
-                cityDistrict = '';
-            } else if (cityDistrict && !data.city_district_fias_id) {
-                // если район взят из ОКАТО (у него пустой city_district_fias_id)
-                cityDistrict = '';
-            }
-        }
-
-        result = utils.compact([
-            region,
-            area,
-            city,
-            cityDistrict,
-            settelement,
-            street,
-            house,
-            flat,
-            postal_box
-        ]).join(', ');
-
-        return result;
-    },
-    formatResult: function() {
-        var componentsUnderCityDistrict = [],
-            _underCityDistrict = false;
-
-        $.each(ADDRESS_COMPONENTS, function () {
-            if (_underCityDistrict) componentsUnderCityDistrict.push(this.id);
-            if (this.id === 'city_district') _underCityDistrict = true;
-        });
-
-        return function (value, currentValue, suggestion, options) {
-            var that = this,
-                district = suggestion.data && suggestion.data.city_district_with_type;
-
-            value = that.highlightMatches(value, currentValue, suggestion, options);
-            value = that.wrapFormattedValue(value, suggestion);
-
-            if (district && (!that.bounds.own.length || that.bounds.own.indexOf('street') >= 0)
-                && !$.isEmptyObject(that.copyDataComponents(suggestion.data, componentsUnderCityDistrict))) {
-                value +=
-                    '<div class="' + that.classes.subtext + '">' +
-                    that.highlightMatches(district, currentValue, suggestion) +
-                    '</div>';
-            }
-
-            return value;
-        };
-    }(),
-    /**
-     * @param instance
-     * @param options
-     * @param options.suggestion
-     * @param options.hasSameValues
-     * @param options.hasBeenEnreached
-     */
-    getSuggestionValue: function(instance, options) {
-        var formattedValue = null;
-
-        if (options.hasSameValues) {
-            if (instance.options.restrict_value) {
-                // Can not use unrestricted address,
-                // because some components (from constraints) must be omitted
-                formattedValue = this.getValueWithinConstraints(instance, options.suggestion);
-            } else if (instance.bounds.own.length) {
-                // Can not use unrestricted address,
-                // because only components from bounds must be included
-                formattedValue = this.getValueWithinBounds(instance, options.suggestion);
-            } else {
-                // Can use full unrestricted address
-                formattedValue = options.suggestion.unrestricted_value;
-            }
-        } else if (options.hasBeenEnriched) {
-            if (instance.options.restrict_value) {
-                formattedValue = this.getValueWithinConstraints(instance, options.suggestion, { excludeCityDistrict: true });
-            }
-        }
-
-        return formattedValue;
-    },
-    /*
-     * Compose suggestion value with respect to constraints
-     */
-    getValueWithinConstraints: function (instance, suggestion, options) {
-        return this.composeValue(instance.getUnrestrictedData(suggestion.data), options);
-    },
-    /*
-     * Compose suggestion value with respect to bounds
-     */
-    getValueWithinBounds: function (instance, suggestion, options) {
-        // для корректного составления адреса нужен city_district_fias_id
-        var data = instance.copyDataComponents(suggestion.data, instance.bounds.own.concat(['city_district_fias_id']));
-
-        return this.composeValue(data, options);
-    }
-
-};
-
-types['PARTY'] = {
-    urlSuffix: 'party',
-    matchers: [
-        $.proxy(matchers.matchByFields, {
-            // These fields of suggestion's `data` used by by-words matcher
-            fieldsStopwords: {
-                'value': null,
-                'data.address.value': ADDRESS_STOPWORDS,
-                'data.inn': null,
-                'data.ogrn': null
-            }
-        })
-    ],
-    dataComponents: ADDRESS_COMPONENTS,
-    geoEnabled: true,
-    formatResult: function (value, currentValue, suggestion, options) {
-        var that = this,
-            formattedInn = that.type.formatResultInn.call(that, suggestion, currentValue),
-            formatterOGRN = that.highlightMatches(utils.getDeepValue(suggestion.data, 'ogrn'), currentValue, suggestion),
-            formattedInnOGRN = chooseFormattedField(formattedInn, formatterOGRN),
-            formattedFIO = that.highlightMatches(utils.getDeepValue(suggestion.data, 'management.name'), currentValue, suggestion),
-            address = utils.getDeepValue(suggestion.data, 'address.value') || '';
-
-        if (that.isMobile) {
-            (options || (options = {})).maxLength = 50;
-        }
-
-        value = formattedField.call(that, value, utils.getDeepValue(suggestion.data, 'name.latin'), currentValue, suggestion, options);
-        value = that.wrapFormattedValue(value, suggestion);
-
-        if (address) {
-            address = address.replace(/^(\d{6}?\s+|Россия,\s+)/i, '');
-            if (that.isMobile) {
-                // keep only two first words
-                address = address.replace(new RegExp('^([^' + WORD_DELIMITERS + ']+[' + WORD_DELIMITERS + ']+[^' + WORD_DELIMITERS + ']+).*'), '$1');
-            } else {
-                address = that.highlightMatches(address, currentValue, suggestion, {
-                    unformattableTokens: ADDRESS_STOPWORDS
-                });
-            }
-        }
-
-        if (formattedInnOGRN || address || formattedFIO) {
-            value +=
-                '<div class="' + that.classes.subtext + '">' +
-                '<span class="' + that.classes.subtext_inline + '">' + (formattedInnOGRN || '') + '</span>' +
-                (chooseFormattedField(address, formattedFIO) || '') +
-                '</div>';
-        }
-        return value;
-    },
-    formatResultInn: function(suggestion, currentValue) {
-        var that = this,
-            inn = suggestion.data && suggestion.data.inn,
-            innPartsLength = innPartsLengths[suggestion.data && suggestion.data.type],
-            innParts,
-            formattedInn,
-            rDigit = /\d/;
-
-        if (inn) {
-            formattedInn = that.highlightMatches(inn, currentValue, suggestion);
-            if (innPartsLength) {
-                formattedInn = formattedInn.split('');
-                innParts = $.map(innPartsLength, function (partLength) {
-                    var formattedPart = '',
-                        ch;
-
-                    while (partLength && (ch = formattedInn.shift())) {
-                        formattedPart += ch;
-                        if (rDigit.test(ch)) partLength--;
-                    }
-
-                    return formattedPart;
-                });
-                formattedInn = innParts.join('<span class="' + that.classes.subtext_delimiter + '"></span>') +
-                    formattedInn.join('');
-            }
-
-            return formattedInn;
-        }
-    }
-};
-
-types['EMAIL'] = {
-    urlSuffix: 'email',
-    matchers: [matchers.matchByNormalizedQuery],
-    isQueryRequestable: function (query) {
-        return this.options.suggest_local || query.indexOf('@') >= 0;
-    }
-};
-
-types['BANK'] = {
-    urlSuffix: 'bank',
-    matchers: [$.proxy(matchers.matchByFields, {
-        // These fields of suggestion's `data` used by by-words matcher
-        fieldsStopwords: {
-            'value': null,
-            'data.bic': null,
-            'data.swift': null
-        }
-    })],
-    dataComponents: ADDRESS_COMPONENTS,
-    geoEnabled: true,
-    formatResult: function (value, currentValue, suggestion, options) {
-        var that = this,
-            formattedBIC = that.highlightMatches(utils.getDeepValue(suggestion.data, 'bic'), currentValue, suggestion),
-            address = utils.getDeepValue(suggestion.data, 'address.value') || '';
-
-        value = that.highlightMatches(value, currentValue, suggestion, options);
-        value = that.wrapFormattedValue(value, suggestion);
-
-        if (address) {
-            address = address.replace(/^\d{6}( РОССИЯ)?, /i, '');
-            if (that.isMobile) {
-                // keep only two first words
-                address = address.replace(new RegExp('^([^' + WORD_DELIMITERS + ']+[' + WORD_DELIMITERS + ']+[^' + WORD_DELIMITERS + ']+).*'), '$1');
-            } else {
-                address = that.highlightMatches(address, currentValue, suggestion, {
-                    unformattableTokens: ADDRESS_STOPWORDS
-                });
-            }
-        }
-
-        if (formattedBIC || address) {
-            value +=
-                '<div class="' + that.classes.subtext + '">' +
-                '<span class="' + that.classes.subtext_inline + '">' + formattedBIC + '</span>' +
-                address +
-                '</div>';
-        }
-        return value;
-    },
-    formatSelected: function (suggestion) {
-        return utils.getDeepValue(suggestion, 'data.name.payment');
-    }
-};
-
-$.extend(DEFAULT_OPTIONS, {
-    suggest_local: true
-});
-
-var notificator = {
-
-    chains: {},
-
-    'on': function (name, method) {
-        this.get(name).push(method);
-        return this;
-    },
-
-    'get': function (name) {
-        var chains = this.chains;
-        return chains[name] || (chains[name] = []);
-    }
-};
-
-var serviceMethods = {
-    'suggest': {
-        defaultParams: {
-            type: utils.getDefaultType(),
-            dataType: 'json',
-            contentType: utils.getDefaultContentType()
-        },
-        addTypeInUrl: true
-    },
-    'detectAddressByIp': {
-        defaultParams: {
-            type: 'GET',
-            dataType: 'json'
-        },
-        addTypeInUrl: false
-    },
-    'status': {
-        defaultParams: {
-            type: 'GET',
-            dataType: 'json'
-        },
-        addTypeInUrl: true
-    },
-    'findById': {
-        defaultParams: {
-            type: utils.getDefaultType(),
-            dataType: 'json',
-            contentType: utils.getDefaultContentType()
-        },
-        addTypeInUrl: true
-    }
-};
-
-var requestModes = {
-    'suggest': {
-        method: 'suggest',
-        userSelect: true,
-        updateValue: true,
-        enrichmentEnabled: true
-    },
-    'findById': {
-        method: 'findById',
-        userSelect: false,
-        updateValue: false,
-        enrichmentEnabled: false
-    }
-};
-
-function Suggestions(el, options) {
-    var that = this;
-
-    // Shared variables:
-    that.element = el;
-    that.el = $(el);
-    that.suggestions = [];
-    that.badQueries = [];
-    that.selectedIndex = -1;
-    that.currentValue = that.element.value;
-    that.intervalId = 0;
-    that.cachedResponse = {};
-    that.enrichmentCache = {};
-    that.currentRequest = null;
-    that.inputPhase = $.Deferred();
-    that.fetchPhase = $.Deferred();
-    that.enrichPhase = $.Deferred();
-    that.onChangeTimeout = null;
-    that.triggering = {};
-    that.$wrapper = null;
-    that.options = $.extend({}, DEFAULT_OPTIONS, options);
-    that.classes = {
-        hint: 'suggestions-hint',
-        mobile: 'suggestions-mobile',
-        nowrap: 'suggestions-nowrap',
-        selected: 'suggestions-selected',
-        suggestion: 'suggestions-suggestion',
-        subtext: 'suggestions-subtext',
-        subtext_inline: 'suggestions-subtext suggestions-subtext_inline',
-        subtext_delimiter: 'suggestions-subtext-delimiter',
-        subtext_label: 'suggestions-subtext suggestions-subtext_label',
-        removeConstraint: 'suggestions-remove',
-        value: 'suggestions-value'
-    };
-    that.disabled = false;
-    that.selection = null;
-    that.$viewport = $(window);
-    that.$body = $(document.body);
-    that.type = null;
-    that.status = {};
-
-    that.setupElement();
-
-    that.initializer = $.Deferred();
-
-    if (that.el.is(':visible')) {
-        that.initializer.resolve();
-    } else {
-        that.deferInitialization();
-    }
-
-    that.initializer.done($.proxy(that.initialize, that));
-}
-
-Suggestions.prototype = {
-
-    // Creation and destruction
-
-    initialize: function () {
-        var that = this;
-
-        that.uniqueId = utils.uniqueId('i');
-
-        that.createWrapper();
-        that.notify('initialize');
-
-        that.bindWindowEvents();
-
-        that.setOptions();
-        that.fixPosition();
-    },
-
-    /**
-     * Initialize when element is firstly interacted
-     */
-    deferInitialization: function () {
-        var that = this,
-            events = 'mouseover focus keydown',
-            timer,
-            callback = function () {
-                that.initializer.resolve();
-                that.enable();
-            };
-
-        that.initializer.always(function(){
-            that.el.off(events, callback);
-            clearInterval(timer);
-        });
-
-        that.disabled = true;
-        that.el.on(events, callback);
-        timer = setInterval(function(){
-            if (that.el.is(':visible')) {
-                callback();
-            }
-        }, that.options.initializeInterval);
-    },
-
-    isInitialized: function () {
-        return this.initializer.state() === 'resolved';
-    },
-
-    dispose: function () {
-        var that = this;
-
-        that.initializer.reject();
-        that.notify('dispose');
-        that.el.removeData(DATA_ATTR_KEY)
-            .removeClass('suggestions-input');
-        that.unbindWindowEvents();
-        that.removeWrapper();
-        that.el.trigger('suggestions-dispose');
-    },
-
-    notify: function (chainName) {
-        var that = this,
-            args = utils.slice(arguments, 1);
-
-        return $.map(notificator.get(chainName), function (method) {
-            return method.apply(that, args);
-        });
-    },
-
-    createWrapper: function () {
-        var that = this;
-
-        that.$wrapper = $('<div class="suggestions-wrapper"/>');
-        that.el.after(that.$wrapper);
-
-        that.$wrapper.on('mousedown' + EVENT_NS, $.proxy(that.onMousedown, that));
-    },
-
-    removeWrapper: function () {
-        var that = this;
-
-        if (that.$wrapper) {
-            that.$wrapper.remove();
-        }
-        $(that.options.$helpers).off(EVENT_NS);
-    },
-
-    /** This whole handler is needed to prevent blur event on textbox
-     * when suggestion is clicked (blur leads to suggestions hide, so we need to prevent it).
-     * See https://github.com/jquery/jquery-ui/blob/master/ui/autocomplete.js for details
-     */
-    onMousedown: function (e) {
-        var that = this;
-
-        // prevent moving focus out of the text field
-        e.preventDefault();
-
-        // IE doesn't prevent moving focus even with e.preventDefault()
-        // so we set a flag to know when we should ignore the blur event
-        that.cancelBlur = true;
-        utils.delay(function () {
-            delete that.cancelBlur;
-        });
-
-        // clicking on the scrollbar causes focus to shift to the body
-        // but we can't detect a mouseup or a click immediately afterward
-        // so we have to track the next mousedown and close the menu if
-        // the user clicks somewhere outside of the autocomplete
-        if ($(e.target).closest(".ui-menu-item").length == 0) {
-            utils.delay(function () {
-                $(document).one("mousedown", function (e) {
-                    var $elements = that.el
-                        .add(that.$wrapper)
-                        .add(that.options.$helpers);
-
-                    if (that.options.floating) {
-                        $elements = $elements.add(that.$container);
-                    }
-
-                    $elements = $elements.filter(function () {
-                        return this === e.target || $.contains(this, e.target);
-                    });
-
-                    if (!$elements.length) {
-                        that.hide();
-                    }
-                });
-            });
-        }
-    },
-
-    bindWindowEvents: function () {
-        var that = this,
-            handler = $.proxy(that.fixPosition, that);
-
-        that.$viewport
-            .on('resize' + EVENT_NS + that.uniqueId, handler)
-            .on('scroll' + EVENT_NS + that.uniqueId, handler);
-    },
-
-    unbindWindowEvents: function () {
-        this.$viewport
-            .off('resize' + EVENT_NS + this.uniqueId)
-            .off('scroll' + EVENT_NS + this.uniqueId);
-    },
-
-    scrollToTop: function () {
-        var that = this,
-            scrollTarget = that.options.scrollOnFocus;
-
-        if (scrollTarget === true) {
-            scrollTarget = that.el;
-        }
-        if (scrollTarget instanceof $ && scrollTarget.length > 0) {
-            $('body,html').animate({
-                scrollTop: scrollTarget.offset().top
-            }, 'fast');
-        }
-    },
-
-    // Configuration methods
-
-    setOptions: function (suppliedOptions) {
-        var that = this;
-
-        $.extend(that.options, suppliedOptions);
-
-        // Check mandatory options
-        $.each({
-            'type': types,
-            'requestMode': requestModes
-        }, function (option, available) {
-            that[option] = available[that.options[option]];
-            if (!that[option]) {
-                that.disable();
-                throw '`' + option + '` option is incorrect! Must be one of: ' + $.map(available, function (value, name) {
-                    return '"' + name + '"';
-                }).join(', ');
-            }
-        });
-
-        $(that.options.$helpers)
-            .off(EVENT_NS)
-            .on('mousedown' + EVENT_NS, $.proxy(that.onMousedown, that));
-
-        if (that.isInitialized()) {
-            that.notify('setOptions');
-        }
-    },
-
-    // Common public methods
-
-    fixPosition: function (e) {
-        var that = this,
-            elLayout = {},
-            wrapperOffset,
-            origin;
-
-        that.isMobile = that.$viewport.width() <= that.options.mobileWidth;
-
-        if (!that.isInitialized() || (e && e.type == 'scroll' && !(that.options.floating || that.isMobile))) return;
-        that.$container.appendTo(that.options.floating ? that.$body : that.$wrapper);
-
-        that.notify('resetPosition');
-        // reset input's padding to default, determined by css
-        that.el.css('paddingLeft', '');
-        that.el.css('paddingRight', '');
-        elLayout.paddingLeft = parseFloat(that.el.css('paddingLeft'));
-        elLayout.paddingRight = parseFloat(that.el.css('paddingRight'));
-
-        $.extend(elLayout, that.el.offset());
-        elLayout.borderTop = that.el.css('border-top-style') == 'none' ? 0 : parseFloat(that.el.css('border-top-width'));
-        elLayout.borderLeft = that.el.css('border-left-style') == 'none' ? 0 : parseFloat(that.el.css('border-left-width'));
-        elLayout.innerHeight = that.el.innerHeight();
-        elLayout.innerWidth = that.el.innerWidth();
-        elLayout.outerHeight = that.el.outerHeight();
-        elLayout.componentsLeft = 0;
-        elLayout.componentsRight = 0;
-        wrapperOffset = that.$wrapper.offset();
-
-        origin = {
-            top: elLayout.top - wrapperOffset.top,
-            left: elLayout.left - wrapperOffset.left
-        };
-
-        that.notify('fixPosition', origin, elLayout);
-
-        if (elLayout.componentsLeft > elLayout.paddingLeft) {
-            that.el.css('paddingLeft', elLayout.componentsLeft + 'px');
-        }
-        if (elLayout.componentsRight > elLayout.paddingRight) {
-            that.el.css('paddingRight', elLayout.componentsRight + 'px');
-        }
-    },
-
-    clearCache: function () {
-        this.cachedResponse = {};
-        this.enrichmentCache = {};
-        this.badQueries = [];
-    },
-
-    clear: function () {
-        var that = this;
-
-        if (that.isInitialized()) {
-            that.clearCache();
-            that.currentValue = '';
-            that.selection = null;
-            that.hide();
-            that.suggestions = [];
-            that.el.val('');
-            that.el.trigger('suggestions-clear');
-            that.notify('clear');
-        }
-    },
-
-    disable: function () {
-        var that = this;
-
-        that.disabled = true;
-        that.abortRequest();
-        if (that.visible) {
-            that.hide();
-        }
-    },
-
-    enable: function () {
-        this.disabled = false;
-    },
-
-    isUnavailable: function () {
-        return this.disabled;
-    },
-
-    update: function () {
-        var that = this,
-            query = that.el.val();
-
-        if (that.isInitialized()) {
-            that.currentValue = query;
-            if (that.isQueryRequestable(query)) {
-                that.updateSuggestions(query);
-            } else {
-                that.hide();
-            }
-        }
-    },
-
-    setSuggestion: function (suggestion) {
-        var that = this,
-            data,
-            value;
-
-        if ($.isPlainObject(suggestion) && $.isPlainObject(suggestion.data)) {
-            suggestion = $.extend(true, {}, suggestion);
-
-            if (that.bounds.own.length) {
-                that.checkValueBounds(suggestion);
-                data = that.copyDataComponents(suggestion.data, that.bounds.all);
-                if (suggestion.data.kladr_id) {
-                    data.kladr_id = that.getBoundedKladrId(suggestion.data.kladr_id, that.bounds.all);
-                }
-                suggestion.data = data;
-            }
-
-            that.selection = suggestion;
-
-            // `that.suggestions` required by `that.getSuggestionValue` and must be set before
-            that.suggestions = [suggestion];
-            value = that.getSuggestionValue(suggestion) || '';
-            that.currentValue = value;
-            that.el.val(value);
-            that.abortRequest();
-            that.el.trigger('suggestions-set');
-        }
-    },
-
-    /**
-     * Fetch full object for current INPUT's value
-     * if no suitable object found, clean input element
-     */
-    fixData: function () {
-        var that = this,
-            fullQuery = that.extendedCurrentValue(),
-            currentValue = that.el.val(),
-            resolver = $.Deferred();
-
-        resolver
-            .done(function (suggestion) {
-                that.selectSuggestion(suggestion, 0, currentValue, { hasBeenEnriched: true });
-                that.el.trigger('suggestions-fixdata', suggestion);
-            })
-            .fail(function () {
-                that.selection = null;
-                that.currentValue = '';
-                that.el.val(that.currentValue);
-                that.el.trigger('suggestions-fixdata');
-            });
-
-        if (that.isQueryRequestable(fullQuery)) {
-            that.currentValue = fullQuery;
-            that.getSuggestions(fullQuery, { count: 1, from_bound: null, to_bound: null })
-                .done(function (suggestions) {
-                    // data fetched
-                    var suggestion = suggestions[0];
-                    if (suggestion) {
-                        resolver.resolve(suggestion);
-                    } else {
-                        resolver.reject();
-                    }
-                })
-                .fail(function () {
-                    // no data fetched
-                    resolver.reject();
-                });
-        } else {
-            resolver.reject();
-        }
-    },
-
-    // Querying related methods
-
-    /**
-     * Looks up parent instances
-     * @returns {String} current value prepended by parents' values
-     */
-    extendedCurrentValue: function () {
-        var that = this,
-            parentInstance = that.getParentInstance(),
-            parentValue = parentInstance && parentInstance.extendedCurrentValue(),
-            currentValue = $.trim(that.el.val());
-
-        return utils.compact([parentValue, currentValue]).join(' ');
-    },
-
-    getAjaxParams: function (method, custom) {
-        var that = this,
-            token = $.trim(that.options.token),
-            partner = $.trim(that.options.partner),
-            serviceUrl = that.options.serviceUrl,
-            url = that.options.url,
-            serviceMethod = serviceMethods[method],
-            params = $.extend({
-                timeout: that.options.timeout
-            }, serviceMethod.defaultParams),
-            headers = {};
-
-        if (url) {
-            serviceUrl = url;
-        } else {
-            if (!/\/$/.test(serviceUrl)) {
-                serviceUrl += '/';
-            }
-            serviceUrl += method;
-            if (serviceMethod.addTypeInUrl) {
-                serviceUrl += '/' + that.type.urlSuffix;
-            }
-        }
-
-        serviceUrl = utils.fixURLProtocol(serviceUrl);
-
-        if ($.support.cors) {
-            // for XMLHttpRequest put token in header
-            if (token) {
-                headers['Authorization'] = 'Token ' + token;
-            }
-            if (partner) {
-                headers['X-Partner'] = partner;
-            }
-            headers['X-Version'] = Suggestions.version;
-            if (!params.headers) {
-                params.headers = {};
-            }
-            $.extend(params.headers, that.options.headers, headers);
-        } else {
-            // for XDomainRequest put token into URL
-            if (token) {
-                headers['token'] = token;
-            }
-            if (partner) {
-                headers['partner'] = partner;
-            }
-            headers['version'] = Suggestions.version;
-            serviceUrl = utils.addUrlParams(serviceUrl, headers);
-        }
-
-        params.url = serviceUrl;
-
-        return $.extend(params, custom);
-    },
-
-    isQueryRequestable: function (query) {
-        var that = this,
-            result;
-
-        result = query.length >= that.options.minChars;
-
-        if (result && that.type.isQueryRequestable) {
-            result = that.type.isQueryRequestable.call(that, query);
-        }
-
-        return result;
-    },
-
-    constructRequestParams: function (query, customParams) {
-        var that = this,
-            options = that.options,
-            params = $.isFunction(options.params)
-                ? options.params.call(that.element, query)
-                : $.extend({}, options.params);
-
-        if (that.type.constructRequestParams) {
-            $.extend(params, that.type.constructRequestParams.call(that));
-        }
-        $.each(that.notify('requestParams'), function (i, hookParams) {
-            $.extend(params, hookParams);
-        });
-        params[options.paramName] = query;
-        if ($.isNumeric(options.count) && options.count > 0) {
-            params.count = options.count;
-        }
-
-        return $.extend(params, customParams);
-    },
-
-    updateSuggestions: function (query) {
-        var that = this;
-
-        that.fetchPhase = that.getSuggestions(query)
-            .done(function (suggestions) {
-                that.assignSuggestions(suggestions, query);
-            });
-    },
-
-    /**
-     * Get suggestions from cache or from server
-     * @param {String} query
-     * @param {Object} customParams parameters specified here will be passed to request body
-     * @param {Object} requestOptions
-     * @param {Boolean} [requestOptions.noCallbacks]  flag, request competence callbacks will not be invoked
-     * @param {Boolean} [requestOptions.useEnrichmentCache]
-     * @return {$.Deferred} waiter which is to be resolved with suggestions as argument
-     */
-    getSuggestions: function (query, customParams, requestOptions) {
-        var response,
-            that = this,
-            options = that.options,
-            noCallbacks = requestOptions && requestOptions.noCallbacks,
-            useEnrichmentCache = requestOptions && requestOptions.useEnrichmentCache,
-            params = that.constructRequestParams(query, customParams),
-            cacheKey = $.param(params || {}),
-            resolver = $.Deferred();
-
-        response = that.cachedResponse[cacheKey];
-        if (response && $.isArray(response.suggestions)) {
-            resolver.resolve(response.suggestions);
-        } else {
-            if (that.isBadQuery(query)) {
-                resolver.reject();
-            } else {
-                if (!noCallbacks && options.onSearchStart.call(that.element, params) === false) {
-                    resolver.reject();
-                } else {
-                    that.doGetSuggestions(params)
-                        .done(function (response) {
-                            // if response is correct and current value has not been changed
-                            if (that.processResponse(response) && query == that.currentValue) {
-
-                                // Cache results if cache is not disabled:
-                                if (!options.noCache) {
-                                    if (useEnrichmentCache) {
-                                        that.enrichmentCache[query] = response.suggestions[0];
-                                    } else {
-                                        that.enrichResponse(response, query);
-                                        that.cachedResponse[cacheKey] = response;
-                                        if (options.preventBadQueries && response.suggestions.length === 0) {
-                                            that.badQueries.push(query);
-                                        }
-                                    }
-                                }
-
-                                resolver.resolve(response.suggestions);
-                            } else {
-                                resolver.reject();
-                            }
-                            if (!noCallbacks) {
-                                options.onSearchComplete.call(that.element, query, response.suggestions);
-                            }
-                        }).fail(function (jqXHR, textStatus, errorThrown) {
-                        resolver.reject();
-                        if (!noCallbacks && textStatus !== 'abort') {
-                            options.onSearchError.call(that.element, query, jqXHR, textStatus, errorThrown);
-                        }
-                    });
-                }
-            }
-        }
-        return resolver;
-    },
-
-    /**
-     * Sends an AJAX request to server suggest method.
-     * @param {Object} params request params
-     * @returns {$.Deferred} response promise
-     */
-    doGetSuggestions: function (params) {
-        var that = this,
-            request = $.ajax(
-                that.getAjaxParams(that.requestMode.method, { data: utils.serialize(params) })
-            );
-
-        that.abortRequest();
-        that.currentRequest = request;
-        that.notify('request');
-
-        request.always(function () {
-            that.currentRequest = null;
-            that.notify('request');
-        });
-
-        return request;
-    },
-
-    isBadQuery: function (q) {
-        if (!this.options.preventBadQueries) {
-            return false;
-        }
-
-        var result = false;
-        $.each(this.badQueries, function (i, query) {
-            return !(result = q.indexOf(query) === 0);
-        });
-        return result;
-    },
-
-    abortRequest: function () {
-        var that = this;
-
-        if (that.currentRequest) {
-            that.currentRequest.abort();
-        }
-    },
-
-    /**
-     * Checks response format and data
-     * @return {Boolean} response contains acceptable data
-     */
-    processResponse: function (response) {
-        var that = this,
-            suggestions;
-
-        if (!response || !$.isArray(response.suggestions)) {
-            return false;
-        }
-
-        that.verifySuggestionsFormat(response.suggestions);
-        that.setUnrestrictedValues(response.suggestions);
-
-        if ($.isFunction(that.options.onSuggestionsFetch)) {
-            suggestions = that.options.onSuggestionsFetch.call(that.element, response.suggestions);
-            if ($.isArray(suggestions)) {
-                response.suggestions = suggestions;
-            }
-        }
-
-        return true;
-    },
-
-    verifySuggestionsFormat: function (suggestions) {
-        if (typeof suggestions[0] === 'string') {
-            $.each(suggestions, function (i, value) {
-                suggestions[i] = { value: value, data: null };
-            });
-        }
-    },
-
-    /**
-     * Gets string to set as input value
-     *
-     * @param suggestion
-     * @param {Object} [selectionOptions]
-     * @param {boolean} selectionOptions.hasBeenEnriched
-     * @param {boolean} selectionOptions.hasSameValues
-     * @return {string}
-     */
-    getSuggestionValue: function (suggestion, selectionOptions) {
-        var that = this,
-            formatSelected = that.options.formatSelected || that.type.formatSelected,
-            hasSameValues = selectionOptions && selectionOptions.hasSameValues,
-            hasBeenEnriched = selectionOptions && selectionOptions.hasBeenEnriched,
-            formattedValue,
-            typeFormattedValue = null;
-
-
-        if ($.isFunction(formatSelected)) {
-            formattedValue = formatSelected.call(that, suggestion);
-        }
-
-        if (typeof formattedValue !== 'string' || formattedValue.length == 0) {
-            formattedValue = suggestion.value;
-
-            if (that.type.getSuggestionValue) {
-                typeFormattedValue = that.type.getSuggestionValue(that, {
-                    suggestion: suggestion,
-                    hasSameValues: hasSameValues,
-                    hasBeenEnriched: hasBeenEnriched,
-                });
-
-                if (typeFormattedValue !== null) {
-                    formattedValue = typeFormattedValue;
-                }
-            }
-        }
-
-        return formattedValue;
-    },
-
-    hasSameValues: function(suggestion){
-        var hasSame = false;
-
-        $.each(this.suggestions, function(i, anotherSuggestion){
-            if (anotherSuggestion.value === suggestion.value && anotherSuggestion !== suggestion) {
-                hasSame = true;
-                return false;
-            }
-        });
-
-        return hasSame;
-    },
-
-    assignSuggestions: function (suggestions, query) {
-        var that = this;
-        that.suggestions = suggestions;
-        that.notify('assignSuggestions', query);
-    },
-
-    shouldRestrictValues: function () {
-        var that = this;
-        // treat suggestions value as restricted only if there is one constraint
-        // and restrict_value is true
-        return that.options.restrict_value
-            && that.constraints
-            && Object.keys(that.constraints).length == 1;
-    },
-
-    /**
-     * Fills suggestion.unrestricted_value property
-     */
-    setUnrestrictedValues: function (suggestions) {
-        var that = this,
-            shouldRestrict = that.shouldRestrictValues(),
-            label = that.getFirstConstraintLabel();
-
-        $.each(suggestions, function (i, suggestion) {
-            if (!suggestion.unrestricted_value) {
-                suggestion.unrestricted_value = shouldRestrict ? label + ', ' + suggestion.value : suggestion.value;
-            }
-        });
-    },
-
-    areSuggestionsSame: function (a, b) {
-        return a && b &&
-            a.value === b.value &&
-            utils.areSame(a.data, b.data);
-    }
-
-};
-
-/**
- * Methods related to INPUT's behavior
- */
-
-var methods = {
-
-    setupElement: function () {
-        // Remove autocomplete attribute to prevent native suggestions:
-        this.el
-            .attr('autocomplete', 'off')
-            .addClass('suggestions-input')
-            .css('box-sizing', 'border-box');
-    },
-
-    bindElementEvents: function () {
-        var that = this;
-
-        that.el.on('keydown' + EVENT_NS, $.proxy(that.onElementKeyDown, that));
-        // IE is buggy, it doesn't trigger `input` on text deletion, so use following events
-        that.el.on(['keyup' + EVENT_NS, 'cut' + EVENT_NS, 'paste' + EVENT_NS, 'input' + EVENT_NS].join(' '), $.proxy(that.onElementKeyUp, that));
-        that.el.on('blur' + EVENT_NS, $.proxy(that.onElementBlur, that));
-        that.el.on('focus' + EVENT_NS, $.proxy(that.onElementFocus, that));
-    },
-
-    unbindElementEvents: function () {
-        this.el.off(EVENT_NS);
-    },
-
-    onElementBlur: function () {
-        var that = this;
-
-        // suggestion was clicked, blur should be ignored
-        // see container mousedown handler
-        if (that.cancelBlur) {
-            that.cancelBlur = false;
-            return;
-        }
-
-        if (that.options.triggerSelectOnBlur) {
-            if (!that.isUnavailable()) {
-                that.selectCurrentValue({ noSpace: true })
-                    .always(function () {
-                        // For NAMEs selecting keeps suggestions list visible, so hide it
-                        that.hide();
-                    });
-            }
-        } else {
-            that.hide();
-        }
-
-        if (that.fetchPhase.abort) {
-            that.fetchPhase.abort();
-        }
-    },
-
-    onElementFocus: function () {
-        var that = this;
-
-        if (!that.cancelFocus) {
-            // defer methods to allow browser update input's style before
-            utils.delay($.proxy(that.completeOnFocus, that));
-        }
-        that.cancelFocus = false;
-    },
-
-    onElementKeyDown: function (e) {
-        var that = this;
-
-        if (that.isUnavailable()) {
-            return;
-        }
-
-        if (!that.visible) {
-            switch (e.which) {
-                // If suggestions are hidden and user presses arrow down, display suggestions
-                case KEYS.DOWN:
-                    that.suggest();
-                    break;
-                // if no suggestions available and user pressed Enter
-                case KEYS.ENTER:
-                    if (that.options.triggerSelectOnEnter) {
-                        that.triggerOnSelectNothing();
-                    }
-                    break;
-            }
-            return;
-        }
-
-        switch (e.which) {
-            case KEYS.ESC:
-                that.el.val(that.currentValue);
-                that.hide();
-                that.abortRequest();
-                break;
-
-            case KEYS.TAB:
-                if (that.options.tabDisabled === false) {
-                    return;
-                }
-                break;
-
-            case KEYS.ENTER:
-                if (that.options.triggerSelectOnEnter) {
-                    that.selectCurrentValue();
-                }
-                break;
-
-            case KEYS.SPACE:
-                if (that.options.triggerSelectOnSpace && that.isCursorAtEnd()) {
-                    e.preventDefault();
-                    that.selectCurrentValue({ continueSelecting: true, dontEnrich: true })
-                        .fail(function () {
-                            // If all data fetched but nothing selected
-                            that.currentValue += ' ';
-                            that.el.val(that.currentValue);
-                            that.proceedChangedValue();
-                        });
-                }
-                return;
-            case KEYS.UP:
-                that.moveUp();
-                break;
-            case KEYS.DOWN:
-                that.moveDown();
-                break;
-            default:
-                return;
-        }
-
-        // Cancel event if function did not return:
-        e.stopImmediatePropagation();
-        e.preventDefault();
-    },
-
-    onElementKeyUp: function (e) {
-        var that = this;
-
-        if (that.isUnavailable()) {
-            return;
-        }
-
-        switch (e.which) {
-            case KEYS.UP:
-            case KEYS.DOWN:
-            case KEYS.ENTER:
-                return;
-        }
-
-        // Cancel pending change
-        clearTimeout(that.onChangeTimeout);
-        that.inputPhase.reject();
-
-        if (that.currentValue !== that.el.val()) {
-            that.proceedChangedValue();
-        }
-    },
-
-    proceedChangedValue: function () {
-        var that = this;
-
-        // Cancel fetching, because it became obsolete
-        that.abortRequest();
-
-        that.inputPhase = $.Deferred()
-            .done($.proxy(that.onValueChange, that));
-
-        if (that.options.deferRequestBy > 0) {
-            // Defer lookup in case when value changes very quickly:
-            that.onChangeTimeout = utils.delay(function () {
-                that.inputPhase.resolve();
-            }, that.options.deferRequestBy);
-        } else {
-            that.inputPhase.resolve();
-        }
-    },
-
-    onValueChange: function () {
-        var that = this,
-            currentSelection;
-
-        if (that.selection) {
-            currentSelection = that.selection;
-            that.selection = null;
-            that.trigger('InvalidateSelection', currentSelection);
-        }
-
-        that.selectedIndex = -1;
-
-        that.update();
-        that.notify('valueChange');
-    },
-
-    completeOnFocus: function () {
-        var that = this;
-
-        if (that.isUnavailable()) {
-            return;
-        }
-
-        if (that.isElementFocused()) {
-            that.fixPosition();
-            that.update();
-            if (that.isMobile) {
-                that.setCursorAtEnd();
-                that.scrollToTop();
-            }
-        }
-    },
-
-    isElementFocused: function () {
-        return document.activeElement === this.element;
-    },
-
-    isCursorAtEnd: function () {
-        var that = this,
-            valLength = that.el.val().length,
-            selectionStart,
-            range;
-
-        // `selectionStart` and `selectionEnd` are not supported by some input types
-        try {
-            selectionStart = that.element.selectionStart;
-            if (typeof selectionStart === 'number') {
-                return selectionStart === valLength;
-            }
-        } catch (ex) {
-        }
-
-        if (document.selection) {
-            range = document.selection.createRange();
-            range.moveStart('character', -valLength);
-            return valLength === range.text.length;
-        }
-        return true;
-    },
-
-    setCursorAtEnd: function () {
-        var element = this.element;
-
-        // `selectionStart` and `selectionEnd` are not supported by some input types
-        try {
-            element.selectionEnd = element.selectionStart = element.value.length;
-            element.scrollLeft = element.scrollWidth;
-        } catch (ex) {
-            element.value = element.value;
-        }
-    }
-
-};
-
-$.extend(Suggestions.prototype, methods);
-
-notificator
-    .on('initialize', methods.bindElementEvents)
-    .on('dispose', methods.unbindElementEvents);
-
-/**
- * Methods related to plugin's authorization on server
- */
-
-// keys are "[type][token]"
-var statusRequests = {};
-
-function resetTokens () {
-    $.each(statusRequests, function(){
-        this.abort();
-    });
-    statusRequests = {};
-}
-
-resetTokens();
-
-var methods$1 = {
-
-    checkStatus: function () {
-        var that = this,
-            token = $.trim(that.options.token),
-            requestKey = that.options.type + token,
-            request = statusRequests[requestKey];
-
-        if (!request) {
-            request = statusRequests[requestKey] = $.ajax(that.getAjaxParams('status'));
-        }
-
-        request
-            .done(function(status){
-                if (status.search) {
-                    $.extend(that.status, status);
-                } else {
-                    triggerError('Service Unavailable');
-                }
-            })
-            .fail(function(){
-                triggerError(request.statusText);
-            });
-
-        function triggerError(errorThrown){
-            // If unauthorized
-            if ($.isFunction(that.options.onSearchError)) {
-                that.options.onSearchError.call(that.element, null, request, 'error', errorThrown);
-            }
-        }
-    }
-
-};
-
-Suggestions.resetTokens = resetTokens;
-
-$.extend(Suggestions.prototype, methods$1);
-
-notificator
-    .on('setOptions', methods$1.checkStatus);
-
-//export { methods, resetTokens };
-
-var locationRequest;
-var defaultGeoLocation = true;
-
-function resetLocation () {
-    locationRequest = null;
-    DEFAULT_OPTIONS.geoLocation = defaultGeoLocation;
-}
-
-var methods$2 = {
-
-    checkLocation: function () {
-        var that = this,
-            providedLocation = that.options.geoLocation;
-
-        if (!that.type.geoEnabled || !providedLocation) {
-            return;
-        }
-
-        that.geoLocation = $.Deferred();
-        if ($.isPlainObject(providedLocation) || $.isArray(providedLocation)) {
-            that.geoLocation.resolve(providedLocation);
-        } else {
-            if (!locationRequest) {
-                locationRequest = $.ajax(that.getAjaxParams('detectAddressByIp'));
-            }
-
-            locationRequest
-                .done(function (resp) {
-                    var locationData = resp && resp.location && resp.location.data;
-                    if (locationData && locationData.kladr_id) {
-                        that.geoLocation.resolve(locationData);
-                    } else {
-                        that.geoLocation.reject();
-                    }
-                })
-                .fail(function(){
-                    that.geoLocation.reject();
-                });
-        }
-    },
-
-    /**
-     * Public method to get `geoLocation` promise
-     * @returns {$.Deferred}
-     */
-    getGeoLocation: function () {
-        return this.geoLocation;
-    },
-
-    constructParams: function () {
-        var that = this,
-            params = {};
-
-        if (that.geoLocation && $.isFunction(that.geoLocation.promise) && that.geoLocation.state() == 'resolved') {
-            that.geoLocation.done(function (locationData) {
-                params['locations_boost'] = $.makeArray(locationData);
-            });
-        }
-
-        return params;
-    }
-
-};
-
-
-// Disable this feature when GET method used. See SUG-202
-if (utils.getDefaultType() != 'GET') {
-    $.extend(DEFAULT_OPTIONS, {
-        geoLocation: defaultGeoLocation
-    });
-
-    $.extend(Suggestions, {
-        resetLocation: resetLocation
-    });
-
-    $.extend(Suggestions.prototype, {
-        getGeoLocation: methods$2.getGeoLocation
-    });
-
-    notificator
-        .on('setOptions', methods$2.checkLocation)
-        .on('requestParams', methods$2.constructParams);
-}
-
-var methods$3 = {
-
-    enrichSuggestion: function (suggestion, selectionOptions) {
-        var that = this,
-            resolver = $.Deferred();
-
-        if (!that.status.enrich || !that.type.enrichmentEnabled || !that.requestMode.enrichmentEnabled ||
-            selectionOptions && selectionOptions.dontEnrich) {
-            return resolver.resolve(suggestion);
-        }
-
-        // if current suggestion is already enriched, use it
-        if (suggestion.data && suggestion.data.qc != null) {
-            return resolver.resolve(suggestion);
-        }
-
-        that.disableDropdown();
-
-        // Set `currentValue` to make `processResponse` to consider enrichment response valid
-        that.currentValue = suggestion.unrestricted_value ;
-
-        // prevent request abortion during onBlur
-        that.enrichPhase = that.getSuggestions(
-            suggestion.unrestricted_value,
-            {
-                count: 1,
-                locations: null,
-                locations_boost: null,
-                from_bound: null,
-                to_bound: null
-            },
-            {
-                noCallbacks: true,
-                useEnrichmentCache: true
-            }
-        )
-            .always(function () {
-                that.enableDropdown();
-            })
-            .done(function (suggestions) {
-                var enrichedSuggestion = suggestions && suggestions[0];
-
-                resolver.resolve(enrichedSuggestion || suggestion, !!enrichedSuggestion);
-            })
-            .fail(function () {
-                resolver.resolve(suggestion);
-            });
-
-        return resolver;
-    },
-
-    /**
-     * Injects enriched suggestion into response
-     * @param response
-     * @param query
-     */
-    enrichResponse: function (response, query) {
-        var that = this,
-            enrichedSuggestion = that.enrichmentCache[query];
-
-        if (enrichedSuggestion) {
-            $.each(response.suggestions, function(i, suggestion){
-                if (suggestion.value === query) {
-                    response.suggestions[i] = enrichedSuggestion;
-                    return false;
-                }
-            });
-        }
-    }
-
-};
-
-$.extend(Suggestions.prototype, methods$3);
-
-/**
- * Methods related to suggestions dropdown list
- */
-
-function highlightMatches(chunks) {
-    return $.map(chunks, function (chunk) {
-        var text = utils.escapeHtml(chunk.text);
-
-        if (text && chunk.matched) {
-            text = '<strong>' + text + '</strong>';
-        }
-        return text;
-    }).join('');
-}
-
-function nowrapLinkedParts(formattedStr, nowrapClass) {
-    var delimitedParts = formattedStr.split(', ');
-    // string has no delimiters, should not wrap
-    if (delimitedParts.length === 1) {
-        return formattedStr;
-    }
-    // disable word-wrap inside delimited parts
-    return $.map(delimitedParts, function (part) {
-        return '<span class="' + nowrapClass + '">' + part + '</span>'
-    }).join(', ');
-}
-
-function hasAnotherSuggestion (suggestions, suggestion) {
-    var result = false;
-
-    $.each(suggestions, function (i, s) {
-        result = s.value == suggestion.value && s != suggestion;
-        if (result) {
-            return false;
-        }
-    });
-
-    return result;
-}
-
-var optionsUsed = {
-    width: 'auto',
-    floating: false
-};
-
-var methods$4 = {
-
-    createContainer: function () {
-        var that = this,
-            suggestionSelector = '.' + that.classes.suggestion,
-            options = that.options,
-            $container = $('<div/>')
-                .addClass(options.containerClass)
-                .css({
-                    position: 'absolute',
-                    display: 'none'
-                });
-
-        that.$container = $container;
-
-        $container.on('click' + EVENT_NS, suggestionSelector, $.proxy(that.onSuggestionClick, that));
-    },
-
-    removeContainer: function () {
-        var that = this;
-
-        if (that.options.floating) {
-            that.$container.remove();
-        }
-    },
-
-    setContainerOptions: function () {
-        var that = this,
-            mousedownEvent = 'mousedown' + EVENT_NS;
-
-        that.$container.off(mousedownEvent);
-        if (that.options.floating) {
-            that.$container.on(mousedownEvent, $.proxy(that.onMousedown, that));
-        }
-    },
-
-    /**
-     * Listen for click event on suggestions list:
-     */
-    onSuggestionClick: function (e) {
-        var that = this,
-            $el = $(e.target),
-            index;
-
-        if (!that.dropdownDisabled) {
-            that.cancelFocus = true;
-            that.el.focus();
-
-            while ($el.length && !(index = $el.attr('data-index'))) {
-                $el = $el.closest('.' + that.classes.suggestion);
-            }
-
-            if (index && !isNaN(index)) {
-                that.select(+index);
-            }
-        }
-    },
-
-    // Dropdown UI methods
-
-    setDropdownPosition: function (origin, elLayout) {
-        var that = this,
-            scrollLeft = that.$viewport.scrollLeft(),
-            style;
-
-        if (that.isMobile) {
-            style = that.options.floating ? {
-                left: scrollLeft + 'px',
-                top: elLayout.top + elLayout.outerHeight + 'px'
-            } : {
-                left: origin.left - elLayout.left + scrollLeft + 'px',
-                top: origin.top + elLayout.outerHeight + 'px'
-            };
-            style.width = that.$viewport.width() + 'px';
-        } else {
-            style = that.options.floating ? {
-                left: elLayout.left + 'px',
-                top: elLayout.top + elLayout.borderTop + elLayout.innerHeight + 'px'
-            } : {
-                left: origin.left + 'px',
-                top: origin.top + elLayout.borderTop + elLayout.innerHeight + 'px'
-            };
-
-            // Defer to let body show scrollbars
-            utils.delay(function () {
-                var width = that.options.width;
-
-                if (width === 'auto') {
-                    width = that.el.outerWidth();
-                }
-                that.$container.outerWidth(width);
-            });
-        }
-
-        that.$container
-            .toggleClass(that.classes.mobile, that.isMobile)
-            .css(style);
-
-        that.containerItemsPadding = elLayout.left + elLayout.borderLeft + elLayout.paddingLeft - scrollLeft;
-    },
-
-    setItemsPositions: function () {
-        var that = this,
-            $items = that.getSuggestionsItems();
-
-        $items.css('paddingLeft', that.isMobile ? that.containerItemsPadding + 'px' : '');
-    },
-
-    getSuggestionsItems: function () {
-        return this.$container.children('.' + this.classes.suggestion);
-    },
-
-    toggleDropdownEnabling: function (enable) {
-        this.dropdownDisabled = !enable;
-        this.$container.attr('disabled', !enable);
-    },
-
-    disableDropdown: function () {
-        this.toggleDropdownEnabling(false);
-    },
-
-    enableDropdown: function () {
-        this.toggleDropdownEnabling(true);
-    },
-
-    /**
-     * Shows if there are any suggestions besides currently selected
-     * @returns {boolean}
-     */
-    hasSuggestionsToChoose: function () {
-        var that = this;
-
-        return that.suggestions.length > 1 ||
-            (that.suggestions.length === 1 &&
-                (!that.selection || $.trim(that.suggestions[0].value) !== $.trim(that.selection.value))
-            );
-    },
-
-    suggest: function () {
-        var that = this,
-            options = that.options,
-            formatResult,
-            html = [];
-
-        if (!that.requestMode.userSelect) {
-            return ;
-        }
-
-        // если нечего показывать, то сообщаем об этом
-        if (!that.hasSuggestionsToChoose()) {
-
-            if (that.suggestions.length) {
-                that.hide();
-                return
-            } else {
-                html.push('<div class="' + that.classes.hint + '">' + options.noSuggestionsHint[options.type] + '</div>');
-            }
-
-        } else {
-
-            formatResult = options.formatResult || that.type.formatResult || that.formatResult;
-
-            // Build hint html
-            if (!that.isMobile && options.hint && that.suggestions.length) {
-                html.push('<div class="' + that.classes.hint + '">' + options.hint + '</div>');
-            }
-            that.selectedIndex = -1;
-            // Build suggestions inner HTML:
-            $.each(that.suggestions, function (i, suggestion) {
-                var labels = that.makeSuggestionLabel(that.suggestions, suggestion);
-
-                if (suggestion == that.selection) {
-                    that.selectedIndex = i;
-                }
-
-                html.push('<div class="' + that.classes.suggestion + '" data-index="' + i + '">');
-                html.push(formatResult.call(that, suggestion.value, that.currentValue, suggestion, {
-                    unformattableTokens: that.type.unformattableTokens
-                }));
-                if (labels) {
-                    html.push('<span class="' + that.classes.subtext_label + '">' + utils.escapeHtml(labels) + '</span>');
-                }
-                html.push('</div>');
-            });
-
-        }
-
-        that.$container.html(html.join(''));
-
-        // Select first value by default:
-        if (options.autoSelectFirst && that.selectedIndex === -1) {
-            that.selectedIndex = 0;
-        }
-        if (that.selectedIndex !== -1) {
-            that.getSuggestionsItems().eq(that.selectedIndex).addClass(that.classes.selected);
-        }
-
-        if ($.isFunction(options.beforeRender)) {
-            options.beforeRender.call(that.element, that.$container);
-        }
-
-        that.$container.show();
-        that.visible = true;
-        that.fixPosition();
-        that.setItemsPositions();
-    },
-
-    wrapFormattedValue: function (value, suggestion) {
-        var that = this,
-            status = utils.getDeepValue(suggestion.data, 'state.status');
-
-        return '<span class="' + that.classes.value + '"' + (status ? ' data-suggestion-status="' + status + '"' : '') + '>' +
-            value +
-            '</span>';
-    },
-
-    formatResult: function (value, currentValue, suggestion, options) {
-        var that = this;
-
-        value = that.highlightMatches(value, currentValue, suggestion, options);
-
-        return that.wrapFormattedValue(value, suggestion);
-    },
-
-    /**
-     * Makes HTML contents for suggestion item
-     * @param {String} value string to be displayed as a value
-     * @param {String} currentValue contents of the textbox
-     * @param suggestion whole suggestion object with displaying value and other fields
-     * @param {Object} [options] set of flags:
-     *          `unformattableTokens` - array of search tokens, that are not to be highlighted
-     *          `maxLength` - if set, `value` is limited by this length
-     * @returns {String} HTML to be inserted in the list
-     */
-    highlightMatches: function (value, currentValue, suggestion, options) {
-
-        var that = this,
-            chunks = [],
-            unformattableTokens = options && options.unformattableTokens,
-            maxLength = options && options.maxLength,
-            tokens, tokenMatchers, preferredTokens,
-            rWords = utils.reWordExtractor(),
-            match, word, i, chunk, formattedStr;
-
-        if (!value) return '';
-
-        tokens = utils.compact(utils.formatToken(currentValue).split(WORD_SPLITTER));
-
-        // Move unformattableTokens to the end.
-        // This will help to apply them only if no other tokens match
-        preferredTokens = utils.arrayMinus(tokens, unformattableTokens);
-        tokens = utils.withSubTokens(preferredTokens.concat(utils.arrayMinus(tokens, preferredTokens)));
-
-        tokenMatchers = $.map(tokens, function (token) {
-            return new RegExp('^((.*)([' + WORD_PARTS_DELIMITERS + ']+))?' +
-                '(' + utils.escapeRegExChars(token) + ')' +
-                '([^' + WORD_PARTS_DELIMITERS + ']*[' + WORD_PARTS_DELIMITERS + ']*)', 'i');
-        });
-
-        // parse string by words
-        while ((match = rWords.exec(value)) && match[0]) {
-            word = match[1];
-            chunks.push({
-                text: word,
-
-                // upper case means a word is a name and can be highlighted even if presents in unformattableTokens
-                hasUpperCase: word.toLowerCase() !== word,
-                formatted: utils.formatToken(word),
-                matchable: true
-            });
-            if (match[2]) {
-                chunks.push({
-                    text: match[2]
-                });
-            }
-        }
-
-        // use simple loop because length can change
-        for (i = 0; i < chunks.length; i++) {
-            chunk = chunks[i];
-            if (chunk.matchable && !chunk.matched && ($.inArray(chunk.formatted, unformattableTokens) === -1 || chunk.hasUpperCase)) {
-                $.each(tokenMatchers, function (j, matcher) {
-                    var tokenMatch = matcher.exec(chunk.formatted),
-                        length, nextIndex = i + 1;
-
-                    if (tokenMatch) {
-                        tokenMatch = {
-                            before: tokenMatch[1] || '',
-                            beforeText: tokenMatch[2] || '',
-                            beforeDelimiter: tokenMatch[3] || '',
-                            text: tokenMatch[4] || '',
-                            after: tokenMatch[5] || ''
-                        };
-
-                        if (tokenMatch.before) {
-                            // insert chunk before current
-                            chunks.splice(i, 0, {
-                                text: chunk.text.substr(0, tokenMatch.beforeText.length),
-                                formatted: tokenMatch.beforeText,
-                                matchable: true
-                            }, {
-                                text: tokenMatch.beforeDelimiter
-                            });
-                            nextIndex += 2;
-
-                            length = tokenMatch.before.length;
-                            chunk.text = chunk.text.substr(length);
-                            chunk.formatted = chunk.formatted.substr(length);
-                            i--;
-                        }
-
-                        length = tokenMatch.text.length + tokenMatch.after.length;
-                        if (chunk.formatted.length > length) {
-                            chunks.splice(nextIndex, 0, {
-                                text: chunk.text.substr(length),
-                                formatted: chunk.formatted.substr(length),
-                                matchable: true
-                            });
-                            chunk.text = chunk.text.substr(0, length);
-                            chunk.formatted = chunk.formatted.substr(0, length);
-                        }
-
-                        if (tokenMatch.after) {
-                            length = tokenMatch.text.length;
-                            chunks.splice(nextIndex, 0, {
-                                text: chunk.text.substr(length),
-                                formatted: chunk.formatted.substr(length)
-                            });
-                            chunk.text = chunk.text.substr(0, length);
-                            chunk.formatted = chunk.formatted.substr(0, length);
-                        }
-                        chunk.matched = true;
-                        return false;
-                    }
-                });
-            }
-        }
-
-        if (maxLength) {
-            for (i = 0; i < chunks.length && maxLength >= 0; i++) {
-                chunk = chunks[i];
-                maxLength -= chunk.text.length;
-                if (maxLength < 0) {
-                    chunk.text = chunk.text.substr(0, chunk.text.length + maxLength) + '...';
-                }
-            }
-            chunks.length = i;
-        }
-
-        formattedStr = highlightMatches(chunks);
-        return nowrapLinkedParts(formattedStr, that.classes.nowrap);
-    },
-
-    makeSuggestionLabel: function (suggestions, suggestion) {
-        var that = this,
-            fieldNames = that.type.fieldNames,
-            nameData = {},
-            rWords = utils.reWordExtractor(),
-            match, word,
-            labels = [];
-
-        if (fieldNames && hasAnotherSuggestion(suggestions, suggestion) && suggestion.data) {
-
-            $.each(fieldNames, function (field) {
-                var value = suggestion.data[field];
-                if (value) {
-                    nameData[field] = utils.formatToken(value);
-                }
-            });
-
-            if (!$.isEmptyObject(nameData)) {
-                while ((match = rWords.exec(utils.formatToken(suggestion.value))) && (word = match[1])) {
-                    $.each(nameData, function (i, value) {
-                        if (value == word) {
-                            labels.push(fieldNames[i]);
-                            delete nameData[i];
-                            return false;
-                        }
-                    });
-                }
-
-                if (labels.length) {
-                    return labels.join(', ');
-                }
-            }
-        }
-    },
-
-    hide: function () {
-        var that = this;
-        that.visible = false;
-        that.selectedIndex = -1;
-        that.$container
-            .hide()
-            .empty();
-    },
-
-    activate: function (index) {
-        var that = this,
-            $activeItem,
-            selected = that.classes.selected,
-            $children;
-
-        if (!that.dropdownDisabled) {
-            $children = that.getSuggestionsItems();
-
-            $children.removeClass(selected);
-
-            that.selectedIndex = index;
-
-            if (that.selectedIndex !== -1 && $children.length > that.selectedIndex) {
-                $activeItem = $children.eq(that.selectedIndex);
-                $activeItem.addClass(selected);
-                return $activeItem;
-            }
-        }
-
-        return null;
-    },
-
-    deactivate: function (restoreValue) {
-        var that = this;
-
-        if (!that.dropdownDisabled) {
-            that.selectedIndex = -1;
-            that.getSuggestionsItems().removeClass(that.classes.selected);
-            if (restoreValue) {
-                that.el.val(that.currentValue);
-            }
-        }
-    },
-
-    moveUp: function () {
-        var that = this;
-
-        if (that.dropdownDisabled) {
-            return;
-        }
-        if (that.selectedIndex === -1) {
-            if (that.suggestions.length) {
-                that.adjustScroll(that.suggestions.length - 1);
-            }
-            return;
-        }
-
-        if (that.selectedIndex === 0) {
-            that.deactivate(true);
-            return;
-        }
-
-        that.adjustScroll(that.selectedIndex - 1);
-    },
-
-    moveDown: function () {
-        var that = this;
-
-        if (that.dropdownDisabled) {
-            return;
-        }
-        if (that.selectedIndex === (that.suggestions.length - 1)) {
-            that.deactivate(true);
-            return;
-        }
-
-        that.adjustScroll(that.selectedIndex + 1);
-    },
-
-    adjustScroll: function (index) {
-        var that = this,
-            $activeItem = that.activate(index),
-            itemTop,
-            itemBottom,
-            scrollTop = that.$container.scrollTop(),
-            containerHeight;
-
-        if (!$activeItem || !$activeItem.length) {
-            return;
-        }
-
-        itemTop = $activeItem.position().top;
-        if (itemTop < 0 ) {
-            that.$container.scrollTop(scrollTop + itemTop);
-        } else {
-            itemBottom = itemTop + $activeItem.outerHeight();
-            containerHeight = that.$container.innerHeight();
-            if (itemBottom > containerHeight) {
-                that.$container.scrollTop(scrollTop - containerHeight + itemBottom);
-            }
-        }
-
-        that.el.val(that.suggestions[index].value);
-    }
-
-};
-
-$.extend(DEFAULT_OPTIONS, optionsUsed);
-
-$.extend(Suggestions.prototype, methods$4);
-
-notificator
-    .on('initialize', methods$4.createContainer)
-    .on('dispose', methods$4.removeContainer)
-    .on('setOptions', methods$4.setContainerOptions)
-    .on('fixPosition', methods$4.setDropdownPosition)
-    .on('fixPosition', methods$4.setItemsPositions)
-    .on('assignSuggestions', methods$4.suggest);
-
-/**
- * Methods related to right-sided component
- */
-
-var QUEUE_NAME = 'addon';
-var BEFORE_SHOW_ADDON = 50;
-var BEFORE_RESTORE_PADDING = 1000;
-
-var optionsUsed$1 = {
-    addon: null
-};
-
-var ADDON_TYPES = {
-    'NONE': 'none',
-    'SPINNER': 'spinner',
-    'CLEAR': 'clear'
-};
-
-var Addon = function (owner) {
-    var that = this,
-        $el = $('<span class="suggestions-addon"/>');
-
-    that.owner = owner;
-    that.$el = $el;
-    that.type = ADDON_TYPES.NONE;
-    that.visible = false;
-    that.initialPadding = null;
-
-    $el.on('click', $.proxy(that, 'onClick'));
-};
-
-Addon.prototype = {
-
-    checkType: function () {
-        var that = this,
-            type = that.owner.options.addon,
-            isTypeCorrect = false;
-
-        $.each(ADDON_TYPES, function (key, value) {
-            isTypeCorrect = value == type;
-            if (isTypeCorrect) {
-                return false;
-            }
-        });
-
-        if (!isTypeCorrect) {
-            type = that.owner.isMobile ? ADDON_TYPES.CLEAR : ADDON_TYPES.SPINNER;
-        }
-
-        if (type != that.type) {
-            that.type = type;
-            that.$el.attr('data-addon-type', type);
-            that.toggle(true);
-        }
-    },
-
-    toggle: function (immediate) {
-        var that = this,
-            visible;
-
-        switch (that.type) {
-            case ADDON_TYPES.CLEAR:
-                visible = !!that.owner.currentValue;
-                break;
-            case ADDON_TYPES.SPINNER:
-                visible = !!that.owner.currentRequest;
-                break;
-            default:
-                visible = false;
-        }
-
-        if (visible != that.visible) {
-            that.visible = visible;
-            if (visible) {
-                that.show(immediate);
-            } else {
-                that.hide(immediate);
-            }
-        }
-    },
-
-    show: function (immediate) {
-        var that = this,
-            style = {'opacity': 1};
-
-        if (immediate) {
-            that.$el
-                .show()
-                .css(style);
-            that.showBackground(true);
-        } else {
-            that.$el
-                .stop(true, true)
-                .delay(BEFORE_SHOW_ADDON)
-                .queue(function () {
-                    that.$el.show();
-                    that.showBackground();
-                    that.$el.dequeue();
-                })
-                .animate(style, 'fast');
-        }
-    },
-
-    hide: function (immediate) {
-        var that = this,
-            style = {'opacity': 0};
-
-        if (immediate) {
-            that.$el
-                .hide()
-                .css(style);
-        }
-        that.$el
-            .stop(true)
-            .animate(style, {
-                duration: 'fast',
-                complete: function () {
-                    that.$el.hide();
-                    that.hideBackground();
-                }
-            });
-    },
-
-    fixPosition: function(origin, elLayout){
-        var that = this,
-            addonSize = elLayout.innerHeight;
-
-        that.checkType();
-        that.$el.css({
-            left: origin.left + elLayout.borderLeft + elLayout.innerWidth - addonSize + 'px',
-            top: origin.top + elLayout.borderTop + 'px',
-            height: addonSize,
-            width: addonSize
-        });
-
-        that.initialPadding = elLayout.paddingRight;
-        that.width = addonSize;
-        if (that.visible) {
-            elLayout.componentsRight += addonSize;
-        }
-    },
-
-    showBackground: function (immediate) {
-        var that = this,
-            $el = that.owner.el,
-            style = {'paddingRight': that.width};
-
-        if (that.width > that.initialPadding) {
-            that.stopBackground();
-            if (immediate) {
-                $el.css(style);
-            } else {
-                $el
-                    .animate(style, { duration: 'fast', queue: QUEUE_NAME })
-                    .dequeue(QUEUE_NAME);
-            }
-        }
-    },
-
-    hideBackground: function (immediate) {
-        var that = this,
-            $el = that.owner.el,
-            style = {'paddingRight': that.initialPadding};
-
-        if (that.width > that.initialPadding) {
-            that.stopBackground(true);
-            if (immediate) {
-                $el.css(style);
-            } else {
-                $el
-                    .delay(BEFORE_RESTORE_PADDING, QUEUE_NAME)
-                    .animate(style, { duration: 'fast', queue: QUEUE_NAME })
-                    .dequeue(QUEUE_NAME);
-            }
-        }
-    },
-
-    stopBackground: function (gotoEnd) {
-        this.owner.el.stop(QUEUE_NAME, true, gotoEnd);
-    },
-
-    onClick: function (e) {
-        var that = this;
-
-        if (that.type == ADDON_TYPES.CLEAR) {
-            that.owner.clear();
-        }
-    }
-
-};
-
-var methods$5 = {
-
-    createAddon: function () {
-        var that = this,
-            addon = new Addon(that);
-
-        that.$wrapper.append(addon.$el);
-        that.addon = addon;
-    },
-
-    fixAddonPosition: function (origin, elLayout) {
-        this.addon.fixPosition(origin, elLayout);
-    },
-
-    checkAddonType: function () {
-        this.addon.checkType();
-    },
-
-    checkAddonVisibility: function () {
-        this.addon.toggle();
-    },
-
-    stopBackground: function () {
-        this.addon.stopBackground();
-    }
-
-};
-
-$.extend(DEFAULT_OPTIONS, optionsUsed$1);
-
-notificator
-    .on('initialize', methods$5.createAddon)
-    .on('setOptions', methods$5.checkAddonType)
-    .on('fixPosition', methods$5.fixAddonPosition)
-    .on('clear', methods$5.checkAddonVisibility)
-    .on('valueChange', methods$5.checkAddonVisibility)
-    .on('request', methods$5.checkAddonVisibility)
-    .on('resetPosition', methods$5.stopBackground);
-
-/**
- * Methods related to CONSTRAINTS component
- */
-var optionsUsed$2 = {
-    constraints: null,
-    restrict_value: false
-};
-
-var fiasParamNames = [
-  'region_fias_id',
-  'area_fias_id',
-  'city_fias_id',
-  'city_district_fias_id',
-  'settlement_fias_id',
-  'street_fias_id'
-];
-
-/**
- * Compares two suggestion objects
- * @param suggestion
- * @param instance other Suggestions instance
- */
-function belongsToArea(suggestion, instance){
-    var parentSuggestion = instance.selection,
-        result = parentSuggestion && parentSuggestion.data && instance.bounds;
-
-    if (result) {
-        $.each(instance.bounds.all, function (i, bound) {
-            return (result = parentSuggestion.data[bound] === suggestion.data[bound]);
-        });
-    }
-    return result;
-}
-
-/**
- * @param {Object} data  fields
- * @param {Suggestions} instance
- * @constructor
- */
-var ConstraintLocation = function(data, instance){
-    var that = this,
-        fieldNames,
-        fiasFieldNames,
-        fiasFields = {};
-
-    that.instance = instance;
-    that.fields = {};
-    that.specificity = -1;
-
-    if ($.isPlainObject(data) && instance.type.dataComponents) {
-        $.each(instance.type.dataComponents, function (i, component) {
-            var fieldName = component.id;
-
-            if (component.forLocations && data[fieldName]) {
-                that.fields[fieldName] = data[fieldName];
-                that.specificity = i;
-            }
-        });
-    }
-
-    fieldNames = utils.objectKeys(that.fields);
-    fiasFieldNames = utils.arraysIntersection(fieldNames, fiasParamNames);
-    if (fiasFieldNames.length) {
-        $.each(fiasFieldNames, function(index, fieldName) {
-            fiasFields[fieldName] = that.fields[fieldName];
-        });
-        that.fields = fiasFields;
-        that.specificity = that.getFiasSpecificity(fiasFieldNames);
-    } else if (that.fields.kladr_id) {
-        that.fields = { kladr_id: that.fields.kladr_id };
-        that.specificity = that.getKladrSpecificity(that.fields.kladr_id);
-    }
-};
-
-$.extend(ConstraintLocation.prototype, {
-    getLabel: function(){
-        return this.instance.type.composeValue(this.fields, { saveCityDistrict: true });
-    },
-
-    getFields: function () {
-        return this.fields;
-    },
-
-    isValid: function(){
-        return !$.isEmptyObject(this.fields);
-    },
-
-    /**
-     * Возвращает specificity для КЛАДР
-     * Описание ниже, в getFiasSpecificity
-     * @param kladr_id
-     * @returns {number}
-     */
-    getKladrSpecificity: function (kladr_id) {
-        var specificity = -1,
-            significantLength;
-
-        this.significantKladr = kladr_id.replace(/^(\d{2})(\d*?)(0+)$/g, '$1$2');
-        significantLength = this.significantKladr.length;
-
-        $.each(this.instance.type.dataComponents, function (i, component) {
-            if (component.kladrFormat && significantLength === component.kladrFormat.digits) {
-                specificity = i;
-            }
-        });
-
-        return specificity;
-    },
-
-    /**
-     * Возвращает особую величину specificity для ФИАС
-     * Specificity это индекс для массива this.instance.type.dataComponents
-     * до которого (включительно) обрежется этот массив при формировании строки адреса.
-     * Этот параметр нужен для случаев, когда в настройках плагина restrict_value = true
-     * Например, установлено ограничение (locations) по region_fias_id (Краснодарский край)
-     * В выпадашке нажимаем на "г. Сочи"
-     * Если restrict_value отключен, то выведется значение "Краснодарский край, г Сочи"
-     * Если включен, то просто "г Сочи"
-     *
-     * @param fiasFieldNames
-     * @returns {number}
-     */
-    getFiasSpecificity: function (fiasFieldNames) {
-        var specificity = -1;
-
-        $.each(this.instance.type.dataComponents, function (i, component) {
-            if (component.fiasType && ($.inArray(component.fiasType, fiasFieldNames) > -1) && specificity < i) {
-                specificity = i;
-            }
-        });
-
-        return specificity;
-    },
-
-    containsData: function (data){
-        var result = true;
-
-        if (this.fields.kladr_id) {
-            return !!data.kladr_id && data.kladr_id.indexOf(this.significantKladr) === 0;
-        } else {
-            $.each(this.fields, function(fieldName, value){
-                return result = !!data[fieldName] && data[fieldName].toLowerCase() === value.toLowerCase();
-            });
-
-            return result;
-        }
-    }
-});
-
-Suggestions.ConstraintLocation = ConstraintLocation;
-
-/**
- * @param {Object} data
- * @param {Object|Array} data.locations
- * @param {string} [data.label]
- * @param {boolean} [data.deletable]
- * @param {Suggestions} [instance]
- * @constructor
- */
-var Constraint = function(data, instance) {
-    this.id = utils.uniqueId('c');
-    this.deletable = !!data.deletable;
-    this.instance = instance;
-
-    this.locations = $.map($.makeArray(data && (data.locations || data.restrictions)), function (data) {
-        return new ConstraintLocation(data, instance);
-    });
-
-    this.locations = $.grep(this.locations, function(location) {
-        return location.isValid();
-    });
-
-    this.label = data.label;
-    if (this.label == null && instance.type.composeValue) {
-        this.label = $.map(this.locations, function (location) {
-            return location.getLabel();
-        }).join(', ');
-    }
-
-    if (this.label && this.isValid()) {
-        this.$el = $(document.createElement('li'))
-            .append($(document.createElement('span')).text(this.label))
-            .attr('data-constraint-id', this.id);
-
-        if (this.deletable) {
-            this.$el.append(
-                $(document.createElement('span'))
-                    .addClass(instance.classes.removeConstraint)
-            );
-        }
-    }
-};
-
-$.extend(Constraint.prototype, {
-    isValid: function () {
-        return this.locations.length > 0;
-    },
-    getFields: function(){
-        return $.map(this.locations, function(location){
-            return location.getFields();
-        });
-    }
-});
-
-var methods$6 = {
-
-    createConstraints: function () {
-        var that = this;
-
-        that.constraints = {};
-
-        that.$constraints = $('<ul class="suggestions-constraints"/>');
-        that.$wrapper.append(that.$constraints);
-        that.$constraints.on('click', '.' + that.classes.removeConstraint, $.proxy(that.onConstraintRemoveClick, that));
-    },
-
-    setConstraintsPosition: function(origin, elLayout){
-        var that = this;
-
-        that.$constraints.css({
-            left: origin.left + elLayout.borderLeft + elLayout.paddingLeft + 'px',
-            top: origin.top + elLayout.borderTop + Math.round((elLayout.innerHeight - that.$constraints.height()) / 2) + 'px'
-        });
-
-        elLayout.componentsLeft += that.$constraints.outerWidth(true) + elLayout.paddingLeft;
-    },
-
-    onConstraintRemoveClick: function (e) {
-        var that = this,
-            $item = $(e.target).closest('li'),
-            id = $item.attr('data-constraint-id');
-
-        // Delete constraint data before animation to let correct requests to be sent while fading
-        delete that.constraints[id];
-        // Request for new suggestions
-        that.update();
-
-        $item.fadeOut('fast', function () {
-            that.removeConstraint(id);
-        });
-    },
-
-    setupConstraints: function () {
-        var that = this,
-            constraints = that.options.constraints,
-            $parent;
-
-        if (!constraints) {
-            that.unbindFromParent();
-            return;
-        }
-
-        if (constraints instanceof $ || typeof constraints === 'string' || typeof constraints.nodeType === 'number') {
-            $parent = $(constraints);
-            if (!$parent.is(that.constraints)) {
-                that.unbindFromParent();
-                if (!$parent.is(that.el)) {
-                    that.constraints = $parent;
-                    that.bindToParent();
-                }
-            }
-        } else {
-            that._constraintsUpdating = true;
-            $.each(that.constraints, $.proxy(that.removeConstraint, that));
-            $.each($.makeArray(constraints), function (i, constraint) {
-                that.addConstraint(constraint);
-            });
-            that._constraintsUpdating = false;
-            that.fixPosition();
-        }
-    },
-
-    filteredLocation: function (data) {
-        var locationComponents = [],
-            location = {};
-
-        $.each(this.type.dataComponents, function () {
-            if (this.forLocations) locationComponents.push(this.id);
-        });
-
-        if ($.isPlainObject(data)) {
-            // Copy to location only allowed fields
-            $.each(data, function (key, value) {
-                if (value && locationComponents.indexOf(key) >= 0) {
-                    location[key] = value;
-                }
-            });
-        }
-
-        if (!$.isEmptyObject(location)) {
-            return location.kladr_id ? { kladr_id: location.kladr_id } : location;
-        }
-    },
-
-    addConstraint: function (constraint) {
-        var that = this;
-
-        constraint = new Constraint(constraint, that);
-
-        if (constraint.isValid()) {
-            that.constraints[constraint.id] = constraint;
-
-            if (constraint.$el) {
-                that.$constraints.append(constraint.$el);
-                if (!that._constraintsUpdating) {
-                    that.fixPosition();
-                }
-            }
-        }
-    },
-
-    removeConstraint: function (id) {
-        var that = this;
-        delete that.constraints[id];
-        that.$constraints.children('[data-constraint-id="' + id + '"]').remove();
-        if (!that._constraintsUpdating) {
-            that.fixPosition();
-        }
-    },
-
-    constructConstraintsParams: function () {
-        var that = this,
-            locations = [],
-            constraints = that.constraints,
-            parentInstance,
-            parentData,
-            params = {};
-
-        while (constraints instanceof $ && (parentInstance = constraints.suggestions()) &&
-            !(parentData = utils.getDeepValue(parentInstance, 'selection.data'))
-        ) {
-            constraints = parentInstance.constraints;
-        }
-
-        if (constraints instanceof $) {
-            parentData = (new ConstraintLocation(parentData, parentInstance))
-                .getFields();
-
-            if (parentData) {
-                params.locations = [ parentData ];
-                params.restrict_value = true;
-            }
-        } else {
-            if (constraints) {
-                $.each(constraints, function (id, constraint) {
-                    locations = locations.concat(constraint.getFields());
-                });
-
-                if (locations.length) {
-                    params.locations = locations;
-                    params.restrict_value = that.options.restrict_value;
-                }
-            }
-        }
-
-        return params;
-    },
-
-    /**
-     * Returns label of the first constraint (if any), empty string otherwise
-     * @returns {String}
-     */
-    getFirstConstraintLabel: function() {
-        var that = this,
-            constraints_id = $.isPlainObject(that.constraints) && Object.keys(that.constraints)[0];
-
-        return constraints_id ? that.constraints[constraints_id].label : '';
-    },
-
-    bindToParent: function () {
-        var that = this;
-
-        that.constraints
-            .on([
-                    'suggestions-select.' + that.uniqueId,
-                    'suggestions-invalidateselection.' + that.uniqueId,
-                    'suggestions-clear.' + that.uniqueId
-                ].join(' '),
-                $.proxy(that.onParentSelectionChanged, that)
-            )
-            .on('suggestions-dispose.' + that.uniqueId, $.proxy(that.onParentDispose, that));
-    },
-
-    unbindFromParent: function  () {
-        var that = this,
-            $parent = that.constraints;
-
-        if ($parent instanceof $) {
-            $parent.off('.' + that.uniqueId);
-        }
-    },
-
-    onParentSelectionChanged: function (e, suggestion, valueChanged) {
-        // Don't clear if parent has been just enriched
-        if (e.type !== 'suggestions-select' || valueChanged) {
-            this.clear();
-        }
-    },
-
-    onParentDispose: function (e) {
-        this.unbindFromParent();
-    },
-
-    getParentInstance: function () {
-        return this.constraints instanceof $ && this.constraints.suggestions();
-    },
-
-    shareWithParent: function (suggestion) {
-        // that is the parent control's instance
-        var that = this.getParentInstance();
-
-        if (!that || that.type !== this.type || belongsToArea(suggestion, that)) {
-            return;
-        }
-
-        that.shareWithParent(suggestion);
-        that.setSuggestion(suggestion);
-    },
-
-    /**
-     * Pick only fields that absent in restriction
-     */
-    getUnrestrictedData: function (data) {
-        var that = this,
-            restrictedKeys = [],
-            unrestrictedData = {},
-            maxSpecificity = -1;
-
-        // Find most specific location that could restrict current data
-        $.each(that.constraints, function (id, constraint) {
-            $.each(constraint.locations, function (i, location) {
-                if (location.containsData(data) && location.specificity > maxSpecificity) {
-                    maxSpecificity = location.specificity;
-                }
-            });
-        });
-
-        if (maxSpecificity >= 0) {
-
-            // Для городов-регионов нужно также отсечь и город
-            if (data.region_kladr_id && data.region_kladr_id === data.city_kladr_id) {
-                restrictedKeys.push.apply(restrictedKeys, that.type.dataComponentsById['city'].fields);
-            }
-
-            // Collect all fieldnames from all restricted components
-            $.each(that.type.dataComponents.slice(0, maxSpecificity + 1), function (i, component) {
-                restrictedKeys.push.apply(restrictedKeys, component.fields);
-            });
-
-            // Copy skipping restricted fields
-            $.each(data, function (key, value) {
-                if (restrictedKeys.indexOf(key) === -1) {
-                    unrestrictedData[key] = value;
-                }
-            });
-        } else {
-            unrestrictedData = data;
-        }
-
-        return unrestrictedData;
-    }
-
-};
-
-$.extend(DEFAULT_OPTIONS, optionsUsed$2);
-
-$.extend(Suggestions.prototype, methods$6);
-
-// Disable this feature when GET method used. See SUG-202
-if (utils.getDefaultType() != 'GET') {
-    notificator
-        .on('initialize', methods$6.createConstraints)
-        .on('setOptions', methods$6.setupConstraints)
-        .on('fixPosition', methods$6.setConstraintsPosition)
-        .on('requestParams', methods$6.constructConstraintsParams)
-        .on('dispose', methods$6.unbindFromParent);
-}
-
-/**
- * Methods for selecting a suggestion
- */
-
-var methods$7 = {
-
-    proceedQuery: function (query) {
-        var that = this;
-
-        if (query.length >= that.options.minChars) {
-            that.updateSuggestions(query);
-        } else {
-            that.hide();
-        }
-    },
-
-    /**
-     * Selects current or first matched suggestion, but firstly waits for data ready
-     * @param selectionOptions
-     * @returns {$.Deferred} promise, resolved with index of selected suggestion or rejected if nothing matched
-     */
-    selectCurrentValue: function (selectionOptions) {
-        var that = this,
-            result = $.Deferred();
-
-        // force onValueChange to be executed if it has been deferred
-        that.inputPhase.resolve();
-
-        that.fetchPhase
-            .done(function () {
-                var index;
-
-                // When suggestion has already been selected and not modified
-                if (that.selection && !that.visible) {
-                    result.reject();
-                } else {
-                    index = that.findSuggestionIndex();
-
-                    that.select(index, selectionOptions);
-
-                    if (index === -1) {
-                        result.reject();
-                    } else {
-                        result.resolve(index);
-                    }
-                }
-            })
-            .fail(function () {
-                result.reject();
-            });
-
-        return result;
-    },
-
-    /**
-     * Selects first when user interaction is not supposed
-     */
-    selectFoundSuggestion: function () {
-        var that = this;
-
-        if (!that.requestMode.userSelect) {
-            that.select(0);
-        }
-    },
-
-    /**
-     * Selects current or first matched suggestion
-     * @returns {number} index of found suggestion
-     */
-    findSuggestionIndex: function() {
-        var that = this,
-            index = that.selectedIndex,
-            value;
-
-        if (index === -1) {
-            // matchers always operate with trimmed strings
-            value = $.trim(that.el.val());
-            if (value) {
-                $.each(that.type.matchers, function (i, matcher) {
-                    index = matcher(value, that.suggestions);
-                    return index === -1;
-                });
-            }
-        }
-
-        return index;
-    },
-
-    /**
-     * Selects a suggestion at specified index
-     * @param index index of suggestion to select. Can be -1
-     * @param {Object} selectionOptions
-     * @param {boolean} [selectionOptions.continueSelecting]  prevents hiding after selection
-     * @param {boolean} [selectionOptions.noSpace]  prevents adding space at the end of current value
-     */
-    select: function (index, selectionOptions) {
-        var that = this,
-            suggestion = that.suggestions[index],
-            continueSelecting = selectionOptions && selectionOptions.continueSelecting,
-            currentValue = that.currentValue,
-            hasSameValues;
-
-        // Prevent recursive execution
-        if (that.triggering['Select'])
-            return;
-
-        // if no suggestion to select
-        if (!suggestion) {
-            if (!continueSelecting && !that.selection) {
-                that.triggerOnSelectNothing();
-            }
-            that.onSelectComplete(continueSelecting);
-            return;
-        }
-
-        hasSameValues = that.hasSameValues(suggestion);
-
-        that.enrichSuggestion(suggestion, selectionOptions)
-            .done(function (enrichedSuggestion, hasBeenEnriched) {
-                that.selectSuggestion(enrichedSuggestion, index, currentValue, $.extend({
-                    hasBeenEnriched: hasBeenEnriched,
-                    hasSameValues: hasSameValues
-                }, selectionOptions));
-            });
-
-    },
-
-    /**
-     * Formats and selects final (enriched) suggestion
-     * @param suggestion
-     * @param index
-     * @param lastValue
-     * @param {Object} selectionOptions
-     * @param {boolean} [selectionOptions.continueSelecting]  prevents hiding after selection
-     * @param {boolean} [selectionOptions.noSpace]  prevents adding space at the end of current value
-     * @param {boolean} selectionOptions.hasBeenEnriched
-     * @param {boolean} selectionOptions.hasSameValues
-     */
-    selectSuggestion: function (suggestion, index, lastValue, selectionOptions) {
-        var that = this,
-            continueSelecting = selectionOptions.continueSelecting,
-            assumeDataComplete = !that.type.isDataComplete || that.type.isDataComplete.call(that, suggestion),
-            currentSelection = that.selection;
-
-        // Prevent recursive execution
-        if (that.triggering['Select'])
-            return;
-
-        if (that.type.alwaysContinueSelecting) {
-            continueSelecting = true;
-        }
-
-        if (assumeDataComplete) {
-            continueSelecting = false;
-        }
-
-        // `suggestions` cat be empty, e.g. during `fixData`
-        if (selectionOptions.hasBeenEnriched && that.suggestions[index]) {
-            that.suggestions[index].data = suggestion.data;
-        }
-
-        if (that.requestMode.updateValue) {
-            that.checkValueBounds(suggestion);
-            that.currentValue = that.getSuggestionValue(suggestion, selectionOptions);
-
-            if (that.currentValue && !selectionOptions.noSpace && !assumeDataComplete) {
-                that.currentValue += ' ';
-            }
-            that.el.val(that.currentValue);
-        }
-
-        if (that.currentValue) {
-            that.selection = suggestion;
-            if (!that.areSuggestionsSame(suggestion, currentSelection)) {
-                that.trigger('Select', suggestion, that.currentValue != lastValue);
-            }
-            if (that.requestMode.userSelect) {
-                that.onSelectComplete(continueSelecting);
-            }
-        } else {
-            that.selection = null;
-            that.triggerOnSelectNothing();
-        }
-
-        that.shareWithParent(suggestion);
-    },
-
-    onSelectComplete: function (continueSelecting) {
-        var that = this;
-
-        if (continueSelecting) {
-            that.selectedIndex = -1;
-            that.updateSuggestions(that.currentValue);
-        } else {
-            that.hide();
-        }
-    },
-
-    triggerOnSelectNothing: function () {
-        var that = this;
-
-        if (!that.triggering['SelectNothing']) {
-            that.trigger('SelectNothing', that.currentValue);
-        }
-    },
-
-    trigger: function (event) {
-        var that = this,
-            args = utils.slice(arguments, 1),
-            callback = that.options['on' + event];
-
-        that.triggering[event] = true;
-        if ($.isFunction(callback)) {
-            callback.apply(that.element, args);
-        }
-        that.el.trigger.call(that.el, 'suggestions-' + event.toLowerCase(), args);
-        that.triggering[event] = false;
-    }
-
-};
-
-$.extend(Suggestions.prototype, methods$7);
-
-notificator
-    .on('assignSuggestions', methods$7.selectFoundSuggestion);
-
-/**
- * features for connected instances
- */
-
-var optionsUsed$3 = {
-    bounds: null
-};
-
-var methods$8 = {
-
-    setupBounds: function () {
-        this.bounds = {
-            from: null,
-            to: null
-        };
-    },
-
-    setBoundsOptions: function () {
-        var that = this,
-            boundsAvailable = [],
-            newBounds = $.trim(that.options.bounds).split('-'),
-            boundFrom = newBounds[0],
-            boundTo = newBounds[newBounds.length - 1],
-            boundsOwn = [],
-            boundIsOwn,
-            boundsAll = [],
-            indexTo;
-
-        if (that.type.dataComponents) {
-            $.each(that.type.dataComponents, function () {
-                if (this.forBounds) {
-                    boundsAvailable.push(this.id);
-                }
-            });
-        }
-
-        if ($.inArray(boundFrom, boundsAvailable) === -1) {
-            boundFrom = null;
-        }
-
-        indexTo = $.inArray(boundTo, boundsAvailable);
-        if (indexTo === -1 || indexTo === boundsAvailable.length - 1) {
-            boundTo = null;
-        }
-
-        if (boundFrom || boundTo) {
-            boundIsOwn = !boundFrom;
-            $.each(boundsAvailable, function (i, bound) {
-                if (bound == boundFrom) {
-                    boundIsOwn = true;
-                }
-                boundsAll.push(bound);
-                if (boundIsOwn) {
-                    boundsOwn.push(bound);
-                }
-                if (bound == boundTo) {
-                    return false;
-                }
-            });
-        }
-
-        that.bounds.from = boundFrom;
-        that.bounds.to = boundTo;
-        that.bounds.all = boundsAll;
-        that.bounds.own = boundsOwn;
-    },
-
-    constructBoundsParams: function () {
-        var that = this,
-            params = {};
-
-        if (that.bounds.from) {
-            params['from_bound'] = { value: that.bounds.from };
-        }
-        if (that.bounds.to) {
-            params['to_bound'] = { value: that.bounds.to };
-        }
-
-        return params;
-    },
-
-    /**
-     * Подстраивает suggestion.value под that.bounds.own
-     * Ничего не возвращает, меняет в самом suggestion
-     * @param suggestion
-     */
-    checkValueBounds: function (suggestion) {
-        var that = this,
-            valueData;
-
-        // If any bounds set up
-        if (that.bounds.own.length && that.type.composeValue) {
-            // делаем копию
-            var bounds = that.bounds.own.slice(0);
-            // если роль текущего инстанса плагина показывать только район города
-            // то для корректного формировния нужен city_district_fias_id
-            if (bounds.length === 1 && bounds[0] === 'city_district') {
-                bounds.push('city_district_fias_id');
-            }
-            valueData = that.copyDataComponents(suggestion.data, bounds);
-            suggestion.value = that.type.composeValue(valueData);
-        }
-    },
-
-    copyDataComponents: function (data, components) {
-        var result = {},
-            dataComponentsById = this.type.dataComponentsById;
-
-        if (dataComponentsById) {
-            $.each(components, function (i, component) {
-                $.each(dataComponentsById[component].fields, function (i, field) {
-                    if (data[field] != null) {
-                        result[field] = data[field];
-                    }
-                });
-            });
-        }
-
-        return result;
-    },
-
-    getBoundedKladrId: function (kladr_id, boundsRange) {
-        var boundTo = boundsRange[boundsRange.length - 1],
-            kladrFormat;
-
-        $.each(this.type.dataComponents, function(i, component){
-            if (component.id === boundTo) {
-                kladrFormat = component.kladrFormat;
-                return false;
-            }
-        });
-
-        return kladr_id.substr(0, kladrFormat.digits) + (new Array((kladrFormat.zeros || 0) + 1).join('0'));
-    }
-
-};
-
-$.extend(DEFAULT_OPTIONS, optionsUsed$3);
-
-$.extend(Suggestions.prototype, methods$8);
-
-notificator
-    .on('initialize', methods$8.setupBounds)
-    .on('setOptions', methods$8.setBoundsOptions)
-    .on('requestParams', methods$8.constructBoundsParams);
-
-Suggestions.defaultOptions = DEFAULT_OPTIONS;
-
-Suggestions.version = '17.5.0';
-
-$.Suggestions = Suggestions;
-
-// Create chainable jQuery plugin:
-$.fn.suggestions = function (options, args) {
-    // If function invoked without argument return
-    // instance of the first matched element:
-    if (arguments.length === 0) {
-        return this.first().data(DATA_ATTR_KEY);
-    }
-
-    return this.each(function () {
-        var inputElement = $(this),
-            instance = inputElement.data(DATA_ATTR_KEY);
-
-        if (typeof options === 'string') {
-            if (instance && typeof instance[options] === 'function') {
-                instance[options](args);
-            }
-        } else {
-            // If instance already exists, destroy it:
-            if (instance && instance.dispose) {
-                instance.dispose();
-            }
-            instance = new Suggestions(this, options);
-            inputElement.data(DATA_ATTR_KEY, instance);
-        }
-    });
-};
-
-})));
-
+!function(l,e){"function"==typeof define&&define.amd?define(["jquery"],e):e(l.jQuery)}(this,function(l){"use strict";function e(e){if(t.webkit&&!e)return{height:0,width:0};if(!t.data.outer){var o={border:"none","box-sizing":"content-box",height:"200px",margin:"0",padding:"0",width:"200px"};t.data.inner=l("<div>").css(l.extend({},o)),t.data.outer=l("<div>").css(l.extend({left:"-1000px",overflow:"scroll",position:"absolute",top:"-1000px"},o)).append(t.data.inner).appendTo("body")}return t.data.outer.scrollLeft(1e3).scrollTop(1e3),{height:Math.ceil(t.data.outer.offset().top-t.data.inner.offset().top||0),width:Math.ceil(t.data.outer.offset().left-t.data.inner.offset().left||0)}}function o(){var l=e(!0);return!(l.height||l.width)}function s(l){var e=l.originalEvent;return e.axis&&e.axis===e.HORIZONTAL_AXIS?!1:e.wheelDeltaX?!1:!0}var r=!1,t={data:{index:0,name:"scrollbar"},macosx:/mac/i.test(navigator.platform),mobile:/android|webos|iphone|ipad|ipod|blackberry/i.test(navigator.userAgent),overlay:null,scroll:null,scrolls:[],webkit:/webkit/i.test(navigator.userAgent)&&!/edge\/\d+/i.test(navigator.userAgent)};t.scrolls.add=function(l){this.remove(l).push(l)},t.scrolls.remove=function(e){for(;l.inArray(e,this)>=0;)this.splice(l.inArray(e,this),1);return this};var i={autoScrollSize:!0,autoUpdate:!0,debug:!1,disableBodyScroll:!1,duration:200,ignoreMobile:!1,ignoreOverlay:!1,scrollStep:30,showArrows:!1,stepScrolling:!0,scrollx:null,scrolly:null,onDestroy:null,onInit:null,onScroll:null,onUpdate:null},n=function(s){t.scroll||(t.overlay=o(),t.scroll=e(),a(),l(window).resize(function(){var l=!1;if(t.scroll&&(t.scroll.height||t.scroll.width)){var o=e();(o.height!==t.scroll.height||o.width!==t.scroll.width)&&(t.scroll=o,l=!0)}a(l)})),this.container=s,this.namespace=".scrollbar_"+t.data.index++,this.options=l.extend({},i,window.jQueryScrollbarOptions||{}),this.scrollTo=null,this.scrollx={},this.scrolly={},s.data(t.data.name,this),t.scrolls.add(this)};n.prototype={destroy:function(){if(this.wrapper){this.container.removeData(t.data.name),t.scrolls.remove(this);var e=this.container.scrollLeft(),o=this.container.scrollTop();this.container.insertBefore(this.wrapper).css({height:"",margin:"","max-height":""}).removeClass("scroll-content scroll-scrollx_visible scroll-scrolly_visible").off(this.namespace).scrollLeft(e).scrollTop(o),this.scrollx.scroll.removeClass("scroll-scrollx_visible").find("div").andSelf().off(this.namespace),this.scrolly.scroll.removeClass("scroll-scrolly_visible").find("div").andSelf().off(this.namespace),this.wrapper.remove(),l(document).add("body").off(this.namespace),l.isFunction(this.options.onDestroy)&&this.options.onDestroy.apply(this,[this.container])}},init:function(e){var o=this,r=this.container,i=this.containerWrapper||r,n=this.namespace,c=l.extend(this.options,e||{}),a={x:this.scrollx,y:this.scrolly},d=this.wrapper,h={scrollLeft:r.scrollLeft(),scrollTop:r.scrollTop()};if(t.mobile&&c.ignoreMobile||t.overlay&&c.ignoreOverlay||t.macosx&&!t.webkit)return!1;if(d)i.css({height:"auto","margin-bottom":-1*t.scroll.height+"px","margin-right":-1*t.scroll.width+"px","max-height":""});else{if(this.wrapper=d=l("<div>").addClass("scroll-wrapper").addClass(r.attr("class")).css("position","absolute"==r.css("position")?"absolute":"relative").insertBefore(r).append(r),r.is("textarea")&&(this.containerWrapper=i=l("<div>").insertBefore(r).append(r),d.addClass("scroll-textarea")),i.addClass("scroll-content").css({height:"auto","margin-bottom":-1*t.scroll.height+"px","margin-right":-1*t.scroll.width+"px","max-height":""}),r.on("scroll"+n,function(e){l.isFunction(c.onScroll)&&c.onScroll.call(o,{maxScroll:a.y.maxScrollOffset,scroll:r.scrollTop(),size:a.y.size,visible:a.y.visible},{maxScroll:a.x.maxScrollOffset,scroll:r.scrollLeft(),size:a.x.size,visible:a.x.visible}),a.x.isVisible&&a.x.scroll.bar.css("left",r.scrollLeft()*a.x.kx+"px"),a.y.isVisible&&a.y.scroll.bar.css("top",r.scrollTop()*a.y.kx+"px")}),d.on("scroll"+n,function(){d.scrollTop(0).scrollLeft(0)}),c.disableBodyScroll){var p=function(l){s(l)?a.y.isVisible&&a.y.mousewheel(l):a.x.isVisible&&a.x.mousewheel(l)};d.on("MozMousePixelScroll"+n,p),d.on("mousewheel"+n,p),t.mobile&&d.on("touchstart"+n,function(e){var o=e.originalEvent.touches&&e.originalEvent.touches[0]||e,s={pageX:o.pageX,pageY:o.pageY},t={left:r.scrollLeft(),top:r.scrollTop()};l(document).on("touchmove"+n,function(l){var e=l.originalEvent.targetTouches&&l.originalEvent.targetTouches[0]||l;r.scrollLeft(t.left+s.pageX-e.pageX),r.scrollTop(t.top+s.pageY-e.pageY),l.preventDefault()}),l(document).on("touchend"+n,function(){l(document).off(n)})})}l.isFunction(c.onInit)&&c.onInit.apply(this,[r])}l.each(a,function(e,t){var i=null,d=1,h="x"===e?"scrollLeft":"scrollTop",p=c.scrollStep,u=function(){var l=r[h]();r[h](l+p),1==d&&l+p>=f&&(l=r[h]()),-1==d&&f>=l+p&&(l=r[h]()),r[h]()==l&&i&&i()},f=0;t.scroll||(t.scroll=o._getScroll(c["scroll"+e]).addClass("scroll-"+e),c.showArrows&&t.scroll.addClass("scroll-element_arrows_visible"),t.mousewheel=function(l){if(!t.isVisible||"x"===e&&s(l))return!0;if("y"===e&&!s(l))return a.x.mousewheel(l),!0;var i=-1*l.originalEvent.wheelDelta||l.originalEvent.detail,n=t.size-t.visible-t.offset;return(i>0&&n>f||0>i&&f>0)&&(f+=i,0>f&&(f=0),f>n&&(f=n),o.scrollTo=o.scrollTo||{},o.scrollTo[h]=f,setTimeout(function(){o.scrollTo&&(r.stop().animate(o.scrollTo,240,"linear",function(){f=r[h]()}),o.scrollTo=null)},1)),l.preventDefault(),!1},t.scroll.on("MozMousePixelScroll"+n,t.mousewheel).on("mousewheel"+n,t.mousewheel).on("mouseenter"+n,function(){f=r[h]()}),t.scroll.find(".scroll-arrow, .scroll-element_track").on("mousedown"+n,function(s){if(1!=s.which)return!0;d=1;var n={eventOffset:s["x"===e?"pageX":"pageY"],maxScrollValue:t.size-t.visible-t.offset,scrollbarOffset:t.scroll.bar.offset()["x"===e?"left":"top"],scrollbarSize:t.scroll.bar["x"===e?"outerWidth":"outerHeight"]()},a=0,v=0;return l(this).hasClass("scroll-arrow")?(d=l(this).hasClass("scroll-arrow_more")?1:-1,p=c.scrollStep*d,f=d>0?n.maxScrollValue:0):(d=n.eventOffset>n.scrollbarOffset+n.scrollbarSize?1:n.eventOffset<n.scrollbarOffset?-1:0,p=Math.round(.75*t.visible)*d,f=n.eventOffset-n.scrollbarOffset-(c.stepScrolling?1==d?n.scrollbarSize:0:Math.round(n.scrollbarSize/2)),f=r[h]()+f/t.kx),o.scrollTo=o.scrollTo||{},o.scrollTo[h]=c.stepScrolling?r[h]()+p:f,c.stepScrolling&&(i=function(){f=r[h](),clearInterval(v),clearTimeout(a),a=0,v=0},a=setTimeout(function(){v=setInterval(u,40)},c.duration+100)),setTimeout(function(){o.scrollTo&&(r.animate(o.scrollTo,c.duration),o.scrollTo=null)},1),o._handleMouseDown(i,s)}),t.scroll.bar.on("mousedown"+n,function(s){if(1!=s.which)return!0;var i=s["x"===e?"pageX":"pageY"],c=r[h]();return t.scroll.addClass("scroll-draggable"),l(document).on("mousemove"+n,function(l){var o=parseInt((l["x"===e?"pageX":"pageY"]-i)/t.kx,10);r[h](c+o)}),o._handleMouseDown(function(){t.scroll.removeClass("scroll-draggable"),f=r[h]()},s)}))}),l.each(a,function(l,e){var o="scroll-scroll"+l+"_visible",s="x"==l?a.y:a.x;e.scroll.removeClass(o),s.scroll.removeClass(o),i.removeClass(o)}),l.each(a,function(e,o){l.extend(o,"x"==e?{offset:parseInt(r.css("left"),10)||0,size:r.prop("scrollWidth"),visible:d.width()}:{offset:parseInt(r.css("top"),10)||0,size:r.prop("scrollHeight"),visible:d.height()})}),this._updateScroll("x",this.scrollx),this._updateScroll("y",this.scrolly),l.isFunction(c.onUpdate)&&c.onUpdate.apply(this,[r]),l.each(a,function(l,e){var o="x"===l?"left":"top",s="x"===l?"outerWidth":"outerHeight",t="x"===l?"width":"height",i=parseInt(r.css(o),10)||0,n=e.size,a=e.visible+i,d=e.scroll.size[s]()+(parseInt(e.scroll.size.css(o),10)||0);c.autoScrollSize&&(e.scrollbarSize=parseInt(d*a/n,10),e.scroll.bar.css(t,e.scrollbarSize+"px")),e.scrollbarSize=e.scroll.bar[s](),e.kx=(d-e.scrollbarSize)/(n-a)||1,e.maxScrollOffset=n-a}),r.scrollLeft(h.scrollLeft).scrollTop(h.scrollTop).trigger("scroll")},_getScroll:function(e){var o={advanced:['<div class="scroll-element">','<div class="scroll-element_corner"></div>','<div class="scroll-arrow scroll-arrow_less"></div>','<div class="scroll-arrow scroll-arrow_more"></div>','<div class="scroll-element_outer">','<div class="scroll-element_size"></div>','<div class="scroll-element_inner-wrapper">','<div class="scroll-element_inner scroll-element_track">','<div class="scroll-element_inner-bottom"></div>',"</div>","</div>",'<div class="scroll-bar">','<div class="scroll-bar_body">','<div class="scroll-bar_body-inner"></div>',"</div>",'<div class="scroll-bar_bottom"></div>','<div class="scroll-bar_center"></div>',"</div>","</div>","</div>"].join(""),simple:['<div class="scroll-element">','<div class="scroll-element_outer">','<div class="scroll-element_size"></div>','<div class="scroll-element_track"></div>','<div class="scroll-bar"></div>',"</div>","</div>"].join("")};return o[e]&&(e=o[e]),e||(e=o.simple),e="string"==typeof e?l(e).appendTo(this.wrapper):l(e),l.extend(e,{bar:e.find(".scroll-bar"),size:e.find(".scroll-element_size"),track:e.find(".scroll-element_track")}),e},_handleMouseDown:function(e,o){var s=this.namespace;return l(document).on("blur"+s,function(){l(document).add("body").off(s),e&&e()}),l(document).on("dragstart"+s,function(l){return l.preventDefault(),!1}),l(document).on("mouseup"+s,function(){l(document).add("body").off(s),e&&e()}),l("body").on("selectstart"+s,function(l){return l.preventDefault(),!1}),o&&o.preventDefault(),!1},_updateScroll:function(e,o){var s=this.container,r=this.containerWrapper||s,i="scroll-scroll"+e+"_visible",n="x"===e?this.scrolly:this.scrollx,c=parseInt(this.container.css("x"===e?"left":"top"),10)||0,a=this.wrapper,d=o.size,h=o.visible+c;o.isVisible=d-h>1,o.isVisible?(o.scroll.addClass(i),n.scroll.addClass(i),r.addClass(i)):(o.scroll.removeClass(i),n.scroll.removeClass(i),r.removeClass(i)),"y"===e&&(s.is("textarea")||h>d?r.css({height:h+t.scroll.height+"px","max-height":"none"}):r.css({"max-height":h+t.scroll.height+"px"})),(o.size!=s.prop("scrollWidth")||n.size!=s.prop("scrollHeight")||o.visible!=a.width()||n.visible!=a.height()||o.offset!=(parseInt(s.css("left"),10)||0)||n.offset!=(parseInt(s.css("top"),10)||0))&&(l.extend(this.scrollx,{offset:parseInt(s.css("left"),10)||0,size:s.prop("scrollWidth"),visible:a.width()}),l.extend(this.scrolly,{offset:parseInt(s.css("top"),10)||0,size:this.container.prop("scrollHeight"),visible:a.height()}),this._updateScroll("x"===e?"y":"x",n))}};var c=n;l.fn.scrollbar=function(e,o){return"string"!=typeof e&&(o=e,e="init"),"undefined"==typeof o&&(o=[]),l.isArray(o)||(o=[o]),this.not("body, .scroll-wrapper").each(function(){var s=l(this),r=s.data(t.data.name);(r||"init"===e)&&(r||(r=new c(s)),r[e]&&r[e].apply(r,o))}),this},l.fn.scrollbar.options=i;var a=function(){var l=0,e=0;return function(o){var s,i,n,c,d,h,p;for(s=0;s<t.scrolls.length;s++)c=t.scrolls[s],i=c.container,n=c.options,d=c.wrapper,h=c.scrollx,p=c.scrolly,(o||n.autoUpdate&&d&&d.is(":visible")&&(i.prop("scrollWidth")!=h.size||i.prop("scrollHeight")!=p.size||d.width()!=h.visible||d.height()!=p.visible))&&(c.init(),n.debug&&(window.console&&console.log({scrollHeight:i.prop("scrollHeight")+":"+c.scrolly.size,scrollWidth:i.prop("scrollWidth")+":"+c.scrollx.size,visibleHeight:d.height()+":"+c.scrolly.visible,visibleWidth:d.width()+":"+c.scrollx.visible},!0),e++));r&&e>10?(window.console&&console.log("Scroll updates exceed 10"),a=function(){}):(clearTimeout(l),l=setTimeout(a,300))}}();window.angular&&!function(l){l.module("jQueryScrollbar",[]).provider("jQueryScrollbar",function(){var e=i;return{setOptions:function(o){l.extend(e,o)},$get:function(){return{options:l.copy(e)}}}}).directive("jqueryScrollbar",["jQueryScrollbar","$parse",function(l,e){return{restrict:"AC",link:function(o,s,r){var t=e(r.jqueryScrollbar),i=t(o);s.scrollbar(i||l.options).on("$destroy",function(){s.scrollbar("destroy")})}}}])}(window.angular)});
 ;(function (global, factory) {
     typeof exports === 'object' && typeof module !== 'undefined' ? module.exports = factory() :
     typeof define === 'function' && define.amd ? define(factory) :
@@ -88476,21 +84497,4000 @@ return hooks;
 }));
 
 /**
- * jQuery CSS Customizable Scrollbar
+ * DaData.ru Suggestions jQuery plugin, version 17.5.0
  *
- * Copyright 2015, Yuriy Khabarov
- * Dual licensed under the MIT or GPL Version 2 licenses.
- *
- * If you found bug, please contact me via email <13real008@gmail.com>
- *
- * Compressed by http://jscompress.com/
- *
- * @author Yuriy Khabarov aka Gromo
- * @version 0.2.10
- * @url https://github.com/gromo/jquery.scrollbar/
- *
+ * DaData.ru Suggestions jQuery plugin is freely distributable under the terms of MIT-style license
+ * Built on DevBridge Autocomplete for jQuery (https://github.com/devbridge/jQuery-Autocomplete)
+ * For details, see https://github.com/hflabs/suggestions-jquery
  */
-!function(l,e){"function"==typeof define&&define.amd?define(["jquery"],e):e(l.jQuery)}(this,function(l){"use strict";function e(e){if(t.webkit&&!e)return{height:0,width:0};if(!t.data.outer){var o={border:"none","box-sizing":"content-box",height:"200px",margin:"0",padding:"0",width:"200px"};t.data.inner=l("<div>").css(l.extend({},o)),t.data.outer=l("<div>").css(l.extend({left:"-1000px",overflow:"scroll",position:"absolute",top:"-1000px"},o)).append(t.data.inner).appendTo("body")}return t.data.outer.scrollLeft(1e3).scrollTop(1e3),{height:Math.ceil(t.data.outer.offset().top-t.data.inner.offset().top||0),width:Math.ceil(t.data.outer.offset().left-t.data.inner.offset().left||0)}}function o(){var l=e(!0);return!(l.height||l.width)}function s(l){var e=l.originalEvent;return e.axis&&e.axis===e.HORIZONTAL_AXIS?!1:e.wheelDeltaX?!1:!0}var r=!1,t={data:{index:0,name:"scrollbar"},macosx:/mac/i.test(navigator.platform),mobile:/android|webos|iphone|ipad|ipod|blackberry/i.test(navigator.userAgent),overlay:null,scroll:null,scrolls:[],webkit:/webkit/i.test(navigator.userAgent)&&!/edge\/\d+/i.test(navigator.userAgent)};t.scrolls.add=function(l){this.remove(l).push(l)},t.scrolls.remove=function(e){for(;l.inArray(e,this)>=0;)this.splice(l.inArray(e,this),1);return this};var i={autoScrollSize:!0,autoUpdate:!0,debug:!1,disableBodyScroll:!1,duration:200,ignoreMobile:!1,ignoreOverlay:!1,scrollStep:30,showArrows:!1,stepScrolling:!0,scrollx:null,scrolly:null,onDestroy:null,onInit:null,onScroll:null,onUpdate:null},n=function(s){t.scroll||(t.overlay=o(),t.scroll=e(),a(),l(window).resize(function(){var l=!1;if(t.scroll&&(t.scroll.height||t.scroll.width)){var o=e();(o.height!==t.scroll.height||o.width!==t.scroll.width)&&(t.scroll=o,l=!0)}a(l)})),this.container=s,this.namespace=".scrollbar_"+t.data.index++,this.options=l.extend({},i,window.jQueryScrollbarOptions||{}),this.scrollTo=null,this.scrollx={},this.scrolly={},s.data(t.data.name,this),t.scrolls.add(this)};n.prototype={destroy:function(){if(this.wrapper){this.container.removeData(t.data.name),t.scrolls.remove(this);var e=this.container.scrollLeft(),o=this.container.scrollTop();this.container.insertBefore(this.wrapper).css({height:"",margin:"","max-height":""}).removeClass("scroll-content scroll-scrollx_visible scroll-scrolly_visible").off(this.namespace).scrollLeft(e).scrollTop(o),this.scrollx.scroll.removeClass("scroll-scrollx_visible").find("div").andSelf().off(this.namespace),this.scrolly.scroll.removeClass("scroll-scrolly_visible").find("div").andSelf().off(this.namespace),this.wrapper.remove(),l(document).add("body").off(this.namespace),l.isFunction(this.options.onDestroy)&&this.options.onDestroy.apply(this,[this.container])}},init:function(e){var o=this,r=this.container,i=this.containerWrapper||r,n=this.namespace,c=l.extend(this.options,e||{}),a={x:this.scrollx,y:this.scrolly},d=this.wrapper,h={scrollLeft:r.scrollLeft(),scrollTop:r.scrollTop()};if(t.mobile&&c.ignoreMobile||t.overlay&&c.ignoreOverlay||t.macosx&&!t.webkit)return!1;if(d)i.css({height:"auto","margin-bottom":-1*t.scroll.height+"px","margin-right":-1*t.scroll.width+"px","max-height":""});else{if(this.wrapper=d=l("<div>").addClass("scroll-wrapper").addClass(r.attr("class")).css("position","absolute"==r.css("position")?"absolute":"relative").insertBefore(r).append(r),r.is("textarea")&&(this.containerWrapper=i=l("<div>").insertBefore(r).append(r),d.addClass("scroll-textarea")),i.addClass("scroll-content").css({height:"auto","margin-bottom":-1*t.scroll.height+"px","margin-right":-1*t.scroll.width+"px","max-height":""}),r.on("scroll"+n,function(e){l.isFunction(c.onScroll)&&c.onScroll.call(o,{maxScroll:a.y.maxScrollOffset,scroll:r.scrollTop(),size:a.y.size,visible:a.y.visible},{maxScroll:a.x.maxScrollOffset,scroll:r.scrollLeft(),size:a.x.size,visible:a.x.visible}),a.x.isVisible&&a.x.scroll.bar.css("left",r.scrollLeft()*a.x.kx+"px"),a.y.isVisible&&a.y.scroll.bar.css("top",r.scrollTop()*a.y.kx+"px")}),d.on("scroll"+n,function(){d.scrollTop(0).scrollLeft(0)}),c.disableBodyScroll){var p=function(l){s(l)?a.y.isVisible&&a.y.mousewheel(l):a.x.isVisible&&a.x.mousewheel(l)};d.on("MozMousePixelScroll"+n,p),d.on("mousewheel"+n,p),t.mobile&&d.on("touchstart"+n,function(e){var o=e.originalEvent.touches&&e.originalEvent.touches[0]||e,s={pageX:o.pageX,pageY:o.pageY},t={left:r.scrollLeft(),top:r.scrollTop()};l(document).on("touchmove"+n,function(l){var e=l.originalEvent.targetTouches&&l.originalEvent.targetTouches[0]||l;r.scrollLeft(t.left+s.pageX-e.pageX),r.scrollTop(t.top+s.pageY-e.pageY),l.preventDefault()}),l(document).on("touchend"+n,function(){l(document).off(n)})})}l.isFunction(c.onInit)&&c.onInit.apply(this,[r])}l.each(a,function(e,t){var i=null,d=1,h="x"===e?"scrollLeft":"scrollTop",p=c.scrollStep,u=function(){var l=r[h]();r[h](l+p),1==d&&l+p>=f&&(l=r[h]()),-1==d&&f>=l+p&&(l=r[h]()),r[h]()==l&&i&&i()},f=0;t.scroll||(t.scroll=o._getScroll(c["scroll"+e]).addClass("scroll-"+e),c.showArrows&&t.scroll.addClass("scroll-element_arrows_visible"),t.mousewheel=function(l){if(!t.isVisible||"x"===e&&s(l))return!0;if("y"===e&&!s(l))return a.x.mousewheel(l),!0;var i=-1*l.originalEvent.wheelDelta||l.originalEvent.detail,n=t.size-t.visible-t.offset;return(i>0&&n>f||0>i&&f>0)&&(f+=i,0>f&&(f=0),f>n&&(f=n),o.scrollTo=o.scrollTo||{},o.scrollTo[h]=f,setTimeout(function(){o.scrollTo&&(r.stop().animate(o.scrollTo,240,"linear",function(){f=r[h]()}),o.scrollTo=null)},1)),l.preventDefault(),!1},t.scroll.on("MozMousePixelScroll"+n,t.mousewheel).on("mousewheel"+n,t.mousewheel).on("mouseenter"+n,function(){f=r[h]()}),t.scroll.find(".scroll-arrow, .scroll-element_track").on("mousedown"+n,function(s){if(1!=s.which)return!0;d=1;var n={eventOffset:s["x"===e?"pageX":"pageY"],maxScrollValue:t.size-t.visible-t.offset,scrollbarOffset:t.scroll.bar.offset()["x"===e?"left":"top"],scrollbarSize:t.scroll.bar["x"===e?"outerWidth":"outerHeight"]()},a=0,v=0;return l(this).hasClass("scroll-arrow")?(d=l(this).hasClass("scroll-arrow_more")?1:-1,p=c.scrollStep*d,f=d>0?n.maxScrollValue:0):(d=n.eventOffset>n.scrollbarOffset+n.scrollbarSize?1:n.eventOffset<n.scrollbarOffset?-1:0,p=Math.round(.75*t.visible)*d,f=n.eventOffset-n.scrollbarOffset-(c.stepScrolling?1==d?n.scrollbarSize:0:Math.round(n.scrollbarSize/2)),f=r[h]()+f/t.kx),o.scrollTo=o.scrollTo||{},o.scrollTo[h]=c.stepScrolling?r[h]()+p:f,c.stepScrolling&&(i=function(){f=r[h](),clearInterval(v),clearTimeout(a),a=0,v=0},a=setTimeout(function(){v=setInterval(u,40)},c.duration+100)),setTimeout(function(){o.scrollTo&&(r.animate(o.scrollTo,c.duration),o.scrollTo=null)},1),o._handleMouseDown(i,s)}),t.scroll.bar.on("mousedown"+n,function(s){if(1!=s.which)return!0;var i=s["x"===e?"pageX":"pageY"],c=r[h]();return t.scroll.addClass("scroll-draggable"),l(document).on("mousemove"+n,function(l){var o=parseInt((l["x"===e?"pageX":"pageY"]-i)/t.kx,10);r[h](c+o)}),o._handleMouseDown(function(){t.scroll.removeClass("scroll-draggable"),f=r[h]()},s)}))}),l.each(a,function(l,e){var o="scroll-scroll"+l+"_visible",s="x"==l?a.y:a.x;e.scroll.removeClass(o),s.scroll.removeClass(o),i.removeClass(o)}),l.each(a,function(e,o){l.extend(o,"x"==e?{offset:parseInt(r.css("left"),10)||0,size:r.prop("scrollWidth"),visible:d.width()}:{offset:parseInt(r.css("top"),10)||0,size:r.prop("scrollHeight"),visible:d.height()})}),this._updateScroll("x",this.scrollx),this._updateScroll("y",this.scrolly),l.isFunction(c.onUpdate)&&c.onUpdate.apply(this,[r]),l.each(a,function(l,e){var o="x"===l?"left":"top",s="x"===l?"outerWidth":"outerHeight",t="x"===l?"width":"height",i=parseInt(r.css(o),10)||0,n=e.size,a=e.visible+i,d=e.scroll.size[s]()+(parseInt(e.scroll.size.css(o),10)||0);c.autoScrollSize&&(e.scrollbarSize=parseInt(d*a/n,10),e.scroll.bar.css(t,e.scrollbarSize+"px")),e.scrollbarSize=e.scroll.bar[s](),e.kx=(d-e.scrollbarSize)/(n-a)||1,e.maxScrollOffset=n-a}),r.scrollLeft(h.scrollLeft).scrollTop(h.scrollTop).trigger("scroll")},_getScroll:function(e){var o={advanced:['<div class="scroll-element">','<div class="scroll-element_corner"></div>','<div class="scroll-arrow scroll-arrow_less"></div>','<div class="scroll-arrow scroll-arrow_more"></div>','<div class="scroll-element_outer">','<div class="scroll-element_size"></div>','<div class="scroll-element_inner-wrapper">','<div class="scroll-element_inner scroll-element_track">','<div class="scroll-element_inner-bottom"></div>',"</div>","</div>",'<div class="scroll-bar">','<div class="scroll-bar_body">','<div class="scroll-bar_body-inner"></div>',"</div>",'<div class="scroll-bar_bottom"></div>','<div class="scroll-bar_center"></div>',"</div>","</div>","</div>"].join(""),simple:['<div class="scroll-element">','<div class="scroll-element_outer">','<div class="scroll-element_size"></div>','<div class="scroll-element_track"></div>','<div class="scroll-bar"></div>',"</div>","</div>"].join("")};return o[e]&&(e=o[e]),e||(e=o.simple),e="string"==typeof e?l(e).appendTo(this.wrapper):l(e),l.extend(e,{bar:e.find(".scroll-bar"),size:e.find(".scroll-element_size"),track:e.find(".scroll-element_track")}),e},_handleMouseDown:function(e,o){var s=this.namespace;return l(document).on("blur"+s,function(){l(document).add("body").off(s),e&&e()}),l(document).on("dragstart"+s,function(l){return l.preventDefault(),!1}),l(document).on("mouseup"+s,function(){l(document).add("body").off(s),e&&e()}),l("body").on("selectstart"+s,function(l){return l.preventDefault(),!1}),o&&o.preventDefault(),!1},_updateScroll:function(e,o){var s=this.container,r=this.containerWrapper||s,i="scroll-scroll"+e+"_visible",n="x"===e?this.scrolly:this.scrollx,c=parseInt(this.container.css("x"===e?"left":"top"),10)||0,a=this.wrapper,d=o.size,h=o.visible+c;o.isVisible=d-h>1,o.isVisible?(o.scroll.addClass(i),n.scroll.addClass(i),r.addClass(i)):(o.scroll.removeClass(i),n.scroll.removeClass(i),r.removeClass(i)),"y"===e&&(s.is("textarea")||h>d?r.css({height:h+t.scroll.height+"px","max-height":"none"}):r.css({"max-height":h+t.scroll.height+"px"})),(o.size!=s.prop("scrollWidth")||n.size!=s.prop("scrollHeight")||o.visible!=a.width()||n.visible!=a.height()||o.offset!=(parseInt(s.css("left"),10)||0)||n.offset!=(parseInt(s.css("top"),10)||0))&&(l.extend(this.scrollx,{offset:parseInt(s.css("left"),10)||0,size:s.prop("scrollWidth"),visible:a.width()}),l.extend(this.scrolly,{offset:parseInt(s.css("top"),10)||0,size:this.container.prop("scrollHeight"),visible:a.height()}),this._updateScroll("x"===e?"y":"x",n))}};var c=n;l.fn.scrollbar=function(e,o){return"string"!=typeof e&&(o=e,e="init"),"undefined"==typeof o&&(o=[]),l.isArray(o)||(o=[o]),this.not("body, .scroll-wrapper").each(function(){var s=l(this),r=s.data(t.data.name);(r||"init"===e)&&(r||(r=new c(s)),r[e]&&r[e].apply(r,o))}),this},l.fn.scrollbar.options=i;var a=function(){var l=0,e=0;return function(o){var s,i,n,c,d,h,p;for(s=0;s<t.scrolls.length;s++)c=t.scrolls[s],i=c.container,n=c.options,d=c.wrapper,h=c.scrollx,p=c.scrolly,(o||n.autoUpdate&&d&&d.is(":visible")&&(i.prop("scrollWidth")!=h.size||i.prop("scrollHeight")!=p.size||d.width()!=h.visible||d.height()!=p.visible))&&(c.init(),n.debug&&(window.console&&console.log({scrollHeight:i.prop("scrollHeight")+":"+c.scrolly.size,scrollWidth:i.prop("scrollWidth")+":"+c.scrollx.size,visibleHeight:d.height()+":"+c.scrolly.visible,visibleWidth:d.width()+":"+c.scrollx.visible},!0),e++));r&&e>10?(window.console&&console.log("Scroll updates exceed 10"),a=function(){}):(clearTimeout(l),l=setTimeout(a,300))}}();window.angular&&!function(l){l.module("jQueryScrollbar",[]).provider("jQueryScrollbar",function(){var e=i;return{setOptions:function(o){l.extend(e,o)},$get:function(){return{options:l.copy(e)}}}}).directive("jqueryScrollbar",["jQueryScrollbar","$parse",function(l,e){return{restrict:"AC",link:function(o,s,r){var t=e(r.jqueryScrollbar),i=t(o);s.scrollbar(i||l.options).on("$destroy",function(){s.scrollbar("destroy")})}}}])}(window.angular)});
+(function (global, factory) {
+	typeof exports === 'object' && typeof module !== 'undefined' ? factory(require('jquery')) :
+	typeof define === 'function' && define.amd ? define(['jquery'], factory) :
+	(factory(global.$));
+}(this, (function ($) { 'use strict';
+
+$ = 'default' in $ ? $['default'] : $;
+
+var KEYS = {
+        ENTER: 13,
+        ESC:   27,
+        TAB:   9,
+        SPACE: 32,
+        UP:    38,
+        DOWN:  40
+    };
+var EVENT_NS = '.suggestions';
+var DATA_ATTR_KEY = 'suggestions';
+var WORD_DELIMITERS = '\\s"\'~\\*\\.,:\\|\\[\\]\\(\\)\\{\\}<>№';
+var WORD_SPLITTER = new RegExp('[' + WORD_DELIMITERS + ']+', 'g');
+var WORD_PARTS_DELIMITERS = '\\-\\+\\/\\\\\\?!@#$%^&';
+var WORD_PARTS_SPLITTER = new RegExp('[' + WORD_PARTS_DELIMITERS + ']+', 'g');
+
+var utils = (function () {
+    var uniqueId = 0;
+    return {
+        escapeRegExChars: function (value) {
+            return value.replace(/[\-\[\]\/\{\}\(\)\*\+\?\.\\\^\$\|]/g, "\\$&");
+        },
+        escapeHtml: function (str) {
+            var map = {
+                '&': '&amp;',
+                '<': '&lt;',
+                '>': '&gt;',
+                '"': '&quot;',
+                "'": '&#x27;',
+                '/': '&#x2F;'
+            };
+
+            if (str) {
+                $.each(map, function(ch, html){
+                    str = str.replace(new RegExp(ch, 'g'), html);
+                });
+            }
+            return str;
+        },
+        getDefaultType: function () {
+            return ($.support.cors ? 'POST' : 'GET');
+        },
+        getDefaultContentType: function () {
+            return ($.support.cors ? 'application/json' : 'application/x-www-form-urlencoded');
+        },
+        fixURLProtocol: function(url){
+            return $.support.cors ? url : url.replace(/^https?:/, location.protocol);
+        },
+        addUrlParams: function (url, params) {
+            return url + (/\?/.test(url) ? '&' : '?') + $.param(params);
+        },
+        serialize: function (data) {
+            if ($.support.cors) {
+                return JSON.stringify(data, function (key, value) {
+                    return value === null ? undefined : value;
+                });
+            } else {
+                data = this.compactObject(data);
+                return $.param(data, true);
+            }
+        },
+        compact: function (array) {
+            return $.grep(array, function (el) {
+                return !!el;
+            });
+        },
+        delay: function (handler, delay) {
+            return setTimeout(handler, delay || 0);
+        },
+        uniqueId: function (prefix) {
+            return (prefix || '') + ++uniqueId;
+        },
+        slice: function(obj, start) {
+            return Array.prototype.slice.call(obj, start);
+        },
+        indexBy: function (data, field, indexField) {
+            var result = {};
+
+            $.each(data, function (i, obj) {
+                var key = obj[field],
+                    val = {};
+
+                if (indexField) {
+                    val[indexField] = i;
+                }
+
+                result[key] = $.extend(true, val, obj);
+            });
+
+            return result;
+        },
+
+        /**
+         * Compares two objects, but only fields that are set in both
+         * @param a
+         * @param b
+         * @returns {boolean}
+         */
+        areSame: function self(a, b) {
+            var same = true;
+
+            if (typeof a != typeof b) {
+                return false;
+            }
+
+            if (typeof a == 'object' && a != null && b != null) {
+                $.each(a, function (i, value) {
+                    return same = self(value, b[i]);
+                });
+                return same;
+            }
+
+            return a === b;
+        },
+
+        /**
+         * Returns array1 minus array2
+         */
+        arrayMinus: function(array1, array2) {
+            return array2 ? $.grep(array1, function(el, i){
+                return $.inArray(el, array2) === -1;
+            }) : array1;
+        },
+        /**
+         * Returns array1 minus array2
+         * if value in array1 in enclosed by value in array2, it is considered a match
+         */
+        arrayMinusWithPartialMatching: function(array1, array2) {
+            return array2 ? $.grep(array1, function(el, i){
+                return !array2.some(function(el2) {
+                    return el2.indexOf(el) === 0;
+                })
+            }) : array1;
+        },
+        /**
+         * Пересечение массивов: ([1,2,3,4], [2,4,5,6]) => [2,4]
+         * Исходные массивы не меняются
+         * @param {Array} array1
+         * @param {Array} array2
+         * @returns {Array}
+         */
+        arraysIntersection: function(array1, array2) {
+            var result = [];
+            if (!$.isArray(array1) || !$.isArray(array2)) {
+                return result;
+            }
+            $.each(array1, function(index, item) {
+                if ($.inArray(item, array2) >= 0) {
+                    result.push(item);
+                }
+            });
+            return result;
+        },
+        getWords: function(str, stopwords) {
+            // Split numbers and letters written together
+            str = str.replace(/(\d+)([а-яА-ЯёЁ]{2,})/g, '$1 $2')
+                .replace(/([а-яА-ЯёЁ]+)(\d+)/g, '$1 $2');
+
+            var words = this.compact(str.split(WORD_SPLITTER)),
+                lastWord = words.pop(),
+                goodWords = this.arrayMinus(words, stopwords);
+
+            goodWords.push(lastWord);
+            return goodWords;
+        },
+        /**
+         * Returns normalized string without stopwords
+         */
+        normalize: function(str, stopwords) {
+            var that = this;
+            return that.getWords(str, stopwords).join(' ');
+        },
+        /**
+         * Returns true if str1 includes str2 plus something else, false otherwise.
+         */
+        stringEncloses: function(str1, str2) {
+            return str1.length > str2.length && str1.indexOf(str2) !== -1;
+        },
+        fieldsNotEmpty: function(obj, fields){
+            if (!$.isPlainObject(obj)) {
+                return false;
+            }
+            var result = true;
+            $.each(fields, function (i, field) {
+                return result = !!(obj[field]);
+            });
+            return result;
+        },
+        getDeepValue: function self(obj, name) {
+            var path = name.split('.'),
+                step = path.shift();
+
+            return obj && (path.length ? self(obj[step], path.join('.')) : obj[step]);
+        },
+        reWordExtractor: function () {
+            return new RegExp('([^' + WORD_DELIMITERS + ']*)([' + WORD_DELIMITERS + ']*)', 'g');
+        },
+        formatToken: function (token) {
+            return token && token.toLowerCase().replace(/[ёЁ]/g, 'е');
+        },
+        withSubTokens: function (tokens) {
+            var result = [];
+
+            $.each(tokens, function (i, token) {
+                var subtokens = token.split(WORD_PARTS_SPLITTER);
+
+                result.push(token);
+
+                if (subtokens.length > 1) {
+                    result = result.concat(utils.compact(subtokens));
+                }
+            });
+
+            return result;
+        },
+
+        /**
+         * Возвращает массив с ключами переданного объекта
+         * Используется нативный Object.keys если он есть
+         * @param {Object} obj
+         * @returns {Array}
+         */
+        objectKeys: function(obj) {
+            if (Object.keys) {
+                return Object.keys(obj);
+            }
+            var keys = [];
+            $.each(obj, function(name) {
+                keys.push(name);
+            });
+            return keys;
+        },
+
+        /**
+         * Возвращает копию объекта без пустых элементов
+         * @param obj
+         */
+        compactObject: function(obj) {
+            var copy = $.extend(true, {}, obj);
+
+            $.each(copy, function (key, val) {
+                if (val === null || val === undefined || val === '') {
+                    delete copy[key];
+                }
+            });
+
+            return copy;
+        }
+
+    };
+}());
+
+/**
+ * Matchers return index of suitable suggestion
+ * Context inside is optionally set in types.js
+ */
+var matchers = function() {
+
+    /**
+     * Factory to create same parent checker function
+     * @param preprocessFn called on each value before comparison
+     * @returns {Function} same parent checker function
+     */
+    function sameParentChecker (preprocessFn) {
+        return function (suggestions) {
+            if (suggestions.length === 0) {
+                return false;
+            }
+            if (suggestions.length === 1) {
+                return true;
+            }
+
+            var parentValue = preprocessFn(suggestions[0].value),
+                aliens = $.grep(suggestions, function (suggestion) {
+                    return preprocessFn(suggestion.value).indexOf(parentValue) === 0;
+                }, true);
+
+            return aliens.length === 0;
+        }
+    }
+
+    /**
+     * Default same parent checker. Compares raw values.
+     * @type {Function}
+     */
+    var haveSameParent = sameParentChecker(function(val) { return val; });
+
+    /**
+     * Same parent checker for addresses. Strips house and extension before comparison.
+     * @type {Function}
+     */
+    var haveSameParentAddress = sameParentChecker(function(val) {
+        return val.replace(/, (?:д|вл|двлд|к) .+$/, '');
+    });
+
+    return {
+
+        /**
+         * Matches query against suggestions, removing all the stopwords.
+         */
+        matchByNormalizedQuery: function (query, suggestions) {
+            var queryLowerCase = query.toLowerCase(),
+                stopwords = this && this.stopwords,
+                normalizedQuery = utils.normalize(queryLowerCase, stopwords),
+                matches = [];
+
+            $.each(suggestions, function(i, suggestion) {
+                var suggestedValue = suggestion.value.toLowerCase();
+                // if query encloses suggestion, than it has already been selected
+                // so we should not select it anymore
+                if (utils.stringEncloses(queryLowerCase, suggestedValue)) {
+                    return false;
+                }
+                // if there is suggestion that contains query as its part
+                // than we should ignore all other matches, even full ones
+                if (suggestedValue.indexOf(normalizedQuery) > 0) {
+                    return false;
+                }
+                if (normalizedQuery === utils.normalize(suggestedValue, stopwords)) {
+                    matches.push(i);
+                }
+            });
+
+            return matches.length === 1 ? matches[0] : -1;
+        },
+
+        /**
+         * Matches query against suggestions word-by-word (with respect to stopwords).
+         * Matches if query words are a subset of suggested words.
+         */
+        matchByWords: function (query, suggestions) {
+            var stopwords = this && this.stopwords,
+                queryLowerCase = query.toLowerCase(),
+                queryTokens,
+                matches = [];
+
+            if (haveSameParent(suggestions)) {
+                queryTokens = utils.withSubTokens(utils.getWords(queryLowerCase, stopwords));
+
+                $.each(suggestions, function(i, suggestion) {
+                    var suggestedValue = suggestion.value.toLowerCase();
+
+                    if (utils.stringEncloses(queryLowerCase, suggestedValue)) {
+                        return false;
+                    }
+
+                    // check if query words are a subset of suggested words
+                    var suggestionWords = utils.withSubTokens(utils.getWords(suggestedValue, stopwords));
+
+                    if (utils.arrayMinus(queryTokens, suggestionWords).length === 0) {
+                        matches.push(i);
+                    }
+                });
+            }
+
+            return matches.length === 1 ? matches[0] : -1;
+        },
+
+        matchByWordsAddress: function (query, suggestions) {
+            var stopwords = this && this.stopwords,
+                queryLowerCase = query.toLowerCase(),
+                queryTokens,
+                index = -1;
+
+            if (haveSameParentAddress(suggestions)) {
+                queryTokens = utils.withSubTokens(utils.getWords(queryLowerCase, stopwords));
+
+                $.each(suggestions, function(i, suggestion) {
+                    var suggestedValue = suggestion.value.toLowerCase();
+
+                    if (utils.stringEncloses(queryLowerCase, suggestedValue)) {
+                        return false;
+                    }
+
+                    // check if query words are a subset of suggested words
+                    var suggestionWords = utils.withSubTokens(utils.getWords(suggestedValue, stopwords));
+
+                    if (utils.arrayMinus(queryTokens, suggestionWords).length === 0) {
+                        index = i;
+                        return false;
+                    }
+                });
+            }
+
+            return index;
+        },
+
+        /**
+         * Matches query against values contained in suggestion fields
+         * for cases, when there is only one suggestion
+         * only considers fields specified in fieldsStopwords map
+         * uses partial matching:
+         *   "0445" vs { value: "ALFA-BANK", data: { "bic": "044525593" }} is a match
+         */
+        matchByFields: function (query, suggestions) {
+            var stopwords = this && this.stopwords,
+                fieldsStopwords = this && this.fieldsStopwords,
+                tokens = utils.withSubTokens(utils.getWords(query.toLowerCase(), stopwords)),
+                suggestionWords = [];
+
+            if (suggestions.length === 1) {
+                if (fieldsStopwords) {
+                    $.each(fieldsStopwords, function (field, stopwords) {
+                        var fieldValue = utils.getDeepValue(suggestions[0], field),
+                            fieldWords = fieldValue && utils.withSubTokens(utils.getWords(fieldValue.toLowerCase(), stopwords));
+
+                        if (fieldWords && fieldWords.length) {
+                            suggestionWords = suggestionWords.concat(fieldWords);
+                        }
+                    });
+                }
+
+                if (utils.arrayMinusWithPartialMatching(tokens, suggestionWords).length === 0) {
+                    return 0;
+                }
+            }
+
+            return -1;
+        }
+
+    };
+
+}();
+
+var DEFAULT_OPTIONS = {
+    autoSelectFirst: false,
+    // основной url, может быть переопределен
+    serviceUrl: 'https://suggestions.dadata.ru/suggestions/api/4_1/rs',
+    // url, который заменяет serviceUrl + method + type
+    // то есть, если он задан, то для всех запросов будет использоваться именно он
+    // если не поддерживается cors то к url будут добавлены параметры ?token=...&version=...
+    // и заменен протокол на протокол текущей страницы
+    url: null,
+    onSearchStart: $.noop,
+    onSearchComplete: $.noop,
+    onSearchError: $.noop,
+    onSuggestionsFetch: null,
+    onSelect: null,
+    onSelectNothing: null,
+    onInvalidateSelection: null,
+    minChars: 1,
+    deferRequestBy: 100,
+    params: {},
+    paramName: 'query',
+    timeout: 3000,
+    formatResult: null,
+    formatSelected: null,
+    noCache: false,
+    containerClass: 'suggestions-suggestions',
+    tabDisabled: false,
+    triggerSelectOnSpace: false,
+    triggerSelectOnEnter: true,
+    triggerSelectOnBlur: true,
+    preventBadQueries: false,
+    hint: 'Выберите вариант или продолжите ввод',
+    noSuggestionsHint: {
+        NAME:       'Неизвестное ФИО',
+        ADDRESS:    'Неизвестный адрес',
+        EMAIL:      'Неизвестная эл. почта',
+        PARTY:      'Неизвестная организация',
+        BANK:       'Неизвестный банк'
+    },
+    type: null,
+    requestMode: 'suggest',
+    count: 5,
+    $helpers: null,
+    headers: null,
+    scrollOnFocus: true,
+    mobileWidth: 980,
+    initializeInterval: 100
+};
+
+/**
+ * Type is a bundle of properties:
+ * - urlSuffix Mandatory. String
+ * - matchers Mandatory. Array of functions (with optional data bound as a context) that find appropriate suggestion to select
+ * - `fieldNames` Map fields of suggestion.data to their displayable names
+ * - `unformattableTokens` Array of strings which should not be highlighted
+ * - `dataComponents` Array of 'bound's can be set as `bounds` option. Order is important.
+ *
+ * flags:
+ * - `alwaysContinueSelecting` Forbids to hide dropdown after selecting
+ * - `geoEnabled` Makes to detect client's location for passing it to all requests
+ * - `enrichmentEnabled` Makes to send additional request when a suggestion is selected
+ *
+ * and methods:
+ * - `isDataComplete` Checks if suggestion.data can be operated as full data of it's type
+ * - `composeValue` returns string value based on suggestion.data
+ * - `formatResult` returns html of a suggestion. Overrides default method
+ * - `formatResultInn` returns html of suggestion.data.inn
+ * - `isQueryRequestable` checks if query is appropriated for requesting server
+ * - `formatSelected` returns string to be inserted in textbox
+ */
+
+var ADDRESS_STOPWORDS = ['ао', 'аобл', 'дом', 'респ', 'а/я', 'аал', 'автодорога', 'аллея', 'арбан', 'аул', 'б-р', 'берег', 'бугор', 'вал', 'вл', 'волость', 'въезд', 'высел', 'г', 'городок', 'гск', 'д', 'двлд', 'днп', 'дор', 'дп', 'ж/д_будка', 'ж/д_казарм', 'ж/д_оп', 'ж/д_платф', 'ж/д_пост', 'ж/д_рзд', 'ж/д_ст', 'жилзона', 'жилрайон', 'жт', 'заезд', 'заимка', 'зона', 'к', 'казарма', 'канал', 'кв', 'кв-л', 'км', 'кольцо', 'комн', 'кордон', 'коса', 'кп', 'край', 'линия', 'лпх', 'м', 'массив', 'местность', 'мкр', 'мост', 'н/п', 'наб', 'нп', 'обл', 'округ', 'остров', 'оф', 'п', 'п/о', 'п/р', 'п/ст', 'парк', 'пгт', 'пер', 'переезд', 'пл', 'пл-ка', 'платф', 'погост', 'полустанок', 'починок', 'пр-кт', 'проезд', 'промзона', 'просек', 'просека', 'проселок', 'проток', 'протока', 'проулок', 'р-н', 'рзд', 'россия', 'рп', 'ряды', 'с', 'с/а', 'с/мо', 'с/о', 'с/п', 'с/с', 'сад', 'сквер', 'сл', 'снт', 'спуск', 'ст', 'ст-ца', 'стр', 'тер', 'тракт', 'туп', 'у', 'ул', 'уч-к', 'ф/х', 'ферма', 'х', 'ш', 'бульвар', 'владение', 'выселки', 'гаражно-строительный', 'город', 'деревня', 'домовладение', 'дорога', 'квартал', 'километр', 'комната', 'корпус', 'литер', 'леспромхоз', 'местечко', 'микрорайон', 'набережная', 'область', 'переулок', 'платформа', 'площадка', 'площадь', 'поселение', 'поселок', 'проспект', 'разъезд', 'район', 'республика', 'село', 'сельсовет', 'слобода', 'сооружение', 'станица', 'станция', 'строение', 'территория', 'тупик', 'улица', 'улус', 'участок', 'хутор', 'шоссе'];
+
+/**
+ * Компоненты адреса
+ * @type {*[]}
+ * id {String} Наименование типа
+ * fields {Array of Strings}
+ * forBounds {Boolean} может использоваться в ограничениях
+ * forLocations {Boolean}
+ * kladrFormat {Object}
+ * fiasType {String} Наименование соответствующего ФИАС типа
+ */
+var ADDRESS_COMPONENTS = [
+    {
+        id: 'kladr_id',
+        fields: ['kladr_id'],
+        forBounds: false,
+        forLocations: true
+    },
+    {
+        id: 'postal_code',
+        fields: ['postal_code'],
+        forBounds: false,
+        forLocations: true
+    },
+    {
+        id: 'country',
+        fields: ['country'],
+        forBounds: false,
+        forLocations: true
+    },
+    {
+        id: 'region_fias_id',
+        fields: ['region_fias_id'],
+        forBounds: false,
+        forLocations: true
+    },
+    {
+        id: 'region_type_full',
+        fields: ['region_type_full'],
+        forBounds: false,
+        forLocations: true,
+        kladrFormat: { digits: 2, zeros: 11 },
+        fiasType: 'region_fias_id'
+    },
+    {
+        id: 'region',
+        fields: ['region', 'region_type', 'region_type_full', 'region_with_type'],
+        forBounds: true,
+        forLocations: true,
+        kladrFormat: { digits: 2, zeros: 11 },
+        fiasType: 'region_fias_id'
+    },
+    {
+        id: 'area_fias_id',
+        fields: ['area_fias_id'],
+        forBounds: false,
+        forLocations: true
+    },
+    {
+        id: 'area_type_full',
+        fields: ['area_type_full'],
+        forBounds: false,
+        forLocations: true,
+        kladrFormat: { digits: 5, zeros: 8 },
+        fiasType: 'area_fias_id'
+    },
+    {
+        id: 'area',
+        fields: ['area', 'area_type', 'area_type_full', 'area_with_type'],
+        forBounds: true,
+        forLocations: true,
+        kladrFormat: { digits: 5, zeros: 8 },
+        fiasType: 'area_fias_id'
+    },
+    {
+        id: 'city_fias_id',
+        fields: ['city_fias_id'],
+        forBounds: false,
+        forLocations: true
+    },
+    {
+        id: 'city_type_full',
+        fields: ['city_type_full'],
+        forBounds: false,
+        forLocations: true,
+        kladrFormat: { digits: 8, zeros: 5 },
+        fiasType: 'city_fias_id'
+    },
+    {
+        id: 'city',
+        fields: ['city', 'city_type', 'city_type_full', 'city_with_type'],
+        forBounds: true,
+        forLocations: true,
+        kladrFormat: { digits: 8, zeros: 5 },
+        fiasType: 'city_fias_id'
+    },
+    {
+        id: 'city_district_fias_id',
+        fields: ['city_district_fias_id'],
+        forBounds: false,
+        forLocations: true
+    },
+    {
+        id: 'city_district_type_full',
+        fields: ['city_district_type_full'],
+        forBounds: false,
+        forLocations: true,
+        kladrFormat: { digits: 11, zeros: 2 },
+        fiasType: 'city_district_fias_id'
+    },
+    {
+        id: 'city_district',
+        fields: ['city_district', 'city_district_type', 'city_district_type_full', 'city_district_with_type'],
+        forBounds: true,
+        forLocations: true,
+        kladrFormat: { digits: 11, zeros: 2 },
+        fiasType: 'city_district_fias_id'
+    },
+    {
+        id: 'settlement_fias_id',
+        fields: ['settlement_fias_id'],
+        forBounds: false,
+        forLocations: true
+    },
+    {
+        id: 'settlement_type_full',
+        fields: ['settlement_type_full'],
+        forBounds: false,
+        forLocations: true,
+        kladrFormat: { digits: 11, zeros: 2 },
+        fiasType: 'settlement_fias_id'
+    },
+    {
+        id: 'settlement',
+        fields: ['settlement', 'settlement_type', 'settlement_type_full', 'settlement_with_type'],
+        forBounds: true,
+        forLocations: true,
+        kladrFormat: { digits: 11, zeros: 2 },
+        fiasType: 'settlement_fias_id'
+    },
+    {
+        id: 'street_fias_id',
+        fields: ['street_fias_id'],
+        forBounds: false,
+        forLocations: true
+    },
+    {
+        id: 'street_type_full',
+        fields: ['street_type_full'],
+        forBounds: false,
+        forLocations: true,
+        kladrFormat: { digits: 15, zeros: 2 },
+        fiasType: 'street_fias_id'
+    },
+    {
+        id: 'street',
+        fields: ['street', 'street_type', 'street_type_full', 'street_with_type'],
+        forBounds: true,
+        forLocations: true,
+        kladrFormat: { digits: 15, zeros: 2 },
+        fiasType: 'street_fias_id'
+    },
+    {
+        id: 'house',
+        fields: ['house', 'house_type', 'house_type_full',
+            'block', 'block_type'],
+        forBounds: true,
+        forLocations: false,
+        kladrFormat: { digits: 19 }
+    }
+
+];
+
+var rHasMatch = /<strong>/;
+
+var innPartsLengths = {
+    'LEGAL': [2, 2, 5, 1],
+    'INDIVIDUAL': [2, 2, 6, 2]
+};
+
+function valueStartsWith (suggestion, field) {
+    var fieldValue = suggestion.data && suggestion.data[field];
+
+    return fieldValue &&
+        new RegExp('^' + utils.escapeRegExChars(fieldValue) + '([' + WORD_DELIMITERS + ']|$)','i')
+            .test(suggestion.value);
+}
+
+function chooseFormattedField (formattedMain, formattedAlt) {
+    return rHasMatch.test(formattedAlt) && !rHasMatch.test(formattedMain)
+        ? formattedAlt
+        : formattedMain;
+}
+
+function formattedField (main, alt, currentValue, suggestion, options) {
+    var that = this,
+        formattedMain = that.highlightMatches(main, currentValue, suggestion, options),
+        formattedAlt = that.highlightMatches(alt, currentValue, suggestion, options);
+
+    return chooseFormattedField(formattedMain, formattedAlt);
+}
+
+var types = {};
+
+types['NAME'] = {
+    urlSuffix: 'fio',
+    matchers: [matchers.matchByNormalizedQuery, matchers.matchByWords],
+    // names for labels, describing which fields are displayed
+    fieldNames: {
+        surname: 'фамилия',
+        name: 'имя',
+        patronymic: 'отчество'
+    },
+    // try to suggest even if a suggestion has been selected manually
+    alwaysContinueSelecting: true,
+    isDataComplete: function (suggestion) {
+        var that = this,
+            params = that.options.params,
+            data = suggestion.data,
+            fields;
+
+        if ($.isFunction(params)) {
+            params = params.call(that.element, suggestion.value);
+        }
+        if (params && params.parts) {
+            fields = $.map(params.parts, function (part) {
+                return part.toLowerCase();
+            });
+        } else {
+            // when NAME is first, patronymic is mot mandatory
+            fields = ['surname', 'name'];
+            // when SURNAME is first, it is
+            if (valueStartsWith(suggestion, 'surname')) {
+                fields.push('patronymic');
+            }
+        }
+        return utils.fieldsNotEmpty(data, fields);
+    },
+    composeValue: function (data) {
+        return utils.compact([data.surname, data.name, data.patronymic]).join(' ');
+    }
+};
+
+types['ADDRESS'] = {
+    urlSuffix: 'address',
+    matchers: [
+        $.proxy(matchers.matchByNormalizedQuery, { stopwords: ADDRESS_STOPWORDS }),
+        $.proxy(matchers.matchByWordsAddress, { stopwords: ADDRESS_STOPWORDS })
+    ],
+    dataComponents: ADDRESS_COMPONENTS,
+    dataComponentsById: utils.indexBy(ADDRESS_COMPONENTS, 'id', 'index'),
+    unformattableTokens: ADDRESS_STOPWORDS,
+    enrichmentEnabled: true,
+    geoEnabled: true,
+    isDataComplete: function (suggestion) {
+        var fields = [this.bounds.to || 'flat'],
+            data = suggestion.data;
+
+        return !$.isPlainObject(data) || utils.fieldsNotEmpty(data, fields);
+    },
+    composeValue: function (data, options) {
+        var region = data.region_with_type || utils.compact([data.region, data.region_type]).join(' ') || data.region_type_full,
+            area = data.area_with_type || utils.compact([data.area_type, data.area]).join(' ') || data.area_type_full,
+            city = data.city_with_type || utils.compact([data.city_type, data.city]).join(' ') || data.city_type_full,
+            settelement = data.settlement_with_type || utils.compact([data.settlement_type, data.settlement]).join(' ') || data.settlement_type_full,
+            cityDistrict = data.city_district_with_type || utils.compact([data.city_district_type, data.city_district]).join(' ') || data.city_district_type_full,
+            street = data.street_with_type || utils.compact([data.street_type, data.street]).join(' ') || data.street_type_full,
+            house = utils.compact([data.house_type, data.house, data.block_type, data.block]).join(' '),
+            flat = utils.compact([data.flat_type, data.flat]).join(' '),
+            postal_box = data.postal_box && ('а/я ' + data.postal_box),
+            result;
+
+        // если регион совпадает с городом
+        // например г Москва, г Москва
+        // то не показываем регион
+        if (region === city) {
+            region = '';
+        }
+
+        // иногда не показываем район
+        if (!(options && options.saveCityDistrict)) {
+            if (options && options.excludeCityDistrict) {
+                // если район явно запрещен
+                cityDistrict = '';
+            } else if (cityDistrict && !data.city_district_fias_id) {
+                // если район взят из ОКАТО (у него пустой city_district_fias_id)
+                cityDistrict = '';
+            }
+        }
+
+        result = utils.compact([
+            region,
+            area,
+            city,
+            cityDistrict,
+            settelement,
+            street,
+            house,
+            flat,
+            postal_box
+        ]).join(', ');
+
+        return result;
+    },
+    formatResult: function() {
+        var componentsUnderCityDistrict = [],
+            _underCityDistrict = false;
+
+        $.each(ADDRESS_COMPONENTS, function () {
+            if (_underCityDistrict) componentsUnderCityDistrict.push(this.id);
+            if (this.id === 'city_district') _underCityDistrict = true;
+        });
+
+        return function (value, currentValue, suggestion, options) {
+            var that = this,
+                district = suggestion.data && suggestion.data.city_district_with_type;
+
+            value = that.highlightMatches(value, currentValue, suggestion, options);
+            value = that.wrapFormattedValue(value, suggestion);
+
+            if (district && (!that.bounds.own.length || that.bounds.own.indexOf('street') >= 0)
+                && !$.isEmptyObject(that.copyDataComponents(suggestion.data, componentsUnderCityDistrict))) {
+                value +=
+                    '<div class="' + that.classes.subtext + '">' +
+                    that.highlightMatches(district, currentValue, suggestion) +
+                    '</div>';
+            }
+
+            return value;
+        };
+    }(),
+    /**
+     * @param instance
+     * @param options
+     * @param options.suggestion
+     * @param options.hasSameValues
+     * @param options.hasBeenEnreached
+     */
+    getSuggestionValue: function(instance, options) {
+        var formattedValue = null;
+
+        if (options.hasSameValues) {
+            if (instance.options.restrict_value) {
+                // Can not use unrestricted address,
+                // because some components (from constraints) must be omitted
+                formattedValue = this.getValueWithinConstraints(instance, options.suggestion);
+            } else if (instance.bounds.own.length) {
+                // Can not use unrestricted address,
+                // because only components from bounds must be included
+                formattedValue = this.getValueWithinBounds(instance, options.suggestion);
+            } else {
+                // Can use full unrestricted address
+                formattedValue = options.suggestion.unrestricted_value;
+            }
+        } else if (options.hasBeenEnriched) {
+            if (instance.options.restrict_value) {
+                formattedValue = this.getValueWithinConstraints(instance, options.suggestion, { excludeCityDistrict: true });
+            }
+        }
+
+        return formattedValue;
+    },
+    /*
+     * Compose suggestion value with respect to constraints
+     */
+    getValueWithinConstraints: function (instance, suggestion, options) {
+        return this.composeValue(instance.getUnrestrictedData(suggestion.data), options);
+    },
+    /*
+     * Compose suggestion value with respect to bounds
+     */
+    getValueWithinBounds: function (instance, suggestion, options) {
+        // для корректного составления адреса нужен city_district_fias_id
+        var data = instance.copyDataComponents(suggestion.data, instance.bounds.own.concat(['city_district_fias_id']));
+
+        return this.composeValue(data, options);
+    }
+
+};
+
+types['PARTY'] = {
+    urlSuffix: 'party',
+    matchers: [
+        $.proxy(matchers.matchByFields, {
+            // These fields of suggestion's `data` used by by-words matcher
+            fieldsStopwords: {
+                'value': null,
+                'data.address.value': ADDRESS_STOPWORDS,
+                'data.inn': null,
+                'data.ogrn': null
+            }
+        })
+    ],
+    dataComponents: ADDRESS_COMPONENTS,
+    geoEnabled: true,
+    formatResult: function (value, currentValue, suggestion, options) {
+        var that = this,
+            formattedInn = that.type.formatResultInn.call(that, suggestion, currentValue),
+            formatterOGRN = that.highlightMatches(utils.getDeepValue(suggestion.data, 'ogrn'), currentValue, suggestion),
+            formattedInnOGRN = chooseFormattedField(formattedInn, formatterOGRN),
+            formattedFIO = that.highlightMatches(utils.getDeepValue(suggestion.data, 'management.name'), currentValue, suggestion),
+            address = utils.getDeepValue(suggestion.data, 'address.value') || '';
+
+        if (that.isMobile) {
+            (options || (options = {})).maxLength = 50;
+        }
+
+        value = formattedField.call(that, value, utils.getDeepValue(suggestion.data, 'name.latin'), currentValue, suggestion, options);
+        value = that.wrapFormattedValue(value, suggestion);
+
+        if (address) {
+            address = address.replace(/^(\d{6}?\s+|Россия,\s+)/i, '');
+            if (that.isMobile) {
+                // keep only two first words
+                address = address.replace(new RegExp('^([^' + WORD_DELIMITERS + ']+[' + WORD_DELIMITERS + ']+[^' + WORD_DELIMITERS + ']+).*'), '$1');
+            } else {
+                address = that.highlightMatches(address, currentValue, suggestion, {
+                    unformattableTokens: ADDRESS_STOPWORDS
+                });
+            }
+        }
+
+        if (formattedInnOGRN || address || formattedFIO) {
+            value +=
+                '<div class="' + that.classes.subtext + '">' +
+                '<span class="' + that.classes.subtext_inline + '">' + (formattedInnOGRN || '') + '</span>' +
+                (chooseFormattedField(address, formattedFIO) || '') +
+                '</div>';
+        }
+        return value;
+    },
+    formatResultInn: function(suggestion, currentValue) {
+        var that = this,
+            inn = suggestion.data && suggestion.data.inn,
+            innPartsLength = innPartsLengths[suggestion.data && suggestion.data.type],
+            innParts,
+            formattedInn,
+            rDigit = /\d/;
+
+        if (inn) {
+            formattedInn = that.highlightMatches(inn, currentValue, suggestion);
+            if (innPartsLength) {
+                formattedInn = formattedInn.split('');
+                innParts = $.map(innPartsLength, function (partLength) {
+                    var formattedPart = '',
+                        ch;
+
+                    while (partLength && (ch = formattedInn.shift())) {
+                        formattedPart += ch;
+                        if (rDigit.test(ch)) partLength--;
+                    }
+
+                    return formattedPart;
+                });
+                formattedInn = innParts.join('<span class="' + that.classes.subtext_delimiter + '"></span>') +
+                    formattedInn.join('');
+            }
+
+            return formattedInn;
+        }
+    }
+};
+
+types['EMAIL'] = {
+    urlSuffix: 'email',
+    matchers: [matchers.matchByNormalizedQuery],
+    isQueryRequestable: function (query) {
+        return this.options.suggest_local || query.indexOf('@') >= 0;
+    }
+};
+
+types['BANK'] = {
+    urlSuffix: 'bank',
+    matchers: [$.proxy(matchers.matchByFields, {
+        // These fields of suggestion's `data` used by by-words matcher
+        fieldsStopwords: {
+            'value': null,
+            'data.bic': null,
+            'data.swift': null
+        }
+    })],
+    dataComponents: ADDRESS_COMPONENTS,
+    geoEnabled: true,
+    formatResult: function (value, currentValue, suggestion, options) {
+        var that = this,
+            formattedBIC = that.highlightMatches(utils.getDeepValue(suggestion.data, 'bic'), currentValue, suggestion),
+            address = utils.getDeepValue(suggestion.data, 'address.value') || '';
+
+        value = that.highlightMatches(value, currentValue, suggestion, options);
+        value = that.wrapFormattedValue(value, suggestion);
+
+        if (address) {
+            address = address.replace(/^\d{6}( РОССИЯ)?, /i, '');
+            if (that.isMobile) {
+                // keep only two first words
+                address = address.replace(new RegExp('^([^' + WORD_DELIMITERS + ']+[' + WORD_DELIMITERS + ']+[^' + WORD_DELIMITERS + ']+).*'), '$1');
+            } else {
+                address = that.highlightMatches(address, currentValue, suggestion, {
+                    unformattableTokens: ADDRESS_STOPWORDS
+                });
+            }
+        }
+
+        if (formattedBIC || address) {
+            value +=
+                '<div class="' + that.classes.subtext + '">' +
+                '<span class="' + that.classes.subtext_inline + '">' + formattedBIC + '</span>' +
+                address +
+                '</div>';
+        }
+        return value;
+    },
+    formatSelected: function (suggestion) {
+        return utils.getDeepValue(suggestion, 'data.name.payment');
+    }
+};
+
+$.extend(DEFAULT_OPTIONS, {
+    suggest_local: true
+});
+
+var notificator = {
+
+    chains: {},
+
+    'on': function (name, method) {
+        this.get(name).push(method);
+        return this;
+    },
+
+    'get': function (name) {
+        var chains = this.chains;
+        return chains[name] || (chains[name] = []);
+    }
+};
+
+var serviceMethods = {
+    'suggest': {
+        defaultParams: {
+            type: utils.getDefaultType(),
+            dataType: 'json',
+            contentType: utils.getDefaultContentType()
+        },
+        addTypeInUrl: true
+    },
+    'detectAddressByIp': {
+        defaultParams: {
+            type: 'GET',
+            dataType: 'json'
+        },
+        addTypeInUrl: false
+    },
+    'status': {
+        defaultParams: {
+            type: 'GET',
+            dataType: 'json'
+        },
+        addTypeInUrl: true
+    },
+    'findById': {
+        defaultParams: {
+            type: utils.getDefaultType(),
+            dataType: 'json',
+            contentType: utils.getDefaultContentType()
+        },
+        addTypeInUrl: true
+    }
+};
+
+var requestModes = {
+    'suggest': {
+        method: 'suggest',
+        userSelect: true,
+        updateValue: true,
+        enrichmentEnabled: true
+    },
+    'findById': {
+        method: 'findById',
+        userSelect: false,
+        updateValue: false,
+        enrichmentEnabled: false
+    }
+};
+
+function Suggestions(el, options) {
+    var that = this;
+
+    // Shared variables:
+    that.element = el;
+    that.el = $(el);
+    that.suggestions = [];
+    that.badQueries = [];
+    that.selectedIndex = -1;
+    that.currentValue = that.element.value;
+    that.intervalId = 0;
+    that.cachedResponse = {};
+    that.enrichmentCache = {};
+    that.currentRequest = null;
+    that.inputPhase = $.Deferred();
+    that.fetchPhase = $.Deferred();
+    that.enrichPhase = $.Deferred();
+    that.onChangeTimeout = null;
+    that.triggering = {};
+    that.$wrapper = null;
+    that.options = $.extend({}, DEFAULT_OPTIONS, options);
+    that.classes = {
+        hint: 'suggestions-hint',
+        mobile: 'suggestions-mobile',
+        nowrap: 'suggestions-nowrap',
+        selected: 'suggestions-selected',
+        suggestion: 'suggestions-suggestion',
+        subtext: 'suggestions-subtext',
+        subtext_inline: 'suggestions-subtext suggestions-subtext_inline',
+        subtext_delimiter: 'suggestions-subtext-delimiter',
+        subtext_label: 'suggestions-subtext suggestions-subtext_label',
+        removeConstraint: 'suggestions-remove',
+        value: 'suggestions-value'
+    };
+    that.disabled = false;
+    that.selection = null;
+    that.$viewport = $(window);
+    that.$body = $(document.body);
+    that.type = null;
+    that.status = {};
+
+    that.setupElement();
+
+    that.initializer = $.Deferred();
+
+    if (that.el.is(':visible')) {
+        that.initializer.resolve();
+    } else {
+        that.deferInitialization();
+    }
+
+    that.initializer.done($.proxy(that.initialize, that));
+}
+
+Suggestions.prototype = {
+
+    // Creation and destruction
+
+    initialize: function () {
+        var that = this;
+
+        that.uniqueId = utils.uniqueId('i');
+
+        that.createWrapper();
+        that.notify('initialize');
+
+        that.bindWindowEvents();
+
+        that.setOptions();
+        that.fixPosition();
+    },
+
+    /**
+     * Initialize when element is firstly interacted
+     */
+    deferInitialization: function () {
+        var that = this,
+            events = 'mouseover focus keydown',
+            timer,
+            callback = function () {
+                that.initializer.resolve();
+                that.enable();
+            };
+
+        that.initializer.always(function(){
+            that.el.off(events, callback);
+            clearInterval(timer);
+        });
+
+        that.disabled = true;
+        that.el.on(events, callback);
+        timer = setInterval(function(){
+            if (that.el.is(':visible')) {
+                callback();
+            }
+        }, that.options.initializeInterval);
+    },
+
+    isInitialized: function () {
+        return this.initializer.state() === 'resolved';
+    },
+
+    dispose: function () {
+        var that = this;
+
+        that.initializer.reject();
+        that.notify('dispose');
+        that.el.removeData(DATA_ATTR_KEY)
+            .removeClass('suggestions-input');
+        that.unbindWindowEvents();
+        that.removeWrapper();
+        that.el.trigger('suggestions-dispose');
+    },
+
+    notify: function (chainName) {
+        var that = this,
+            args = utils.slice(arguments, 1);
+
+        return $.map(notificator.get(chainName), function (method) {
+            return method.apply(that, args);
+        });
+    },
+
+    createWrapper: function () {
+        var that = this;
+
+        that.$wrapper = $('<div class="suggestions-wrapper"/>');
+        that.el.after(that.$wrapper);
+
+        that.$wrapper.on('mousedown' + EVENT_NS, $.proxy(that.onMousedown, that));
+    },
+
+    removeWrapper: function () {
+        var that = this;
+
+        if (that.$wrapper) {
+            that.$wrapper.remove();
+        }
+        $(that.options.$helpers).off(EVENT_NS);
+    },
+
+    /** This whole handler is needed to prevent blur event on textbox
+     * when suggestion is clicked (blur leads to suggestions hide, so we need to prevent it).
+     * See https://github.com/jquery/jquery-ui/blob/master/ui/autocomplete.js for details
+     */
+    onMousedown: function (e) {
+        var that = this;
+
+        // prevent moving focus out of the text field
+        e.preventDefault();
+
+        // IE doesn't prevent moving focus even with e.preventDefault()
+        // so we set a flag to know when we should ignore the blur event
+        that.cancelBlur = true;
+        utils.delay(function () {
+            delete that.cancelBlur;
+        });
+
+        // clicking on the scrollbar causes focus to shift to the body
+        // but we can't detect a mouseup or a click immediately afterward
+        // so we have to track the next mousedown and close the menu if
+        // the user clicks somewhere outside of the autocomplete
+        if ($(e.target).closest(".ui-menu-item").length == 0) {
+            utils.delay(function () {
+                $(document).one("mousedown", function (e) {
+                    var $elements = that.el
+                        .add(that.$wrapper)
+                        .add(that.options.$helpers);
+
+                    if (that.options.floating) {
+                        $elements = $elements.add(that.$container);
+                    }
+
+                    $elements = $elements.filter(function () {
+                        return this === e.target || $.contains(this, e.target);
+                    });
+
+                    if (!$elements.length) {
+                        that.hide();
+                    }
+                });
+            });
+        }
+    },
+
+    bindWindowEvents: function () {
+        var that = this,
+            handler = $.proxy(that.fixPosition, that);
+
+        that.$viewport
+            .on('resize' + EVENT_NS + that.uniqueId, handler)
+            .on('scroll' + EVENT_NS + that.uniqueId, handler);
+    },
+
+    unbindWindowEvents: function () {
+        this.$viewport
+            .off('resize' + EVENT_NS + this.uniqueId)
+            .off('scroll' + EVENT_NS + this.uniqueId);
+    },
+
+    scrollToTop: function () {
+        var that = this,
+            scrollTarget = that.options.scrollOnFocus;
+
+        if (scrollTarget === true) {
+            scrollTarget = that.el;
+        }
+        if (scrollTarget instanceof $ && scrollTarget.length > 0) {
+            $('body,html').animate({
+                scrollTop: scrollTarget.offset().top
+            }, 'fast');
+        }
+    },
+
+    // Configuration methods
+
+    setOptions: function (suppliedOptions) {
+        var that = this;
+
+        $.extend(that.options, suppliedOptions);
+
+        // Check mandatory options
+        $.each({
+            'type': types,
+            'requestMode': requestModes
+        }, function (option, available) {
+            that[option] = available[that.options[option]];
+            if (!that[option]) {
+                that.disable();
+                throw '`' + option + '` option is incorrect! Must be one of: ' + $.map(available, function (value, name) {
+                    return '"' + name + '"';
+                }).join(', ');
+            }
+        });
+
+        $(that.options.$helpers)
+            .off(EVENT_NS)
+            .on('mousedown' + EVENT_NS, $.proxy(that.onMousedown, that));
+
+        if (that.isInitialized()) {
+            that.notify('setOptions');
+        }
+    },
+
+    // Common public methods
+
+    fixPosition: function (e) {
+        var that = this,
+            elLayout = {},
+            wrapperOffset,
+            origin;
+
+        that.isMobile = that.$viewport.width() <= that.options.mobileWidth;
+
+        if (!that.isInitialized() || (e && e.type == 'scroll' && !(that.options.floating || that.isMobile))) return;
+        that.$container.appendTo(that.options.floating ? that.$body : that.$wrapper);
+
+        that.notify('resetPosition');
+        // reset input's padding to default, determined by css
+        that.el.css('paddingLeft', '');
+        that.el.css('paddingRight', '');
+        elLayout.paddingLeft = parseFloat(that.el.css('paddingLeft'));
+        elLayout.paddingRight = parseFloat(that.el.css('paddingRight'));
+
+        $.extend(elLayout, that.el.offset());
+        elLayout.borderTop = that.el.css('border-top-style') == 'none' ? 0 : parseFloat(that.el.css('border-top-width'));
+        elLayout.borderLeft = that.el.css('border-left-style') == 'none' ? 0 : parseFloat(that.el.css('border-left-width'));
+        elLayout.innerHeight = that.el.innerHeight();
+        elLayout.innerWidth = that.el.innerWidth();
+        elLayout.outerHeight = that.el.outerHeight();
+        elLayout.componentsLeft = 0;
+        elLayout.componentsRight = 0;
+        wrapperOffset = that.$wrapper.offset();
+
+        origin = {
+            top: elLayout.top - wrapperOffset.top,
+            left: elLayout.left - wrapperOffset.left
+        };
+
+        that.notify('fixPosition', origin, elLayout);
+
+        if (elLayout.componentsLeft > elLayout.paddingLeft) {
+            that.el.css('paddingLeft', elLayout.componentsLeft + 'px');
+        }
+        if (elLayout.componentsRight > elLayout.paddingRight) {
+            that.el.css('paddingRight', elLayout.componentsRight + 'px');
+        }
+    },
+
+    clearCache: function () {
+        this.cachedResponse = {};
+        this.enrichmentCache = {};
+        this.badQueries = [];
+    },
+
+    clear: function () {
+        var that = this;
+
+        if (that.isInitialized()) {
+            that.clearCache();
+            that.currentValue = '';
+            that.selection = null;
+            that.hide();
+            that.suggestions = [];
+            that.el.val('');
+            that.el.trigger('suggestions-clear');
+            that.notify('clear');
+        }
+    },
+
+    disable: function () {
+        var that = this;
+
+        that.disabled = true;
+        that.abortRequest();
+        if (that.visible) {
+            that.hide();
+        }
+    },
+
+    enable: function () {
+        this.disabled = false;
+    },
+
+    isUnavailable: function () {
+        return this.disabled;
+    },
+
+    update: function () {
+        var that = this,
+            query = that.el.val();
+
+        if (that.isInitialized()) {
+            that.currentValue = query;
+            if (that.isQueryRequestable(query)) {
+                that.updateSuggestions(query);
+            } else {
+                that.hide();
+            }
+        }
+    },
+
+    setSuggestion: function (suggestion) {
+        var that = this,
+            data,
+            value;
+
+        if ($.isPlainObject(suggestion) && $.isPlainObject(suggestion.data)) {
+            suggestion = $.extend(true, {}, suggestion);
+
+            if (that.bounds.own.length) {
+                that.checkValueBounds(suggestion);
+                data = that.copyDataComponents(suggestion.data, that.bounds.all);
+                if (suggestion.data.kladr_id) {
+                    data.kladr_id = that.getBoundedKladrId(suggestion.data.kladr_id, that.bounds.all);
+                }
+                suggestion.data = data;
+            }
+
+            that.selection = suggestion;
+
+            // `that.suggestions` required by `that.getSuggestionValue` and must be set before
+            that.suggestions = [suggestion];
+            value = that.getSuggestionValue(suggestion) || '';
+            that.currentValue = value;
+            that.el.val(value);
+            that.abortRequest();
+            that.el.trigger('suggestions-set');
+        }
+    },
+
+    /**
+     * Fetch full object for current INPUT's value
+     * if no suitable object found, clean input element
+     */
+    fixData: function () {
+        var that = this,
+            fullQuery = that.extendedCurrentValue(),
+            currentValue = that.el.val(),
+            resolver = $.Deferred();
+
+        resolver
+            .done(function (suggestion) {
+                that.selectSuggestion(suggestion, 0, currentValue, { hasBeenEnriched: true });
+                that.el.trigger('suggestions-fixdata', suggestion);
+            })
+            .fail(function () {
+                that.selection = null;
+                that.currentValue = '';
+                that.el.val(that.currentValue);
+                that.el.trigger('suggestions-fixdata');
+            });
+
+        if (that.isQueryRequestable(fullQuery)) {
+            that.currentValue = fullQuery;
+            that.getSuggestions(fullQuery, { count: 1, from_bound: null, to_bound: null })
+                .done(function (suggestions) {
+                    // data fetched
+                    var suggestion = suggestions[0];
+                    if (suggestion) {
+                        resolver.resolve(suggestion);
+                    } else {
+                        resolver.reject();
+                    }
+                })
+                .fail(function () {
+                    // no data fetched
+                    resolver.reject();
+                });
+        } else {
+            resolver.reject();
+        }
+    },
+
+    // Querying related methods
+
+    /**
+     * Looks up parent instances
+     * @returns {String} current value prepended by parents' values
+     */
+    extendedCurrentValue: function () {
+        var that = this,
+            parentInstance = that.getParentInstance(),
+            parentValue = parentInstance && parentInstance.extendedCurrentValue(),
+            currentValue = $.trim(that.el.val());
+
+        return utils.compact([parentValue, currentValue]).join(' ');
+    },
+
+    getAjaxParams: function (method, custom) {
+        var that = this,
+            token = $.trim(that.options.token),
+            partner = $.trim(that.options.partner),
+            serviceUrl = that.options.serviceUrl,
+            url = that.options.url,
+            serviceMethod = serviceMethods[method],
+            params = $.extend({
+                timeout: that.options.timeout
+            }, serviceMethod.defaultParams),
+            headers = {};
+
+        if (url) {
+            serviceUrl = url;
+        } else {
+            if (!/\/$/.test(serviceUrl)) {
+                serviceUrl += '/';
+            }
+            serviceUrl += method;
+            if (serviceMethod.addTypeInUrl) {
+                serviceUrl += '/' + that.type.urlSuffix;
+            }
+        }
+
+        serviceUrl = utils.fixURLProtocol(serviceUrl);
+
+        if ($.support.cors) {
+            // for XMLHttpRequest put token in header
+            if (token) {
+                headers['Authorization'] = 'Token ' + token;
+            }
+            if (partner) {
+                headers['X-Partner'] = partner;
+            }
+            headers['X-Version'] = Suggestions.version;
+            if (!params.headers) {
+                params.headers = {};
+            }
+            $.extend(params.headers, that.options.headers, headers);
+        } else {
+            // for XDomainRequest put token into URL
+            if (token) {
+                headers['token'] = token;
+            }
+            if (partner) {
+                headers['partner'] = partner;
+            }
+            headers['version'] = Suggestions.version;
+            serviceUrl = utils.addUrlParams(serviceUrl, headers);
+        }
+
+        params.url = serviceUrl;
+
+        return $.extend(params, custom);
+    },
+
+    isQueryRequestable: function (query) {
+        var that = this,
+            result;
+
+        result = query.length >= that.options.minChars;
+
+        if (result && that.type.isQueryRequestable) {
+            result = that.type.isQueryRequestable.call(that, query);
+        }
+
+        return result;
+    },
+
+    constructRequestParams: function (query, customParams) {
+        var that = this,
+            options = that.options,
+            params = $.isFunction(options.params)
+                ? options.params.call(that.element, query)
+                : $.extend({}, options.params);
+
+        if (that.type.constructRequestParams) {
+            $.extend(params, that.type.constructRequestParams.call(that));
+        }
+        $.each(that.notify('requestParams'), function (i, hookParams) {
+            $.extend(params, hookParams);
+        });
+        params[options.paramName] = query;
+        if ($.isNumeric(options.count) && options.count > 0) {
+            params.count = options.count;
+        }
+
+        return $.extend(params, customParams);
+    },
+
+    updateSuggestions: function (query) {
+        var that = this;
+
+        that.fetchPhase = that.getSuggestions(query)
+            .done(function (suggestions) {
+                that.assignSuggestions(suggestions, query);
+            });
+    },
+
+    /**
+     * Get suggestions from cache or from server
+     * @param {String} query
+     * @param {Object} customParams parameters specified here will be passed to request body
+     * @param {Object} requestOptions
+     * @param {Boolean} [requestOptions.noCallbacks]  flag, request competence callbacks will not be invoked
+     * @param {Boolean} [requestOptions.useEnrichmentCache]
+     * @return {$.Deferred} waiter which is to be resolved with suggestions as argument
+     */
+    getSuggestions: function (query, customParams, requestOptions) {
+        var response,
+            that = this,
+            options = that.options,
+            noCallbacks = requestOptions && requestOptions.noCallbacks,
+            useEnrichmentCache = requestOptions && requestOptions.useEnrichmentCache,
+            params = that.constructRequestParams(query, customParams),
+            cacheKey = $.param(params || {}),
+            resolver = $.Deferred();
+
+        response = that.cachedResponse[cacheKey];
+        if (response && $.isArray(response.suggestions)) {
+            resolver.resolve(response.suggestions);
+        } else {
+            if (that.isBadQuery(query)) {
+                resolver.reject();
+            } else {
+                if (!noCallbacks && options.onSearchStart.call(that.element, params) === false) {
+                    resolver.reject();
+                } else {
+                    that.doGetSuggestions(params)
+                        .done(function (response) {
+                            // if response is correct and current value has not been changed
+                            if (that.processResponse(response) && query == that.currentValue) {
+
+                                // Cache results if cache is not disabled:
+                                if (!options.noCache) {
+                                    if (useEnrichmentCache) {
+                                        that.enrichmentCache[query] = response.suggestions[0];
+                                    } else {
+                                        that.enrichResponse(response, query);
+                                        that.cachedResponse[cacheKey] = response;
+                                        if (options.preventBadQueries && response.suggestions.length === 0) {
+                                            that.badQueries.push(query);
+                                        }
+                                    }
+                                }
+
+                                resolver.resolve(response.suggestions);
+                            } else {
+                                resolver.reject();
+                            }
+                            if (!noCallbacks) {
+                                options.onSearchComplete.call(that.element, query, response.suggestions);
+                            }
+                        }).fail(function (jqXHR, textStatus, errorThrown) {
+                        resolver.reject();
+                        if (!noCallbacks && textStatus !== 'abort') {
+                            options.onSearchError.call(that.element, query, jqXHR, textStatus, errorThrown);
+                        }
+                    });
+                }
+            }
+        }
+        return resolver;
+    },
+
+    /**
+     * Sends an AJAX request to server suggest method.
+     * @param {Object} params request params
+     * @returns {$.Deferred} response promise
+     */
+    doGetSuggestions: function (params) {
+        var that = this,
+            request = $.ajax(
+                that.getAjaxParams(that.requestMode.method, { data: utils.serialize(params) })
+            );
+
+        that.abortRequest();
+        that.currentRequest = request;
+        that.notify('request');
+
+        request.always(function () {
+            that.currentRequest = null;
+            that.notify('request');
+        });
+
+        return request;
+    },
+
+    isBadQuery: function (q) {
+        if (!this.options.preventBadQueries) {
+            return false;
+        }
+
+        var result = false;
+        $.each(this.badQueries, function (i, query) {
+            return !(result = q.indexOf(query) === 0);
+        });
+        return result;
+    },
+
+    abortRequest: function () {
+        var that = this;
+
+        if (that.currentRequest) {
+            that.currentRequest.abort();
+        }
+    },
+
+    /**
+     * Checks response format and data
+     * @return {Boolean} response contains acceptable data
+     */
+    processResponse: function (response) {
+        var that = this,
+            suggestions;
+
+        if (!response || !$.isArray(response.suggestions)) {
+            return false;
+        }
+
+        that.verifySuggestionsFormat(response.suggestions);
+        that.setUnrestrictedValues(response.suggestions);
+
+        if ($.isFunction(that.options.onSuggestionsFetch)) {
+            suggestions = that.options.onSuggestionsFetch.call(that.element, response.suggestions);
+            if ($.isArray(suggestions)) {
+                response.suggestions = suggestions;
+            }
+        }
+
+        return true;
+    },
+
+    verifySuggestionsFormat: function (suggestions) {
+        if (typeof suggestions[0] === 'string') {
+            $.each(suggestions, function (i, value) {
+                suggestions[i] = { value: value, data: null };
+            });
+        }
+    },
+
+    /**
+     * Gets string to set as input value
+     *
+     * @param suggestion
+     * @param {Object} [selectionOptions]
+     * @param {boolean} selectionOptions.hasBeenEnriched
+     * @param {boolean} selectionOptions.hasSameValues
+     * @return {string}
+     */
+    getSuggestionValue: function (suggestion, selectionOptions) {
+        var that = this,
+            formatSelected = that.options.formatSelected || that.type.formatSelected,
+            hasSameValues = selectionOptions && selectionOptions.hasSameValues,
+            hasBeenEnriched = selectionOptions && selectionOptions.hasBeenEnriched,
+            formattedValue,
+            typeFormattedValue = null;
+
+
+        if ($.isFunction(formatSelected)) {
+            formattedValue = formatSelected.call(that, suggestion);
+        }
+
+        if (typeof formattedValue !== 'string' || formattedValue.length == 0) {
+            formattedValue = suggestion.value;
+
+            if (that.type.getSuggestionValue) {
+                typeFormattedValue = that.type.getSuggestionValue(that, {
+                    suggestion: suggestion,
+                    hasSameValues: hasSameValues,
+                    hasBeenEnriched: hasBeenEnriched,
+                });
+
+                if (typeFormattedValue !== null) {
+                    formattedValue = typeFormattedValue;
+                }
+            }
+        }
+
+        return formattedValue;
+    },
+
+    hasSameValues: function(suggestion){
+        var hasSame = false;
+
+        $.each(this.suggestions, function(i, anotherSuggestion){
+            if (anotherSuggestion.value === suggestion.value && anotherSuggestion !== suggestion) {
+                hasSame = true;
+                return false;
+            }
+        });
+
+        return hasSame;
+    },
+
+    assignSuggestions: function (suggestions, query) {
+        var that = this;
+        that.suggestions = suggestions;
+        that.notify('assignSuggestions', query);
+    },
+
+    shouldRestrictValues: function () {
+        var that = this;
+        // treat suggestions value as restricted only if there is one constraint
+        // and restrict_value is true
+        return that.options.restrict_value
+            && that.constraints
+            && Object.keys(that.constraints).length == 1;
+    },
+
+    /**
+     * Fills suggestion.unrestricted_value property
+     */
+    setUnrestrictedValues: function (suggestions) {
+        var that = this,
+            shouldRestrict = that.shouldRestrictValues(),
+            label = that.getFirstConstraintLabel();
+
+        $.each(suggestions, function (i, suggestion) {
+            if (!suggestion.unrestricted_value) {
+                suggestion.unrestricted_value = shouldRestrict ? label + ', ' + suggestion.value : suggestion.value;
+            }
+        });
+    },
+
+    areSuggestionsSame: function (a, b) {
+        return a && b &&
+            a.value === b.value &&
+            utils.areSame(a.data, b.data);
+    }
+
+};
+
+/**
+ * Methods related to INPUT's behavior
+ */
+
+var methods = {
+
+    setupElement: function () {
+        // Remove autocomplete attribute to prevent native suggestions:
+        this.el
+            .attr('autocomplete', 'off')
+            .addClass('suggestions-input')
+            .css('box-sizing', 'border-box');
+    },
+
+    bindElementEvents: function () {
+        var that = this;
+
+        that.el.on('keydown' + EVENT_NS, $.proxy(that.onElementKeyDown, that));
+        // IE is buggy, it doesn't trigger `input` on text deletion, so use following events
+        that.el.on(['keyup' + EVENT_NS, 'cut' + EVENT_NS, 'paste' + EVENT_NS, 'input' + EVENT_NS].join(' '), $.proxy(that.onElementKeyUp, that));
+        that.el.on('blur' + EVENT_NS, $.proxy(that.onElementBlur, that));
+        that.el.on('focus' + EVENT_NS, $.proxy(that.onElementFocus, that));
+    },
+
+    unbindElementEvents: function () {
+        this.el.off(EVENT_NS);
+    },
+
+    onElementBlur: function () {
+        var that = this;
+
+        // suggestion was clicked, blur should be ignored
+        // see container mousedown handler
+        if (that.cancelBlur) {
+            that.cancelBlur = false;
+            return;
+        }
+
+        if (that.options.triggerSelectOnBlur) {
+            if (!that.isUnavailable()) {
+                that.selectCurrentValue({ noSpace: true })
+                    .always(function () {
+                        // For NAMEs selecting keeps suggestions list visible, so hide it
+                        that.hide();
+                    });
+            }
+        } else {
+            that.hide();
+        }
+
+        if (that.fetchPhase.abort) {
+            that.fetchPhase.abort();
+        }
+    },
+
+    onElementFocus: function () {
+        var that = this;
+
+        if (!that.cancelFocus) {
+            // defer methods to allow browser update input's style before
+            utils.delay($.proxy(that.completeOnFocus, that));
+        }
+        that.cancelFocus = false;
+    },
+
+    onElementKeyDown: function (e) {
+        var that = this;
+
+        if (that.isUnavailable()) {
+            return;
+        }
+
+        if (!that.visible) {
+            switch (e.which) {
+                // If suggestions are hidden and user presses arrow down, display suggestions
+                case KEYS.DOWN:
+                    that.suggest();
+                    break;
+                // if no suggestions available and user pressed Enter
+                case KEYS.ENTER:
+                    if (that.options.triggerSelectOnEnter) {
+                        that.triggerOnSelectNothing();
+                    }
+                    break;
+            }
+            return;
+        }
+
+        switch (e.which) {
+            case KEYS.ESC:
+                that.el.val(that.currentValue);
+                that.hide();
+                that.abortRequest();
+                break;
+
+            case KEYS.TAB:
+                if (that.options.tabDisabled === false) {
+                    return;
+                }
+                break;
+
+            case KEYS.ENTER:
+                if (that.options.triggerSelectOnEnter) {
+                    that.selectCurrentValue();
+                }
+                break;
+
+            case KEYS.SPACE:
+                if (that.options.triggerSelectOnSpace && that.isCursorAtEnd()) {
+                    e.preventDefault();
+                    that.selectCurrentValue({ continueSelecting: true, dontEnrich: true })
+                        .fail(function () {
+                            // If all data fetched but nothing selected
+                            that.currentValue += ' ';
+                            that.el.val(that.currentValue);
+                            that.proceedChangedValue();
+                        });
+                }
+                return;
+            case KEYS.UP:
+                that.moveUp();
+                break;
+            case KEYS.DOWN:
+                that.moveDown();
+                break;
+            default:
+                return;
+        }
+
+        // Cancel event if function did not return:
+        e.stopImmediatePropagation();
+        e.preventDefault();
+    },
+
+    onElementKeyUp: function (e) {
+        var that = this;
+
+        if (that.isUnavailable()) {
+            return;
+        }
+
+        switch (e.which) {
+            case KEYS.UP:
+            case KEYS.DOWN:
+            case KEYS.ENTER:
+                return;
+        }
+
+        // Cancel pending change
+        clearTimeout(that.onChangeTimeout);
+        that.inputPhase.reject();
+
+        if (that.currentValue !== that.el.val()) {
+            that.proceedChangedValue();
+        }
+    },
+
+    proceedChangedValue: function () {
+        var that = this;
+
+        // Cancel fetching, because it became obsolete
+        that.abortRequest();
+
+        that.inputPhase = $.Deferred()
+            .done($.proxy(that.onValueChange, that));
+
+        if (that.options.deferRequestBy > 0) {
+            // Defer lookup in case when value changes very quickly:
+            that.onChangeTimeout = utils.delay(function () {
+                that.inputPhase.resolve();
+            }, that.options.deferRequestBy);
+        } else {
+            that.inputPhase.resolve();
+        }
+    },
+
+    onValueChange: function () {
+        var that = this,
+            currentSelection;
+
+        if (that.selection) {
+            currentSelection = that.selection;
+            that.selection = null;
+            that.trigger('InvalidateSelection', currentSelection);
+        }
+
+        that.selectedIndex = -1;
+
+        that.update();
+        that.notify('valueChange');
+    },
+
+    completeOnFocus: function () {
+        var that = this;
+
+        if (that.isUnavailable()) {
+            return;
+        }
+
+        if (that.isElementFocused()) {
+            that.fixPosition();
+            that.update();
+            if (that.isMobile) {
+                that.setCursorAtEnd();
+                that.scrollToTop();
+            }
+        }
+    },
+
+    isElementFocused: function () {
+        return document.activeElement === this.element;
+    },
+
+    isCursorAtEnd: function () {
+        var that = this,
+            valLength = that.el.val().length,
+            selectionStart,
+            range;
+
+        // `selectionStart` and `selectionEnd` are not supported by some input types
+        try {
+            selectionStart = that.element.selectionStart;
+            if (typeof selectionStart === 'number') {
+                return selectionStart === valLength;
+            }
+        } catch (ex) {
+        }
+
+        if (document.selection) {
+            range = document.selection.createRange();
+            range.moveStart('character', -valLength);
+            return valLength === range.text.length;
+        }
+        return true;
+    },
+
+    setCursorAtEnd: function () {
+        var element = this.element;
+
+        // `selectionStart` and `selectionEnd` are not supported by some input types
+        try {
+            element.selectionEnd = element.selectionStart = element.value.length;
+            element.scrollLeft = element.scrollWidth;
+        } catch (ex) {
+            element.value = element.value;
+        }
+    }
+
+};
+
+$.extend(Suggestions.prototype, methods);
+
+notificator
+    .on('initialize', methods.bindElementEvents)
+    .on('dispose', methods.unbindElementEvents);
+
+/**
+ * Methods related to plugin's authorization on server
+ */
+
+// keys are "[type][token]"
+var statusRequests = {};
+
+function resetTokens () {
+    $.each(statusRequests, function(){
+        this.abort();
+    });
+    statusRequests = {};
+}
+
+resetTokens();
+
+var methods$1 = {
+
+    checkStatus: function () {
+        var that = this,
+            token = $.trim(that.options.token),
+            requestKey = that.options.type + token,
+            request = statusRequests[requestKey];
+
+        if (!request) {
+            request = statusRequests[requestKey] = $.ajax(that.getAjaxParams('status'));
+        }
+
+        request
+            .done(function(status){
+                if (status.search) {
+                    $.extend(that.status, status);
+                } else {
+                    triggerError('Service Unavailable');
+                }
+            })
+            .fail(function(){
+                triggerError(request.statusText);
+            });
+
+        function triggerError(errorThrown){
+            // If unauthorized
+            if ($.isFunction(that.options.onSearchError)) {
+                that.options.onSearchError.call(that.element, null, request, 'error', errorThrown);
+            }
+        }
+    }
+
+};
+
+Suggestions.resetTokens = resetTokens;
+
+$.extend(Suggestions.prototype, methods$1);
+
+notificator
+    .on('setOptions', methods$1.checkStatus);
+
+//export { methods, resetTokens };
+
+var locationRequest;
+var defaultGeoLocation = true;
+
+function resetLocation () {
+    locationRequest = null;
+    DEFAULT_OPTIONS.geoLocation = defaultGeoLocation;
+}
+
+var methods$2 = {
+
+    checkLocation: function () {
+        var that = this,
+            providedLocation = that.options.geoLocation;
+
+        if (!that.type.geoEnabled || !providedLocation) {
+            return;
+        }
+
+        that.geoLocation = $.Deferred();
+        if ($.isPlainObject(providedLocation) || $.isArray(providedLocation)) {
+            that.geoLocation.resolve(providedLocation);
+        } else {
+            if (!locationRequest) {
+                locationRequest = $.ajax(that.getAjaxParams('detectAddressByIp'));
+            }
+
+            locationRequest
+                .done(function (resp) {
+                    var locationData = resp && resp.location && resp.location.data;
+                    if (locationData && locationData.kladr_id) {
+                        that.geoLocation.resolve(locationData);
+                    } else {
+                        that.geoLocation.reject();
+                    }
+                })
+                .fail(function(){
+                    that.geoLocation.reject();
+                });
+        }
+    },
+
+    /**
+     * Public method to get `geoLocation` promise
+     * @returns {$.Deferred}
+     */
+    getGeoLocation: function () {
+        return this.geoLocation;
+    },
+
+    constructParams: function () {
+        var that = this,
+            params = {};
+
+        if (that.geoLocation && $.isFunction(that.geoLocation.promise) && that.geoLocation.state() == 'resolved') {
+            that.geoLocation.done(function (locationData) {
+                params['locations_boost'] = $.makeArray(locationData);
+            });
+        }
+
+        return params;
+    }
+
+};
+
+
+// Disable this feature when GET method used. See SUG-202
+if (utils.getDefaultType() != 'GET') {
+    $.extend(DEFAULT_OPTIONS, {
+        geoLocation: defaultGeoLocation
+    });
+
+    $.extend(Suggestions, {
+        resetLocation: resetLocation
+    });
+
+    $.extend(Suggestions.prototype, {
+        getGeoLocation: methods$2.getGeoLocation
+    });
+
+    notificator
+        .on('setOptions', methods$2.checkLocation)
+        .on('requestParams', methods$2.constructParams);
+}
+
+var methods$3 = {
+
+    enrichSuggestion: function (suggestion, selectionOptions) {
+        var that = this,
+            resolver = $.Deferred();
+
+        if (!that.status.enrich || !that.type.enrichmentEnabled || !that.requestMode.enrichmentEnabled ||
+            selectionOptions && selectionOptions.dontEnrich) {
+            return resolver.resolve(suggestion);
+        }
+
+        // if current suggestion is already enriched, use it
+        if (suggestion.data && suggestion.data.qc != null) {
+            return resolver.resolve(suggestion);
+        }
+
+        that.disableDropdown();
+
+        // Set `currentValue` to make `processResponse` to consider enrichment response valid
+        that.currentValue = suggestion.unrestricted_value ;
+
+        // prevent request abortion during onBlur
+        that.enrichPhase = that.getSuggestions(
+            suggestion.unrestricted_value,
+            {
+                count: 1,
+                locations: null,
+                locations_boost: null,
+                from_bound: null,
+                to_bound: null
+            },
+            {
+                noCallbacks: true,
+                useEnrichmentCache: true
+            }
+        )
+            .always(function () {
+                that.enableDropdown();
+            })
+            .done(function (suggestions) {
+                var enrichedSuggestion = suggestions && suggestions[0];
+
+                resolver.resolve(enrichedSuggestion || suggestion, !!enrichedSuggestion);
+            })
+            .fail(function () {
+                resolver.resolve(suggestion);
+            });
+
+        return resolver;
+    },
+
+    /**
+     * Injects enriched suggestion into response
+     * @param response
+     * @param query
+     */
+    enrichResponse: function (response, query) {
+        var that = this,
+            enrichedSuggestion = that.enrichmentCache[query];
+
+        if (enrichedSuggestion) {
+            $.each(response.suggestions, function(i, suggestion){
+                if (suggestion.value === query) {
+                    response.suggestions[i] = enrichedSuggestion;
+                    return false;
+                }
+            });
+        }
+    }
+
+};
+
+$.extend(Suggestions.prototype, methods$3);
+
+/**
+ * Methods related to suggestions dropdown list
+ */
+
+function highlightMatches(chunks) {
+    return $.map(chunks, function (chunk) {
+        var text = utils.escapeHtml(chunk.text);
+
+        if (text && chunk.matched) {
+            text = '<strong>' + text + '</strong>';
+        }
+        return text;
+    }).join('');
+}
+
+function nowrapLinkedParts(formattedStr, nowrapClass) {
+    var delimitedParts = formattedStr.split(', ');
+    // string has no delimiters, should not wrap
+    if (delimitedParts.length === 1) {
+        return formattedStr;
+    }
+    // disable word-wrap inside delimited parts
+    return $.map(delimitedParts, function (part) {
+        return '<span class="' + nowrapClass + '">' + part + '</span>'
+    }).join(', ');
+}
+
+function hasAnotherSuggestion (suggestions, suggestion) {
+    var result = false;
+
+    $.each(suggestions, function (i, s) {
+        result = s.value == suggestion.value && s != suggestion;
+        if (result) {
+            return false;
+        }
+    });
+
+    return result;
+}
+
+var optionsUsed = {
+    width: 'auto',
+    floating: false
+};
+
+var methods$4 = {
+
+    createContainer: function () {
+        var that = this,
+            suggestionSelector = '.' + that.classes.suggestion,
+            options = that.options,
+            $container = $('<div/>')
+                .addClass(options.containerClass)
+                .css({
+                    position: 'absolute',
+                    display: 'none'
+                });
+
+        that.$container = $container;
+
+        $container.on('click' + EVENT_NS, suggestionSelector, $.proxy(that.onSuggestionClick, that));
+    },
+
+    removeContainer: function () {
+        var that = this;
+
+        if (that.options.floating) {
+            that.$container.remove();
+        }
+    },
+
+    setContainerOptions: function () {
+        var that = this,
+            mousedownEvent = 'mousedown' + EVENT_NS;
+
+        that.$container.off(mousedownEvent);
+        if (that.options.floating) {
+            that.$container.on(mousedownEvent, $.proxy(that.onMousedown, that));
+        }
+    },
+
+    /**
+     * Listen for click event on suggestions list:
+     */
+    onSuggestionClick: function (e) {
+        var that = this,
+            $el = $(e.target),
+            index;
+
+        if (!that.dropdownDisabled) {
+            that.cancelFocus = true;
+            that.el.focus();
+
+            while ($el.length && !(index = $el.attr('data-index'))) {
+                $el = $el.closest('.' + that.classes.suggestion);
+            }
+
+            if (index && !isNaN(index)) {
+                that.select(+index);
+            }
+        }
+    },
+
+    // Dropdown UI methods
+
+    setDropdownPosition: function (origin, elLayout) {
+        var that = this,
+            scrollLeft = that.$viewport.scrollLeft(),
+            style;
+
+        if (that.isMobile) {
+            style = that.options.floating ? {
+                left: scrollLeft + 'px',
+                top: elLayout.top + elLayout.outerHeight + 'px'
+            } : {
+                left: origin.left - elLayout.left + scrollLeft + 'px',
+                top: origin.top + elLayout.outerHeight + 'px'
+            };
+            style.width = that.$viewport.width() + 'px';
+        } else {
+            style = that.options.floating ? {
+                left: elLayout.left + 'px',
+                top: elLayout.top + elLayout.borderTop + elLayout.innerHeight + 'px'
+            } : {
+                left: origin.left + 'px',
+                top: origin.top + elLayout.borderTop + elLayout.innerHeight + 'px'
+            };
+
+            // Defer to let body show scrollbars
+            utils.delay(function () {
+                var width = that.options.width;
+
+                if (width === 'auto') {
+                    width = that.el.outerWidth();
+                }
+                that.$container.outerWidth(width);
+            });
+        }
+
+        that.$container
+            .toggleClass(that.classes.mobile, that.isMobile)
+            .css(style);
+
+        that.containerItemsPadding = elLayout.left + elLayout.borderLeft + elLayout.paddingLeft - scrollLeft;
+    },
+
+    setItemsPositions: function () {
+        var that = this,
+            $items = that.getSuggestionsItems();
+
+        $items.css('paddingLeft', that.isMobile ? that.containerItemsPadding + 'px' : '');
+    },
+
+    getSuggestionsItems: function () {
+        return this.$container.children('.' + this.classes.suggestion);
+    },
+
+    toggleDropdownEnabling: function (enable) {
+        this.dropdownDisabled = !enable;
+        this.$container.attr('disabled', !enable);
+    },
+
+    disableDropdown: function () {
+        this.toggleDropdownEnabling(false);
+    },
+
+    enableDropdown: function () {
+        this.toggleDropdownEnabling(true);
+    },
+
+    /**
+     * Shows if there are any suggestions besides currently selected
+     * @returns {boolean}
+     */
+    hasSuggestionsToChoose: function () {
+        var that = this;
+
+        return that.suggestions.length > 1 ||
+            (that.suggestions.length === 1 &&
+                (!that.selection || $.trim(that.suggestions[0].value) !== $.trim(that.selection.value))
+            );
+    },
+
+    suggest: function () {
+        var that = this,
+            options = that.options,
+            formatResult,
+            html = [];
+
+        if (!that.requestMode.userSelect) {
+            return ;
+        }
+
+        // если нечего показывать, то сообщаем об этом
+        if (!that.hasSuggestionsToChoose()) {
+
+            if (that.suggestions.length) {
+                that.hide();
+                return
+            } else {
+                html.push('<div class="' + that.classes.hint + '">' + options.noSuggestionsHint[options.type] + '</div>');
+            }
+
+        } else {
+
+            formatResult = options.formatResult || that.type.formatResult || that.formatResult;
+
+            // Build hint html
+            if (!that.isMobile && options.hint && that.suggestions.length) {
+                html.push('<div class="' + that.classes.hint + '">' + options.hint + '</div>');
+            }
+            that.selectedIndex = -1;
+            // Build suggestions inner HTML:
+            $.each(that.suggestions, function (i, suggestion) {
+                var labels = that.makeSuggestionLabel(that.suggestions, suggestion);
+
+                if (suggestion == that.selection) {
+                    that.selectedIndex = i;
+                }
+
+                html.push('<div class="' + that.classes.suggestion + '" data-index="' + i + '">');
+                html.push(formatResult.call(that, suggestion.value, that.currentValue, suggestion, {
+                    unformattableTokens: that.type.unformattableTokens
+                }));
+                if (labels) {
+                    html.push('<span class="' + that.classes.subtext_label + '">' + utils.escapeHtml(labels) + '</span>');
+                }
+                html.push('</div>');
+            });
+
+        }
+
+        that.$container.html(html.join(''));
+
+        // Select first value by default:
+        if (options.autoSelectFirst && that.selectedIndex === -1) {
+            that.selectedIndex = 0;
+        }
+        if (that.selectedIndex !== -1) {
+            that.getSuggestionsItems().eq(that.selectedIndex).addClass(that.classes.selected);
+        }
+
+        if ($.isFunction(options.beforeRender)) {
+            options.beforeRender.call(that.element, that.$container);
+        }
+
+        that.$container.show();
+        that.visible = true;
+        that.fixPosition();
+        that.setItemsPositions();
+    },
+
+    wrapFormattedValue: function (value, suggestion) {
+        var that = this,
+            status = utils.getDeepValue(suggestion.data, 'state.status');
+
+        return '<span class="' + that.classes.value + '"' + (status ? ' data-suggestion-status="' + status + '"' : '') + '>' +
+            value +
+            '</span>';
+    },
+
+    formatResult: function (value, currentValue, suggestion, options) {
+        var that = this;
+
+        value = that.highlightMatches(value, currentValue, suggestion, options);
+
+        return that.wrapFormattedValue(value, suggestion);
+    },
+
+    /**
+     * Makes HTML contents for suggestion item
+     * @param {String} value string to be displayed as a value
+     * @param {String} currentValue contents of the textbox
+     * @param suggestion whole suggestion object with displaying value and other fields
+     * @param {Object} [options] set of flags:
+     *          `unformattableTokens` - array of search tokens, that are not to be highlighted
+     *          `maxLength` - if set, `value` is limited by this length
+     * @returns {String} HTML to be inserted in the list
+     */
+    highlightMatches: function (value, currentValue, suggestion, options) {
+
+        var that = this,
+            chunks = [],
+            unformattableTokens = options && options.unformattableTokens,
+            maxLength = options && options.maxLength,
+            tokens, tokenMatchers, preferredTokens,
+            rWords = utils.reWordExtractor(),
+            match, word, i, chunk, formattedStr;
+
+        if (!value) return '';
+
+        tokens = utils.compact(utils.formatToken(currentValue).split(WORD_SPLITTER));
+
+        // Move unformattableTokens to the end.
+        // This will help to apply them only if no other tokens match
+        preferredTokens = utils.arrayMinus(tokens, unformattableTokens);
+        tokens = utils.withSubTokens(preferredTokens.concat(utils.arrayMinus(tokens, preferredTokens)));
+
+        tokenMatchers = $.map(tokens, function (token) {
+            return new RegExp('^((.*)([' + WORD_PARTS_DELIMITERS + ']+))?' +
+                '(' + utils.escapeRegExChars(token) + ')' +
+                '([^' + WORD_PARTS_DELIMITERS + ']*[' + WORD_PARTS_DELIMITERS + ']*)', 'i');
+        });
+
+        // parse string by words
+        while ((match = rWords.exec(value)) && match[0]) {
+            word = match[1];
+            chunks.push({
+                text: word,
+
+                // upper case means a word is a name and can be highlighted even if presents in unformattableTokens
+                hasUpperCase: word.toLowerCase() !== word,
+                formatted: utils.formatToken(word),
+                matchable: true
+            });
+            if (match[2]) {
+                chunks.push({
+                    text: match[2]
+                });
+            }
+        }
+
+        // use simple loop because length can change
+        for (i = 0; i < chunks.length; i++) {
+            chunk = chunks[i];
+            if (chunk.matchable && !chunk.matched && ($.inArray(chunk.formatted, unformattableTokens) === -1 || chunk.hasUpperCase)) {
+                $.each(tokenMatchers, function (j, matcher) {
+                    var tokenMatch = matcher.exec(chunk.formatted),
+                        length, nextIndex = i + 1;
+
+                    if (tokenMatch) {
+                        tokenMatch = {
+                            before: tokenMatch[1] || '',
+                            beforeText: tokenMatch[2] || '',
+                            beforeDelimiter: tokenMatch[3] || '',
+                            text: tokenMatch[4] || '',
+                            after: tokenMatch[5] || ''
+                        };
+
+                        if (tokenMatch.before) {
+                            // insert chunk before current
+                            chunks.splice(i, 0, {
+                                text: chunk.text.substr(0, tokenMatch.beforeText.length),
+                                formatted: tokenMatch.beforeText,
+                                matchable: true
+                            }, {
+                                text: tokenMatch.beforeDelimiter
+                            });
+                            nextIndex += 2;
+
+                            length = tokenMatch.before.length;
+                            chunk.text = chunk.text.substr(length);
+                            chunk.formatted = chunk.formatted.substr(length);
+                            i--;
+                        }
+
+                        length = tokenMatch.text.length + tokenMatch.after.length;
+                        if (chunk.formatted.length > length) {
+                            chunks.splice(nextIndex, 0, {
+                                text: chunk.text.substr(length),
+                                formatted: chunk.formatted.substr(length),
+                                matchable: true
+                            });
+                            chunk.text = chunk.text.substr(0, length);
+                            chunk.formatted = chunk.formatted.substr(0, length);
+                        }
+
+                        if (tokenMatch.after) {
+                            length = tokenMatch.text.length;
+                            chunks.splice(nextIndex, 0, {
+                                text: chunk.text.substr(length),
+                                formatted: chunk.formatted.substr(length)
+                            });
+                            chunk.text = chunk.text.substr(0, length);
+                            chunk.formatted = chunk.formatted.substr(0, length);
+                        }
+                        chunk.matched = true;
+                        return false;
+                    }
+                });
+            }
+        }
+
+        if (maxLength) {
+            for (i = 0; i < chunks.length && maxLength >= 0; i++) {
+                chunk = chunks[i];
+                maxLength -= chunk.text.length;
+                if (maxLength < 0) {
+                    chunk.text = chunk.text.substr(0, chunk.text.length + maxLength) + '...';
+                }
+            }
+            chunks.length = i;
+        }
+
+        formattedStr = highlightMatches(chunks);
+        return nowrapLinkedParts(formattedStr, that.classes.nowrap);
+    },
+
+    makeSuggestionLabel: function (suggestions, suggestion) {
+        var that = this,
+            fieldNames = that.type.fieldNames,
+            nameData = {},
+            rWords = utils.reWordExtractor(),
+            match, word,
+            labels = [];
+
+        if (fieldNames && hasAnotherSuggestion(suggestions, suggestion) && suggestion.data) {
+
+            $.each(fieldNames, function (field) {
+                var value = suggestion.data[field];
+                if (value) {
+                    nameData[field] = utils.formatToken(value);
+                }
+            });
+
+            if (!$.isEmptyObject(nameData)) {
+                while ((match = rWords.exec(utils.formatToken(suggestion.value))) && (word = match[1])) {
+                    $.each(nameData, function (i, value) {
+                        if (value == word) {
+                            labels.push(fieldNames[i]);
+                            delete nameData[i];
+                            return false;
+                        }
+                    });
+                }
+
+                if (labels.length) {
+                    return labels.join(', ');
+                }
+            }
+        }
+    },
+
+    hide: function () {
+        var that = this;
+        that.visible = false;
+        that.selectedIndex = -1;
+        that.$container
+            .hide()
+            .empty();
+    },
+
+    activate: function (index) {
+        var that = this,
+            $activeItem,
+            selected = that.classes.selected,
+            $children;
+
+        if (!that.dropdownDisabled) {
+            $children = that.getSuggestionsItems();
+
+            $children.removeClass(selected);
+
+            that.selectedIndex = index;
+
+            if (that.selectedIndex !== -1 && $children.length > that.selectedIndex) {
+                $activeItem = $children.eq(that.selectedIndex);
+                $activeItem.addClass(selected);
+                return $activeItem;
+            }
+        }
+
+        return null;
+    },
+
+    deactivate: function (restoreValue) {
+        var that = this;
+
+        if (!that.dropdownDisabled) {
+            that.selectedIndex = -1;
+            that.getSuggestionsItems().removeClass(that.classes.selected);
+            if (restoreValue) {
+                that.el.val(that.currentValue);
+            }
+        }
+    },
+
+    moveUp: function () {
+        var that = this;
+
+        if (that.dropdownDisabled) {
+            return;
+        }
+        if (that.selectedIndex === -1) {
+            if (that.suggestions.length) {
+                that.adjustScroll(that.suggestions.length - 1);
+            }
+            return;
+        }
+
+        if (that.selectedIndex === 0) {
+            that.deactivate(true);
+            return;
+        }
+
+        that.adjustScroll(that.selectedIndex - 1);
+    },
+
+    moveDown: function () {
+        var that = this;
+
+        if (that.dropdownDisabled) {
+            return;
+        }
+        if (that.selectedIndex === (that.suggestions.length - 1)) {
+            that.deactivate(true);
+            return;
+        }
+
+        that.adjustScroll(that.selectedIndex + 1);
+    },
+
+    adjustScroll: function (index) {
+        var that = this,
+            $activeItem = that.activate(index),
+            itemTop,
+            itemBottom,
+            scrollTop = that.$container.scrollTop(),
+            containerHeight;
+
+        if (!$activeItem || !$activeItem.length) {
+            return;
+        }
+
+        itemTop = $activeItem.position().top;
+        if (itemTop < 0 ) {
+            that.$container.scrollTop(scrollTop + itemTop);
+        } else {
+            itemBottom = itemTop + $activeItem.outerHeight();
+            containerHeight = that.$container.innerHeight();
+            if (itemBottom > containerHeight) {
+                that.$container.scrollTop(scrollTop - containerHeight + itemBottom);
+            }
+        }
+
+        that.el.val(that.suggestions[index].value);
+    }
+
+};
+
+$.extend(DEFAULT_OPTIONS, optionsUsed);
+
+$.extend(Suggestions.prototype, methods$4);
+
+notificator
+    .on('initialize', methods$4.createContainer)
+    .on('dispose', methods$4.removeContainer)
+    .on('setOptions', methods$4.setContainerOptions)
+    .on('fixPosition', methods$4.setDropdownPosition)
+    .on('fixPosition', methods$4.setItemsPositions)
+    .on('assignSuggestions', methods$4.suggest);
+
+/**
+ * Methods related to right-sided component
+ */
+
+var QUEUE_NAME = 'addon';
+var BEFORE_SHOW_ADDON = 50;
+var BEFORE_RESTORE_PADDING = 1000;
+
+var optionsUsed$1 = {
+    addon: null
+};
+
+var ADDON_TYPES = {
+    'NONE': 'none',
+    'SPINNER': 'spinner',
+    'CLEAR': 'clear'
+};
+
+var Addon = function (owner) {
+    var that = this,
+        $el = $('<span class="suggestions-addon"/>');
+
+    that.owner = owner;
+    that.$el = $el;
+    that.type = ADDON_TYPES.NONE;
+    that.visible = false;
+    that.initialPadding = null;
+
+    $el.on('click', $.proxy(that, 'onClick'));
+};
+
+Addon.prototype = {
+
+    checkType: function () {
+        var that = this,
+            type = that.owner.options.addon,
+            isTypeCorrect = false;
+
+        $.each(ADDON_TYPES, function (key, value) {
+            isTypeCorrect = value == type;
+            if (isTypeCorrect) {
+                return false;
+            }
+        });
+
+        if (!isTypeCorrect) {
+            type = that.owner.isMobile ? ADDON_TYPES.CLEAR : ADDON_TYPES.SPINNER;
+        }
+
+        if (type != that.type) {
+            that.type = type;
+            that.$el.attr('data-addon-type', type);
+            that.toggle(true);
+        }
+    },
+
+    toggle: function (immediate) {
+        var that = this,
+            visible;
+
+        switch (that.type) {
+            case ADDON_TYPES.CLEAR:
+                visible = !!that.owner.currentValue;
+                break;
+            case ADDON_TYPES.SPINNER:
+                visible = !!that.owner.currentRequest;
+                break;
+            default:
+                visible = false;
+        }
+
+        if (visible != that.visible) {
+            that.visible = visible;
+            if (visible) {
+                that.show(immediate);
+            } else {
+                that.hide(immediate);
+            }
+        }
+    },
+
+    show: function (immediate) {
+        var that = this,
+            style = {'opacity': 1};
+
+        if (immediate) {
+            that.$el
+                .show()
+                .css(style);
+            that.showBackground(true);
+        } else {
+            that.$el
+                .stop(true, true)
+                .delay(BEFORE_SHOW_ADDON)
+                .queue(function () {
+                    that.$el.show();
+                    that.showBackground();
+                    that.$el.dequeue();
+                })
+                .animate(style, 'fast');
+        }
+    },
+
+    hide: function (immediate) {
+        var that = this,
+            style = {'opacity': 0};
+
+        if (immediate) {
+            that.$el
+                .hide()
+                .css(style);
+        }
+        that.$el
+            .stop(true)
+            .animate(style, {
+                duration: 'fast',
+                complete: function () {
+                    that.$el.hide();
+                    that.hideBackground();
+                }
+            });
+    },
+
+    fixPosition: function(origin, elLayout){
+        var that = this,
+            addonSize = elLayout.innerHeight;
+
+        that.checkType();
+        that.$el.css({
+            left: origin.left + elLayout.borderLeft + elLayout.innerWidth - addonSize + 'px',
+            top: origin.top + elLayout.borderTop + 'px',
+            height: addonSize,
+            width: addonSize
+        });
+
+        that.initialPadding = elLayout.paddingRight;
+        that.width = addonSize;
+        if (that.visible) {
+            elLayout.componentsRight += addonSize;
+        }
+    },
+
+    showBackground: function (immediate) {
+        var that = this,
+            $el = that.owner.el,
+            style = {'paddingRight': that.width};
+
+        if (that.width > that.initialPadding) {
+            that.stopBackground();
+            if (immediate) {
+                $el.css(style);
+            } else {
+                $el
+                    .animate(style, { duration: 'fast', queue: QUEUE_NAME })
+                    .dequeue(QUEUE_NAME);
+            }
+        }
+    },
+
+    hideBackground: function (immediate) {
+        var that = this,
+            $el = that.owner.el,
+            style = {'paddingRight': that.initialPadding};
+
+        if (that.width > that.initialPadding) {
+            that.stopBackground(true);
+            if (immediate) {
+                $el.css(style);
+            } else {
+                $el
+                    .delay(BEFORE_RESTORE_PADDING, QUEUE_NAME)
+                    .animate(style, { duration: 'fast', queue: QUEUE_NAME })
+                    .dequeue(QUEUE_NAME);
+            }
+        }
+    },
+
+    stopBackground: function (gotoEnd) {
+        this.owner.el.stop(QUEUE_NAME, true, gotoEnd);
+    },
+
+    onClick: function (e) {
+        var that = this;
+
+        if (that.type == ADDON_TYPES.CLEAR) {
+            that.owner.clear();
+        }
+    }
+
+};
+
+var methods$5 = {
+
+    createAddon: function () {
+        var that = this,
+            addon = new Addon(that);
+
+        that.$wrapper.append(addon.$el);
+        that.addon = addon;
+    },
+
+    fixAddonPosition: function (origin, elLayout) {
+        this.addon.fixPosition(origin, elLayout);
+    },
+
+    checkAddonType: function () {
+        this.addon.checkType();
+    },
+
+    checkAddonVisibility: function () {
+        this.addon.toggle();
+    },
+
+    stopBackground: function () {
+        this.addon.stopBackground();
+    }
+
+};
+
+$.extend(DEFAULT_OPTIONS, optionsUsed$1);
+
+notificator
+    .on('initialize', methods$5.createAddon)
+    .on('setOptions', methods$5.checkAddonType)
+    .on('fixPosition', methods$5.fixAddonPosition)
+    .on('clear', methods$5.checkAddonVisibility)
+    .on('valueChange', methods$5.checkAddonVisibility)
+    .on('request', methods$5.checkAddonVisibility)
+    .on('resetPosition', methods$5.stopBackground);
+
+/**
+ * Methods related to CONSTRAINTS component
+ */
+var optionsUsed$2 = {
+    constraints: null,
+    restrict_value: false
+};
+
+var fiasParamNames = [
+  'region_fias_id',
+  'area_fias_id',
+  'city_fias_id',
+  'city_district_fias_id',
+  'settlement_fias_id',
+  'street_fias_id'
+];
+
+/**
+ * Compares two suggestion objects
+ * @param suggestion
+ * @param instance other Suggestions instance
+ */
+function belongsToArea(suggestion, instance){
+    var parentSuggestion = instance.selection,
+        result = parentSuggestion && parentSuggestion.data && instance.bounds;
+
+    if (result) {
+        $.each(instance.bounds.all, function (i, bound) {
+            return (result = parentSuggestion.data[bound] === suggestion.data[bound]);
+        });
+    }
+    return result;
+}
+
+/**
+ * @param {Object} data  fields
+ * @param {Suggestions} instance
+ * @constructor
+ */
+var ConstraintLocation = function(data, instance){
+    var that = this,
+        fieldNames,
+        fiasFieldNames,
+        fiasFields = {};
+
+    that.instance = instance;
+    that.fields = {};
+    that.specificity = -1;
+
+    if ($.isPlainObject(data) && instance.type.dataComponents) {
+        $.each(instance.type.dataComponents, function (i, component) {
+            var fieldName = component.id;
+
+            if (component.forLocations && data[fieldName]) {
+                that.fields[fieldName] = data[fieldName];
+                that.specificity = i;
+            }
+        });
+    }
+
+    fieldNames = utils.objectKeys(that.fields);
+    fiasFieldNames = utils.arraysIntersection(fieldNames, fiasParamNames);
+    if (fiasFieldNames.length) {
+        $.each(fiasFieldNames, function(index, fieldName) {
+            fiasFields[fieldName] = that.fields[fieldName];
+        });
+        that.fields = fiasFields;
+        that.specificity = that.getFiasSpecificity(fiasFieldNames);
+    } else if (that.fields.kladr_id) {
+        that.fields = { kladr_id: that.fields.kladr_id };
+        that.specificity = that.getKladrSpecificity(that.fields.kladr_id);
+    }
+};
+
+$.extend(ConstraintLocation.prototype, {
+    getLabel: function(){
+        return this.instance.type.composeValue(this.fields, { saveCityDistrict: true });
+    },
+
+    getFields: function () {
+        return this.fields;
+    },
+
+    isValid: function(){
+        return !$.isEmptyObject(this.fields);
+    },
+
+    /**
+     * Возвращает specificity для КЛАДР
+     * Описание ниже, в getFiasSpecificity
+     * @param kladr_id
+     * @returns {number}
+     */
+    getKladrSpecificity: function (kladr_id) {
+        var specificity = -1,
+            significantLength;
+
+        this.significantKladr = kladr_id.replace(/^(\d{2})(\d*?)(0+)$/g, '$1$2');
+        significantLength = this.significantKladr.length;
+
+        $.each(this.instance.type.dataComponents, function (i, component) {
+            if (component.kladrFormat && significantLength === component.kladrFormat.digits) {
+                specificity = i;
+            }
+        });
+
+        return specificity;
+    },
+
+    /**
+     * Возвращает особую величину specificity для ФИАС
+     * Specificity это индекс для массива this.instance.type.dataComponents
+     * до которого (включительно) обрежется этот массив при формировании строки адреса.
+     * Этот параметр нужен для случаев, когда в настройках плагина restrict_value = true
+     * Например, установлено ограничение (locations) по region_fias_id (Краснодарский край)
+     * В выпадашке нажимаем на "г. Сочи"
+     * Если restrict_value отключен, то выведется значение "Краснодарский край, г Сочи"
+     * Если включен, то просто "г Сочи"
+     *
+     * @param fiasFieldNames
+     * @returns {number}
+     */
+    getFiasSpecificity: function (fiasFieldNames) {
+        var specificity = -1;
+
+        $.each(this.instance.type.dataComponents, function (i, component) {
+            if (component.fiasType && ($.inArray(component.fiasType, fiasFieldNames) > -1) && specificity < i) {
+                specificity = i;
+            }
+        });
+
+        return specificity;
+    },
+
+    containsData: function (data){
+        var result = true;
+
+        if (this.fields.kladr_id) {
+            return !!data.kladr_id && data.kladr_id.indexOf(this.significantKladr) === 0;
+        } else {
+            $.each(this.fields, function(fieldName, value){
+                return result = !!data[fieldName] && data[fieldName].toLowerCase() === value.toLowerCase();
+            });
+
+            return result;
+        }
+    }
+});
+
+Suggestions.ConstraintLocation = ConstraintLocation;
+
+/**
+ * @param {Object} data
+ * @param {Object|Array} data.locations
+ * @param {string} [data.label]
+ * @param {boolean} [data.deletable]
+ * @param {Suggestions} [instance]
+ * @constructor
+ */
+var Constraint = function(data, instance) {
+    this.id = utils.uniqueId('c');
+    this.deletable = !!data.deletable;
+    this.instance = instance;
+
+    this.locations = $.map($.makeArray(data && (data.locations || data.restrictions)), function (data) {
+        return new ConstraintLocation(data, instance);
+    });
+
+    this.locations = $.grep(this.locations, function(location) {
+        return location.isValid();
+    });
+
+    this.label = data.label;
+    if (this.label == null && instance.type.composeValue) {
+        this.label = $.map(this.locations, function (location) {
+            return location.getLabel();
+        }).join(', ');
+    }
+
+    if (this.label && this.isValid()) {
+        this.$el = $(document.createElement('li'))
+            .append($(document.createElement('span')).text(this.label))
+            .attr('data-constraint-id', this.id);
+
+        if (this.deletable) {
+            this.$el.append(
+                $(document.createElement('span'))
+                    .addClass(instance.classes.removeConstraint)
+            );
+        }
+    }
+};
+
+$.extend(Constraint.prototype, {
+    isValid: function () {
+        return this.locations.length > 0;
+    },
+    getFields: function(){
+        return $.map(this.locations, function(location){
+            return location.getFields();
+        });
+    }
+});
+
+var methods$6 = {
+
+    createConstraints: function () {
+        var that = this;
+
+        that.constraints = {};
+
+        that.$constraints = $('<ul class="suggestions-constraints"/>');
+        that.$wrapper.append(that.$constraints);
+        that.$constraints.on('click', '.' + that.classes.removeConstraint, $.proxy(that.onConstraintRemoveClick, that));
+    },
+
+    setConstraintsPosition: function(origin, elLayout){
+        var that = this;
+
+        that.$constraints.css({
+            left: origin.left + elLayout.borderLeft + elLayout.paddingLeft + 'px',
+            top: origin.top + elLayout.borderTop + Math.round((elLayout.innerHeight - that.$constraints.height()) / 2) + 'px'
+        });
+
+        elLayout.componentsLeft += that.$constraints.outerWidth(true) + elLayout.paddingLeft;
+    },
+
+    onConstraintRemoveClick: function (e) {
+        var that = this,
+            $item = $(e.target).closest('li'),
+            id = $item.attr('data-constraint-id');
+
+        // Delete constraint data before animation to let correct requests to be sent while fading
+        delete that.constraints[id];
+        // Request for new suggestions
+        that.update();
+
+        $item.fadeOut('fast', function () {
+            that.removeConstraint(id);
+        });
+    },
+
+    setupConstraints: function () {
+        var that = this,
+            constraints = that.options.constraints,
+            $parent;
+
+        if (!constraints) {
+            that.unbindFromParent();
+            return;
+        }
+
+        if (constraints instanceof $ || typeof constraints === 'string' || typeof constraints.nodeType === 'number') {
+            $parent = $(constraints);
+            if (!$parent.is(that.constraints)) {
+                that.unbindFromParent();
+                if (!$parent.is(that.el)) {
+                    that.constraints = $parent;
+                    that.bindToParent();
+                }
+            }
+        } else {
+            that._constraintsUpdating = true;
+            $.each(that.constraints, $.proxy(that.removeConstraint, that));
+            $.each($.makeArray(constraints), function (i, constraint) {
+                that.addConstraint(constraint);
+            });
+            that._constraintsUpdating = false;
+            that.fixPosition();
+        }
+    },
+
+    filteredLocation: function (data) {
+        var locationComponents = [],
+            location = {};
+
+        $.each(this.type.dataComponents, function () {
+            if (this.forLocations) locationComponents.push(this.id);
+        });
+
+        if ($.isPlainObject(data)) {
+            // Copy to location only allowed fields
+            $.each(data, function (key, value) {
+                if (value && locationComponents.indexOf(key) >= 0) {
+                    location[key] = value;
+                }
+            });
+        }
+
+        if (!$.isEmptyObject(location)) {
+            return location.kladr_id ? { kladr_id: location.kladr_id } : location;
+        }
+    },
+
+    addConstraint: function (constraint) {
+        var that = this;
+
+        constraint = new Constraint(constraint, that);
+
+        if (constraint.isValid()) {
+            that.constraints[constraint.id] = constraint;
+
+            if (constraint.$el) {
+                that.$constraints.append(constraint.$el);
+                if (!that._constraintsUpdating) {
+                    that.fixPosition();
+                }
+            }
+        }
+    },
+
+    removeConstraint: function (id) {
+        var that = this;
+        delete that.constraints[id];
+        that.$constraints.children('[data-constraint-id="' + id + '"]').remove();
+        if (!that._constraintsUpdating) {
+            that.fixPosition();
+        }
+    },
+
+    constructConstraintsParams: function () {
+        var that = this,
+            locations = [],
+            constraints = that.constraints,
+            parentInstance,
+            parentData,
+            params = {};
+
+        while (constraints instanceof $ && (parentInstance = constraints.suggestions()) &&
+            !(parentData = utils.getDeepValue(parentInstance, 'selection.data'))
+        ) {
+            constraints = parentInstance.constraints;
+        }
+
+        if (constraints instanceof $) {
+            parentData = (new ConstraintLocation(parentData, parentInstance))
+                .getFields();
+
+            if (parentData) {
+                params.locations = [ parentData ];
+                params.restrict_value = true;
+            }
+        } else {
+            if (constraints) {
+                $.each(constraints, function (id, constraint) {
+                    locations = locations.concat(constraint.getFields());
+                });
+
+                if (locations.length) {
+                    params.locations = locations;
+                    params.restrict_value = that.options.restrict_value;
+                }
+            }
+        }
+
+        return params;
+    },
+
+    /**
+     * Returns label of the first constraint (if any), empty string otherwise
+     * @returns {String}
+     */
+    getFirstConstraintLabel: function() {
+        var that = this,
+            constraints_id = $.isPlainObject(that.constraints) && Object.keys(that.constraints)[0];
+
+        return constraints_id ? that.constraints[constraints_id].label : '';
+    },
+
+    bindToParent: function () {
+        var that = this;
+
+        that.constraints
+            .on([
+                    'suggestions-select.' + that.uniqueId,
+                    'suggestions-invalidateselection.' + that.uniqueId,
+                    'suggestions-clear.' + that.uniqueId
+                ].join(' '),
+                $.proxy(that.onParentSelectionChanged, that)
+            )
+            .on('suggestions-dispose.' + that.uniqueId, $.proxy(that.onParentDispose, that));
+    },
+
+    unbindFromParent: function  () {
+        var that = this,
+            $parent = that.constraints;
+
+        if ($parent instanceof $) {
+            $parent.off('.' + that.uniqueId);
+        }
+    },
+
+    onParentSelectionChanged: function (e, suggestion, valueChanged) {
+        // Don't clear if parent has been just enriched
+        if (e.type !== 'suggestions-select' || valueChanged) {
+            this.clear();
+        }
+    },
+
+    onParentDispose: function (e) {
+        this.unbindFromParent();
+    },
+
+    getParentInstance: function () {
+        return this.constraints instanceof $ && this.constraints.suggestions();
+    },
+
+    shareWithParent: function (suggestion) {
+        // that is the parent control's instance
+        var that = this.getParentInstance();
+
+        if (!that || that.type !== this.type || belongsToArea(suggestion, that)) {
+            return;
+        }
+
+        that.shareWithParent(suggestion);
+        that.setSuggestion(suggestion);
+    },
+
+    /**
+     * Pick only fields that absent in restriction
+     */
+    getUnrestrictedData: function (data) {
+        var that = this,
+            restrictedKeys = [],
+            unrestrictedData = {},
+            maxSpecificity = -1;
+
+        // Find most specific location that could restrict current data
+        $.each(that.constraints, function (id, constraint) {
+            $.each(constraint.locations, function (i, location) {
+                if (location.containsData(data) && location.specificity > maxSpecificity) {
+                    maxSpecificity = location.specificity;
+                }
+            });
+        });
+
+        if (maxSpecificity >= 0) {
+
+            // Для городов-регионов нужно также отсечь и город
+            if (data.region_kladr_id && data.region_kladr_id === data.city_kladr_id) {
+                restrictedKeys.push.apply(restrictedKeys, that.type.dataComponentsById['city'].fields);
+            }
+
+            // Collect all fieldnames from all restricted components
+            $.each(that.type.dataComponents.slice(0, maxSpecificity + 1), function (i, component) {
+                restrictedKeys.push.apply(restrictedKeys, component.fields);
+            });
+
+            // Copy skipping restricted fields
+            $.each(data, function (key, value) {
+                if (restrictedKeys.indexOf(key) === -1) {
+                    unrestrictedData[key] = value;
+                }
+            });
+        } else {
+            unrestrictedData = data;
+        }
+
+        return unrestrictedData;
+    }
+
+};
+
+$.extend(DEFAULT_OPTIONS, optionsUsed$2);
+
+$.extend(Suggestions.prototype, methods$6);
+
+// Disable this feature when GET method used. See SUG-202
+if (utils.getDefaultType() != 'GET') {
+    notificator
+        .on('initialize', methods$6.createConstraints)
+        .on('setOptions', methods$6.setupConstraints)
+        .on('fixPosition', methods$6.setConstraintsPosition)
+        .on('requestParams', methods$6.constructConstraintsParams)
+        .on('dispose', methods$6.unbindFromParent);
+}
+
+/**
+ * Methods for selecting a suggestion
+ */
+
+var methods$7 = {
+
+    proceedQuery: function (query) {
+        var that = this;
+
+        if (query.length >= that.options.minChars) {
+            that.updateSuggestions(query);
+        } else {
+            that.hide();
+        }
+    },
+
+    /**
+     * Selects current or first matched suggestion, but firstly waits for data ready
+     * @param selectionOptions
+     * @returns {$.Deferred} promise, resolved with index of selected suggestion or rejected if nothing matched
+     */
+    selectCurrentValue: function (selectionOptions) {
+        var that = this,
+            result = $.Deferred();
+
+        // force onValueChange to be executed if it has been deferred
+        that.inputPhase.resolve();
+
+        that.fetchPhase
+            .done(function () {
+                var index;
+
+                // When suggestion has already been selected and not modified
+                if (that.selection && !that.visible) {
+                    result.reject();
+                } else {
+                    index = that.findSuggestionIndex();
+
+                    that.select(index, selectionOptions);
+
+                    if (index === -1) {
+                        result.reject();
+                    } else {
+                        result.resolve(index);
+                    }
+                }
+            })
+            .fail(function () {
+                result.reject();
+            });
+
+        return result;
+    },
+
+    /**
+     * Selects first when user interaction is not supposed
+     */
+    selectFoundSuggestion: function () {
+        var that = this;
+
+        if (!that.requestMode.userSelect) {
+            that.select(0);
+        }
+    },
+
+    /**
+     * Selects current or first matched suggestion
+     * @returns {number} index of found suggestion
+     */
+    findSuggestionIndex: function() {
+        var that = this,
+            index = that.selectedIndex,
+            value;
+
+        if (index === -1) {
+            // matchers always operate with trimmed strings
+            value = $.trim(that.el.val());
+            if (value) {
+                $.each(that.type.matchers, function (i, matcher) {
+                    index = matcher(value, that.suggestions);
+                    return index === -1;
+                });
+            }
+        }
+
+        return index;
+    },
+
+    /**
+     * Selects a suggestion at specified index
+     * @param index index of suggestion to select. Can be -1
+     * @param {Object} selectionOptions
+     * @param {boolean} [selectionOptions.continueSelecting]  prevents hiding after selection
+     * @param {boolean} [selectionOptions.noSpace]  prevents adding space at the end of current value
+     */
+    select: function (index, selectionOptions) {
+        var that = this,
+            suggestion = that.suggestions[index],
+            continueSelecting = selectionOptions && selectionOptions.continueSelecting,
+            currentValue = that.currentValue,
+            hasSameValues;
+
+        // Prevent recursive execution
+        if (that.triggering['Select'])
+            return;
+
+        // if no suggestion to select
+        if (!suggestion) {
+            if (!continueSelecting && !that.selection) {
+                that.triggerOnSelectNothing();
+            }
+            that.onSelectComplete(continueSelecting);
+            return;
+        }
+
+        hasSameValues = that.hasSameValues(suggestion);
+
+        that.enrichSuggestion(suggestion, selectionOptions)
+            .done(function (enrichedSuggestion, hasBeenEnriched) {
+                that.selectSuggestion(enrichedSuggestion, index, currentValue, $.extend({
+                    hasBeenEnriched: hasBeenEnriched,
+                    hasSameValues: hasSameValues
+                }, selectionOptions));
+            });
+
+    },
+
+    /**
+     * Formats and selects final (enriched) suggestion
+     * @param suggestion
+     * @param index
+     * @param lastValue
+     * @param {Object} selectionOptions
+     * @param {boolean} [selectionOptions.continueSelecting]  prevents hiding after selection
+     * @param {boolean} [selectionOptions.noSpace]  prevents adding space at the end of current value
+     * @param {boolean} selectionOptions.hasBeenEnriched
+     * @param {boolean} selectionOptions.hasSameValues
+     */
+    selectSuggestion: function (suggestion, index, lastValue, selectionOptions) {
+        var that = this,
+            continueSelecting = selectionOptions.continueSelecting,
+            assumeDataComplete = !that.type.isDataComplete || that.type.isDataComplete.call(that, suggestion),
+            currentSelection = that.selection;
+
+        // Prevent recursive execution
+        if (that.triggering['Select'])
+            return;
+
+        if (that.type.alwaysContinueSelecting) {
+            continueSelecting = true;
+        }
+
+        if (assumeDataComplete) {
+            continueSelecting = false;
+        }
+
+        // `suggestions` cat be empty, e.g. during `fixData`
+        if (selectionOptions.hasBeenEnriched && that.suggestions[index]) {
+            that.suggestions[index].data = suggestion.data;
+        }
+
+        if (that.requestMode.updateValue) {
+            that.checkValueBounds(suggestion);
+            that.currentValue = that.getSuggestionValue(suggestion, selectionOptions);
+
+            if (that.currentValue && !selectionOptions.noSpace && !assumeDataComplete) {
+                that.currentValue += ' ';
+            }
+            that.el.val(that.currentValue);
+        }
+
+        if (that.currentValue) {
+            that.selection = suggestion;
+            if (!that.areSuggestionsSame(suggestion, currentSelection)) {
+                that.trigger('Select', suggestion, that.currentValue != lastValue);
+            }
+            if (that.requestMode.userSelect) {
+                that.onSelectComplete(continueSelecting);
+            }
+        } else {
+            that.selection = null;
+            that.triggerOnSelectNothing();
+        }
+
+        that.shareWithParent(suggestion);
+    },
+
+    onSelectComplete: function (continueSelecting) {
+        var that = this;
+
+        if (continueSelecting) {
+            that.selectedIndex = -1;
+            that.updateSuggestions(that.currentValue);
+        } else {
+            that.hide();
+        }
+    },
+
+    triggerOnSelectNothing: function () {
+        var that = this;
+
+        if (!that.triggering['SelectNothing']) {
+            that.trigger('SelectNothing', that.currentValue);
+        }
+    },
+
+    trigger: function (event) {
+        var that = this,
+            args = utils.slice(arguments, 1),
+            callback = that.options['on' + event];
+
+        that.triggering[event] = true;
+        if ($.isFunction(callback)) {
+            callback.apply(that.element, args);
+        }
+        that.el.trigger.call(that.el, 'suggestions-' + event.toLowerCase(), args);
+        that.triggering[event] = false;
+    }
+
+};
+
+$.extend(Suggestions.prototype, methods$7);
+
+notificator
+    .on('assignSuggestions', methods$7.selectFoundSuggestion);
+
+/**
+ * features for connected instances
+ */
+
+var optionsUsed$3 = {
+    bounds: null
+};
+
+var methods$8 = {
+
+    setupBounds: function () {
+        this.bounds = {
+            from: null,
+            to: null
+        };
+    },
+
+    setBoundsOptions: function () {
+        var that = this,
+            boundsAvailable = [],
+            newBounds = $.trim(that.options.bounds).split('-'),
+            boundFrom = newBounds[0],
+            boundTo = newBounds[newBounds.length - 1],
+            boundsOwn = [],
+            boundIsOwn,
+            boundsAll = [],
+            indexTo;
+
+        if (that.type.dataComponents) {
+            $.each(that.type.dataComponents, function () {
+                if (this.forBounds) {
+                    boundsAvailable.push(this.id);
+                }
+            });
+        }
+
+        if ($.inArray(boundFrom, boundsAvailable) === -1) {
+            boundFrom = null;
+        }
+
+        indexTo = $.inArray(boundTo, boundsAvailable);
+        if (indexTo === -1 || indexTo === boundsAvailable.length - 1) {
+            boundTo = null;
+        }
+
+        if (boundFrom || boundTo) {
+            boundIsOwn = !boundFrom;
+            $.each(boundsAvailable, function (i, bound) {
+                if (bound == boundFrom) {
+                    boundIsOwn = true;
+                }
+                boundsAll.push(bound);
+                if (boundIsOwn) {
+                    boundsOwn.push(bound);
+                }
+                if (bound == boundTo) {
+                    return false;
+                }
+            });
+        }
+
+        that.bounds.from = boundFrom;
+        that.bounds.to = boundTo;
+        that.bounds.all = boundsAll;
+        that.bounds.own = boundsOwn;
+    },
+
+    constructBoundsParams: function () {
+        var that = this,
+            params = {};
+
+        if (that.bounds.from) {
+            params['from_bound'] = { value: that.bounds.from };
+        }
+        if (that.bounds.to) {
+            params['to_bound'] = { value: that.bounds.to };
+        }
+
+        return params;
+    },
+
+    /**
+     * Подстраивает suggestion.value под that.bounds.own
+     * Ничего не возвращает, меняет в самом suggestion
+     * @param suggestion
+     */
+    checkValueBounds: function (suggestion) {
+        var that = this,
+            valueData;
+
+        // If any bounds set up
+        if (that.bounds.own.length && that.type.composeValue) {
+            // делаем копию
+            var bounds = that.bounds.own.slice(0);
+            // если роль текущего инстанса плагина показывать только район города
+            // то для корректного формировния нужен city_district_fias_id
+            if (bounds.length === 1 && bounds[0] === 'city_district') {
+                bounds.push('city_district_fias_id');
+            }
+            valueData = that.copyDataComponents(suggestion.data, bounds);
+            suggestion.value = that.type.composeValue(valueData);
+        }
+    },
+
+    copyDataComponents: function (data, components) {
+        var result = {},
+            dataComponentsById = this.type.dataComponentsById;
+
+        if (dataComponentsById) {
+            $.each(components, function (i, component) {
+                $.each(dataComponentsById[component].fields, function (i, field) {
+                    if (data[field] != null) {
+                        result[field] = data[field];
+                    }
+                });
+            });
+        }
+
+        return result;
+    },
+
+    getBoundedKladrId: function (kladr_id, boundsRange) {
+        var boundTo = boundsRange[boundsRange.length - 1],
+            kladrFormat;
+
+        $.each(this.type.dataComponents, function(i, component){
+            if (component.id === boundTo) {
+                kladrFormat = component.kladrFormat;
+                return false;
+            }
+        });
+
+        return kladr_id.substr(0, kladrFormat.digits) + (new Array((kladrFormat.zeros || 0) + 1).join('0'));
+    }
+
+};
+
+$.extend(DEFAULT_OPTIONS, optionsUsed$3);
+
+$.extend(Suggestions.prototype, methods$8);
+
+notificator
+    .on('initialize', methods$8.setupBounds)
+    .on('setOptions', methods$8.setBoundsOptions)
+    .on('requestParams', methods$8.constructBoundsParams);
+
+Suggestions.defaultOptions = DEFAULT_OPTIONS;
+
+Suggestions.version = '17.5.0';
+
+$.Suggestions = Suggestions;
+
+// Create chainable jQuery plugin:
+$.fn.suggestions = function (options, args) {
+    // If function invoked without argument return
+    // instance of the first matched element:
+    if (arguments.length === 0) {
+        return this.first().data(DATA_ATTR_KEY);
+    }
+
+    return this.each(function () {
+        var inputElement = $(this),
+            instance = inputElement.data(DATA_ATTR_KEY);
+
+        if (typeof options === 'string') {
+            if (instance && typeof instance[options] === 'function') {
+                instance[options](args);
+            }
+        } else {
+            // If instance already exists, destroy it:
+            if (instance && instance.dispose) {
+                instance.dispose();
+            }
+            instance = new Suggestions(this, options);
+            inputElement.data(DATA_ATTR_KEY, instance);
+        }
+    });
+};
+
+})));
+
 /*
  * Author: Alex Gibson
  * https://github.com/alexgibson/notify.js
@@ -92446,63 +92446,6 @@ the specific language governing permissions and limitations under the Apache Lic
     }
 })(jQuery);
 
-/*!
- * tablesort v4.0.1 (2016-07-23)
- * http://tristen.ca/tablesort/demo/
- * Copyright (c) 2016 ; Licensed MIT
- */!function(){function a(b,c){if(!(this instanceof a))return new a(b,c);if(!b||"TABLE"!==b.tagName)throw new Error("Element must be a table");this.init(b,c||{})}var b=[],c=function(a){var b;return window.CustomEvent&&"function"==typeof window.CustomEvent?b=new CustomEvent(a):(b=document.createEvent("CustomEvent"),b.initCustomEvent(a,!1,!1,void 0)),b},d=function(a){return a.getAttribute("data-sort")||a.textContent||a.innerText||""},e=function(a,b){return a=a.toLowerCase(),b=b.toLowerCase(),a===b?0:b>a?1:-1},f=function(a,b){return function(c,d){var e=a(c.td,d.td);return 0===e?b?d.index-c.index:c.index-d.index:e}};a.extend=function(a,c,d){if("function"!=typeof c||"function"!=typeof d)throw new Error("Pattern and sort must be a function");b.push({name:a,pattern:c,sort:d})},a.prototype={init:function(a,b){var c,d,e,f,g=this;if(g.table=a,g.thead=!1,g.options=b,a.rows&&a.rows.length>0)if(a.tHead&&a.tHead.rows.length>0){for(e=0;e<a.tHead.rows.length;e++)if(a.tHead.rows[e].classList.contains("sort-row")){c=a.tHead.rows[e];break}c||(c=a.tHead.rows[a.tHead.rows.length-1]),g.thead=!0}else c=a.rows[0];if(c){var h=function(){g.current&&g.current!==this&&(g.current.classList.remove("sort-up"),g.current.classList.remove("sort-down")),g.current=this,g.sortTable(this)};for(e=0;e<c.cells.length;e++)f=c.cells[e],f.classList.contains("no-sort")||(f.classList.add("sort-header"),f.tabindex=0,f.addEventListener("click",h,!1),f.classList.contains("sort-default")&&(d=f));d&&(g.current=d,g.sortTable(d))}},sortTable:function(a,g){var h,i=this,j=a.cellIndex,k=e,l="",m=[],n=i.thead?0:1,o=a.getAttribute("data-sort-method"),p=a.getAttribute("data-sort-order");if(i.table.dispatchEvent(c("beforeSort")),g?h=a.classList.contains("sort-up")?"sort-up":"sort-down":(h=a.classList.contains("sort-up")?"sort-down":a.classList.contains("sort-down")?"sort-up":"asc"===p?"sort-down":"desc"===p?"sort-up":i.options.descending?"sort-up":"sort-down",a.classList.remove("sort-down"===h?"sort-up":"sort-down"),a.classList.add(h)),!(i.table.rows.length<2)){if(!o){for(;m.length<3&&n<i.table.tBodies[0].rows.length;)l=d(i.table.tBodies[0].rows[n].cells[j]),l=l.trim(),l.length>0&&m.push(l),n++;if(!m)return}for(n=0;n<b.length;n++)if(l=b[n],o){if(l.name===o){k=l.sort;break}}else if(m.every(l.pattern)){k=l.sort;break}for(i.col=j,n=0;n<i.table.tBodies.length;n++){var q,r=[],s={},t=0,u=0;if(!(i.table.tBodies[n].rows.length<2)){for(q=0;q<i.table.tBodies[n].rows.length;q++)l=i.table.tBodies[n].rows[q],l.classList.contains("no-sort")?s[t]=l:r.push({tr:l,td:d(l.cells[i.col]),index:t}),t++;for("sort-down"===h?(r.sort(f(k,!0)),r.reverse()):r.sort(f(k,!1)),q=0;t>q;q++)s[q]?(l=s[q],u++):l=r[q-u].tr,i.table.tBodies[n].appendChild(l)}}i.table.dispatchEvent(c("afterSort"))}},refresh:function(){void 0!==this.current&&this.sortTable(this.current,!0)}},"undefined"!=typeof module&&module.exports?module.exports=a:window.Tablesort=a}();
-/**
- * @requires tablesort.min.js
- */
-// Basic dates in dd/mm/yy or dd-mm-yy format.
-// Years can be 4 digits. Days and Months can be 1 or 2 digits.
-(function(){
-	var parseDate = function(date) {
-		date = date.replace(/\-/g, '/');
-		date = date.replace(/(\d{1,2})[\/\-](\d{1,2})[\/\-](\d{2})/, '$1/$2/$3'); // format before getTime
-		
-		return new Date(date).getTime() || -1;
-	};
-	
-	Tablesort.extend('date', function(item) {
-		return (
-				item.search(/(Mon|Tue|Wed|Thu|Fri|Sat|Sun)\.?\,?\s*/i) !== -1 ||
-				item.search(/\d{1,2}[\/\-]\d{1,2}[\/\-]\d{2,4}/) !== -1 ||
-				item.search(/(Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec)/i) !== -1
-			) && !isNaN(parseDate(item));
-	}, function(a, b) {
-		a = a.toLowerCase();
-		b = b.toLowerCase();
-		
-		return parseDate(b) - parseDate(a);
-	});
-}());
-(function(){
-	var cleanNumber = function(i) {
-			return i.replace(/[^\-?0-9.]/g, '');
-		},
-		
-		compareNumber = function(a, b) {
-			a = parseFloat(a);
-			b = parseFloat(b);
-			
-			a = isNaN(a) ? 0 : a;
-			b = isNaN(b) ? 0 : b;
-			
-			return a - b;
-		};
-	
-	Tablesort.extend('number', function(item) {
-		return item.match(/^-?[£\x24Û¢´€]?\d+\s*([,\.]\d{0,2})/) || // Prefixed currency
-			item.match(/^-?\d+\s*([,\.]\d{0,2})?[£\x24Û¢´€]/) || // Suffixed currency
-			item.match(/^-?(\d)*-?([,\.]){0,1}-?(\d)+([E,e][\-+][\d]+)?%?$/); // Number
-	}, function(a, b) {
-		a = cleanNumber(a);
-		b = cleanNumber(b);
-		
-		return compareNumber(b, a);
-	});
-}());
 /**!
  * Sortable
  * @author	RubaXa   <trash@rubaxa.org>
@@ -94058,4 +94001,2385 @@ the specific language governing permissions and limitations under the Apache Lic
 
 		return (retVal === void 0) ? this : retVal;
 	};
+});
+
+/*!
+ * tablesort v4.0.1 (2016-07-23)
+ * http://tristen.ca/tablesort/demo/
+ * Copyright (c) 2016 ; Licensed MIT
+ */!function(){function a(b,c){if(!(this instanceof a))return new a(b,c);if(!b||"TABLE"!==b.tagName)throw new Error("Element must be a table");this.init(b,c||{})}var b=[],c=function(a){var b;return window.CustomEvent&&"function"==typeof window.CustomEvent?b=new CustomEvent(a):(b=document.createEvent("CustomEvent"),b.initCustomEvent(a,!1,!1,void 0)),b},d=function(a){return a.getAttribute("data-sort")||a.textContent||a.innerText||""},e=function(a,b){return a=a.toLowerCase(),b=b.toLowerCase(),a===b?0:b>a?1:-1},f=function(a,b){return function(c,d){var e=a(c.td,d.td);return 0===e?b?d.index-c.index:c.index-d.index:e}};a.extend=function(a,c,d){if("function"!=typeof c||"function"!=typeof d)throw new Error("Pattern and sort must be a function");b.push({name:a,pattern:c,sort:d})},a.prototype={init:function(a,b){var c,d,e,f,g=this;if(g.table=a,g.thead=!1,g.options=b,a.rows&&a.rows.length>0)if(a.tHead&&a.tHead.rows.length>0){for(e=0;e<a.tHead.rows.length;e++)if(a.tHead.rows[e].classList.contains("sort-row")){c=a.tHead.rows[e];break}c||(c=a.tHead.rows[a.tHead.rows.length-1]),g.thead=!0}else c=a.rows[0];if(c){var h=function(){g.current&&g.current!==this&&(g.current.classList.remove("sort-up"),g.current.classList.remove("sort-down")),g.current=this,g.sortTable(this)};for(e=0;e<c.cells.length;e++)f=c.cells[e],f.classList.contains("no-sort")||(f.classList.add("sort-header"),f.tabindex=0,f.addEventListener("click",h,!1),f.classList.contains("sort-default")&&(d=f));d&&(g.current=d,g.sortTable(d))}},sortTable:function(a,g){var h,i=this,j=a.cellIndex,k=e,l="",m=[],n=i.thead?0:1,o=a.getAttribute("data-sort-method"),p=a.getAttribute("data-sort-order");if(i.table.dispatchEvent(c("beforeSort")),g?h=a.classList.contains("sort-up")?"sort-up":"sort-down":(h=a.classList.contains("sort-up")?"sort-down":a.classList.contains("sort-down")?"sort-up":"asc"===p?"sort-down":"desc"===p?"sort-up":i.options.descending?"sort-up":"sort-down",a.classList.remove("sort-down"===h?"sort-up":"sort-down"),a.classList.add(h)),!(i.table.rows.length<2)){if(!o){for(;m.length<3&&n<i.table.tBodies[0].rows.length;)l=d(i.table.tBodies[0].rows[n].cells[j]),l=l.trim(),l.length>0&&m.push(l),n++;if(!m)return}for(n=0;n<b.length;n++)if(l=b[n],o){if(l.name===o){k=l.sort;break}}else if(m.every(l.pattern)){k=l.sort;break}for(i.col=j,n=0;n<i.table.tBodies.length;n++){var q,r=[],s={},t=0,u=0;if(!(i.table.tBodies[n].rows.length<2)){for(q=0;q<i.table.tBodies[n].rows.length;q++)l=i.table.tBodies[n].rows[q],l.classList.contains("no-sort")?s[t]=l:r.push({tr:l,td:d(l.cells[i.col]),index:t}),t++;for("sort-down"===h?(r.sort(f(k,!0)),r.reverse()):r.sort(f(k,!1)),q=0;t>q;q++)s[q]?(l=s[q],u++):l=r[q-u].tr,i.table.tBodies[n].appendChild(l)}}i.table.dispatchEvent(c("afterSort"))}},refresh:function(){void 0!==this.current&&this.sortTable(this.current,!0)}},"undefined"!=typeof module&&module.exports?module.exports=a:window.Tablesort=a}();
+/**
+ * @requires tablesort.min.js
+ */
+// Basic dates in dd/mm/yy or dd-mm-yy format.
+// Years can be 4 digits. Days and Months can be 1 or 2 digits.
+(function(){
+	var parseDate = function(date) {
+		date = date.replace(/\-/g, '/');
+		date = date.replace(/(\d{1,2})[\/\-](\d{1,2})[\/\-](\d{2})/, '$1/$2/$3'); // format before getTime
+		
+		return new Date(date).getTime() || -1;
+	};
+	
+	Tablesort.extend('date', function(item) {
+		return (
+				item.search(/(Mon|Tue|Wed|Thu|Fri|Sat|Sun)\.?\,?\s*/i) !== -1 ||
+				item.search(/\d{1,2}[\/\-]\d{1,2}[\/\-]\d{2,4}/) !== -1 ||
+				item.search(/(Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec)/i) !== -1
+			) && !isNaN(parseDate(item));
+	}, function(a, b) {
+		a = a.toLowerCase();
+		b = b.toLowerCase();
+		
+		return parseDate(b) - parseDate(a);
+	});
+}());
+(function(){
+	var cleanNumber = function(i) {
+			return i.replace(/[^\-?0-9.]/g, '');
+		},
+		
+		compareNumber = function(a, b) {
+			a = parseFloat(a);
+			b = parseFloat(b);
+			
+			a = isNaN(a) ? 0 : a;
+			b = isNaN(b) ? 0 : b;
+			
+			return a - b;
+		};
+	
+	Tablesort.extend('number', function(item) {
+		return item.match(/^-?[£\x24Û¢´€]?\d+\s*([,\.]\d{0,2})/) || // Prefixed currency
+			item.match(/^-?\d+\s*([,\.]\d{0,2})?[£\x24Û¢´€]/) || // Suffixed currency
+			item.match(/^-?(\d)*-?([,\.]){0,1}-?(\d)+([E,e][\-+][\d]+)?%?$/); // Number
+	}, function(a, b) {
+		a = cleanNumber(a);
+		b = cleanNumber(b);
+		
+		return compareNumber(b, a);
+	});
+}());
+// Spectrum Colorpicker v1.8.0
+// https://github.com/bgrins/spectrum
+// Author: Brian Grinstead
+// License: MIT
+
+(function (factory) {
+    "use strict";
+
+    if (typeof define === 'function' && define.amd) { // AMD
+        define(['jquery'], factory);
+    }
+    else if (typeof exports == "object" && typeof module == "object") { // CommonJS
+        module.exports = factory(require('jquery'));
+    }
+    else { // Browser
+        factory(jQuery);
+    }
+})(function($, undefined) {
+    "use strict";
+
+    var defaultOpts = {
+
+        // Callbacks
+        beforeShow: noop,
+        move: noop,
+        change: noop,
+        show: noop,
+        hide: noop,
+
+        // Options
+        color: false,
+        flat: false,
+        showInput: false,
+        allowEmpty: false,
+        showButtons: true,
+        clickoutFiresChange: true,
+        showInitial: false,
+        showPalette: false,
+        showPaletteOnly: false,
+        hideAfterPaletteSelect: false,
+        togglePaletteOnly: false,
+        showSelectionPalette: true,
+        localStorageKey: false,
+        appendTo: "body",
+        maxSelectionSize: 7,
+        cancelText: "cancel",
+        chooseText: "choose",
+        togglePaletteMoreText: "more",
+        togglePaletteLessText: "less",
+        clearText: "Clear Color Selection",
+        noColorSelectedText: "No Color Selected",
+        preferredFormat: false,
+        className: "", // Deprecated - use containerClassName and replacerClassName instead.
+        containerClassName: "",
+        replacerClassName: "",
+        showAlpha: false,
+        theme: "sp-light",
+        palette: [["#ffffff", "#000000", "#ff0000", "#ff8000", "#ffff00", "#008000", "#0000ff", "#4b0082", "#9400d3"]],
+        selectionPalette: [],
+        disabled: false,
+        offset: null
+    },
+    spectrums = [],
+    IE = !!/msie/i.exec( window.navigator.userAgent ),
+    rgbaSupport = (function() {
+        function contains( str, substr ) {
+            return !!~('' + str).indexOf(substr);
+        }
+
+        var elem = document.createElement('div');
+        var style = elem.style;
+        style.cssText = 'background-color:rgba(0,0,0,.5)';
+        return contains(style.backgroundColor, 'rgba') || contains(style.backgroundColor, 'hsla');
+    })(),
+    replaceInput = [
+        "<div class='sp-replacer'>",
+            "<div class='sp-preview'><div class='sp-preview-inner'></div></div>",
+            "<div class='sp-dd'>&#9660;</div>",
+        "</div>"
+    ].join(''),
+    markup = (function () {
+
+        // IE does not support gradients with multiple stops, so we need to simulate
+        //  that for the rainbow slider with 8 divs that each have a single gradient
+        var gradientFix = "";
+        if (IE) {
+            for (var i = 1; i <= 6; i++) {
+                gradientFix += "<div class='sp-" + i + "'></div>";
+            }
+        }
+
+        return [
+            "<div class='sp-container sp-hidden'>",
+                "<div class='sp-palette-container'>",
+                    "<div class='sp-palette sp-thumb sp-cf'></div>",
+                    "<div class='sp-palette-button-container sp-cf'>",
+                        "<button type='button' class='sp-palette-toggle'></button>",
+                    "</div>",
+                "</div>",
+                "<div class='sp-picker-container'>",
+                    "<div class='sp-top sp-cf'>",
+                        "<div class='sp-fill'></div>",
+                        "<div class='sp-top-inner'>",
+                            "<div class='sp-color'>",
+                                "<div class='sp-sat'>",
+                                    "<div class='sp-val'>",
+                                        "<div class='sp-dragger'></div>",
+                                    "</div>",
+                                "</div>",
+                            "</div>",
+                            "<div class='sp-clear sp-clear-display'>",
+                            "</div>",
+                            "<div class='sp-hue'>",
+                                "<div class='sp-slider'></div>",
+                                gradientFix,
+                            "</div>",
+                        "</div>",
+                        "<div class='sp-alpha'><div class='sp-alpha-inner'><div class='sp-alpha-handle'></div></div></div>",
+                    "</div>",
+                    "<div class='sp-input-container sp-cf'>",
+                        "<input class='sp-input' type='text' spellcheck='false'  />",
+                    "</div>",
+                    "<div class='sp-initial sp-thumb sp-cf'></div>",
+                    "<div class='sp-button-container sp-cf'>",
+                        "<a class='sp-cancel' href='#'></a>",
+                        "<button type='button' class='sp-choose'></button>",
+                    "</div>",
+                "</div>",
+            "</div>"
+        ].join("");
+    })();
+
+    function paletteTemplate (p, color, className, opts) {
+        var html = [];
+        for (var i = 0; i < p.length; i++) {
+            var current = p[i];
+            if(current) {
+                var tiny = tinycolor(current);
+                var c = tiny.toHsl().l < 0.5 ? "sp-thumb-el sp-thumb-dark" : "sp-thumb-el sp-thumb-light";
+                c += (tinycolor.equals(color, current)) ? " sp-thumb-active" : "";
+                var formattedString = tiny.toString(opts.preferredFormat || "rgb");
+                var swatchStyle = rgbaSupport ? ("background-color:" + tiny.toRgbString()) : "filter:" + tiny.toFilter();
+                html.push('<span title="' + formattedString + '" data-color="' + tiny.toRgbString() + '" class="' + c + '"><span class="sp-thumb-inner" style="' + swatchStyle + ';" /></span>');
+            } else {
+                var cls = 'sp-clear-display';
+                html.push($('<div />')
+                    .append($('<span data-color="" style="background-color:transparent;" class="' + cls + '"></span>')
+                        .attr('title', opts.noColorSelectedText)
+                    )
+                    .html()
+                );
+            }
+        }
+        return "<div class='sp-cf " + className + "'>" + html.join('') + "</div>";
+    }
+
+    function hideAll() {
+        for (var i = 0; i < spectrums.length; i++) {
+            if (spectrums[i]) {
+                spectrums[i].hide();
+            }
+        }
+    }
+
+    function instanceOptions(o, callbackContext) {
+        var opts = $.extend({}, defaultOpts, o);
+        opts.callbacks = {
+            'move': bind(opts.move, callbackContext),
+            'change': bind(opts.change, callbackContext),
+            'show': bind(opts.show, callbackContext),
+            'hide': bind(opts.hide, callbackContext),
+            'beforeShow': bind(opts.beforeShow, callbackContext)
+        };
+
+        return opts;
+    }
+
+    function spectrum(element, o) {
+
+        var opts = instanceOptions(o, element),
+            flat = opts.flat,
+            showSelectionPalette = opts.showSelectionPalette,
+            localStorageKey = opts.localStorageKey,
+            theme = opts.theme,
+            callbacks = opts.callbacks,
+            resize = throttle(reflow, 10),
+            visible = false,
+            isDragging = false,
+            dragWidth = 0,
+            dragHeight = 0,
+            dragHelperHeight = 0,
+            slideHeight = 0,
+            slideWidth = 0,
+            alphaWidth = 0,
+            alphaSlideHelperWidth = 0,
+            slideHelperHeight = 0,
+            currentHue = 0,
+            currentSaturation = 0,
+            currentValue = 0,
+            currentAlpha = 1,
+            palette = [],
+            paletteArray = [],
+            paletteLookup = {},
+            selectionPalette = opts.selectionPalette.slice(0),
+            maxSelectionSize = opts.maxSelectionSize,
+            draggingClass = "sp-dragging",
+            shiftMovementDirection = null;
+
+        var doc = element.ownerDocument,
+            body = doc.body,
+            boundElement = $(element),
+            disabled = false,
+            container = $(markup, doc).addClass(theme),
+            pickerContainer = container.find(".sp-picker-container"),
+            dragger = container.find(".sp-color"),
+            dragHelper = container.find(".sp-dragger"),
+            slider = container.find(".sp-hue"),
+            slideHelper = container.find(".sp-slider"),
+            alphaSliderInner = container.find(".sp-alpha-inner"),
+            alphaSlider = container.find(".sp-alpha"),
+            alphaSlideHelper = container.find(".sp-alpha-handle"),
+            textInput = container.find(".sp-input"),
+            paletteContainer = container.find(".sp-palette"),
+            initialColorContainer = container.find(".sp-initial"),
+            cancelButton = container.find(".sp-cancel"),
+            clearButton = container.find(".sp-clear"),
+            chooseButton = container.find(".sp-choose"),
+            toggleButton = container.find(".sp-palette-toggle"),
+            isInput = boundElement.is("input"),
+            isInputTypeColor = isInput && boundElement.attr("type") === "color" && inputTypeColorSupport(),
+            shouldReplace = isInput && !flat,
+            replacer = (shouldReplace) ? $(replaceInput).addClass(theme).addClass(opts.className).addClass(opts.replacerClassName) : $([]),
+            offsetElement = (shouldReplace) ? replacer : boundElement,
+            previewElement = replacer.find(".sp-preview-inner"),
+            initialColor = opts.color || (isInput && boundElement.val()),
+            colorOnShow = false,
+            currentPreferredFormat = opts.preferredFormat,
+            clickoutFiresChange = !opts.showButtons || opts.clickoutFiresChange,
+            isEmpty = !initialColor,
+            allowEmpty = opts.allowEmpty && !isInputTypeColor;
+
+        function applyOptions() {
+
+            if (opts.showPaletteOnly) {
+                opts.showPalette = true;
+            }
+
+            toggleButton.text(opts.showPaletteOnly ? opts.togglePaletteMoreText : opts.togglePaletteLessText);
+
+            if (opts.palette) {
+                palette = opts.palette.slice(0);
+                paletteArray = $.isArray(palette[0]) ? palette : [palette];
+                paletteLookup = {};
+                for (var i = 0; i < paletteArray.length; i++) {
+                    for (var j = 0; j < paletteArray[i].length; j++) {
+                        var rgb = tinycolor(paletteArray[i][j]).toRgbString();
+                        paletteLookup[rgb] = true;
+                    }
+                }
+            }
+
+            container.toggleClass("sp-flat", flat);
+            container.toggleClass("sp-input-disabled", !opts.showInput);
+            container.toggleClass("sp-alpha-enabled", opts.showAlpha);
+            container.toggleClass("sp-clear-enabled", allowEmpty);
+            container.toggleClass("sp-buttons-disabled", !opts.showButtons);
+            container.toggleClass("sp-palette-buttons-disabled", !opts.togglePaletteOnly);
+            container.toggleClass("sp-palette-disabled", !opts.showPalette);
+            container.toggleClass("sp-palette-only", opts.showPaletteOnly);
+            container.toggleClass("sp-initial-disabled", !opts.showInitial);
+            container.addClass(opts.className).addClass(opts.containerClassName);
+
+            reflow();
+        }
+
+        function initialize() {
+
+            if (IE) {
+                container.find("*:not(input)").attr("unselectable", "on");
+            }
+
+            applyOptions();
+
+            if (shouldReplace) {
+                boundElement.after(replacer).hide();
+            }
+
+            if (!allowEmpty) {
+                clearButton.hide();
+            }
+
+            if (flat) {
+                boundElement.after(container).hide();
+            }
+            else {
+
+                var appendTo = opts.appendTo === "parent" ? boundElement.parent() : $(opts.appendTo);
+                if (appendTo.length !== 1) {
+                    appendTo = $("body");
+                }
+
+                appendTo.append(container);
+            }
+
+            updateSelectionPaletteFromStorage();
+
+            offsetElement.bind("click.spectrum touchstart.spectrum", function (e) {
+                if (!disabled) {
+                    toggle();
+                }
+
+                e.stopPropagation();
+
+                if (!$(e.target).is("input")) {
+                    e.preventDefault();
+                }
+            });
+
+            if(boundElement.is(":disabled") || (opts.disabled === true)) {
+                disable();
+            }
+
+            // Prevent clicks from bubbling up to document.  This would cause it to be hidden.
+            container.click(stopPropagation);
+
+            // Handle user typed input
+            textInput.change(setFromTextInput);
+            textInput.bind("paste", function () {
+                setTimeout(setFromTextInput, 1);
+            });
+            textInput.keydown(function (e) { if (e.keyCode == 13) { setFromTextInput(); } });
+
+            cancelButton.text(opts.cancelText);
+            cancelButton.bind("click.spectrum", function (e) {
+                e.stopPropagation();
+                e.preventDefault();
+                revert();
+                hide();
+            });
+
+            clearButton.attr("title", opts.clearText);
+            clearButton.bind("click.spectrum", function (e) {
+                e.stopPropagation();
+                e.preventDefault();
+                isEmpty = true;
+                move();
+
+                if(flat) {
+                    //for the flat style, this is a change event
+                    updateOriginalInput(true);
+                }
+            });
+
+            chooseButton.text(opts.chooseText);
+            chooseButton.bind("click.spectrum", function (e) {
+                e.stopPropagation();
+                e.preventDefault();
+
+                if (IE && textInput.is(":focus")) {
+                    textInput.trigger('change');
+                }
+
+                if (isValid()) {
+                    updateOriginalInput(true);
+                    hide();
+                }
+            });
+
+            toggleButton.text(opts.showPaletteOnly ? opts.togglePaletteMoreText : opts.togglePaletteLessText);
+            toggleButton.bind("click.spectrum", function (e) {
+                e.stopPropagation();
+                e.preventDefault();
+
+                opts.showPaletteOnly = !opts.showPaletteOnly;
+
+                // To make sure the Picker area is drawn on the right, next to the
+                // Palette area (and not below the palette), first move the Palette
+                // to the left to make space for the picker, plus 5px extra.
+                // The 'applyOptions' function puts the whole container back into place
+                // and takes care of the button-text and the sp-palette-only CSS class.
+                if (!opts.showPaletteOnly && !flat) {
+                    container.css('left', '-=' + (pickerContainer.outerWidth(true) + 5));
+                }
+                applyOptions();
+            });
+
+            draggable(alphaSlider, function (dragX, dragY, e) {
+                currentAlpha = (dragX / alphaWidth);
+                isEmpty = false;
+                if (e.shiftKey) {
+                    currentAlpha = Math.round(currentAlpha * 10) / 10;
+                }
+
+                move();
+            }, dragStart, dragStop);
+
+            draggable(slider, function (dragX, dragY) {
+                currentHue = parseFloat(dragY / slideHeight);
+                isEmpty = false;
+                if (!opts.showAlpha) {
+                    currentAlpha = 1;
+                }
+                move();
+            }, dragStart, dragStop);
+
+            draggable(dragger, function (dragX, dragY, e) {
+
+                // shift+drag should snap the movement to either the x or y axis.
+                if (!e.shiftKey) {
+                    shiftMovementDirection = null;
+                }
+                else if (!shiftMovementDirection) {
+                    var oldDragX = currentSaturation * dragWidth;
+                    var oldDragY = dragHeight - (currentValue * dragHeight);
+                    var furtherFromX = Math.abs(dragX - oldDragX) > Math.abs(dragY - oldDragY);
+
+                    shiftMovementDirection = furtherFromX ? "x" : "y";
+                }
+
+                var setSaturation = !shiftMovementDirection || shiftMovementDirection === "x";
+                var setValue = !shiftMovementDirection || shiftMovementDirection === "y";
+
+                if (setSaturation) {
+                    currentSaturation = parseFloat(dragX / dragWidth);
+                }
+                if (setValue) {
+                    currentValue = parseFloat((dragHeight - dragY) / dragHeight);
+                }
+
+                isEmpty = false;
+                if (!opts.showAlpha) {
+                    currentAlpha = 1;
+                }
+
+                move();
+
+            }, dragStart, dragStop);
+
+            if (!!initialColor) {
+                set(initialColor);
+
+                // In case color was black - update the preview UI and set the format
+                // since the set function will not run (default color is black).
+                updateUI();
+                currentPreferredFormat = opts.preferredFormat || tinycolor(initialColor).format;
+
+                addColorToSelectionPalette(initialColor);
+            }
+            else {
+                updateUI();
+            }
+
+            if (flat) {
+                show();
+            }
+
+            function paletteElementClick(e) {
+                if (e.data && e.data.ignore) {
+                    set($(e.target).closest(".sp-thumb-el").data("color"));
+                    move();
+                }
+                else {
+                    set($(e.target).closest(".sp-thumb-el").data("color"));
+                    move();
+                    updateOriginalInput(true);
+                    if (opts.hideAfterPaletteSelect) {
+                      hide();
+                    }
+                }
+
+                return false;
+            }
+
+            var paletteEvent = IE ? "mousedown.spectrum" : "click.spectrum touchstart.spectrum";
+            paletteContainer.delegate(".sp-thumb-el", paletteEvent, paletteElementClick);
+            initialColorContainer.delegate(".sp-thumb-el:nth-child(1)", paletteEvent, { ignore: true }, paletteElementClick);
+        }
+
+        function updateSelectionPaletteFromStorage() {
+
+            if (localStorageKey && window.localStorage) {
+
+                // Migrate old palettes over to new format.  May want to remove this eventually.
+                try {
+                    var oldPalette = window.localStorage[localStorageKey].split(",#");
+                    if (oldPalette.length > 1) {
+                        delete window.localStorage[localStorageKey];
+                        $.each(oldPalette, function(i, c) {
+                             addColorToSelectionPalette(c);
+                        });
+                    }
+                }
+                catch(e) { }
+
+                try {
+                    selectionPalette = window.localStorage[localStorageKey].split(";");
+                }
+                catch (e) { }
+            }
+        }
+
+        function addColorToSelectionPalette(color) {
+            if (showSelectionPalette) {
+                var rgb = tinycolor(color).toRgbString();
+                if (!paletteLookup[rgb] && $.inArray(rgb, selectionPalette) === -1) {
+                    selectionPalette.push(rgb);
+                    while(selectionPalette.length > maxSelectionSize) {
+                        selectionPalette.shift();
+                    }
+                }
+
+                if (localStorageKey && window.localStorage) {
+                    try {
+                        window.localStorage[localStorageKey] = selectionPalette.join(";");
+                    }
+                    catch(e) { }
+                }
+            }
+        }
+
+        function getUniqueSelectionPalette() {
+            var unique = [];
+            if (opts.showPalette) {
+                for (var i = 0; i < selectionPalette.length; i++) {
+                    var rgb = tinycolor(selectionPalette[i]).toRgbString();
+
+                    if (!paletteLookup[rgb]) {
+                        unique.push(selectionPalette[i]);
+                    }
+                }
+            }
+
+            return unique.reverse().slice(0, opts.maxSelectionSize);
+        }
+
+        function drawPalette() {
+
+            var currentColor = get();
+
+            var html = $.map(paletteArray, function (palette, i) {
+                return paletteTemplate(palette, currentColor, "sp-palette-row sp-palette-row-" + i, opts);
+            });
+
+            updateSelectionPaletteFromStorage();
+
+            if (selectionPalette) {
+                html.push(paletteTemplate(getUniqueSelectionPalette(), currentColor, "sp-palette-row sp-palette-row-selection", opts));
+            }
+
+            paletteContainer.html(html.join(""));
+        }
+
+        function drawInitial() {
+            if (opts.showInitial) {
+                var initial = colorOnShow;
+                var current = get();
+                initialColorContainer.html(paletteTemplate([initial, current], current, "sp-palette-row-initial", opts));
+            }
+        }
+
+        function dragStart() {
+            if (dragHeight <= 0 || dragWidth <= 0 || slideHeight <= 0) {
+                reflow();
+            }
+            isDragging = true;
+            container.addClass(draggingClass);
+            shiftMovementDirection = null;
+            boundElement.trigger('dragstart.spectrum', [ get() ]);
+        }
+
+        function dragStop() {
+            isDragging = false;
+            container.removeClass(draggingClass);
+            boundElement.trigger('dragstop.spectrum', [ get() ]);
+        }
+
+        function setFromTextInput() {
+
+            var value = textInput.val();
+
+            if ((value === null || value === "") && allowEmpty) {
+                set(null);
+                updateOriginalInput(true);
+            }
+            else {
+                var tiny = tinycolor(value);
+                if (tiny.isValid()) {
+                    set(tiny);
+                    updateOriginalInput(true);
+                }
+                else {
+                    textInput.addClass("sp-validation-error");
+                }
+            }
+        }
+
+        function toggle() {
+            if (visible) {
+                hide();
+            }
+            else {
+                show();
+            }
+        }
+
+        function show() {
+            var event = $.Event('beforeShow.spectrum');
+
+            if (visible) {
+                reflow();
+                return;
+            }
+
+            boundElement.trigger(event, [ get() ]);
+
+            if (callbacks.beforeShow(get()) === false || event.isDefaultPrevented()) {
+                return;
+            }
+
+            hideAll();
+            visible = true;
+
+            $(doc).bind("keydown.spectrum", onkeydown);
+            $(doc).bind("click.spectrum", clickout);
+            $(window).bind("resize.spectrum", resize);
+            replacer.addClass("sp-active");
+            container.removeClass("sp-hidden");
+
+            reflow();
+            updateUI();
+
+            colorOnShow = get();
+
+            drawInitial();
+            callbacks.show(colorOnShow);
+            boundElement.trigger('show.spectrum', [ colorOnShow ]);
+        }
+
+        function onkeydown(e) {
+            // Close on ESC
+            if (e.keyCode === 27) {
+                hide();
+            }
+        }
+
+        function clickout(e) {
+            // Return on right click.
+            if (e.button == 2) { return; }
+
+            // If a drag event was happening during the mouseup, don't hide
+            // on click.
+            if (isDragging) { return; }
+
+            if (clickoutFiresChange) {
+                updateOriginalInput(true);
+            }
+            else {
+                revert();
+            }
+            hide();
+        }
+
+        function hide() {
+            // Return if hiding is unnecessary
+            if (!visible || flat) { return; }
+            visible = false;
+
+            $(doc).unbind("keydown.spectrum", onkeydown);
+            $(doc).unbind("click.spectrum", clickout);
+            $(window).unbind("resize.spectrum", resize);
+
+            replacer.removeClass("sp-active");
+            container.addClass("sp-hidden");
+
+            callbacks.hide(get());
+            boundElement.trigger('hide.spectrum', [ get() ]);
+        }
+
+        function revert() {
+            set(colorOnShow, true);
+        }
+
+        function set(color, ignoreFormatChange) {
+            if (tinycolor.equals(color, get())) {
+                // Update UI just in case a validation error needs
+                // to be cleared.
+                updateUI();
+                return;
+            }
+
+            var newColor, newHsv;
+            if (!color && allowEmpty) {
+                isEmpty = true;
+            } else {
+                isEmpty = false;
+                newColor = tinycolor(color);
+                newHsv = newColor.toHsv();
+
+                currentHue = (newHsv.h % 360) / 360;
+                currentSaturation = newHsv.s;
+                currentValue = newHsv.v;
+                currentAlpha = newHsv.a;
+            }
+            updateUI();
+
+            if (newColor && newColor.isValid() && !ignoreFormatChange) {
+                currentPreferredFormat = opts.preferredFormat || newColor.getFormat();
+            }
+        }
+
+        function get(opts) {
+            opts = opts || { };
+
+            if (allowEmpty && isEmpty) {
+                return null;
+            }
+
+            return tinycolor.fromRatio({
+                h: currentHue,
+                s: currentSaturation,
+                v: currentValue,
+                a: Math.round(currentAlpha * 100) / 100
+            }, { format: opts.format || currentPreferredFormat });
+        }
+
+        function isValid() {
+            return !textInput.hasClass("sp-validation-error");
+        }
+
+        function move() {
+            updateUI();
+
+            callbacks.move(get());
+            boundElement.trigger('move.spectrum', [ get() ]);
+        }
+
+        function updateUI() {
+
+            textInput.removeClass("sp-validation-error");
+
+            updateHelperLocations();
+
+            // Update dragger background color (gradients take care of saturation and value).
+            var flatColor = tinycolor.fromRatio({ h: currentHue, s: 1, v: 1 });
+            dragger.css("background-color", flatColor.toHexString());
+
+            // Get a format that alpha will be included in (hex and names ignore alpha)
+            var format = currentPreferredFormat;
+            if (currentAlpha < 1 && !(currentAlpha === 0 && format === "name")) {
+                if (format === "hex" || format === "hex3" || format === "hex6" || format === "name") {
+                    format = "rgb";
+                }
+            }
+
+            var realColor = get({ format: format }),
+                displayColor = '';
+
+             //reset background info for preview element
+            previewElement.removeClass("sp-clear-display");
+            previewElement.css('background-color', 'transparent');
+
+            if (!realColor && allowEmpty) {
+                // Update the replaced elements background with icon indicating no color selection
+                previewElement.addClass("sp-clear-display");
+            }
+            else {
+                var realHex = realColor.toHexString(),
+                    realRgb = realColor.toRgbString();
+
+                // Update the replaced elements background color (with actual selected color)
+                if (rgbaSupport || realColor.alpha === 1) {
+                    previewElement.css("background-color", realRgb);
+                }
+                else {
+                    previewElement.css("background-color", "transparent");
+                    previewElement.css("filter", realColor.toFilter());
+                }
+
+                if (opts.showAlpha) {
+                    var rgb = realColor.toRgb();
+                    rgb.a = 0;
+                    var realAlpha = tinycolor(rgb).toRgbString();
+                    var gradient = "linear-gradient(left, " + realAlpha + ", " + realHex + ")";
+
+                    if (IE) {
+                        alphaSliderInner.css("filter", tinycolor(realAlpha).toFilter({ gradientType: 1 }, realHex));
+                    }
+                    else {
+                        alphaSliderInner.css("background", "-webkit-" + gradient);
+                        alphaSliderInner.css("background", "-moz-" + gradient);
+                        alphaSliderInner.css("background", "-ms-" + gradient);
+                        // Use current syntax gradient on unprefixed property.
+                        alphaSliderInner.css("background",
+                            "linear-gradient(to right, " + realAlpha + ", " + realHex + ")");
+                    }
+                }
+
+                displayColor = realColor.toString(format);
+            }
+
+            // Update the text entry input as it changes happen
+            if (opts.showInput) {
+                textInput.val(displayColor);
+            }
+
+            if (opts.showPalette) {
+                drawPalette();
+            }
+
+            drawInitial();
+        }
+
+        function updateHelperLocations() {
+            var s = currentSaturation;
+            var v = currentValue;
+
+            if(allowEmpty && isEmpty) {
+                //if selected color is empty, hide the helpers
+                alphaSlideHelper.hide();
+                slideHelper.hide();
+                dragHelper.hide();
+            }
+            else {
+                //make sure helpers are visible
+                alphaSlideHelper.show();
+                slideHelper.show();
+                dragHelper.show();
+
+                // Where to show the little circle in that displays your current selected color
+                var dragX = s * dragWidth;
+                var dragY = dragHeight - (v * dragHeight);
+                dragX = Math.max(
+                    -dragHelperHeight,
+                    Math.min(dragWidth - dragHelperHeight, dragX - dragHelperHeight)
+                );
+                dragY = Math.max(
+                    -dragHelperHeight,
+                    Math.min(dragHeight - dragHelperHeight, dragY - dragHelperHeight)
+                );
+                dragHelper.css({
+                    "top": dragY + "px",
+                    "left": dragX + "px"
+                });
+
+                var alphaX = currentAlpha * alphaWidth;
+                alphaSlideHelper.css({
+                    "left": (alphaX - (alphaSlideHelperWidth / 2)) + "px"
+                });
+
+                // Where to show the bar that displays your current selected hue
+                var slideY = (currentHue) * slideHeight;
+                slideHelper.css({
+                    "top": (slideY - slideHelperHeight) + "px"
+                });
+            }
+        }
+
+        function updateOriginalInput(fireCallback) {
+            var color = get(),
+                displayColor = '',
+                hasChanged = !tinycolor.equals(color, colorOnShow);
+
+            if (color) {
+                displayColor = color.toString(currentPreferredFormat);
+                // Update the selection palette with the current color
+                addColorToSelectionPalette(color);
+            }
+
+            if (isInput) {
+                boundElement.val(displayColor);
+            }
+
+            if (fireCallback && hasChanged) {
+                callbacks.change(color);
+                boundElement.trigger('change', [ color ]);
+            }
+        }
+
+        function reflow() {
+            if (!visible) {
+                return; // Calculations would be useless and wouldn't be reliable anyways
+            }
+            dragWidth = dragger.width();
+            dragHeight = dragger.height();
+            dragHelperHeight = dragHelper.height();
+            slideWidth = slider.width();
+            slideHeight = slider.height();
+            slideHelperHeight = slideHelper.height();
+            alphaWidth = alphaSlider.width();
+            alphaSlideHelperWidth = alphaSlideHelper.width();
+
+            if (!flat) {
+                container.css("position", "absolute");
+                if (opts.offset) {
+                    container.offset(opts.offset);
+                } else {
+                    container.offset(getOffset(container, offsetElement));
+                }
+            }
+
+            updateHelperLocations();
+
+            if (opts.showPalette) {
+                drawPalette();
+            }
+
+            boundElement.trigger('reflow.spectrum');
+        }
+
+        function destroy() {
+            boundElement.show();
+            offsetElement.unbind("click.spectrum touchstart.spectrum");
+            container.remove();
+            replacer.remove();
+            spectrums[spect.id] = null;
+        }
+
+        function option(optionName, optionValue) {
+            if (optionName === undefined) {
+                return $.extend({}, opts);
+            }
+            if (optionValue === undefined) {
+                return opts[optionName];
+            }
+
+            opts[optionName] = optionValue;
+
+            if (optionName === "preferredFormat") {
+                currentPreferredFormat = opts.preferredFormat;
+            }
+            applyOptions();
+        }
+
+        function enable() {
+            disabled = false;
+            boundElement.attr("disabled", false);
+            offsetElement.removeClass("sp-disabled");
+        }
+
+        function disable() {
+            hide();
+            disabled = true;
+            boundElement.attr("disabled", true);
+            offsetElement.addClass("sp-disabled");
+        }
+
+        function setOffset(coord) {
+            opts.offset = coord;
+            reflow();
+        }
+
+        initialize();
+
+        var spect = {
+            show: show,
+            hide: hide,
+            toggle: toggle,
+            reflow: reflow,
+            option: option,
+            enable: enable,
+            disable: disable,
+            offset: setOffset,
+            set: function (c) {
+                set(c);
+                updateOriginalInput();
+            },
+            get: get,
+            destroy: destroy,
+            container: container
+        };
+
+        spect.id = spectrums.push(spect) - 1;
+
+        return spect;
+    }
+
+    /**
+    * checkOffset - get the offset below/above and left/right element depending on screen position
+    * Thanks https://github.com/jquery/jquery-ui/blob/master/ui/jquery.ui.datepicker.js
+    */
+    function getOffset(picker, input) {
+        var extraY = 0;
+        var dpWidth = picker.outerWidth();
+        var dpHeight = picker.outerHeight();
+        var inputHeight = input.outerHeight();
+        var doc = picker[0].ownerDocument;
+        var docElem = doc.documentElement;
+        var viewWidth = docElem.clientWidth + $(doc).scrollLeft();
+        var viewHeight = docElem.clientHeight + $(doc).scrollTop();
+        var offset = input.offset();
+        offset.top += inputHeight;
+
+        offset.left -=
+            Math.min(offset.left, (offset.left + dpWidth > viewWidth && viewWidth > dpWidth) ?
+            Math.abs(offset.left + dpWidth - viewWidth) : 0);
+
+        offset.top -=
+            Math.min(offset.top, ((offset.top + dpHeight > viewHeight && viewHeight > dpHeight) ?
+            Math.abs(dpHeight + inputHeight - extraY) : extraY));
+
+        return offset;
+    }
+
+    /**
+    * noop - do nothing
+    */
+    function noop() {
+
+    }
+
+    /**
+    * stopPropagation - makes the code only doing this a little easier to read in line
+    */
+    function stopPropagation(e) {
+        e.stopPropagation();
+    }
+
+    /**
+    * Create a function bound to a given object
+    * Thanks to underscore.js
+    */
+    function bind(func, obj) {
+        var slice = Array.prototype.slice;
+        var args = slice.call(arguments, 2);
+        return function () {
+            return func.apply(obj, args.concat(slice.call(arguments)));
+        };
+    }
+
+    /**
+    * Lightweight drag helper.  Handles containment within the element, so that
+    * when dragging, the x is within [0,element.width] and y is within [0,element.height]
+    */
+    function draggable(element, onmove, onstart, onstop) {
+        onmove = onmove || function () { };
+        onstart = onstart || function () { };
+        onstop = onstop || function () { };
+        var doc = document;
+        var dragging = false;
+        var offset = {};
+        var maxHeight = 0;
+        var maxWidth = 0;
+        var hasTouch = ('ontouchstart' in window);
+
+        var duringDragEvents = {};
+        duringDragEvents["selectstart"] = prevent;
+        duringDragEvents["dragstart"] = prevent;
+        duringDragEvents["touchmove mousemove"] = move;
+        duringDragEvents["touchend mouseup"] = stop;
+
+        function prevent(e) {
+            if (e.stopPropagation) {
+                e.stopPropagation();
+            }
+            if (e.preventDefault) {
+                e.preventDefault();
+            }
+            e.returnValue = false;
+        }
+
+        function move(e) {
+            if (dragging) {
+                // Mouseup happened outside of window
+                if (IE && doc.documentMode < 9 && !e.button) {
+                    return stop();
+                }
+
+                var t0 = e.originalEvent && e.originalEvent.touches && e.originalEvent.touches[0];
+                var pageX = t0 && t0.pageX || e.pageX;
+                var pageY = t0 && t0.pageY || e.pageY;
+
+                var dragX = Math.max(0, Math.min(pageX - offset.left, maxWidth));
+                var dragY = Math.max(0, Math.min(pageY - offset.top, maxHeight));
+
+                if (hasTouch) {
+                    // Stop scrolling in iOS
+                    prevent(e);
+                }
+
+                onmove.apply(element, [dragX, dragY, e]);
+            }
+        }
+
+        function start(e) {
+            var rightclick = (e.which) ? (e.which == 3) : (e.button == 2);
+
+            if (!rightclick && !dragging) {
+                if (onstart.apply(element, arguments) !== false) {
+                    dragging = true;
+                    maxHeight = $(element).height();
+                    maxWidth = $(element).width();
+                    offset = $(element).offset();
+
+                    $(doc).bind(duringDragEvents);
+                    $(doc.body).addClass("sp-dragging");
+
+                    move(e);
+
+                    prevent(e);
+                }
+            }
+        }
+
+        function stop() {
+            if (dragging) {
+                $(doc).unbind(duringDragEvents);
+                $(doc.body).removeClass("sp-dragging");
+
+                // Wait a tick before notifying observers to allow the click event
+                // to fire in Chrome.
+                setTimeout(function() {
+                    onstop.apply(element, arguments);
+                }, 0);
+            }
+            dragging = false;
+        }
+
+        $(element).bind("touchstart mousedown", start);
+    }
+
+    function throttle(func, wait, debounce) {
+        var timeout;
+        return function () {
+            var context = this, args = arguments;
+            var throttler = function () {
+                timeout = null;
+                func.apply(context, args);
+            };
+            if (debounce) clearTimeout(timeout);
+            if (debounce || !timeout) timeout = setTimeout(throttler, wait);
+        };
+    }
+
+    function inputTypeColorSupport() {
+        return $.fn.spectrum.inputTypeColorSupport();
+    }
+
+    /**
+    * Define a jQuery plugin
+    */
+    var dataID = "spectrum.id";
+    $.fn.spectrum = function (opts, extra) {
+
+        if (typeof opts == "string") {
+
+            var returnValue = this;
+            var args = Array.prototype.slice.call( arguments, 1 );
+
+            this.each(function () {
+                var spect = spectrums[$(this).data(dataID)];
+                if (spect) {
+                    var method = spect[opts];
+                    if (!method) {
+                        throw new Error( "Spectrum: no such method: '" + opts + "'" );
+                    }
+
+                    if (opts == "get") {
+                        returnValue = spect.get();
+                    }
+                    else if (opts == "container") {
+                        returnValue = spect.container;
+                    }
+                    else if (opts == "option") {
+                        returnValue = spect.option.apply(spect, args);
+                    }
+                    else if (opts == "destroy") {
+                        spect.destroy();
+                        $(this).removeData(dataID);
+                    }
+                    else {
+                        method.apply(spect, args);
+                    }
+                }
+            });
+
+            return returnValue;
+        }
+
+        // Initializing a new instance of spectrum
+        return this.spectrum("destroy").each(function () {
+            var options = $.extend({}, opts, $(this).data());
+            var spect = spectrum(this, options);
+            $(this).data(dataID, spect.id);
+        });
+    };
+
+    $.fn.spectrum.load = true;
+    $.fn.spectrum.loadOpts = {};
+    $.fn.spectrum.draggable = draggable;
+    $.fn.spectrum.defaults = defaultOpts;
+    $.fn.spectrum.inputTypeColorSupport = function inputTypeColorSupport() {
+        if (typeof inputTypeColorSupport._cachedResult === "undefined") {
+            var colorInput = $("<input type='color'/>")[0]; // if color element is supported, value will default to not null
+            inputTypeColorSupport._cachedResult = colorInput.type === "color" && colorInput.value !== "";
+        }
+        return inputTypeColorSupport._cachedResult;
+    };
+
+    $.spectrum = { };
+    $.spectrum.localization = { };
+    $.spectrum.palettes = { };
+
+    $.fn.spectrum.processNativeColorInputs = function () {
+        var colorInputs = $("input[type=color]");
+        if (colorInputs.length && !inputTypeColorSupport()) {
+            colorInputs.spectrum({
+                preferredFormat: "hex6"
+            });
+        }
+    };
+
+    // TinyColor v1.1.2
+    // https://github.com/bgrins/TinyColor
+    // Brian Grinstead, MIT License
+
+    (function() {
+
+    var trimLeft = /^[\s,#]+/,
+        trimRight = /\s+$/,
+        tinyCounter = 0,
+        math = Math,
+        mathRound = math.round,
+        mathMin = math.min,
+        mathMax = math.max,
+        mathRandom = math.random;
+
+    var tinycolor = function(color, opts) {
+
+        color = (color) ? color : '';
+        opts = opts || { };
+
+        // If input is already a tinycolor, return itself
+        if (color instanceof tinycolor) {
+           return color;
+        }
+        // If we are called as a function, call using new instead
+        if (!(this instanceof tinycolor)) {
+            return new tinycolor(color, opts);
+        }
+
+        var rgb = inputToRGB(color);
+        this._originalInput = color,
+        this._r = rgb.r,
+        this._g = rgb.g,
+        this._b = rgb.b,
+        this._a = rgb.a,
+        this._roundA = mathRound(100*this._a) / 100,
+        this._format = opts.format || rgb.format;
+        this._gradientType = opts.gradientType;
+
+        // Don't let the range of [0,255] come back in [0,1].
+        // Potentially lose a little bit of precision here, but will fix issues where
+        // .5 gets interpreted as half of the total, instead of half of 1
+        // If it was supposed to be 128, this was already taken care of by `inputToRgb`
+        if (this._r < 1) { this._r = mathRound(this._r); }
+        if (this._g < 1) { this._g = mathRound(this._g); }
+        if (this._b < 1) { this._b = mathRound(this._b); }
+
+        this._ok = rgb.ok;
+        this._tc_id = tinyCounter++;
+    };
+
+    tinycolor.prototype = {
+        isDark: function() {
+            return this.getBrightness() < 128;
+        },
+        isLight: function() {
+            return !this.isDark();
+        },
+        isValid: function() {
+            return this._ok;
+        },
+        getOriginalInput: function() {
+          return this._originalInput;
+        },
+        getFormat: function() {
+            return this._format;
+        },
+        getAlpha: function() {
+            return this._a;
+        },
+        getBrightness: function() {
+            var rgb = this.toRgb();
+            return (rgb.r * 299 + rgb.g * 587 + rgb.b * 114) / 1000;
+        },
+        setAlpha: function(value) {
+            this._a = boundAlpha(value);
+            this._roundA = mathRound(100*this._a) / 100;
+            return this;
+        },
+        toHsv: function() {
+            var hsv = rgbToHsv(this._r, this._g, this._b);
+            return { h: hsv.h * 360, s: hsv.s, v: hsv.v, a: this._a };
+        },
+        toHsvString: function() {
+            var hsv = rgbToHsv(this._r, this._g, this._b);
+            var h = mathRound(hsv.h * 360), s = mathRound(hsv.s * 100), v = mathRound(hsv.v * 100);
+            return (this._a == 1) ?
+              "hsv("  + h + ", " + s + "%, " + v + "%)" :
+              "hsva(" + h + ", " + s + "%, " + v + "%, "+ this._roundA + ")";
+        },
+        toHsl: function() {
+            var hsl = rgbToHsl(this._r, this._g, this._b);
+            return { h: hsl.h * 360, s: hsl.s, l: hsl.l, a: this._a };
+        },
+        toHslString: function() {
+            var hsl = rgbToHsl(this._r, this._g, this._b);
+            var h = mathRound(hsl.h * 360), s = mathRound(hsl.s * 100), l = mathRound(hsl.l * 100);
+            return (this._a == 1) ?
+              "hsl("  + h + ", " + s + "%, " + l + "%)" :
+              "hsla(" + h + ", " + s + "%, " + l + "%, "+ this._roundA + ")";
+        },
+        toHex: function(allow3Char) {
+            return rgbToHex(this._r, this._g, this._b, allow3Char);
+        },
+        toHexString: function(allow3Char) {
+            return '#' + this.toHex(allow3Char);
+        },
+        toHex8: function() {
+            return rgbaToHex(this._r, this._g, this._b, this._a);
+        },
+        toHex8String: function() {
+            return '#' + this.toHex8();
+        },
+        toRgb: function() {
+            return { r: mathRound(this._r), g: mathRound(this._g), b: mathRound(this._b), a: this._a };
+        },
+        toRgbString: function() {
+            return (this._a == 1) ?
+              "rgb("  + mathRound(this._r) + ", " + mathRound(this._g) + ", " + mathRound(this._b) + ")" :
+              "rgba(" + mathRound(this._r) + ", " + mathRound(this._g) + ", " + mathRound(this._b) + ", " + this._roundA + ")";
+        },
+        toPercentageRgb: function() {
+            return { r: mathRound(bound01(this._r, 255) * 100) + "%", g: mathRound(bound01(this._g, 255) * 100) + "%", b: mathRound(bound01(this._b, 255) * 100) + "%", a: this._a };
+        },
+        toPercentageRgbString: function() {
+            return (this._a == 1) ?
+              "rgb("  + mathRound(bound01(this._r, 255) * 100) + "%, " + mathRound(bound01(this._g, 255) * 100) + "%, " + mathRound(bound01(this._b, 255) * 100) + "%)" :
+              "rgba(" + mathRound(bound01(this._r, 255) * 100) + "%, " + mathRound(bound01(this._g, 255) * 100) + "%, " + mathRound(bound01(this._b, 255) * 100) + "%, " + this._roundA + ")";
+        },
+        toName: function() {
+            if (this._a === 0) {
+                return "transparent";
+            }
+
+            if (this._a < 1) {
+                return false;
+            }
+
+            return hexNames[rgbToHex(this._r, this._g, this._b, true)] || false;
+        },
+        toFilter: function(secondColor) {
+            var hex8String = '#' + rgbaToHex(this._r, this._g, this._b, this._a);
+            var secondHex8String = hex8String;
+            var gradientType = this._gradientType ? "GradientType = 1, " : "";
+
+            if (secondColor) {
+                var s = tinycolor(secondColor);
+                secondHex8String = s.toHex8String();
+            }
+
+            return "progid:DXImageTransform.Microsoft.gradient("+gradientType+"startColorstr="+hex8String+",endColorstr="+secondHex8String+")";
+        },
+        toString: function(format) {
+            var formatSet = !!format;
+            format = format || this._format;
+
+            var formattedString = false;
+            var hasAlpha = this._a < 1 && this._a >= 0;
+            var needsAlphaFormat = !formatSet && hasAlpha && (format === "hex" || format === "hex6" || format === "hex3" || format === "name");
+
+            if (needsAlphaFormat) {
+                // Special case for "transparent", all other non-alpha formats
+                // will return rgba when there is transparency.
+                if (format === "name" && this._a === 0) {
+                    return this.toName();
+                }
+                return this.toRgbString();
+            }
+            if (format === "rgb") {
+                formattedString = this.toRgbString();
+            }
+            if (format === "prgb") {
+                formattedString = this.toPercentageRgbString();
+            }
+            if (format === "hex" || format === "hex6") {
+                formattedString = this.toHexString();
+            }
+            if (format === "hex3") {
+                formattedString = this.toHexString(true);
+            }
+            if (format === "hex8") {
+                formattedString = this.toHex8String();
+            }
+            if (format === "name") {
+                formattedString = this.toName();
+            }
+            if (format === "hsl") {
+                formattedString = this.toHslString();
+            }
+            if (format === "hsv") {
+                formattedString = this.toHsvString();
+            }
+
+            return formattedString || this.toHexString();
+        },
+
+        _applyModification: function(fn, args) {
+            var color = fn.apply(null, [this].concat([].slice.call(args)));
+            this._r = color._r;
+            this._g = color._g;
+            this._b = color._b;
+            this.setAlpha(color._a);
+            return this;
+        },
+        lighten: function() {
+            return this._applyModification(lighten, arguments);
+        },
+        brighten: function() {
+            return this._applyModification(brighten, arguments);
+        },
+        darken: function() {
+            return this._applyModification(darken, arguments);
+        },
+        desaturate: function() {
+            return this._applyModification(desaturate, arguments);
+        },
+        saturate: function() {
+            return this._applyModification(saturate, arguments);
+        },
+        greyscale: function() {
+            return this._applyModification(greyscale, arguments);
+        },
+        spin: function() {
+            return this._applyModification(spin, arguments);
+        },
+
+        _applyCombination: function(fn, args) {
+            return fn.apply(null, [this].concat([].slice.call(args)));
+        },
+        analogous: function() {
+            return this._applyCombination(analogous, arguments);
+        },
+        complement: function() {
+            return this._applyCombination(complement, arguments);
+        },
+        monochromatic: function() {
+            return this._applyCombination(monochromatic, arguments);
+        },
+        splitcomplement: function() {
+            return this._applyCombination(splitcomplement, arguments);
+        },
+        triad: function() {
+            return this._applyCombination(triad, arguments);
+        },
+        tetrad: function() {
+            return this._applyCombination(tetrad, arguments);
+        }
+    };
+
+    // If input is an object, force 1 into "1.0" to handle ratios properly
+    // String input requires "1.0" as input, so 1 will be treated as 1
+    tinycolor.fromRatio = function(color, opts) {
+        if (typeof color == "object") {
+            var newColor = {};
+            for (var i in color) {
+                if (color.hasOwnProperty(i)) {
+                    if (i === "a") {
+                        newColor[i] = color[i];
+                    }
+                    else {
+                        newColor[i] = convertToPercentage(color[i]);
+                    }
+                }
+            }
+            color = newColor;
+        }
+
+        return tinycolor(color, opts);
+    };
+
+    // Given a string or object, convert that input to RGB
+    // Possible string inputs:
+    //
+    //     "red"
+    //     "#f00" or "f00"
+    //     "#ff0000" or "ff0000"
+    //     "#ff000000" or "ff000000"
+    //     "rgb 255 0 0" or "rgb (255, 0, 0)"
+    //     "rgb 1.0 0 0" or "rgb (1, 0, 0)"
+    //     "rgba (255, 0, 0, 1)" or "rgba 255, 0, 0, 1"
+    //     "rgba (1.0, 0, 0, 1)" or "rgba 1.0, 0, 0, 1"
+    //     "hsl(0, 100%, 50%)" or "hsl 0 100% 50%"
+    //     "hsla(0, 100%, 50%, 1)" or "hsla 0 100% 50%, 1"
+    //     "hsv(0, 100%, 100%)" or "hsv 0 100% 100%"
+    //
+    function inputToRGB(color) {
+
+        var rgb = { r: 0, g: 0, b: 0 };
+        var a = 1;
+        var ok = false;
+        var format = false;
+
+        if (typeof color == "string") {
+            color = stringInputToObject(color);
+        }
+
+        if (typeof color == "object") {
+            if (color.hasOwnProperty("r") && color.hasOwnProperty("g") && color.hasOwnProperty("b")) {
+                rgb = rgbToRgb(color.r, color.g, color.b);
+                ok = true;
+                format = String(color.r).substr(-1) === "%" ? "prgb" : "rgb";
+            }
+            else if (color.hasOwnProperty("h") && color.hasOwnProperty("s") && color.hasOwnProperty("v")) {
+                color.s = convertToPercentage(color.s);
+                color.v = convertToPercentage(color.v);
+                rgb = hsvToRgb(color.h, color.s, color.v);
+                ok = true;
+                format = "hsv";
+            }
+            else if (color.hasOwnProperty("h") && color.hasOwnProperty("s") && color.hasOwnProperty("l")) {
+                color.s = convertToPercentage(color.s);
+                color.l = convertToPercentage(color.l);
+                rgb = hslToRgb(color.h, color.s, color.l);
+                ok = true;
+                format = "hsl";
+            }
+
+            if (color.hasOwnProperty("a")) {
+                a = color.a;
+            }
+        }
+
+        a = boundAlpha(a);
+
+        return {
+            ok: ok,
+            format: color.format || format,
+            r: mathMin(255, mathMax(rgb.r, 0)),
+            g: mathMin(255, mathMax(rgb.g, 0)),
+            b: mathMin(255, mathMax(rgb.b, 0)),
+            a: a
+        };
+    }
+
+
+    // Conversion Functions
+    // --------------------
+
+    // `rgbToHsl`, `rgbToHsv`, `hslToRgb`, `hsvToRgb` modified from:
+    // <http://mjijackson.com/2008/02/rgb-to-hsl-and-rgb-to-hsv-color-model-conversion-algorithms-in-javascript>
+
+    // `rgbToRgb`
+    // Handle bounds / percentage checking to conform to CSS color spec
+    // <http://www.w3.org/TR/css3-color/>
+    // *Assumes:* r, g, b in [0, 255] or [0, 1]
+    // *Returns:* { r, g, b } in [0, 255]
+    function rgbToRgb(r, g, b){
+        return {
+            r: bound01(r, 255) * 255,
+            g: bound01(g, 255) * 255,
+            b: bound01(b, 255) * 255
+        };
+    }
+
+    // `rgbToHsl`
+    // Converts an RGB color value to HSL.
+    // *Assumes:* r, g, and b are contained in [0, 255] or [0, 1]
+    // *Returns:* { h, s, l } in [0,1]
+    function rgbToHsl(r, g, b) {
+
+        r = bound01(r, 255);
+        g = bound01(g, 255);
+        b = bound01(b, 255);
+
+        var max = mathMax(r, g, b), min = mathMin(r, g, b);
+        var h, s, l = (max + min) / 2;
+
+        if(max == min) {
+            h = s = 0; // achromatic
+        }
+        else {
+            var d = max - min;
+            s = l > 0.5 ? d / (2 - max - min) : d / (max + min);
+            switch(max) {
+                case r: h = (g - b) / d + (g < b ? 6 : 0); break;
+                case g: h = (b - r) / d + 2; break;
+                case b: h = (r - g) / d + 4; break;
+            }
+
+            h /= 6;
+        }
+
+        return { h: h, s: s, l: l };
+    }
+
+    // `hslToRgb`
+    // Converts an HSL color value to RGB.
+    // *Assumes:* h is contained in [0, 1] or [0, 360] and s and l are contained [0, 1] or [0, 100]
+    // *Returns:* { r, g, b } in the set [0, 255]
+    function hslToRgb(h, s, l) {
+        var r, g, b;
+
+        h = bound01(h, 360);
+        s = bound01(s, 100);
+        l = bound01(l, 100);
+
+        function hue2rgb(p, q, t) {
+            if(t < 0) t += 1;
+            if(t > 1) t -= 1;
+            if(t < 1/6) return p + (q - p) * 6 * t;
+            if(t < 1/2) return q;
+            if(t < 2/3) return p + (q - p) * (2/3 - t) * 6;
+            return p;
+        }
+
+        if(s === 0) {
+            r = g = b = l; // achromatic
+        }
+        else {
+            var q = l < 0.5 ? l * (1 + s) : l + s - l * s;
+            var p = 2 * l - q;
+            r = hue2rgb(p, q, h + 1/3);
+            g = hue2rgb(p, q, h);
+            b = hue2rgb(p, q, h - 1/3);
+        }
+
+        return { r: r * 255, g: g * 255, b: b * 255 };
+    }
+
+    // `rgbToHsv`
+    // Converts an RGB color value to HSV
+    // *Assumes:* r, g, and b are contained in the set [0, 255] or [0, 1]
+    // *Returns:* { h, s, v } in [0,1]
+    function rgbToHsv(r, g, b) {
+
+        r = bound01(r, 255);
+        g = bound01(g, 255);
+        b = bound01(b, 255);
+
+        var max = mathMax(r, g, b), min = mathMin(r, g, b);
+        var h, s, v = max;
+
+        var d = max - min;
+        s = max === 0 ? 0 : d / max;
+
+        if(max == min) {
+            h = 0; // achromatic
+        }
+        else {
+            switch(max) {
+                case r: h = (g - b) / d + (g < b ? 6 : 0); break;
+                case g: h = (b - r) / d + 2; break;
+                case b: h = (r - g) / d + 4; break;
+            }
+            h /= 6;
+        }
+        return { h: h, s: s, v: v };
+    }
+
+    // `hsvToRgb`
+    // Converts an HSV color value to RGB.
+    // *Assumes:* h is contained in [0, 1] or [0, 360] and s and v are contained in [0, 1] or [0, 100]
+    // *Returns:* { r, g, b } in the set [0, 255]
+     function hsvToRgb(h, s, v) {
+
+        h = bound01(h, 360) * 6;
+        s = bound01(s, 100);
+        v = bound01(v, 100);
+
+        var i = math.floor(h),
+            f = h - i,
+            p = v * (1 - s),
+            q = v * (1 - f * s),
+            t = v * (1 - (1 - f) * s),
+            mod = i % 6,
+            r = [v, q, p, p, t, v][mod],
+            g = [t, v, v, q, p, p][mod],
+            b = [p, p, t, v, v, q][mod];
+
+        return { r: r * 255, g: g * 255, b: b * 255 };
+    }
+
+    // `rgbToHex`
+    // Converts an RGB color to hex
+    // Assumes r, g, and b are contained in the set [0, 255]
+    // Returns a 3 or 6 character hex
+    function rgbToHex(r, g, b, allow3Char) {
+
+        var hex = [
+            pad2(mathRound(r).toString(16)),
+            pad2(mathRound(g).toString(16)),
+            pad2(mathRound(b).toString(16))
+        ];
+
+        // Return a 3 character hex if possible
+        if (allow3Char && hex[0].charAt(0) == hex[0].charAt(1) && hex[1].charAt(0) == hex[1].charAt(1) && hex[2].charAt(0) == hex[2].charAt(1)) {
+            return hex[0].charAt(0) + hex[1].charAt(0) + hex[2].charAt(0);
+        }
+
+        return hex.join("");
+    }
+        // `rgbaToHex`
+        // Converts an RGBA color plus alpha transparency to hex
+        // Assumes r, g, b and a are contained in the set [0, 255]
+        // Returns an 8 character hex
+        function rgbaToHex(r, g, b, a) {
+
+            var hex = [
+                pad2(convertDecimalToHex(a)),
+                pad2(mathRound(r).toString(16)),
+                pad2(mathRound(g).toString(16)),
+                pad2(mathRound(b).toString(16))
+            ];
+
+            return hex.join("");
+        }
+
+    // `equals`
+    // Can be called with any tinycolor input
+    tinycolor.equals = function (color1, color2) {
+        if (!color1 || !color2) { return false; }
+        return tinycolor(color1).toRgbString() == tinycolor(color2).toRgbString();
+    };
+    tinycolor.random = function() {
+        return tinycolor.fromRatio({
+            r: mathRandom(),
+            g: mathRandom(),
+            b: mathRandom()
+        });
+    };
+
+
+    // Modification Functions
+    // ----------------------
+    // Thanks to less.js for some of the basics here
+    // <https://github.com/cloudhead/less.js/blob/master/lib/less/functions.js>
+
+    function desaturate(color, amount) {
+        amount = (amount === 0) ? 0 : (amount || 10);
+        var hsl = tinycolor(color).toHsl();
+        hsl.s -= amount / 100;
+        hsl.s = clamp01(hsl.s);
+        return tinycolor(hsl);
+    }
+
+    function saturate(color, amount) {
+        amount = (amount === 0) ? 0 : (amount || 10);
+        var hsl = tinycolor(color).toHsl();
+        hsl.s += amount / 100;
+        hsl.s = clamp01(hsl.s);
+        return tinycolor(hsl);
+    }
+
+    function greyscale(color) {
+        return tinycolor(color).desaturate(100);
+    }
+
+    function lighten (color, amount) {
+        amount = (amount === 0) ? 0 : (amount || 10);
+        var hsl = tinycolor(color).toHsl();
+        hsl.l += amount / 100;
+        hsl.l = clamp01(hsl.l);
+        return tinycolor(hsl);
+    }
+
+    function brighten(color, amount) {
+        amount = (amount === 0) ? 0 : (amount || 10);
+        var rgb = tinycolor(color).toRgb();
+        rgb.r = mathMax(0, mathMin(255, rgb.r - mathRound(255 * - (amount / 100))));
+        rgb.g = mathMax(0, mathMin(255, rgb.g - mathRound(255 * - (amount / 100))));
+        rgb.b = mathMax(0, mathMin(255, rgb.b - mathRound(255 * - (amount / 100))));
+        return tinycolor(rgb);
+    }
+
+    function darken (color, amount) {
+        amount = (amount === 0) ? 0 : (amount || 10);
+        var hsl = tinycolor(color).toHsl();
+        hsl.l -= amount / 100;
+        hsl.l = clamp01(hsl.l);
+        return tinycolor(hsl);
+    }
+
+    // Spin takes a positive or negative amount within [-360, 360] indicating the change of hue.
+    // Values outside of this range will be wrapped into this range.
+    function spin(color, amount) {
+        var hsl = tinycolor(color).toHsl();
+        var hue = (mathRound(hsl.h) + amount) % 360;
+        hsl.h = hue < 0 ? 360 + hue : hue;
+        return tinycolor(hsl);
+    }
+
+    // Combination Functions
+    // ---------------------
+    // Thanks to jQuery xColor for some of the ideas behind these
+    // <https://github.com/infusion/jQuery-xcolor/blob/master/jquery.xcolor.js>
+
+    function complement(color) {
+        var hsl = tinycolor(color).toHsl();
+        hsl.h = (hsl.h + 180) % 360;
+        return tinycolor(hsl);
+    }
+
+    function triad(color) {
+        var hsl = tinycolor(color).toHsl();
+        var h = hsl.h;
+        return [
+            tinycolor(color),
+            tinycolor({ h: (h + 120) % 360, s: hsl.s, l: hsl.l }),
+            tinycolor({ h: (h + 240) % 360, s: hsl.s, l: hsl.l })
+        ];
+    }
+
+    function tetrad(color) {
+        var hsl = tinycolor(color).toHsl();
+        var h = hsl.h;
+        return [
+            tinycolor(color),
+            tinycolor({ h: (h + 90) % 360, s: hsl.s, l: hsl.l }),
+            tinycolor({ h: (h + 180) % 360, s: hsl.s, l: hsl.l }),
+            tinycolor({ h: (h + 270) % 360, s: hsl.s, l: hsl.l })
+        ];
+    }
+
+    function splitcomplement(color) {
+        var hsl = tinycolor(color).toHsl();
+        var h = hsl.h;
+        return [
+            tinycolor(color),
+            tinycolor({ h: (h + 72) % 360, s: hsl.s, l: hsl.l}),
+            tinycolor({ h: (h + 216) % 360, s: hsl.s, l: hsl.l})
+        ];
+    }
+
+    function analogous(color, results, slices) {
+        results = results || 6;
+        slices = slices || 30;
+
+        var hsl = tinycolor(color).toHsl();
+        var part = 360 / slices;
+        var ret = [tinycolor(color)];
+
+        for (hsl.h = ((hsl.h - (part * results >> 1)) + 720) % 360; --results; ) {
+            hsl.h = (hsl.h + part) % 360;
+            ret.push(tinycolor(hsl));
+        }
+        return ret;
+    }
+
+    function monochromatic(color, results) {
+        results = results || 6;
+        var hsv = tinycolor(color).toHsv();
+        var h = hsv.h, s = hsv.s, v = hsv.v;
+        var ret = [];
+        var modification = 1 / results;
+
+        while (results--) {
+            ret.push(tinycolor({ h: h, s: s, v: v}));
+            v = (v + modification) % 1;
+        }
+
+        return ret;
+    }
+
+    // Utility Functions
+    // ---------------------
+
+    tinycolor.mix = function(color1, color2, amount) {
+        amount = (amount === 0) ? 0 : (amount || 50);
+
+        var rgb1 = tinycolor(color1).toRgb();
+        var rgb2 = tinycolor(color2).toRgb();
+
+        var p = amount / 100;
+        var w = p * 2 - 1;
+        var a = rgb2.a - rgb1.a;
+
+        var w1;
+
+        if (w * a == -1) {
+            w1 = w;
+        } else {
+            w1 = (w + a) / (1 + w * a);
+        }
+
+        w1 = (w1 + 1) / 2;
+
+        var w2 = 1 - w1;
+
+        var rgba = {
+            r: rgb2.r * w1 + rgb1.r * w2,
+            g: rgb2.g * w1 + rgb1.g * w2,
+            b: rgb2.b * w1 + rgb1.b * w2,
+            a: rgb2.a * p  + rgb1.a * (1 - p)
+        };
+
+        return tinycolor(rgba);
+    };
+
+
+    // Readability Functions
+    // ---------------------
+    // <http://www.w3.org/TR/AERT#color-contrast>
+
+    // `readability`
+    // Analyze the 2 colors and returns an object with the following properties:
+    //    `brightness`: difference in brightness between the two colors
+    //    `color`: difference in color/hue between the two colors
+    tinycolor.readability = function(color1, color2) {
+        var c1 = tinycolor(color1);
+        var c2 = tinycolor(color2);
+        var rgb1 = c1.toRgb();
+        var rgb2 = c2.toRgb();
+        var brightnessA = c1.getBrightness();
+        var brightnessB = c2.getBrightness();
+        var colorDiff = (
+            Math.max(rgb1.r, rgb2.r) - Math.min(rgb1.r, rgb2.r) +
+            Math.max(rgb1.g, rgb2.g) - Math.min(rgb1.g, rgb2.g) +
+            Math.max(rgb1.b, rgb2.b) - Math.min(rgb1.b, rgb2.b)
+        );
+
+        return {
+            brightness: Math.abs(brightnessA - brightnessB),
+            color: colorDiff
+        };
+    };
+
+    // `readable`
+    // http://www.w3.org/TR/AERT#color-contrast
+    // Ensure that foreground and background color combinations provide sufficient contrast.
+    // *Example*
+    //    tinycolor.isReadable("#000", "#111") => false
+    tinycolor.isReadable = function(color1, color2) {
+        var readability = tinycolor.readability(color1, color2);
+        return readability.brightness > 125 && readability.color > 500;
+    };
+
+    // `mostReadable`
+    // Given a base color and a list of possible foreground or background
+    // colors for that base, returns the most readable color.
+    // *Example*
+    //    tinycolor.mostReadable("#123", ["#fff", "#000"]) => "#000"
+    tinycolor.mostReadable = function(baseColor, colorList) {
+        var bestColor = null;
+        var bestScore = 0;
+        var bestIsReadable = false;
+        for (var i=0; i < colorList.length; i++) {
+
+            // We normalize both around the "acceptable" breaking point,
+            // but rank brightness constrast higher than hue.
+
+            var readability = tinycolor.readability(baseColor, colorList[i]);
+            var readable = readability.brightness > 125 && readability.color > 500;
+            var score = 3 * (readability.brightness / 125) + (readability.color / 500);
+
+            if ((readable && ! bestIsReadable) ||
+                (readable && bestIsReadable && score > bestScore) ||
+                ((! readable) && (! bestIsReadable) && score > bestScore)) {
+                bestIsReadable = readable;
+                bestScore = score;
+                bestColor = tinycolor(colorList[i]);
+            }
+        }
+        return bestColor;
+    };
+
+
+    // Big List of Colors
+    // ------------------
+    // <http://www.w3.org/TR/css3-color/#svg-color>
+    var names = tinycolor.names = {
+        aliceblue: "f0f8ff",
+        antiquewhite: "faebd7",
+        aqua: "0ff",
+        aquamarine: "7fffd4",
+        azure: "f0ffff",
+        beige: "f5f5dc",
+        bisque: "ffe4c4",
+        black: "000",
+        blanchedalmond: "ffebcd",
+        blue: "00f",
+        blueviolet: "8a2be2",
+        brown: "a52a2a",
+        burlywood: "deb887",
+        burntsienna: "ea7e5d",
+        cadetblue: "5f9ea0",
+        chartreuse: "7fff00",
+        chocolate: "d2691e",
+        coral: "ff7f50",
+        cornflowerblue: "6495ed",
+        cornsilk: "fff8dc",
+        crimson: "dc143c",
+        cyan: "0ff",
+        darkblue: "00008b",
+        darkcyan: "008b8b",
+        darkgoldenrod: "b8860b",
+        darkgray: "a9a9a9",
+        darkgreen: "006400",
+        darkgrey: "a9a9a9",
+        darkkhaki: "bdb76b",
+        darkmagenta: "8b008b",
+        darkolivegreen: "556b2f",
+        darkorange: "ff8c00",
+        darkorchid: "9932cc",
+        darkred: "8b0000",
+        darksalmon: "e9967a",
+        darkseagreen: "8fbc8f",
+        darkslateblue: "483d8b",
+        darkslategray: "2f4f4f",
+        darkslategrey: "2f4f4f",
+        darkturquoise: "00ced1",
+        darkviolet: "9400d3",
+        deeppink: "ff1493",
+        deepskyblue: "00bfff",
+        dimgray: "696969",
+        dimgrey: "696969",
+        dodgerblue: "1e90ff",
+        firebrick: "b22222",
+        floralwhite: "fffaf0",
+        forestgreen: "228b22",
+        fuchsia: "f0f",
+        gainsboro: "dcdcdc",
+        ghostwhite: "f8f8ff",
+        gold: "ffd700",
+        goldenrod: "daa520",
+        gray: "808080",
+        green: "008000",
+        greenyellow: "adff2f",
+        grey: "808080",
+        honeydew: "f0fff0",
+        hotpink: "ff69b4",
+        indianred: "cd5c5c",
+        indigo: "4b0082",
+        ivory: "fffff0",
+        khaki: "f0e68c",
+        lavender: "e6e6fa",
+        lavenderblush: "fff0f5",
+        lawngreen: "7cfc00",
+        lemonchiffon: "fffacd",
+        lightblue: "add8e6",
+        lightcoral: "f08080",
+        lightcyan: "e0ffff",
+        lightgoldenrodyellow: "fafad2",
+        lightgray: "d3d3d3",
+        lightgreen: "90ee90",
+        lightgrey: "d3d3d3",
+        lightpink: "ffb6c1",
+        lightsalmon: "ffa07a",
+        lightseagreen: "20b2aa",
+        lightskyblue: "87cefa",
+        lightslategray: "789",
+        lightslategrey: "789",
+        lightsteelblue: "b0c4de",
+        lightyellow: "ffffe0",
+        lime: "0f0",
+        limegreen: "32cd32",
+        linen: "faf0e6",
+        magenta: "f0f",
+        maroon: "800000",
+        mediumaquamarine: "66cdaa",
+        mediumblue: "0000cd",
+        mediumorchid: "ba55d3",
+        mediumpurple: "9370db",
+        mediumseagreen: "3cb371",
+        mediumslateblue: "7b68ee",
+        mediumspringgreen: "00fa9a",
+        mediumturquoise: "48d1cc",
+        mediumvioletred: "c71585",
+        midnightblue: "191970",
+        mintcream: "f5fffa",
+        mistyrose: "ffe4e1",
+        moccasin: "ffe4b5",
+        navajowhite: "ffdead",
+        navy: "000080",
+        oldlace: "fdf5e6",
+        olive: "808000",
+        olivedrab: "6b8e23",
+        orange: "ffa500",
+        orangered: "ff4500",
+        orchid: "da70d6",
+        palegoldenrod: "eee8aa",
+        palegreen: "98fb98",
+        paleturquoise: "afeeee",
+        palevioletred: "db7093",
+        papayawhip: "ffefd5",
+        peachpuff: "ffdab9",
+        peru: "cd853f",
+        pink: "ffc0cb",
+        plum: "dda0dd",
+        powderblue: "b0e0e6",
+        purple: "800080",
+        rebeccapurple: "663399",
+        red: "f00",
+        rosybrown: "bc8f8f",
+        royalblue: "4169e1",
+        saddlebrown: "8b4513",
+        salmon: "fa8072",
+        sandybrown: "f4a460",
+        seagreen: "2e8b57",
+        seashell: "fff5ee",
+        sienna: "a0522d",
+        silver: "c0c0c0",
+        skyblue: "87ceeb",
+        slateblue: "6a5acd",
+        slategray: "708090",
+        slategrey: "708090",
+        snow: "fffafa",
+        springgreen: "00ff7f",
+        steelblue: "4682b4",
+        tan: "d2b48c",
+        teal: "008080",
+        thistle: "d8bfd8",
+        tomato: "ff6347",
+        turquoise: "40e0d0",
+        violet: "ee82ee",
+        wheat: "f5deb3",
+        white: "fff",
+        whitesmoke: "f5f5f5",
+        yellow: "ff0",
+        yellowgreen: "9acd32"
+    };
+
+    // Make it easy to access colors via `hexNames[hex]`
+    var hexNames = tinycolor.hexNames = flip(names);
+
+
+    // Utilities
+    // ---------
+
+    // `{ 'name1': 'val1' }` becomes `{ 'val1': 'name1' }`
+    function flip(o) {
+        var flipped = { };
+        for (var i in o) {
+            if (o.hasOwnProperty(i)) {
+                flipped[o[i]] = i;
+            }
+        }
+        return flipped;
+    }
+
+    // Return a valid alpha value [0,1] with all invalid values being set to 1
+    function boundAlpha(a) {
+        a = parseFloat(a);
+
+        if (isNaN(a) || a < 0 || a > 1) {
+            a = 1;
+        }
+
+        return a;
+    }
+
+    // Take input from [0, n] and return it as [0, 1]
+    function bound01(n, max) {
+        if (isOnePointZero(n)) { n = "100%"; }
+
+        var processPercent = isPercentage(n);
+        n = mathMin(max, mathMax(0, parseFloat(n)));
+
+        // Automatically convert percentage into number
+        if (processPercent) {
+            n = parseInt(n * max, 10) / 100;
+        }
+
+        // Handle floating point rounding errors
+        if ((math.abs(n - max) < 0.000001)) {
+            return 1;
+        }
+
+        // Convert into [0, 1] range if it isn't already
+        return (n % max) / parseFloat(max);
+    }
+
+    // Force a number between 0 and 1
+    function clamp01(val) {
+        return mathMin(1, mathMax(0, val));
+    }
+
+    // Parse a base-16 hex value into a base-10 integer
+    function parseIntFromHex(val) {
+        return parseInt(val, 16);
+    }
+
+    // Need to handle 1.0 as 100%, since once it is a number, there is no difference between it and 1
+    // <http://stackoverflow.com/questions/7422072/javascript-how-to-detect-number-as-a-decimal-including-1-0>
+    function isOnePointZero(n) {
+        return typeof n == "string" && n.indexOf('.') != -1 && parseFloat(n) === 1;
+    }
+
+    // Check to see if string passed in is a percentage
+    function isPercentage(n) {
+        return typeof n === "string" && n.indexOf('%') != -1;
+    }
+
+    // Force a hex value to have 2 characters
+    function pad2(c) {
+        return c.length == 1 ? '0' + c : '' + c;
+    }
+
+    // Replace a decimal with it's percentage value
+    function convertToPercentage(n) {
+        if (n <= 1) {
+            n = (n * 100) + "%";
+        }
+
+        return n;
+    }
+
+    // Converts a decimal to a hex value
+    function convertDecimalToHex(d) {
+        return Math.round(parseFloat(d) * 255).toString(16);
+    }
+    // Converts a hex value to a decimal
+    function convertHexToDecimal(h) {
+        return (parseIntFromHex(h) / 255);
+    }
+
+    var matchers = (function() {
+
+        // <http://www.w3.org/TR/css3-values/#integers>
+        var CSS_INTEGER = "[-\\+]?\\d+%?";
+
+        // <http://www.w3.org/TR/css3-values/#number-value>
+        var CSS_NUMBER = "[-\\+]?\\d*\\.\\d+%?";
+
+        // Allow positive/negative integer/number.  Don't capture the either/or, just the entire outcome.
+        var CSS_UNIT = "(?:" + CSS_NUMBER + ")|(?:" + CSS_INTEGER + ")";
+
+        // Actual matching.
+        // Parentheses and commas are optional, but not required.
+        // Whitespace can take the place of commas or opening paren
+        var PERMISSIVE_MATCH3 = "[\\s|\\(]+(" + CSS_UNIT + ")[,|\\s]+(" + CSS_UNIT + ")[,|\\s]+(" + CSS_UNIT + ")\\s*\\)?";
+        var PERMISSIVE_MATCH4 = "[\\s|\\(]+(" + CSS_UNIT + ")[,|\\s]+(" + CSS_UNIT + ")[,|\\s]+(" + CSS_UNIT + ")[,|\\s]+(" + CSS_UNIT + ")\\s*\\)?";
+
+        return {
+            rgb: new RegExp("rgb" + PERMISSIVE_MATCH3),
+            rgba: new RegExp("rgba" + PERMISSIVE_MATCH4),
+            hsl: new RegExp("hsl" + PERMISSIVE_MATCH3),
+            hsla: new RegExp("hsla" + PERMISSIVE_MATCH4),
+            hsv: new RegExp("hsv" + PERMISSIVE_MATCH3),
+            hsva: new RegExp("hsva" + PERMISSIVE_MATCH4),
+            hex3: /^([0-9a-fA-F]{1})([0-9a-fA-F]{1})([0-9a-fA-F]{1})$/,
+            hex6: /^([0-9a-fA-F]{2})([0-9a-fA-F]{2})([0-9a-fA-F]{2})$/,
+            hex8: /^([0-9a-fA-F]{2})([0-9a-fA-F]{2})([0-9a-fA-F]{2})([0-9a-fA-F]{2})$/
+        };
+    })();
+
+    // `stringInputToObject`
+    // Permissive string parsing.  Take in a number of formats, and output an object
+    // based on detected format.  Returns `{ r, g, b }` or `{ h, s, l }` or `{ h, s, v}`
+    function stringInputToObject(color) {
+
+        color = color.replace(trimLeft,'').replace(trimRight, '').toLowerCase();
+        var named = false;
+        if (names[color]) {
+            color = names[color];
+            named = true;
+        }
+        else if (color == 'transparent') {
+            return { r: 0, g: 0, b: 0, a: 0, format: "name" };
+        }
+
+        // Try to match string input using regular expressions.
+        // Keep most of the number bounding out of this function - don't worry about [0,1] or [0,100] or [0,360]
+        // Just return an object and let the conversion functions handle that.
+        // This way the result will be the same whether the tinycolor is initialized with string or object.
+        var match;
+        if ((match = matchers.rgb.exec(color))) {
+            return { r: match[1], g: match[2], b: match[3] };
+        }
+        if ((match = matchers.rgba.exec(color))) {
+            return { r: match[1], g: match[2], b: match[3], a: match[4] };
+        }
+        if ((match = matchers.hsl.exec(color))) {
+            return { h: match[1], s: match[2], l: match[3] };
+        }
+        if ((match = matchers.hsla.exec(color))) {
+            return { h: match[1], s: match[2], l: match[3], a: match[4] };
+        }
+        if ((match = matchers.hsv.exec(color))) {
+            return { h: match[1], s: match[2], v: match[3] };
+        }
+        if ((match = matchers.hsva.exec(color))) {
+            return { h: match[1], s: match[2], v: match[3], a: match[4] };
+        }
+        if ((match = matchers.hex8.exec(color))) {
+            return {
+                a: convertHexToDecimal(match[1]),
+                r: parseIntFromHex(match[2]),
+                g: parseIntFromHex(match[3]),
+                b: parseIntFromHex(match[4]),
+                format: named ? "name" : "hex8"
+            };
+        }
+        if ((match = matchers.hex6.exec(color))) {
+            return {
+                r: parseIntFromHex(match[1]),
+                g: parseIntFromHex(match[2]),
+                b: parseIntFromHex(match[3]),
+                format: named ? "name" : "hex"
+            };
+        }
+        if ((match = matchers.hex3.exec(color))) {
+            return {
+                r: parseIntFromHex(match[1] + '' + match[1]),
+                g: parseIntFromHex(match[2] + '' + match[2]),
+                b: parseIntFromHex(match[3] + '' + match[3]),
+                format: named ? "name" : "hex"
+            };
+        }
+
+        return false;
+    }
+
+    window.tinycolor = tinycolor;
+    })();
+
+    $(function () {
+        if ($.fn.spectrum.load) {
+            $.fn.spectrum.processNativeColorInputs();
+        }
+    });
+
 });

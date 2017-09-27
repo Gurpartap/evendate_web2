@@ -19,8 +19,6 @@ $__modules['organizations'] = array(
 		'{update/search}' => function () use ($__db, $__request, $__offset, $__length, $__user, $__fields) {
 			return OrganizationsCollection::reindexCollection($__db, $__user, $__request);
 		},
-
-
 		'{vk_groups}' => function () use ($__db, $__pagination, $__request, $__user, $__fields, $__order_by) {
 			if ($__user instanceof User === false) throw new PrivilegesException('NOT_AUTHORIZED', $__db);
 			return $__user->getEditorInstance()->getVkGroupsToPost();
@@ -121,6 +119,16 @@ $__modules['organizations'] = array(
 				'links' => $organization->getInvitationLinks($__user, $__fields ?? array(), $__order_by ?? array())->getData(),
 				'users' => $organization->getInvitedUsers($__user, $__fields ?? array(), $__order_by ?? array())->getData(),
 			));
+		},
+		'{/(id:[0-9]+)/requisites}' => function ($organization_id) use ($__db, $__request, $__user, $__fields, $__order_by) {
+			$organization = OrganizationsCollection::one(
+				$__db,
+				$__user,
+				intval($organization_id),
+				null,
+				$__fields
+			);
+			return $organization->getRequisites($__user);
 		},
 		'{{/(id:[0-9]+)}}' => function ($id) use ($__db, $__request, $__user, $__fields) {
 			$org_instance = OrganizationsCollection::one(
@@ -278,6 +286,16 @@ $__modules['organizations'] = array(
 			return OrganizationsCollection::one($__db, $__user, $id, array())->addStaff(
 				$__user, UsersCollection::one($__db, $__user, $__request['user_id'], array()), $__request['role']
 			);
+		},
+		'{/(id:[0-9]+)/requisites}' => function ($organization_id) use ($__db, $__request, $__user, $__fields, $__order_by) {
+			$organization = OrganizationsCollection::onePrivate(
+				$__db,
+				$__user,
+				intval($organization_id),
+				null,
+				$__fields
+			);
+			return $organization->updateRequisites($__user, $__request);
 		},
 		'{(id:[0-9]+)/invitations/links}' => function ($organization_id) use ($__db, $__request, $__user, $__fields) {
 			$organization = OrganizationsCollection::onePrivate(

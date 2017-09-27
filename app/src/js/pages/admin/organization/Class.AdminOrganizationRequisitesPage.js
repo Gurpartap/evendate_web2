@@ -15,6 +15,10 @@ AdminOrganizationRequisitesPage = extending(AdminOrganizationPage, (function() {
 	function AdminOrganizationRequisitesPage(org_id) {
 		AdminOrganizationPage.call(this, org_id);
 		
+		this.requisites = {
+			agent_type: null
+		};
+		
 		Object.defineProperty(this, 'page_title_obj', {
 			get: function() {
 				
@@ -26,11 +30,24 @@ AdminOrganizationRequisitesPage = extending(AdminOrganizationPage, (function() {
 		});
 	}
 	
+	AdminOrganizationRequisitesPage.prototype.fetchData = function() {
+		var self = this;
+		
+		return this.fetching_data_defer = __APP.SERVER.multipleAjax(
+			this.organization.fetchOrganization(this.organization_fields),
+			OneOrganization.fetchRequisites(this.organization.id).done(function(data) {
+				Object.assign(self.requisites, data.agent_info);
+			})
+		);
+	};
+	
 	AdminOrganizationRequisitesPage.prototype.init = function() {
 		var self = this,
+			$tabs = this.$wrapper.find('.Tabs'),
 			$legal_company_name = this.$wrapper.find('.LegalEntityCompanyNameInput'),
 			$legal_inn = this.$wrapper.find('.LegalEntityInnInput'),
 			$legal_kpp = this.$wrapper.find('.LegalEntityKppInput'),
+			$legal_ogrn = this.$wrapper.find('.LegalEntityOgrnInput'),
 			$legal_address = this.$wrapper.find('.LegalEntityAddressInput'),
 			$legal_bank_name = this.$wrapper.find('.LegalEntityBankNameInput'),
 			$legal_bic = this.$wrapper.find('.LegalEntityBikInput'),
@@ -41,21 +58,29 @@ AdminOrganizationRequisitesPage = extending(AdminOrganizationPage, (function() {
 		
 		bindTabs(this.$wrapper);
 		
-		this.$wrapper.find('.Tabs').on('tabs:change', function() {
+		$tabs.on('tabs:change', function() {
 			var $bodies = $(this).find('.TabsBody');
 			
 			$bodies.not('.'+__C.CLASSES.ACTIVE).prop('disabled', true);
 			$bodies.filter('.'+__C.CLASSES.ACTIVE).prop('disabled', false);
 		});
 		
-		$legal_company_name.on('input.ToggleCompanyInfo', function() {
-			var $this = $(this);
-			
-			if ($this.val().trim() !== '') {
-				self.$wrapper.find('.CompanyAdditionalInfo').removeClass(__C.CLASSES.HIDDEN);
-				$this.off('input.ToggleCompanyInfo');
-			}
-		});
+		if (this.requisites.agent_type) {
+			$tabs.resolveInstance().setToTab($tabs.find('.Tab').filter('[data-type="'+this.requisites.agent_type+'"]').index());
+		}
+		
+		if (this.requisites.company_name) {
+			this.$wrapper.find('.CompanyAdditionalInfo').removeClass(__C.CLASSES.HIDDEN);
+		} else {
+			$legal_company_name.on('input.ToggleCompanyInfo', function() {
+				var $this = $(this);
+				
+				if ($this.val().trim() !== '') {
+					self.$wrapper.find('.CompanyAdditionalInfo').removeClass(__C.CLASSES.HIDDEN);
+					$this.off('input.ToggleCompanyInfo');
+				}
+			});
+		}
 		
 		$legal_company_name.add($legal_inn).suggestions({
 			token: __C.API_TOKENS.DADATA,
@@ -68,6 +93,7 @@ AdminOrganizationRequisitesPage = extending(AdminOrganizationPage, (function() {
 				}
 				$legal_inn.val(suggestion.data.inn).trigger('change');
 				$legal_kpp.val(suggestion.data.kpp).trigger('change');
+				$legal_ogrn.val(suggestion.data.ogrn).trigger('change');
 				
 				if (suggestion.data.address) {
 					$legal_address.val(suggestion.data.address.value).trigger('change');
@@ -75,14 +101,18 @@ AdminOrganizationRequisitesPage = extending(AdminOrganizationPage, (function() {
 			}
 		});
 		
-		$legal_bank_name.on('input.ToggleBankInfo', function() {
-			var $this = $(this);
-			
-			if ($this.val().trim() !== '') {
-				self.$wrapper.find('.LegalEntityBankAdditionalInfo').removeClass(__C.CLASSES.HIDDEN);
-				$this.off('input.ToggleBankInfo');
-			}
-		});
+		if (this.requisites.bank_name) {
+			this.$wrapper.find('.LegalEntityBankAdditionalInfo').removeClass(__C.CLASSES.HIDDEN);
+		} else {
+			$legal_bank_name.on('input.ToggleBankInfo', function() {
+				var $this = $(this);
+				
+				if ($this.val().trim() !== '') {
+					self.$wrapper.find('.LegalEntityBankAdditionalInfo').removeClass(__C.CLASSES.HIDDEN);
+					$this.off('input.ToggleBankInfo');
+				}
+			});
+		}
 		
 		$legal_bank_name.add($legal_bic).suggestions({
 			token: __C.API_TOKENS.DADATA,
@@ -98,14 +128,18 @@ AdminOrganizationRequisitesPage = extending(AdminOrganizationPage, (function() {
 			}
 		});
 		
-		$person_bank_name.on('input.ToggleBankInfo', function() {
-			var $this = $(this);
-			
-			if ($this.val().trim() !== '') {
-				self.$wrapper.find('.NaturalPersonBankAdditionalInfo').removeClass(__C.CLASSES.HIDDEN);
-				$this.off('input.ToggleBankInfo');
-			}
-		});
+		if (this.requisites.bank_name) {
+			this.$wrapper.find('.NaturalPersonBankAdditionalInfo').removeClass(__C.CLASSES.HIDDEN);
+		} else {
+			$person_bank_name.on('input.ToggleBankInfo', function() {
+				var $this = $(this);
+				
+				if ($this.val().trim() !== '') {
+					self.$wrapper.find('.NaturalPersonBankAdditionalInfo').removeClass(__C.CLASSES.HIDDEN);
+					$this.off('input.ToggleBankInfo');
+				}
+			});
+		}
 		
 		$person_bank_name.add($person_bic).suggestions({
 			token: __C.API_TOKENS.DADATA,
@@ -124,11 +158,20 @@ AdminOrganizationRequisitesPage = extending(AdminOrganizationPage, (function() {
 		
 		this.render_vars.submit_button.on('click.Submit', function() {
 			var $form = self.$wrapper.find('.RequisitesForm'),
-				form_data;
+				$loader;
 			
 			if (isFormValid($form)) {
-				form_data = self.gatherSendData();
-				console.log(form_data);
+				$loader = __APP.BUILD.overlayLoader(self.$wrapper);
+				self.render_vars.submit_button.attr('disabled', true);
+				OneOrganization.saveRequisites(self.organization.id, self.gatherSendData()).always(function() {
+					$loader.remove();
+					self.render_vars.submit_button.removeAttr('disabled');
+				}).done(function() {
+					showNotifier({
+						status: true,
+						text: 'Реквизиты успешно сохранены'
+					});
+				});
 			}
 		});
 	};
@@ -139,6 +182,39 @@ AdminOrganizationRequisitesPage = extending(AdminOrganizationPage, (function() {
 	};
 	
 	AdminOrganizationRequisitesPage.prototype.preRender = function() {
+		this.render_vars.radio_group = __APP.BUILD.radioGroup({
+			name: 'agent_type',
+			classes: [
+				__C.CLASSES.SIZES.BIG,
+				'HeaderTabs'
+			],
+			units: [
+				{
+					id: 'legal_entity_requisites_agent_type_legal',
+					label: 'Юридическое лицо',
+					unit_classes: ['Tab'],
+					unit_dataset: {
+						type: 'legal_entity'
+					},
+					attributes: {
+						value: 'legal_entity',
+						checked: this.requisites.agent_type ? this.requisites.agent_type === 'legal_entity' : true
+					}
+				},
+				{
+					id: 'legal_entity_requisites_agent_type_individual',
+					label: 'Физическое лицо',
+					unit_classes: ['Tab'],
+					unit_dataset: {
+						type: 'individual'
+					},
+					attributes: {
+						value: 'individual',
+						checked: this.requisites.agent_type === 'individual'
+					}
+				}
+			]
+		});
 		
 		this.render_vars.l_company_form_field = __APP.BUILD.formUnit({
 			label: 'Название компании',
@@ -147,7 +223,8 @@ AdminOrganizationRequisitesPage = extending(AdminOrganizationPage, (function() {
 			classes: 'LegalEntityCompanyNameInput',
 			placeholder: 'Начните вводить чтобы появились предложения',
 			helptext: 'Полное наименование организации, включая форму предприятия',
-			required: true
+			required: true,
+			value: escapeHtml(this.requisites.company_name)
 		});
 		
 		this.render_vars.l_inn_form_field = __APP.BUILD.formUnit({
@@ -160,7 +237,8 @@ AdminOrganizationRequisitesPage = extending(AdminOrganizationPage, (function() {
 			required: true,
 			attributes: {
 				maxlength: 12
-			}
+			},
+			value: this.requisites.company_inn
 		});
 		
 		this.render_vars.l_kpp_form_field = __APP.BUILD.formUnit({
@@ -172,7 +250,18 @@ AdminOrganizationRequisitesPage = extending(AdminOrganizationPage, (function() {
 			required: true,
 			attributes: {
 				maxlength: 9
-			}
+			},
+			value: this.requisites.company_kpp
+		});
+		
+		this.render_vars.l_ogrn_form_field = __APP.BUILD.formUnit({
+			label: 'ОГРН',
+			id: 'legal_entity_requisites_ogrn',
+			name: 'company_ogrn',
+			classes: 'LegalEntityOgrnInput',
+			helptext: 'Для ИП укажите ОГРНИП',
+			required: true,
+			value: this.requisites.company_ogrn
 		});
 		
 		this.render_vars.l_real_address_form_field = __APP.BUILD.formUnit({
@@ -181,7 +270,8 @@ AdminOrganizationRequisitesPage = extending(AdminOrganizationPage, (function() {
 			name: 'company_address',
 			classes: 'LegalEntityAddressInput',
 			helptext: 'Например: 150000, Россия, Москыв, ул. Ленина, д. 108, корп. 1, кв. 8',
-			required: true
+			required: true,
+			value: escapeHtml(this.requisites.company_address)
 		});
 		
 		this.render_vars.l_bank_name_form_field = __APP.BUILD.formUnit({
@@ -191,7 +281,8 @@ AdminOrganizationRequisitesPage = extending(AdminOrganizationPage, (function() {
 			classes: 'LegalEntityBankNameInput',
 			placeholder: 'Начните вводить чтобы появились предложения',
 			helptext: 'Полное наименование банка, включая отделение (если есть)',
-			required: true
+			required: true,
+			value: escapeHtml(this.requisites.bank_name)
 		});
 		
 		this.render_vars.l_bic_form_field = __APP.BUILD.formUnit({
@@ -204,7 +295,8 @@ AdminOrganizationRequisitesPage = extending(AdminOrganizationPage, (function() {
 			required: true,
 			attributes: {
 				maxlength: 9
-			}
+			},
+			value: this.requisites.bank_bik
 		});
 		
 		this.render_vars.l_correspondent_account_form_field = __APP.BUILD.formUnit({
@@ -219,7 +311,8 @@ AdminOrganizationRequisitesPage = extending(AdminOrganizationPage, (function() {
 			},
 			inputmask: {
 			
-			}
+			},
+			value: this.requisites.bank_correspondent_account
 		});
 		
 		this.render_vars.l_checking_account_form_field = __APP.BUILD.formUnit({
@@ -230,7 +323,8 @@ AdminOrganizationRequisitesPage = extending(AdminOrganizationPage, (function() {
 			required: true,
 			attributes: {
 				maxlength: 20
-			}
+			},
+			value: this.requisites.bank_payment_account
 		});
 		
 		this.render_vars.l_signer_name_form_field = __APP.BUILD.formUnit({
@@ -238,7 +332,8 @@ AdminOrganizationRequisitesPage = extending(AdminOrganizationPage, (function() {
 			id: 'legal_entity_requisites_signer_name',
 			name: 'signer_full_name',
 			helptext: 'ФИО лица, подписывающего договор (полностью). Например, Иванов Иван Иванович',
-			required: true
+			required: true,
+			value: escapeHtml(this.requisites.signer_full_name)
 		});
 		
 		this.render_vars.l_signer_position_form_field = __APP.BUILD.formUnit({
@@ -246,24 +341,25 @@ AdminOrganizationRequisitesPage = extending(AdminOrganizationPage, (function() {
 			id: 'legal_entity_requisites_signer_position',
 			name: 'signer_position',
 			helptext: 'Должность директора или ответственного лица, подписывающего договор',
-			required: true
+			required: true,
+			value: escapeHtml(this.requisites.signer_position)
 		});
 		
 		this.render_vars.l_self_name_form_field = __APP.BUILD.formUnit({
 			label: 'Ваши имя и фамилия',
 			id: 'legal_entity_requisites_self_name',
 			name: 'contact_full_name',
-			value: __APP.USER.full_name,
-			required: true
+			required: true,
+			value: escapeHtml(this.requisites.contact_full_name || __APP.USER.full_name)
 		});
 		
 		this.render_vars.l_self_email_form_field = __APP.BUILD.formUnit({
 			label: 'Ваш e-mail',
 			id: 'legal_entity_requisites_self_email',
 			name: 'contact_email',
-			value: __APP.USER.email,
 			helptext: 'На него мы вышлем заполненный договор',
-			required: true
+			required: true,
+			value: escapeHtml(this.requisites.contact_email || __APP.USER.email)
 		});
 		
 		this.render_vars.l_self_phone_form_field = __APP.BUILD.formUnit({
@@ -271,7 +367,8 @@ AdminOrganizationRequisitesPage = extending(AdminOrganizationPage, (function() {
 			id: 'legal_entity_requisites_self_phone',
 			name: 'contact_phone_number',
 			helptext: 'В формате: +7 (xxx) xxx-xx-xx',
-			required: true
+			required: true,
+			value: escapeHtml(this.requisites.contact_phone_number)
 		});
 		
 		
@@ -279,60 +376,65 @@ AdminOrganizationRequisitesPage = extending(AdminOrganizationPage, (function() {
 		this.render_vars.n_self_name_form_field = __APP.BUILD.formUnit({
 			label: 'Ваши имя и фамилия',
 			id: 'natural_person_requisites_self_name',
-			name: 'contact_full_name',
-			value: __APP.USER.full_name,
-			required: true
+			name: 'full_name',
+			required: true,
+			value: escapeHtml(this.requisites.full_name || __APP.USER.full_name)
 		});
 		
 		this.render_vars.n_inn_form_field = __APP.BUILD.formUnit({
 			label: 'ИНН',
 			id: 'natural_person_requisites_inn',
-			name: 'company_inn',
-			classes: 'LegalEntityInnInput',
+			name: 'inn',
 			placeholder: 'ИНН',
 			helptext: '12 знаков. Если у вас нет ИНН, оставьте поле пустым',
 			attributes: {
 				maxlength: 12
-			}
+			},
+			value: this.requisites.inn
 		});
 		
 		this.render_vars.n_id_number_field = __APP.BUILD.formUnit({
 			label: 'Серия и номер паспорта',
-			name: 'id_number',
+			name: 'passport_number',
 			placeholder: 'Серия и номер',
 			helptext: 'Например, 1234 123456',
-			required: true
+			required: true,
+			value: this.requisites.passport_number
 		});
 		
 		this.render_vars.n_id_when_field = __APP.BUILD.formUnit({
 			label: 'Когда выдан паспорт',
-			name: 'id_when',
+			name: 'passport_issue_date',
 			type: 'date',
 			required: true,
 			dataset: {
 				max_date: moment().format(__C.DATE_FORMAT)
-			}
+			},
+			value: this.requisites.passport_issue_date
 		});
 		
 		this.render_vars.n_id_who_field = __APP.BUILD.formUnit({
 			label: 'Кем выдан паспорт',
-			name: 'id_who',
+			name: 'passport_issue_by',
 			helptext: 'Например, ОВД Алексеевского района города Москвы',
-			required: true
+			required: true,
+			value: escapeHtml(this.requisites.passport_issue_by)
 		});
 		
 		this.render_vars.n_register_address_field = __APP.BUILD.formUnit({
 			label: 'Адрес регистрации',
-			name: 'register_address',
+			name: 'registration_address',
 			helptext: 'Например: 150000, Россия, Москыв, ул. Ленина, д. 108, корп. 1, кв. 8',
-			required: true
+			required: true,
+			value: escapeHtml(this.requisites.registration_address)
 		});
 		
 		this.render_vars.n_post_address_field = __APP.BUILD.formUnit({
 			label: 'Почтновый адрес',
 			name: 'post_address',
 			helptext: 'Например: 150000, Россия, Москыв, ул. Ленина, д. 108, корп. 1, кв. 8',
-			required: true
+			required: true,
+			value: escapeHtml(this.requisites.post_address)
 		});
 		
 		this.render_vars.n_bank_name_form_field = __APP.BUILD.formUnit({
@@ -341,7 +443,8 @@ AdminOrganizationRequisitesPage = extending(AdminOrganizationPage, (function() {
 			classes: 'NaturalPersonBankNameInput',
 			placeholder: 'Начните вводить чтобы появились предложения',
 			helptext: 'Полное наименование банка, включая отделение (если есть)',
-			required: true
+			required: true,
+			value: escapeHtml(this.requisites.bank_name)
 		});
 		
 		this.render_vars.n_bic_form_field = __APP.BUILD.formUnit({
@@ -353,7 +456,8 @@ AdminOrganizationRequisitesPage = extending(AdminOrganizationPage, (function() {
 			required: true,
 			attributes: {
 				maxlength: 9
-			}
+			},
+			value: this.requisites.bank_bik
 		});
 		
 		this.render_vars.n_correspondent_account_form_field = __APP.BUILD.formUnit({
@@ -365,7 +469,8 @@ AdminOrganizationRequisitesPage = extending(AdminOrganizationPage, (function() {
 			attributes: {
 				maxlength: 20
 			},
-			inputmask: {}
+			inputmask: {},
+			value: this.requisites.bank_correspondent_account
 		});
 		
 		this.render_vars.n_checking_account_form_field = __APP.BUILD.formUnit({
@@ -375,22 +480,32 @@ AdminOrganizationRequisitesPage = extending(AdminOrganizationPage, (function() {
 			required: true,
 			attributes: {
 				maxlength: 20
-			}
+			},
+			value: this.requisites.bank_payment_account
+		});
+		
+		this.render_vars.n_checking_account_form_field = __APP.BUILD.formUnit({
+			label: 'Комментарий для перевода денег',
+			name: 'withdraw_comments',
+			type: 'textarea',
+			helptext: 'Например назначение платежа или номер банковской карты',
+			value: escapeHtml(this.requisites.withdraw_comments)
 		});
 		
 		this.render_vars.n_self_email_form_field = __APP.BUILD.formUnit({
 			label: 'Контактрый e-mail',
 			name: 'contact_email',
-			value: __APP.USER.email,
 			helptext: 'В формате john@doe.com',
-			required: true
+			required: true,
+			value: escapeHtml(this.requisites.contact_email || __APP.USER.email)
 		});
 		
 		this.render_vars.n_self_phone_form_field = __APP.BUILD.formUnit({
 			label: 'Контактный телефон',
 			name: 'contact_phone_number',
 			helptext: 'В формате: +7 (xxx) xxx-xx-xx',
-			required: true
+			required: true,
+			value: escapeHtml(this.requisites.contact_phone_number)
 		});
 		
 		this.render_vars.submit_button = __APP.BUILD.button({

@@ -6,7 +6,6 @@
 
 .page {
 	background-color: #fff;
-	background-color: var(--color_page);
 	box-shadow: 0 2px 6px hsla(0,0%,0%,.28);
 	border-radius: 2px;
 }
@@ -17,3 +16,7 @@
 	width: 300px;
 }
 .page + .side_page {margin-left: 60px}
+
+@supports (--custom_properties: 1) {
+	.page {background-color: var(--color_page)}
+}

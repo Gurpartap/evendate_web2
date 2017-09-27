@@ -26,7 +26,6 @@
 	font-size: 1.12em;
 	font-weight: 500;
 	color: #3e4d66;
-	color: var(--color_primary);
 }
 
 .eventstat_overview_datetime {display: flex}
@@ -77,4 +76,8 @@
 	display: flex;
 	flex-direction: column;
 	justify-content: center;
+}
+
+@supports (--custom_properties: 1) {
+	.eventstat_overview_event_title {color: var(--color_primary)}
 }

@@ -22,38 +22,14 @@
 .tab:hover {opacity: 1}
 
 .tab.-active {
-	border-color: inherit;
 	opacity: 1;
 	cursor: default;
+	border-color: currentColor;
 }
-
-.-color_primary .tab.-active,
-.tab.-color_primary.-active {/*
-	color: #3e4d66;
-	color: var(--color_primary);*/
-	border-color: #3e4d66;
-	border-color: var(--color_primary);
-}
-
-.-color_accent .tab.-active,
-.tab.-color_accent.-active {/*
-	color: #f82969;
-	color: var(--color_accent);*/
-	border-color: #f82969;
-	border-color: var(--color_accent);
-}
-
-.-state_admin .-color_accent .tab.-active,
-.-state_admin .tab.-color_accent.-active {/*
-	color: #00dc88;*/
-	border-color: #00dc88;
-}
+.link.tab.tab.tab {color: currentColor}
 
 .-color_default .tab.-active,
-.tab.-color_default.-active {/*
-	color: #fff;*/
-	border-color: #fff;
-}
+.tab.-color_default.-active {color: #fff}
 
 .tab_bodies_wrap {
 	margin: 20px 0;
@@ -105,4 +81,23 @@
 	-ms-transform: translateX(100%);
 	-o-transform: translateX(100%);
 	transform: translateX(100%);
+}
+
+@supports (--custom_properties: 1) {
+	.-color_primary .tab.-active,
+	.tab.-color_primary.-active {color: var(--color_primary)}
+
+	.-color_accent .tab.-active,
+	.tab.-color_accent.-active {color: var(--color_accent)}
+}
+
+@supports not (--custom_properties: 0) {
+	.-color_primary .tab.-active,
+	.tab.-color_primary.-active {color: #3e4d66}
+
+	.-color_accent .tab.-active,
+	.tab.-color_accent.-active {color: #f82969}
+
+	.-state_admin .-color_accent .tab.-active,
+	.-state_admin .tab.-color_accent.-active {color: #00dc88}
 }

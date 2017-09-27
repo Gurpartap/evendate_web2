@@ -10,6 +10,10 @@ class Organization extends AbstractEntity
 {
 
 
+	const AGENT_TYPE_LEGAL_ENTITY = 'legal_entity';
+	const AGENT_TYPE_INDIVIDUAL = 'individual';
+
+
 	const SUBSCRIBED_FIELD_NAME = 'subscribed';
 	const EVENTS_FIELD_NAME = 'events';
 	const SUBSCRIPTION_ID_FIELD_NAME = 'subscription_id';
@@ -26,6 +30,8 @@ class Organization extends AbstractEntity
 	const SEARCH_SCORE_FIELD_NAME = 'search_score';
 	const WITHDRAWS_FIELD_NAME = 'withdraws';
 	const FINANCE_FIELD_NAME = 'finance';
+	const AGENT_TYPE_FIELD_NAME = 'agent_type';
+	const REQUISITES_FIELD_NAME = 'requisites';
 
 	const IMAGES_PATH = 'organizations_images/';
 	const IMAGE_SIZE_LARGE = '/large/';
@@ -448,6 +454,13 @@ class Organization extends AbstractEntity
 				$result_data[self::FINANCE_FIELD_NAME] = null;
 			}
 		}
+		if (isset($fields[self::REQUISITES_FIELD_NAME])) {
+			if ($user instanceof User) {
+				$result_data[self::REQUISITES_FIELD_NAME] = $this->getRequisites($user)->getData();
+			} else {
+				$result_data[self::REQUISITES_FIELD_NAME] = null;
+			}
+		}
 
 
 		if (isset($fields[Organization::PRIVILEGES_FIELD_NAME])) {
@@ -764,6 +777,10 @@ class Organization extends AbstractEntity
 		} catch (Exception $e) {
 		}
 
+		if (isset($data['requisites']) && is_array($data['requisites'])) {
+			$this->updateRequisites($user, $data['requisites']);
+		}
+
 		$this->db->prepareExecute($q_upd_organization, 'CANT_UPDATE_ORGANIZATION');
 		@file_get_contents(App::DEFAULT_NODE_LOCATION . '/recommendations/organizations/' . $this->id);
 		return new Result(true, '', array('organization_id' => $this->getId()));
@@ -883,7 +900,6 @@ class Organization extends AbstractEntity
 		self::addOwner($user, $result['id'], $db);
 		self::addMailInfo($user, $data, $result['id'], $db);
 
-
 		try {
 			OrganizationsCollection::reindexCollection($db, App::getCurrentUser(), array(
 				'id' => $result['id']
@@ -938,12 +954,12 @@ class Organization extends AbstractEntity
 
 		$user_data['organization'] = $this->getShortName();
 		$text = '';
-		foreach($user_data as $key => $input){
+		foreach ($user_data as $key => $input) {
 			if ($key[0] == '_') continue;
 			$text .= $key . ': ' . $input . "\n <br>";
 		}
 
-		foreach($this->getAdminEmails() as $index => $row){
+		foreach ($this->getAdminEmails() as $index => $row) {
 			Emails::schedule(self::EMAIL_ORGANIZATION_FEEDBACK_TYPE, $row['email'], array(
 				'message_text' => $text
 			));
@@ -951,6 +967,44 @@ class Organization extends AbstractEntity
 
 		return new Result(true, 'Сообщение успешно отправлено.');
 
+	}
+
+	public function getRequisites(User $user)
+	{
+		if (!$user->isAdmin($this)) throw new PrivilegesException('', $this->db);
+		$q_get_type = App::queryFactory()->newSelect();
+		$q_get_type->from('organizations')
+			->cols(array('agent_approved', 'agent_info'))
+			->where('id = ?', $this->getId());
+		$result = $this->db->prepareExecute($q_get_type)->fetch();
+		if (isset($result['agent_info'])) {
+			try {
+				$result['agent_info'] = json_decode($result['agent_info'], true);
+			} catch (Exception $e) {
+				$result['agent_info'] = array('approved' => 'false', 'agent_info' => array());
+			}
+		}
+		return new Result(true, '', $result);
+	}
+
+	public function updateRequisites(User $user, array $requisites)
+	{
+		if (!$user->isAdmin($this)) throw new PrivilegesException('', $this->db);
+		print_r( $requisites['agent_type']);
+		if (!isset($requisites['agent_type'])
+			|| !($requisites['agent_type'] === self::AGENT_TYPE_LEGAL_ENTITY || $requisites['agent_type'] === self::AGENT_TYPE_INDIVIDUAL)) {
+			throw new InvalidArgumentException('AGENT_TYPE_IS_REQUIRED');
+		}
+
+		$q_upd_organization = App::queryFactory()->newUpdate();
+		$q_upd_organization->table('organizations')
+			->cols(array(
+				'agent_approved' => 'false',
+				'agent_info' => json_encode($requisites)
+			))
+			->where('id = ?', $this->getId());
+		$this->db->prepareExecute($q_upd_organization);
+		return new Result(true, '');
 	}
 
 }
