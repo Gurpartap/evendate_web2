@@ -143,7 +143,7 @@ class App
 	{
 		if (self::$__USER instanceof User)
 			return self::$__USER;
-		$token = isset(self::$__HEADERS['authorization']) ? self::$__HEADERS['authorization'] : null;
+		$token = isset(self::$__HEADERS['authorization']) ? self::$__HEADERS['authorization'] : (self::$__REQUEST['authorization'] ?? null);
 
 		try {
 			self::$__USER = new User(self::$__DB, $token);
