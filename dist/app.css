@@ -4166,6 +4166,7 @@ fieldset:disabled .form_select {cursor: default}
 }
 /**
  * @requires form_elements.css
+ * @requires ../button.css
  */
 .quantity_input_component {
 	display: flex;
