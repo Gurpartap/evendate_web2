@@ -172,27 +172,36 @@ AdminOrganizationSettingsPage = extending(AdminOrganizationPage, (function() {
 					containerClassName: '-spectrum_container_override'
 				};
 			
-			$brand_color.on('move.spectrum change.spectrum', function(e, color) {
+			function repaint(color, place) {
+				var obj = {};
+				
 				if (color) {
-					__APP.repaint({
-						header: color.toHexString()
-					});
+					obj[place] = color.toHexString();
+					__APP.repaint(obj);
 				} else {
 					__APP.setDefaultColors();
 				}
-			});
-			$brand_color.spectrum(Object.assign({color: $brand_color.val() || __C.COLORS.MUTED}, options));
+			}
 			
-			$brand_color_accent.on('move.spectrum change.spectrum', function(e, color) {
-				if (color) {
-					__APP.repaint({
-						accent: color.toHexString()
-					});
-				} else {
-					__APP.setDefaultColors();
-				}
-			});
-			$brand_color_accent.spectrum(Object.assign({color: $brand_color_accent.val() || __C.COLORS.ACCENT}, options));
+			$brand_color
+				.on('move.spectrum', function(e, color) {
+					$brand_color.spectrum('set', color.toHexString());
+					repaint(color, 'header');
+				})
+				.on('change.spectrum', function(e, color) {
+					repaint(color, 'header');
+				})
+				.spectrum(Object.assign({color: $brand_color.val() || __C.COLORS.MUTED}, options));
+			
+			$brand_color_accent
+				.on('move.spectrum', function(e, color) {
+					$brand_color_accent.spectrum('set', color.toHexString());
+					repaint(color, 'accent');
+				})
+				.on('change.spectrum', function(e, color) {
+					repaint(color, 'accent');
+				})
+				.spectrum(Object.assign({color: $brand_color_accent.val() || __C.COLORS.ACCENT}, options));
 			
 		}(this.$wrapper));
 	};

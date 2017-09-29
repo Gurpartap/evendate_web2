@@ -4166,6 +4166,7 @@ fieldset:disabled .form_select {cursor: default}
 }
 /**
  * @requires form_elements.css
+ * @requires ../button.css
  */
 .quantity_input_component {
 	display: flex;
@@ -7364,8 +7365,11 @@ body,
 	#main_overlay {padding: 0}
 
   .page_wrapper,
-  .print_page {width: auto}
-	.print_page {height: auto}
+  .print_page {
+	  width: auto;
+	  height: auto;
+	  box-shadow: none;
+  }
 
   .ticket {padding: 0 0 64px}
 }

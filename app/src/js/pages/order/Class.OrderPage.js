@@ -231,6 +231,21 @@ OrderPage = extending(Page, (function() {
 			$payload,
 			$selected_type;
 		
+		function isTicketTypeSelected() {
+			var $inputs = self.$wrapper.find('.TicketType').find('.QuantityInput'),
+				i = 0;
+			
+			while (!empty($inputs[i])) {
+				if ($inputs[i].value !== 0) {
+					
+					return true;
+				}
+				i++;
+			}
+			
+			return false;
+		}
+		
 		function countTicketTypeSum($ticket_type) {
 			var $sum = $ticket_type.find('.TicketTypeSum'),
 				value = $ticket_type.find('.QuantityInput').val();
@@ -251,6 +266,12 @@ OrderPage = extending(Page, (function() {
 			}, 0);
 			
 			self.$wrapper.find('.TicketsOverallSum').text(formatCurrency(self.overall_sum));
+			
+			if (isTicketTypeSelected()) {
+				$footer.removeAttr('disabled');
+			} else {
+				$footer.attr('disabled', true);
+			}
 			
 			if (self.is_promocode_active) {
 				self.$wrapper.find('.TicketsTotalSum').text(formatCurrency(self.total_sum));
@@ -360,16 +381,6 @@ OrderPage = extending(Page, (function() {
 			}
 		}
 		
-		$quantity_inputs.on('QuantityInput::change', function() {
-			countTicketTypeSum($(this).closest('.TicketType'));
-			countTotalSum();
-		});
-		
-		this.$wrapper.find('.TicketType').each(function() {
-			countTicketTypeSum($(this));
-		});
-		countTotalSum();
-		
 		if (ticket_selected) {
 			ticket_selected = decodeURIComponent(ticket_selected);
 			$selected_type = this.$wrapper.find('.TicketType').filter(function() {
@@ -380,6 +391,31 @@ OrderPage = extending(Page, (function() {
 			if ($selected_type.length) {
 				$selected_type.find('.QuantityInput').resolveInstance().increment();
 			}
+		}
+		
+		if (this.event.ticketing_locally) {
+			$quantity_inputs.on('QuantityInput::change', function() {
+				countTicketTypeSum($(this).closest('.TicketType'));
+				countTotalSum();
+			});
+			
+			this.$wrapper.find('.TicketType').each(function() {
+				countTicketTypeSum($(this));
+			});
+			
+			countTotalSum();
+			
+			this.render_vars.legal_entity_payment_button.on('click.LegalEntityPayment', function() {
+				var result = makeOrder();
+				
+				if (result !== false) {
+					result.done(function(data) {
+						var parsed_uri = parseUri(location);
+						
+						__APP.changeState(parsed_uri.path + '/' + data.order.uuid + '/from_legal_entity');
+					});
+				}
+			});
 		}
 		
 		this.render_vars.pay_button.on('click.MakeOrder', function() {
@@ -451,19 +487,6 @@ OrderPage = extending(Page, (function() {
 			}
 		});
 		
-		if (this.event.ticketing_locally) {
-			this.render_vars.legal_entity_payment_button.on('click.LegalEntityPayment', function() {
-				var result = makeOrder();
-				
-				if (result !== false) {
-					result.done(function(data) {
-						var parsed_uri = parseUri(location);
-						
-						__APP.changeState(parsed_uri.path + '/' + data.order.uuid + '/from_legal_entity');
-					});
-				}
-			});
-		}
 		if (this.event.accept_bitcoins) {
 			this.render_vars.bitcoin_payment_button.on('click.BitcoinPayment', function() {
 				var $this = $(this),
@@ -485,11 +508,15 @@ OrderPage = extending(Page, (function() {
 	};
 	
 	OrderPage.prototype.preRender = function() {
-		var self = this;
+		var self = this,
+			selling_ticket_types = this.event.ticket_types.filter(function(ticket_type) {
+				
+				return ticket_type.is_selling;
+			});
 		
 		if (this.event.ticketing_locally) {
 			this.render_vars.tickets_selling = tmpl('order-tickets-selling', {
-				ticket_types: tmpl('order-ticket-type', this.event.ticket_types.map(function(ticket_type) {
+				ticket_types: tmpl('order-ticket-type', selling_ticket_types.map(function(ticket_type) {
 					
 					return {
 						name: ticket_type.name,
@@ -511,9 +538,9 @@ OrderPage = extending(Page, (function() {
 			this.render_vars.tickets_selling.find('.TicketType').each(function(i) {
 				var $this = $(this);
 				
-				$this.data('ticket_type', self.event.ticket_types[i]);
+				$this.data('ticket_type', selling_ticket_types[i]);
 				
-				if (!self.event.ticket_types[i].is_selling) {
+				if (!selling_ticket_types[i].is_selling) {
 					$this.attr('disabled', true);
 				}
 			});
