@@ -975,9 +975,9 @@ pg.connect(pg_conn_string, function (err, client, done) {
         let event_id = req.params.event_id;
         let domain = process.env.ENV === 'prod' ? 'https://evendate.io/' : 'http://localhost/';
 
-        console.log(domain + 'email_files/email-offer-template.php?event_id=' + event_id + '&uuid=' + uuid);
+        console.log(domain + 'email_files/email-offer-template.php?event_id=' + event_id + '&uuid=' + uuid+ '&authorization=' + req.params.token);
 
-        pdf_render.generateSinglePdf(domain + 'email_files/email-offer-template.php?event_id=' + event_id + '&uuid=' + uuid, '../email_files/Evendate-Bill-' + uuid + '.pdf')
+        pdf_render.generateSinglePdf(domain + 'email_files/email-offer-template.php?event_id=' + event_id + '&uuid=' + uuid + '&authorization=' + req.query.token, '../email_files/Evendate-Bill-' + uuid + '.pdf')
             .then(() => {
                 res.json({status: true});
             })

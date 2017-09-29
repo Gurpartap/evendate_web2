@@ -118,7 +118,7 @@ $__modules['events'] = array(
 			header('Pragma: no-cache');
 
 
-			file_get_contents(App::DEFAULT_NODE_LOCATION . '/utils/pdf/events/' . $event->getId() . '/orders/' . $uuid);
+			file_get_contents(App::DEFAULT_NODE_LOCATION . '/utils/pdf/events/' . $event->getId() . '/orders/' . $uuid . '?token=' . $__user->getToken());
 			echo file_get_contents($ROOT_PATH . '/email_files/' . $filename);
 			die();
 		},

@@ -356,7 +356,11 @@ class Notifications {
   events.title AS event_title
 FROM notifications_recommendations
   INNER JOIN notification_types ON notifications_recommendations.notification_type_id = notification_types.id
-  INNER JOIN users ON users.id = notifications_recommendations.user_id
+  INNER JOIN users ON users.id = (SELECT user_id
+                                  FROM favorite_events
+                                  WHERE event_id = (notifications_recommendations.data ->> 'event_id')::INT
+                                        AND status = TRUE
+                                  ORDER BY id DESC LIMIT 1)
   INNER JOIN events ON (notifications_recommendations.data ->> 'event_id')::BIGINT = events.id
 WHERE done = FALSE AND notifications_recommendations.notification_type_id = 51`;
 

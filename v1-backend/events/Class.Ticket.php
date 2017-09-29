@@ -186,23 +186,20 @@ class Ticket extends AbstractEntity
 
 
 		if (isset($fields[self::TYPE_FIELD_NAME])) {
-			if ($user instanceof User) {
-				if ($this->type_code == 'registration') {
-					$result_data[self::TYPE_FIELD_NAME] = array(
-						'type_code' => 'registration',
-						'uuid' => null,
-						'name' => 'Регистрация на событие'
-					);
-				} else {
-					$_fields = Fields::parseFields($fields[self::TYPE_FIELD_NAME]['fields'] ?? '');
-					$result_data[self::TYPE_FIELD_NAME] = TicketTypesCollection::filter(
-						App::DB(),
-						$user,
-						array('ticket' => $this),
-						$_fields)->getData()[0];
-				}
+
+			if ($this->type_code == 'registration') {
+				$result_data[self::TYPE_FIELD_NAME] = array(
+					'type_code' => 'registration',
+					'uuid' => null,
+					'name' => 'Регистрация на событие'
+				);
 			} else {
-				$result_data[self::TYPE_FIELD_NAME] = null;
+				$_fields = Fields::parseFields($fields[self::TYPE_FIELD_NAME]['fields'] ?? '');
+				$result_data[self::TYPE_FIELD_NAME] = TicketTypesCollection::filter(
+					App::DB(),
+					$user,
+					array('ticket' => $this),
+					$_fields)->getData()[0];
 			}
 		}
 

@@ -188,7 +188,7 @@ $__modules['organizations'] = array(
 						$__db,
 						$__user,
 						array_merge($__request, array('is_new' => true)),
-						$__fields,
+						Fields::parseFields($__fields['organizations']['fields'] ?? ''),
 						$__pagination,
 						Fields::parseOrderBy($__fields['order_by'] ?? 'id')
 					)->getData()
