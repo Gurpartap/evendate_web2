@@ -317,7 +317,7 @@ AbstractEditEventPage = extending(Page, (function() {
 					}),
 					tickets_sell_start_after_checkbox: __APP.BUILD.formUnit({
 						id: 'event_edit_ticket_type_' + row_id + '_start_after',
-						label: 'По истечении продаж билета',
+						label: 'По окончании продаж билета',
 						type: 'checkbox',
 						name: 'ticket_type_' + row_id + '_start_after',
 						dataset: {
