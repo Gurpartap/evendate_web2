@@ -71,7 +71,14 @@ AdminEventSalesPage = extending(AdminEventPage, (function() {
 	
 	AdminEventSalesPage.prototype.render = function() {
 		var self = this,
-			first_event_date_split = moment.unix(this.event.first_event_date).calendar().split(' '),
+			first_event_date_split = moment.unix(this.event.first_event_date).calendar(null, {
+				sameDay: __C.MOMENTJS_CALENDAR.DATE_AND_MONTH,
+				nextDay: __C.MOMENTJS_CALENDAR.DATE_AND_MONTH,
+				nextWeek: __C.MOMENTJS_CALENDAR.DATE_AND_MONTH,
+				lastDay: __C.MOMENTJS_CALENDAR.DATE_AND_MONTH,
+				lastWeek: __C.MOMENTJS_CALENDAR.DATE_AND_MONTH,
+				sameElse: __C.MOMENTJS_CALENDAR.DATE_AND_MONTH
+			}).split(' '),
 			formatted_dates = formatDates(this.event.dates),
 			dynamics_filters = {
 				scale: AbstractStatisticsCollection.SCALES.DAY,

@@ -186,6 +186,11 @@ __C = {
 	KEY_CODES: {
 		ENTER: 13,
 		ESC: 27
+	},
+	
+	MOMENTJS_CALENDAR: {
+		DATE_AND_MONTH: 'D MMMM',
+		HOURS_AND_MINUTES: 'HH:mm'
 	}
 };
 Object.freeze(__C);
