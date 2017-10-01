@@ -96,7 +96,7 @@ CREATE OR REPLACE VIEW view_tickets_orders AS
                                           (CASE
                                            WHEN events.registration_approvement_required IS TRUE
                                                 AND COALESCE(ticket_orders.final_sum, money.sum) :: REAL = 0 :: REAL
-                                                AND ticket_orders.order_status_id = 4
+                                                AND (ticket_orders.order_status_id = 4 OR ticket_orders.order_status_id = 1)
                                              THEN 9 :: INT -- should not pay for tickets
 
                                            WHEN COALESCE(ticket_orders.final_sum, money.sum) :: REAL > 0 :: REAL
