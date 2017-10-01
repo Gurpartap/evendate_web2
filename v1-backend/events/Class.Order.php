@@ -194,7 +194,7 @@ class Order extends AbstractEntity
 		$event_info = $db->prepareExecuteRaw($q_get_event_info, array(':uuid' => $upd['uuid']))->fetch();
 
 		if ($event_info['registration_locally'] && $event_info['ticketing_locally']) {
-			if ($event_info['final_sum'] == 0 AND
+			if ($event_info['final_sum'] == 0 &&
 				($event_info['promocode_id'] != null || $event_info['registration_approvement_required'] == false)
 			) {
 				self::setPaymentStatus(array(
@@ -331,9 +331,7 @@ class Order extends AbstractEntity
 			$available_codes = array_merge($available_codes, self::STATUSES_FOR_ORGANIZATIONS);
 		}
 
-		if ($event->getTicketingLocally() == false) {
-			$available_codes = array_merge($available_codes, self::REGISTRATION_STATUSES);
-		}
+		$available_codes = array_merge($available_codes, self::REGISTRATION_STATUSES);
 
 		if ($this->user_id == $user->getId()) {
 			$available_codes = array_merge($available_codes, $available_codes = self::STATUSES_FOR_CLIENT);
