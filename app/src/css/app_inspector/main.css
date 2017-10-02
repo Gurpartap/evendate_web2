@@ -9,7 +9,7 @@
 
 .app_inspector {
 	position: absolute;
-	width: 400px;
+	width: 500px;
 	height: 100%;
 	transform: translateX(10%);
 	transition: transform .3s ease;
@@ -23,11 +23,11 @@
 	display: flex;
 	align-items: center;
 	box-shadow: 0 0 4px 0 hsla(0,0%,0%,.12);
+	white-space: nowrap;
 }
 
 .app_inspector_remover {
 	top: -3px;
-	margin-right: 12px;
 	padding: 8px 18px;
 	font-size: 2.5em;
 	font-weight: 100;
@@ -37,8 +37,11 @@
 }
 
 .app_inspector_title {
+	width: 100%;
 	font-size: 1.5em;
 	font-weight: bold;
+	overflow: hidden;
+	text-overflow: ellipsis;
 }
 
 .app_inspector_content_wrapper {
@@ -46,6 +49,50 @@
 }
 
 .app_inspector_content {padding: 12px 18px}
+
+.app_inspector_help_content_wrapper {
+	color: #657184;
+	padding: 16px 0;
+}
+
+.app_inspector_help_content_wrapper p {padding: 0 18px}
+
+.app_inspector_help_content_wrapper img,
+.app_inspector_help_content_wrapper video {
+	display: block;
+	max-width: 100%;
+	margin: 1em 0;
+}
+
+.app_inspector_help_content_wrapper h1,
+.app_inspector_help_content_wrapper h2,
+.app_inspector_help_content_wrapper h3,
+.app_inspector_help_content_wrapper h4,
+.app_inspector_help_content_wrapper h5 {
+	font-style: normal;
+	color: #4a4a4a;
+}
+
+.app_inspector_help_content_wrapper table {
+	width: 100%;
+	margin-bottom: 1em;
+}
+
+.app_inspector_help_content_wrapper table,
+.app_inspector_help_content_wrapper th,
+.app_inspector_help_content_wrapper td {border: 1px solid #9fa6b3}
+.app_inspector_help_content_wrapper th,
+.app_inspector_help_content_wrapper td {padding: 8px 10px}
+.app_inspector_help_content_wrapper th {}
+
+.app_inspector_help_content_wrapper blockquote {
+	border-left: 3px solid #f82969;
+	color: #9fa6b3;
+	font-size: .875em;
+	font-style: italic;
+	margin: 0 20px;
+	padding: 0 20px;
+}
 
 .app_inspector_subtitle {
 	display: block;
@@ -60,4 +107,21 @@
 
 @supports (--custom_properties: 1) {
 	.app_inspector_subtitle {color: var(--color_primary_50)}
+
+	.app_inspector_help_content_wrapper {color: var(--color_primary_80)}
+
+	.app_inspector_help_content_wrapper h1,
+	.app_inspector_help_content_wrapper h2,
+	.app_inspector_help_content_wrapper h3,
+	.app_inspector_help_content_wrapper h4,
+	.app_inspector_help_content_wrapper h5 {color: var(--color_text)}
+
+	.app_inspector_help_content_wrapper blockquote {
+		border-color: var(--color_accent);
+		color: var(--color_primary_50);
+	}
+
+	.app_inspector_help_content_wrapper table,
+	.app_inspector_help_content_wrapper th,
+	.app_inspector_help_content_wrapper td {border-color: var(--color_primary_50)}
 }

@@ -17,7 +17,7 @@ AbstractAppInspector = extendingJQuery((function() {
 		
 		this.id = AbstractAppInspector.collection.push(this) - 1;
 		this.title = setDefaultValue(this.title, null);
-		this.$content = setDefaultValue(this.$content, $());
+		this.$content = setDefaultValue(this.$content, __APP.BUILD.loaderBlock());
 		this.is_shown = false;
 		this.is_rendered = false;
 		
@@ -28,7 +28,7 @@ AbstractAppInspector = extendingJQuery((function() {
 		}));
 		
 		this.find('.AppInspectorRemoveButton').on('click.CloseInspector', function() {
-			self.hide();
+			self.callWithAncestors('hide');
 		});
 		
 		if (AbstractAppInspector.collection.length > 5) {
@@ -64,15 +64,29 @@ AbstractAppInspector = extendingJQuery((function() {
 			inspector.destroy();
 		});
 	};
-	
-	AbstractAppInspector.prototype.render = function() {
-		AbstractAppInspector.$wrapper.append(this);
-		this.is_rendered = true;
-		this.initiate();
-		this.find('.AppInspectorScroll').scrollbar();
+	/**
+	 *
+	 * @returns {jqPromise}
+	 */
+	AbstractAppInspector.prototype.fetchData = function() {
+		
+		return $.Deferred().resolve().promise();
 	};
 	
-	AbstractAppInspector.prototype.initiate = function() {};
+	AbstractAppInspector.prototype.fetchDone = function() {};
+	
+	AbstractAppInspector.prototype.render = function() {
+		this.changeTitle(this.title);
+		this.find('.AppInspectorContent').html(this.$content);
+		this.is_rendered = true;
+		this.callWithAncestors('initiate');
+		
+		return this;
+	};
+	
+	AbstractAppInspector.prototype.initiate = function() {
+		this.find('.AppInspectorScroll').scrollbar();
+	};
 	
 	AbstractAppInspector.prototype.show = function() {
 		var self = this;
@@ -80,14 +94,29 @@ AbstractAppInspector = extendingJQuery((function() {
 		if (AbstractAppInspector.currentInspector) {
 			AbstractAppInspector.currentInspector.hide();
 		}
-		if (!this.is_rendered) {
-			this.render();
-		}
+		
+		AbstractAppInspector.$wrapper.append(this);
+		
 		setTimeout(function() {
 			self.addClass(__C.CLASSES.SHOW);
 		}, 100);
+		
 		AbstractAppInspector.currentInspector = this;
 		this.is_shown = true;
+		
+		this.fetchData().done(function() {
+			AbstractAppInspector.$wrapper.trigger('inspector:data_fetched');
+			self.fetchDone.apply(self, arguments);
+			if (!self.is_rendered) {
+				self.callWithAncestors('render');
+			}
+		});
+	};
+	
+	AbstractAppInspector.prototype.changeTitle = function(title) {
+		this.find('.AppInspectorTitle').html(title);
+		
+		return this;
 	};
 	
 	AbstractAppInspector.prototype.hide = function() {
@@ -95,15 +124,32 @@ AbstractAppInspector = extendingJQuery((function() {
 		AbstractAppInspector.currentInspector = null;
 		AbstractAppInspector.$wrapper.trigger('inspector:hide');
 		this.is_shown = false;
+		
+		return this;
 	};
 	
 	AbstractAppInspector.prototype.destroy = function() {
-		if(this.is_shown) {
-			this.hide();
+		if (this.is_shown) {
+			this.callWithAncestors('hide');
 		}
 		AbstractAppInspector.collection.splice(this.id, 1);
 		this.is_rendered = false;
 		this.remove();
+	};
+	/**
+	 *
+	 * @param {string} method
+	 * @param {Function} [ancestor]
+	 * @returns {*}
+	 */
+	AbstractAppInspector.prototype.callWithAncestors = function(method, ancestor) {
+		ancestor = !empty(ancestor) ? ancestor : AbstractAppInspector;
+		
+		if (this instanceof ancestor && this[method] !== ancestor.prototype[method]) {
+			ancestor.prototype[method].call(this);
+		}
+		
+		return this[method]();
 	};
 	
 	$('body').on('keyup.CloseCurrentAppInspector', function(e) {
