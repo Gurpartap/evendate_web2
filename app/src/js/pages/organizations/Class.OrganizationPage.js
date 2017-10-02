@@ -224,7 +224,10 @@ OrganizationPage = extending(Page, (function() {
 		__APP.changeTitle(organization.short_name);
 		__APP.SIDEBAR.$subscribed_orgs.find('[data-organization_id="' + organization.id + '"]').find('.OrganizationCounter').addClass(__C.CLASSES.HIDDEN);
 		PAGE.$wrapper.html(tmpl('organization-wrapper', $.extend(true, {
-			background_image: organization.background_img_url ? tmpl('organization-background-image', organization) : '',
+			background_image: tmpl('organization-background-image', {
+				background_img_url: organization.background_medium_img_url || organization.background_img_url,
+				background_full_img_url: organization.background_img_url
+			}),
 			avatar_block: __APP.BUILD.avatarBlocks(organization, {
 				block_classes: ['organization_title_block'],
 				avatar_classes: [__C.CLASSES.SIZES.SMALL, 'organization_avatar'],
