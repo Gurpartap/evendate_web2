@@ -39,70 +39,70 @@ var backgrounds = [
         image: ''
     }, {
         title: 'Ковёр',
-        image: 'images/polygon-bg/cover.png'
+        image: '/event_landing/images/polygon-bg/cover.png'
     }, {
         title: 'Углы',
-        image: 'images/polygon-bg/corners.png'
+        image: '/event_landing/images/polygon-bg/corners.png'
     }, {
         title: 'Чили',
-        image: 'images/polygon-bg/chile.png'
+        image: '/event_landing/images/polygon-bg/chile.png'
     }, {
         title: 'Геймпад',
-        image: 'images/polygon-bg/gamepad.png'
+        image: '/event_landing/images/polygon-bg/gamepad.png'
     }, {
         title: 'Орнамент',
-        image: 'images/polygon-bg/ornaments.png'
+        image: '/event_landing/images/polygon-bg/ornaments.png'
     }, {
         title: 'Руны',
-        image: 'images/polygon-bg/runes.png'
+        image: '/event_landing/images/polygon-bg/runes.png'
     }, {
         title: 'Звезды',
-        image: 'images/polygon-bg/stars.png'
+        image: '/event_landing/images/polygon-bg/stars.png'
     }, {
         title: 'Трип',
-        image: 'images/polygon-bg/trip.png'
+        image: '/event_landing/images/polygon-bg/trip.png'
     }, {
         title: 'Следы',
-        image: 'images/polygon-bg/ufo.png'
+        image: '/event_landing/images/polygon-bg/ufo.png'
     }, {
         title: 'Стол',
-        image: 'images/polygon-bg/table.png'
+        image: '/event_landing/images/polygon-bg/table.png'
     }, {
         title: 'Радуги',
-        image: 'images/polygon-bg/rainbows.png'
+        image: '/event_landing/images/polygon-bg/rainbows.png'
     }, {
         title: 'Площадь',
-        image: 'images/polygon-bg/squares.png'
+        image: '/event_landing/images/polygon-bg/squares.png'
     }, {
         title: 'Чешуя',
-        image: 'images/polygon-bg/helmet.png'
+        image: '/event_landing/images/polygon-bg/helmet.png'
     }, {
         title: 'Дизайн',
-        image: 'images/polygon-bg/design.png'
+        image: '/event_landing/images/polygon-bg/design.png'
     }, {
         title: 'Деревня',
-        image: 'images/polygon-bg/village.png'
+        image: '/event_landing/images/polygon-bg/village.png'
     }, {
         title: 'Калейдоскоп',
-        image: 'images/polygon-bg/caleidoscope.png'
+        image: '/event_landing/images/polygon-bg/caleidoscope.png'
     }, {
         title: 'Полигон',
-        image: 'images/polygon-bg/green.jpg'
+        image: '/event_landing/images/polygon-bg/green.jpg'
     }, {
         title: 'Кометы',
-        image: 'images/polygon-bg/comets.png'
+        image: '/event_landing/images/polygon-bg/comets.png'
     }, {
         title: 'Направления',
-        image: 'images/polygon-bg/directions.png'
+        image: '/event_landing/images/polygon-bg/directions.png'
     }, {
         title: 'Треугольники',
-        image: 'images/polygon-bg/triangles.png'
+        image: '/event_landing/images/polygon-bg/triangles.png'
     }, {
         title: 'Трубы',
-        image: 'images/polygon-bg/pipes.png'
+        image: '/event_landing/images/polygon-bg/pipes.png'
     }, {
         title: 'Спирали',
-        image: 'images/polygon-bg/spirals.png'
+        image: '/event_landing/images/polygon-bg/spirals.png'
     }
 ];
 
@@ -312,24 +312,24 @@ __app.controller('WholeWorldController', ['$scope', 'Upload', '$timeout', functi
                 swapping: false, // whether or not to have items of the same size switch places instead of pushing down if they are the same size
                 width: 'auto', // can be an integer or 'auto'. 'auto' scales gridster to be the full width of its containing element
                 colWidth: 'auto', // can be an integer or 'auto'.  'auto' uses the pixel width of the element divided by 'columns'
-                rowHeight: '70', // can be an integer or 'match'.  Match uses the colWidth, giving you square widgets.
+                rowHeight: '90', // can be an integer or 'match'.  Match uses the colWidth, giving you square widgets.
                 margins: [40, 40], // the pixel distance between each widget
                 outerMargin: true, // whether margins apply to outer edges of the grid
                 sparse: false, // "true" can increase performance of dragging and resizing for big grid (e.g. 20x50)
                 isMobile: false, // stacks the grid items if true
                 mobileBreakPoint: 600, // if the screen is not wider that this, remove the grid layout and stack the items
                 mobileModeEnabled: true, // whether or not to toggle mobile mode when screen width is less than mobileBreakPoint
-                minColumns: 1, // the minimum columns the grid must have
+                minColumns: 3, // the minimum columns the grid must have
                 minRows: 1, // the minimum height of the grid, in rows
                 maxRows: 100,
-                defaultSizeX: 1, // the default width of a gridster item, if not specifed
+                defaultSizeX: 3, // the default width of a gridster item, if not specifed
                 defaultSizeY: 1, // the default height of a gridster item, if not specified
                 minSizeX: 3, // minimum column width of an item
                 maxSizeX: null, // maximum column width of an item
                 minSizeY: 1, // minumum row height of an item
                 maxSizeY: null, // maximum row height of an item
                 resizable: {
-                    enabled: false
+                    enabled: true
                 },
                 draggable: {
                     enabled: true, // whether dragging items is supported
@@ -426,7 +426,7 @@ __app.controller('WholeWorldController', ['$scope', 'Upload', '$timeout', functi
             enabled: true
         },
         gallery: {
-            title: 'Галлерея',
+            title: 'Галерея',
             subtitle: 'Подзаголовок',
             items: {},
             itemImageChange: function ($files, $file, $newFiles, $duplicateFiles, $invalidFiles, $event, item_uuid) {
@@ -463,7 +463,7 @@ __app.controller('WholeWorldController', ['$scope', 'Upload', '$timeout', functi
                 return false;
             },
             gridOptions: {
-                columns: 3, // the width of the grid, in columns
+                columns: 12, // the width of the grid, in columns
                 pushing: false, // whether to push other items out of the way on move or resize
                 floating: false, // whether to automatically float items up so they stack (you can temporarily disable if you are adding unsorted items with ng-repeat)
                 swapping: false, // whether or not to have items of the same size switch places instead of pushing down if they are the same size
@@ -476,17 +476,17 @@ __app.controller('WholeWorldController', ['$scope', 'Upload', '$timeout', functi
                 isMobile: false, // stacks the grid items if true
                 mobileBreakPoint: 600, // if the screen is not wider that this, remove the grid layout and stack the items
                 mobileModeEnabled: true, // whether or not to toggle mobile mode when screen width is less than mobileBreakPoint
-                minColumns: 1, // the minimum columns the grid must have
+                minColumns: 3, // the minimum columns the grid must have
                 minRows: 1, // the minimum height of the grid, in rows
                 maxRows: 100,
-                defaultSizeX: 1, // the default width of a gridster item, if not specifed
-                defaultSizeY: 1, // the default height of a gridster item, if not specified
+                defaultSizeX: 4, // the default width of a gridster item, if not specifed
+                defaultSizeY: 4, // the default height of a gridster item, if not specified
                 minSizeX: 1, // minimum column width of an item
                 maxSizeX: null, // maximum column width of an item
                 minSizeY: 1, // minumum row height of an item
                 maxSizeY: null, // maximum row height of an item
                 resizable: {
-                    enabled: false,
+                    enabled: true,
                     // handles: ['n', 'e', 's', 'w', 'ne', 'se', 'sw', 'nw'],
                     // start: function(event, $element, widget) {}, // optional callback fired when resize is started,
                     // resize: function(event, $element, widget) {}, // optional callback fired when item is resized,
@@ -889,6 +889,7 @@ __app.controller('WholeWorldController', ['$scope', 'Upload', '$timeout', functi
                     return false;
                 });
                 $('.lightbox').nivoLightbox();
+                $('.days-tab-link:first').click();
                 $scope.data.sponsors.gridOptions.resizable.enabled = false;
                 $scope.data.faq.gridOptions.resizable.enabled = false;
                 $scope.data.speakers.gridOptions.resizable.enabled = false;

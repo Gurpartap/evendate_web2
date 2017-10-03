@@ -3212,7 +3212,7 @@ button:focus {
   opacity: 1;
 }
 .recap-gallery-item .img-scale {
-  max-height: 449px;
+  /*max-height: 449px;*/
 }
 .recap-gallery-item img {
   transition: all 0.3s;
