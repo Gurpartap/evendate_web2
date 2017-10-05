@@ -200,7 +200,7 @@ __app.controller('WholeWorldController', ['$scope', 'Upload', '$timeout', functi
             },
             gridOptions: {
                 columns: 12, // the width of the grid, in columns
-                pushing: false, // whether to push other items out of the way on move or resize
+                pushing: true, // whether to push other items out of the way on move or resize
                 floating: false, // whether to automatically float items up so they stack (you can temporarily disable if you are adding unsorted items with ng-repeat)
                 swapping: false, // whether or not to have items of the same size switch places instead of pushing down if they are the same size
                 width: 'auto', // can be an integer or 'auto'. 'auto' scales gridster to be the full width of its containing element
@@ -307,7 +307,7 @@ __app.controller('WholeWorldController', ['$scope', 'Upload', '$timeout', functi
             },
             gridOptions: {
                 columns: 12, // the width of the grid, in columns
-                pushing: false, // whether to push other items out of the way on move or resize
+                pushing: true, // whether to push other items out of the way on move or resize
                 floating: false, // whether to automatically float items up so they stack (you can temporarily disable if you are adding unsorted items with ng-repeat)
                 swapping: false, // whether or not to have items of the same size switch places instead of pushing down if they are the same size
                 width: 'auto', // can be an integer or 'auto'. 'auto' scales gridster to be the full width of its containing element
@@ -369,7 +369,7 @@ __app.controller('WholeWorldController', ['$scope', 'Upload', '$timeout', functi
             enabled: true,
             gridOptions: {
                 columns: 12, // the width of the grid, in columns
-                pushing: false, // whether to push other items out of the way on move or resize
+                pushing: true, // whether to push other items out of the way on move or resize
                 floating: false, // whether to automatically float items up so they stack (you can temporarily disable if you are adding unsorted items with ng-repeat)
                 swapping: false, // whether or not to have items of the same size switch places instead of pushing down if they are the same size
                 width: 'auto', // can be an integer or 'auto'. 'auto' scales gridster to be the full width of its containing element
@@ -464,7 +464,7 @@ __app.controller('WholeWorldController', ['$scope', 'Upload', '$timeout', functi
             },
             gridOptions: {
                 columns: 12, // the width of the grid, in columns
-                pushing: false, // whether to push other items out of the way on move or resize
+                pushing: true, // whether to push other items out of the way on move or resize
                 floating: false, // whether to automatically float items up so they stack (you can temporarily disable if you are adding unsorted items with ng-repeat)
                 swapping: false, // whether or not to have items of the same size switch places instead of pushing down if they are the same size
                 width: 'auto', // can be an integer or 'auto'. 'auto' scales gridster to be the full width of its containing element
