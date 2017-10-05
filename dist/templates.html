@@ -2787,7 +2787,7 @@
 <script type="javascript/template" id="tmpl-admin-organization-requisites-page">
 	<form class="page org_admin_requisites_page material -level_2_material Tabs RequisitesForm">
 		{radio_group}
-		<p class="text -mini">Заключение договора дает возможность продавать билеты через Интернет. Договор можно заключить одним из следующих способов:</p>
+		<p class="text -mini">Заключение <a href="/docs/agent_agreement.pdf" target="_blank">договора</a> дает возможность продавать билеты через Интернет. Договор можно заключить одним из следующих способов:</p>
 		<div class="tab_bodies_wrap TabsBodyWrapper">
 			<fieldset class="tab_body TabsBody -active">
 				<ol class="text -mini">
@@ -2796,28 +2796,28 @@
 				</ol>
 				<h3>Информация о компании</h3>
 				{l_company_form_field}
-				<fieldset class="CompanyAdditionalInfo -hidden">
+				<fieldset class="form_unit CompanyAdditionalInfo -hidden">
 					<div class="form_group -parts_e_e_e -valign_baseline">
 						{l_inn_form_field}
 						{l_kpp_form_field}
 						{l_ogrn_form_field}
 					</div>
 					{l_real_address_form_field}
-
-					<div class="form_unit">
-						<label class="form_label" for="legal_entity_requisites_taxation_type">Информация об НДС</label>
-						<select id="legal_entity_requisites_taxation_type" class="form_select" name="taxation_type" required>
-							<option select hidden value="">Выберите</option>
-							<option value="value_added_tax">Обычная система налогообложения (с НДС)</option>
-							<option value="no_value_added_tax">Упрощенная система налогообложения (без НДС)</option>
-						</select>
-						<p class="form_helptext">Укажите, является ли ваша компания налогоплательщиком НДС</p>
-					</div>
 				</fieldset>
+
+				<div class="form_unit">
+					<label class="form_label" for="legal_entity_requisites_taxation_type">Информация об НДС</label>
+					<select id="legal_entity_requisites_taxation_type" class="form_select TaxationTypeSelect" name="taxation_type" required>
+						<option select hidden value="">Выберите</option>
+						<option value="value_added_tax">Обычная система налогообложения (с НДС)</option>
+						<option value="no_value_added_tax">Упрощенная система налогообложения (без НДС)</option>
+					</select>
+					<p class="form_helptext">Укажите, является ли ваша компания налогоплательщиком НДС</p>
+				</div>
 
 				<h3>Банковские данные</h3>
 				{l_bank_name_form_field}
-				<fieldset class="LegalEntityBankAdditionalInfo -hidden">
+				<fieldset class="form_unit LegalEntityBankAdditionalInfo -hidden">
 					<div class="form_group -parts_e_e -valign_baseline">
 						{l_bic_form_field}
 						{l_correspondent_account_form_field}
@@ -2836,7 +2836,7 @@
 					{l_self_phone_form_field}
 				</div>
 			</fieldset>
-			<fieldset class="tab_body TabsBody">
+			<fieldset class="tab_body TabsBody" disabled>
 				<ol class="text -mini">
 					<li>Перевести нам 15 рублей с вашего личного банковского счета</li>
 					<li>Прислать нам нотариально заверенное заявление</li>
@@ -2856,7 +2856,7 @@
 
 				<h3>Банковские данные</h3>
 				{n_bank_name_form_field}
-				<fieldset class="NaturalPersonBankAdditionalInfo -hidden">
+				<fieldset class="form_unit NaturalPersonBankAdditionalInfo -hidden">
 					<div class="form_group -parts_e_e -valign_baseline">
 						{n_bic_form_field}
 						{n_correspondent_account_form_field}
