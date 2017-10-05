@@ -121,6 +121,8 @@ EntitiesCollection = extending(Array, (function() {
 	 *
 	 * @param {string} key
 	 * @param {boolean} [ascending=false]
+	 *
+	 * @return {EntitiesCollection}
 	 */
 	EntitiesCollection.prototype.sortBy = function(key, ascending) {
 		var key_spliced = key.split('.');

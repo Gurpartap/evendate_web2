@@ -62,6 +62,35 @@ AbstractEventTicketsCollection = extending(TicketsCollection, (function() {
 			}
 		});
 	};
+	/**
+	 *
+	 * @param {(Fields|string)} [fields]
+	 * @param {object} [filters]
+	 * @param {(string|Array)} [order_by]
+	 * @param {AJAXCallback} [success]
+	 *
+	 * @return {jqPromise}
+	 */
+	AbstractEventTicketsCollection.prototype.fetchAllTickets = function(fields, filters, order_by, success) {
+		var self = this;
+		
+		this.empty();
+		
+		return this.constructor.fetchTickets(this.event_id, Object.assign({
+			fields: fields || undefined,
+			offset: 0,
+			length: ServerConnection.MAX_ENTITIES_LENGTH,
+			order_by: order_by || undefined
+		}, filters), function(data) {
+			self.setData(data);
+			if (isFunction(success)) {
+				success.call(self, self.last_pushed);
+			}
+		}).then(function() {
+			
+			return self.last_pushed;
+		});
+	};
 	
 	return AbstractEventTicketsCollection;
 }()));

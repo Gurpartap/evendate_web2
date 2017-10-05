@@ -619,63 +619,6 @@
 		{comment_form_unit}
 	</form>
 </script>
-<script type="javascript/template" id="tmpl-app-inspector">
-	<div class="app_inspector material -floating_material AppInspector">
-		<header class="app_inspector_header">
-			<button class="app_inspector_remover AppInspectorRemoveButton" type="button">&times;</button>
-			<span class="app_inspector_title AppInspectorTitle">{title}</span>
-		</header>
-		<div class="app_inspector_content_wrapper scrollbar-outer AppInspectorScroll">
-			<div class="app_inspector_content AppInspectorContent">{content}</div>
-		</div>
-	</div>
-</script>
-<script type="javascript/template" id="tmpl-order-app-inspector">
-	{orderer}
-	<div class="app_inspector_wrapper -align_right">
-		{status_block}
-	</div>
-	<div class="app_inspector_wrapper">
-		{payment_info}
-	</div>
-	{tickets_title}
-	{tickets}
-	{registration_form_title}
-	{registration_fields}
-	{event_title}
-	{event}
-</script>
-
-<script type="javascript/template" id="tmpl-client-app-inspector">
-	{client}
-	{interests_title}
-	{interests_spiderweb_chart}
-</script>
-<script type="javascript/template" id="tmpl-app-inspector-title">
-	<h6 class="app_inspector_subtitle">{title}</h6>
-</script>
-
-<script type="javascript/template" id="tmpl-app-inspector-ticket">
-	<div class="app_inspector_ticket">
-		<div class="app_inspector_ticket_body">
-			{fields}
-		</div>
-		{footer}
-	</div>
-</script>
-
-<script type="javascript/template" id="tmpl-app-inspector-ticket-footer">
-	<footer class="app_inspector_ticket_footer"><span>Билет использован</span></footer>
-</script>
-
-<script type="javascript/template" id="tmpl-app-inspector-event">
-	<a class="app_inspector_event Link" href="/event/{id}">
-		<img src="{image_horizontal_url}?width=108" width="108" height="60">
-		<div class="app_inspector_event_body">
-			<span class="app_inspector_event_title">{title}</span>
-		</div>
-	</a>
-</script>
 <script type="javascript/template" id="tmpl-add-organization-page">
 
 	<div class="page add_organization_page">
@@ -2006,6 +1949,63 @@
 		</div>
 	</div>
 </script>
+<script type="javascript/template" id="tmpl-app-inspector">
+	<div class="app_inspector material -floating_material AppInspector">
+		<header class="app_inspector_header">
+			<button class="app_inspector_remover AppInspectorRemoveButton" type="button">&times;</button>
+			<span class="app_inspector_title AppInspectorTitle">{title}</span>
+		</header>
+		<div class="app_inspector_content_wrapper scrollbar-outer AppInspectorScroll">
+			<div class="app_inspector_content AppInspectorContent">{content}</div>
+		</div>
+	</div>
+</script>
+<script type="javascript/template" id="tmpl-order-app-inspector">
+	{orderer}
+	<div class="app_inspector_wrapper -align_right">
+		{status_block}
+	</div>
+	<div class="app_inspector_wrapper">
+		{payment_info}
+	</div>
+	{tickets_title}
+	{tickets}
+	{registration_form_title}
+	{registration_fields}
+	{event_title}
+	{event}
+</script>
+
+<script type="javascript/template" id="tmpl-client-app-inspector">
+	{client}
+	{interests_title}
+	{interests_spiderweb_chart}
+</script>
+<script type="javascript/template" id="tmpl-app-inspector-title">
+	<h6 class="app_inspector_subtitle">{title}</h6>
+</script>
+
+<script type="javascript/template" id="tmpl-app-inspector-ticket">
+	<div class="app_inspector_ticket">
+		<div class="app_inspector_ticket_body">
+			{fields}
+		</div>
+		{footer}
+	</div>
+</script>
+
+<script type="javascript/template" id="tmpl-app-inspector-ticket-footer">
+	<footer class="app_inspector_ticket_footer"><span>Билет использован</span></footer>
+</script>
+
+<script type="javascript/template" id="tmpl-app-inspector-event">
+	<a class="app_inspector_event Link" href="/event/{id}">
+		<img src="{image_horizontal_url}?width=108" width="108" height="60">
+		<div class="app_inspector_event_body">
+			<span class="app_inspector_event_title">{title}</span>
+		</div>
+	</a>
+</script>
 <script type="javascript/template" id="tmpl-calendar">
 	<div class="{wrapper_class} -unselectable">
 		<div class="{header_class}">
@@ -2108,7 +2108,7 @@
 					<th class="-unselectable" align="left" data-sort-order="desc" width="250px"><span class="Text">Статус</span></th>
 				</tr>
 			</thead>
-			{rows}
+			<tbody></tbody>
 		</table>
 	</div>
 </script>
@@ -2426,6 +2426,7 @@
 				</div>
 			</div>
 			{charts}
+			{promocodes}
 		</div>
 	</div>
 </script>
@@ -2442,6 +2443,30 @@
 			<span class="event_admin_sales_ticket_type_price">{price}</span>
 		</p>
 		{progress_bar}
+	</div>
+</script>
+
+<script type="javascript/template" id="tmpl-admin-event-sales-promocodes">
+	<h4>Промокоды</h4>
+	<div class="-edge_to_edge">
+		<table class="table -data_table_override PromocodesTable">
+			<thead>
+				<tr>
+					<th>Код</th>
+					<th>Скидка</th>
+					<th>Период активности</th>
+					<th>Использовано</th>
+					<th>Общая сумма скидки</th>
+				</tr>
+			</thead>
+			<tbody></tbody>
+			<tfoot>
+				<tr>
+					<th colspan="4" align="right">Суммарная скидка по промокадам:</th>
+					<th class="EffortTotalSum"></th>
+				</tr>
+			</tfoot>
+		</table>
 	</div>
 </script>
 <script type="javascript/template" id="tmpl-admin-organization-crm-page">
@@ -2762,7 +2787,7 @@
 <script type="javascript/template" id="tmpl-admin-organization-requisites-page">
 	<form class="page org_admin_requisites_page material -level_2_material Tabs RequisitesForm">
 		{radio_group}
-		<p class="text -mini">Заключение договора дает возможность продавать билеты через Интернет. Договор можно заключить одним из следующих способов:</p>
+		<p class="text -mini">Заключение <a href="/docs/agent_agreement.pdf" target="_blank">договора</a> дает возможность продавать билеты через Интернет. Договор можно заключить одним из следующих способов:</p>
 		<div class="tab_bodies_wrap TabsBodyWrapper">
 			<fieldset class="tab_body TabsBody -active">
 				<ol class="text -mini">
@@ -2771,28 +2796,28 @@
 				</ol>
 				<h3>Информация о компании</h3>
 				{l_company_form_field}
-				<fieldset class="CompanyAdditionalInfo -hidden">
+				<fieldset class="form_unit CompanyAdditionalInfo -hidden">
 					<div class="form_group -parts_e_e_e -valign_baseline">
 						{l_inn_form_field}
 						{l_kpp_form_field}
 						{l_ogrn_form_field}
 					</div>
 					{l_real_address_form_field}
-
-					<div class="form_unit">
-						<label class="form_label" for="legal_entity_requisites_taxation_type">Информация об НДС</label>
-						<select id="legal_entity_requisites_taxation_type" class="form_select" name="taxation_type" required>
-							<option select hidden value="">Выберите</option>
-							<option value="value_added_tax">Обычная система налогообложения (с НДС)</option>
-							<option value="no_value_added_tax">Упрощенная система налогообложения (без НДС)</option>
-						</select>
-						<p class="form_helptext">Укажите, является ли ваша компания налогоплательщиком НДС</p>
-					</div>
 				</fieldset>
+
+				<div class="form_unit">
+					<label class="form_label" for="legal_entity_requisites_taxation_type">Информация об НДС</label>
+					<select id="legal_entity_requisites_taxation_type" class="form_select TaxationTypeSelect" name="taxation_type" required>
+						<option select hidden value="">Выберите</option>
+						<option value="value_added_tax">Обычная система налогообложения (с НДС)</option>
+						<option value="no_value_added_tax">Упрощенная система налогообложения (без НДС)</option>
+					</select>
+					<p class="form_helptext">Укажите, является ли ваша компания налогоплательщиком НДС</p>
+				</div>
 
 				<h3>Банковские данные</h3>
 				{l_bank_name_form_field}
-				<fieldset class="LegalEntityBankAdditionalInfo -hidden">
+				<fieldset class="form_unit LegalEntityBankAdditionalInfo -hidden">
 					<div class="form_group -parts_e_e -valign_baseline">
 						{l_bic_form_field}
 						{l_correspondent_account_form_field}
@@ -2811,7 +2836,7 @@
 					{l_self_phone_form_field}
 				</div>
 			</fieldset>
-			<fieldset class="tab_body TabsBody">
+			<fieldset class="tab_body TabsBody" disabled>
 				<ol class="text -mini">
 					<li>Перевести нам 15 рублей с вашего личного банковского счета</li>
 					<li>Прислать нам нотариально заверенное заявление</li>
@@ -2831,7 +2856,7 @@
 
 				<h3>Банковские данные</h3>
 				{n_bank_name_form_field}
-				<fieldset class="NaturalPersonBankAdditionalInfo -hidden">
+				<fieldset class="form_unit NaturalPersonBankAdditionalInfo -hidden">
 					<div class="form_group -parts_e_e -valign_baseline">
 						{n_bic_form_field}
 						{n_correspondent_account_form_field}

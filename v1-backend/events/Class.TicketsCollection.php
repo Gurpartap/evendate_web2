@@ -102,7 +102,7 @@ class TicketsCollection extends AbstractCollection
 					break;
 				}
 				case 'order_status_type': {
-					$q_get_tickets->join('order_status_type = ?', $value);
+					$q_get_tickets->where('order_status_type = ?', $value);
 				}
 			}
 		}
