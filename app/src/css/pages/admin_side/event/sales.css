@@ -50,6 +50,11 @@
 	padding: 24px;
 }
 
+.event_admin_sales_page_main > .-edge_to_edge {
+	margin-left: -24px;
+	margin-right: -24px;
+}
+
 .event_admin_sales_ticket_type {
 	margin: 26px 0;
 }

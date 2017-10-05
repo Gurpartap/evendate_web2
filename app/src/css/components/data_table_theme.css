@@ -16,9 +16,7 @@ table.table.-data_table_override td {
 	height: 30px;
 	padding: 9px 18px;
 }
-table.table.-data_table_override th {
-	padding-right: 28px;
-}
+table.table.-data_table_override thead th {padding-right: 28px}
 
 table.table.-data_table_override tbody tr.even.-has_child + tr {background-color: #f9f9fa}
 
@@ -30,17 +28,28 @@ table.table.-data_table_override tr.-has_child + tr > td {
 table.table.-data_table_override tr.-has_child + tr td {width: auto}
 
 table.table.-data_table_override thead th,
-table.table.-data_table_override thead td {
+table.table.-data_table_override thead td,
+table.table.-data_table_override tfoot th,
+table.table.-data_table_override tfoot td {
 	color: #657184;
 	font-weight: bold;
 	font-size: .9375em;
 	border-bottom: 0;
-	vertical-align: bottom;
 	word-wrap: normal;
 }
 
+table.table.-data_table_override thead th,
+table.table.-data_table_override thead td {vertical-align: bottom}
+table.table.-data_table_override tfoot th,
+table.table.-data_table_override tfoot td {
+	vertical-align: top;
+	border-top: 1px solid #c5c9d1;
+}
+
 table.table.-data_table_override thead th:not([align]),
-table.table.-data_table_override thead td:not([align]) {text-align: left}
+table.table.-data_table_override thead td:not([align]),
+table.table.-data_table_override tfoot th:not([align]),
+table.table.-data_table_override tfoot td:not([align]) {text-align: left}
 
 table.table.-data_table_override tbody td {
 	color: inherit;
@@ -185,7 +194,12 @@ table.table.-data_table_override.-data_table_row_selection tr {cursor: pointer}
 	table.table.-data_table_override tbody tr.even.-has_child + tr {background-color: var(--color_background_gray)}
 
 	table.table.-data_table_override thead th,
-	table.table.-data_table_override thead td {color: var(--color_primary_80)}
+	table.table.-data_table_override thead td,
+	table.table.-data_table_override tfoot th,
+	table.table.-data_table_override tfoot td {color: var(--color_primary_80)}
+
+	table.table.-data_table_override tfoot th,
+	table.table.-data_table_override tfoot td {border-color: var(--color_primary_30)}
 
 	table.-data_table_override thead .sorting_asc:after,
 	table.-data_table_override thead .sorting_desc:after {color: var(--color_accent)}
