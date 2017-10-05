@@ -1562,7 +1562,7 @@ button:focus {
   top: 29px;
 }
 @media (max-width: 768px) {
-  .navbar-nemo {display: none}
+  /*.navbar-nemo {display: none}*/
 }
 @media (min-width: 768px) {
   .navbar-transparent {

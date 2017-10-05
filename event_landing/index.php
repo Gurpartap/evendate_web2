@@ -158,19 +158,15 @@ if (isset($_REQUEST['edit']) && $_REQUEST['edit'] == true) {
 ============================== -->
 <div class="navbar navbar-nemo appear-onscroll navbar-fixed-top">
   <div class="container">
-    <!--    <div class="navbar-header">-->
-    <!--      <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#nemo-navigation"-->
-    <!--              aria-expanded="false">-->
-    <!--        <span class="sr-only">Toggle navigation</span>-->
-    <!--        <span class="icon-bar icon-bar-top"></span>-->
-    <!--        <span class="icon-bar icon-bar-middle"></span>-->
-    <!--        <span class="icon-bar icon-bar-bottom"></span>-->
-    <!--      </button>-->
-    <!--      <!-- YOUR LOGO -->
-    <!--      <a class="navbar-brand" href="#">-->
-    <!--        <img src="$event['organization_logo_medium_url']" alt="">-->
-    <!--      </a>-->
-    <!--    </div>-->
+        <div class="navbar-header">
+          <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#nemo-navigation"
+                  aria-expanded="false">
+            <span class="sr-only">Toggle navigation</span>
+            <span class="icon-bar icon-bar-top"></span>
+            <span class="icon-bar icon-bar-middle"></span>
+            <span class="icon-bar icon-bar-bottom"></span>
+          </button>
+        </div>
 
     <div class="collapse navbar-collapse navbar-center" id="nemo-navigation">
       <ul class="nav navbar-nav">
