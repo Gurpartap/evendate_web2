@@ -861,8 +861,16 @@ __app.controller('WholeWorldController', ['$scope', 'Upload', '$timeout', functi
                 $.each(_data, function (key, value) {
                     if ($.type(value) === 'object') {
                         $.each(value, function (key_l2, val_l2) {
+
                             if ($.type($scope.data[key][key_l2]) !== 'function' &&
                                 !Array.isArray(val_l2)) {
+
+                                if (key_l2.indexOf('gridOptions') !== -1 &&
+                                    $scope.data[key][key_l2].hasOwnProperty('resizable')
+                                    && !$scope.edit_mode
+                                ) {
+                                    $scope.data[key][key_l2]['resizable']['enabled'] = false;
+                                }
                                 $scope.data[key][key_l2] = val_l2;
                             }
                         });
