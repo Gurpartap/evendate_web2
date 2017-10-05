@@ -1602,6 +1602,7 @@ button:focus {
   position: relative;
   color: #fff;
   text-align: center;
+  overflow: hidden;
 }
 .home .heading-text {
   color: #fff;
