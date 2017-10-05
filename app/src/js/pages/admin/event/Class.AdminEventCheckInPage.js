@@ -77,7 +77,7 @@ AdminEventCheckInPage = extending(AdminEventPage, (function() {
 	 *
 	 * @property {AdminEventCheckInPage.STATES} current_checkin_state
 	 * @property {CheckInTicketsCollection} tickets
-	 * @property {SearchEventTicketsCollection} searching_tickets
+	 * @property {Fuse} searching_tickets_fuse
 	 * @property {Fields} tickets_fields
 	 * @property {boolean} is_awaiting_state
 	 * @property {boolean} is_searching_state
@@ -93,7 +93,6 @@ AdminEventCheckInPage = extending(AdminEventPage, (function() {
 		this.current_checkin_state = AdminEventCheckInPage.STATES.AWAITING;
 		this.tickets_fields = new Fields('user', 'ticket_type', 'event_id');
 		this.tickets = new CheckInTicketsCollection(event_id);
-		this.searching_tickets = new SearchEventTicketsCollection('', event_id);
 		this.is_searching_state = false;
 		this.is_fetching = false;
 		
@@ -122,6 +121,20 @@ AdminEventCheckInPage = extending(AdminEventPage, (function() {
 				get: function() {
 					return self.current_checkin_state === AdminEventCheckInPage.STATES.AWAITING;
 				}
+			},
+			searching_tickets_fuse: {
+				get: function() {
+					
+					return new Fuse(self.tickets, {
+						shouldSort: true,
+						threshold: 0.1,
+						distance: 1000,
+						keys: [
+							'number',
+							'user.full_name'
+						]
+					});
+				}
 			}
 		});
 	}
@@ -143,7 +156,8 @@ AdminEventCheckInPage = extending(AdminEventPage, (function() {
 	};
 	
 	AdminEventCheckInPage.prototype.fetchData = function() {
-		return this.fetching_data_defer = __APP.SERVER.multipleAjax(AdminEventPage.prototype.fetchData.call(this), this.tickets.fetchTickets(this.tickets_fields, 0, 'created_at'));
+		
+		return this.fetching_data_defer = AdminEventPage.prototype.fetchData.call(this);
 	};
 	/**
 	 *
@@ -245,7 +259,6 @@ AdminEventCheckInPage = extending(AdminEventPage, (function() {
 		
 		this.$wrapper.find('#event_admin_check_in_type_' + this.current_checkin_state).prop('checked', true);
 		this.table_body.html(this.buildTableRows(this.tickets[this.current_checkin_state]));
-		
 	};
 	
 	AdminEventCheckInPage.prototype.init = function() {
@@ -263,38 +276,18 @@ AdminEventCheckInPage = extending(AdminEventPage, (function() {
 				self.initSearch();
 			}
 			
-			__APP.SERVER.abortAllConnections();
-			
 			if (value === '') {
 				self.deInitSearch();
 			} else {
-				self.searching_tickets = new SearchEventTicketsCollection(value, self.event.id);
-				
-				self.fetching_data_defer = self.searching_tickets.fetchTickets(self.tickets_fields, 0, 'created_at', function() {
-					self.table_body.html(self.buildTableRows(this.last_pushed));
-				});
-			}
-		});
-	};
-	/**
-	 *
-	 * @return {jqPromise}
-	 */
-	AdminEventCheckInPage.prototype.loadRest = function() {
-		var self = this;
-		
-		return this.tickets.fetchTickets(this.tickets_fields, 0, 'created_at', function() {
-			if (this.last_pushed.length) {
-				self.progress_bar.setMax(self.tickets.length);
-				self.progress_bar.set(self.tickets.checked.length);
-				
-				self.table_body.append(self.buildTableRows(this['new_' + self.current_checkin_state]));
-				self.fetching_data_defer = self.loadRest();
+				self.table_body.html(self.buildTableRows(self.searching_tickets_fuse.search(value)));
 			}
 		});
 	};
 	
 	AdminEventCheckInPage.prototype.render = function() {
+		var self = this,
+			$loader;
+		
 		this.progress_bar.setMax(this.tickets.length);
 		this.progress_bar.set(this.tickets.checked.length);
 		
@@ -319,13 +312,23 @@ AdminEventCheckInPage = extending(AdminEventPage, (function() {
 					}
 				]
 			}),
-			progress_bar: this.progress_bar,
-			rows: this.buildTableRows(this.tickets.awaiting)
+			progress_bar: this.progress_bar
 		}));
 		
+		this.$wrapper.find('.CheckInTable').after($loader = __APP.BUILD.loaderBlock());
 		this.table_body = this.$wrapper.find('.CheckInTable').children('tbody');
 		
-		this.fetching_data_defer = this.loadRest();
+		this.tickets.fetchAllTickets(this.tickets_fields, {
+			order_status_type: 'green'
+		}, 'created_at').always(function() {
+			$loader.remove();
+		}).done(function() {
+			self.progress_bar.setMax(self.tickets.length);
+			self.progress_bar.set(self.tickets.checked.length);
+			
+			self.table_body.append(self.buildTableRows(self.tickets['new_' + self.current_checkin_state]));
+		});
+		
 		this.init();
 	};
 	

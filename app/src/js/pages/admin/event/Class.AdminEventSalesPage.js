@@ -17,6 +17,8 @@ AdminEventSalesPage = extending(AdminEventPage, (function() {
 	 * @property {(string|number)} id
 	 * @property {OneEventWithFinances} event
 	 * @property {Fields} event_fields
+	 * @property {DataTable.Api} promocodesTable
+	 * @property {boolean} has_promocodes
 	 */
 	function AdminEventSalesPage(event_id) {
 		AdminEventPage.call(this, event_id);
@@ -49,9 +51,18 @@ AdminEventSalesPage = extending(AdminEventPage, (function() {
 						'sell_end_date',
 						'amount'
 					)
+				},
+				promocodes: {
+					fields: new Fields(
+						'use_limit',
+						'use_count',
+						'total_effort'
+					)
 				}
 			}
 		);
+		
+		this.promocodesTable = null;
 		
 		Object.defineProperties(this, {
 			page_title_obj: {
@@ -65,9 +76,85 @@ AdminEventSalesPage = extending(AdminEventPage, (function() {
 						page: '/admin/organization/' + this.event.organization_id
 					}, this.event.title + ' - продажи'];
 				}
+			},
+			has_promocodes: {
+				get: function() {
+					
+					return this.event.promocodes.length !== 0;
+				}
 			}
 		});
 	}
+	
+	AdminEventSalesPage.prototype.initPromocodesTable = function() {
+		this.promocodesTable = this.$wrapper.find('.PromocodesTable').DataTable({
+			paging: false,
+			columns: [
+				{data: 'code'},
+				{
+					data: function(promocode, type, val, meta) {
+						switch (type) {
+							case 'display': {
+								
+								return formatCurrency(promocode.effort, ' ', '.', '', promocode.is_fixed ? '₽' : '%');
+							}
+						}
+						
+						return promocode.effort;
+					},
+					orderable: false
+				},
+				{
+					data: function(promocode, type, val, meta) {
+						switch (type) {
+							case 'sort': {
+								
+								return promocode.start_date;
+							}
+						}
+						
+						return displayDateRange(promocode.start_date, promocode.end_date);
+					}
+				},
+				{
+					data: function(promocode, type, val, meta) {
+						switch (type) {
+							case 'display': {
+								
+								return promocode.use_count + (promocode.use_limit && promocode.use_limit !== 100000 ? ' / ' + promocode.use_limit : '');
+							}
+						}
+						
+						return promocode.use_count;
+					}
+				},
+				{
+					data: function(promocode, type, val, meta) {
+						switch (type) {
+							case 'display': {
+								
+								return formatCurrency(promocode.total_effort, ' ', '.', '', '₽');
+							}
+						}
+						
+						return promocode.total_effort;
+					}
+				}
+			],
+			dom: 't',
+			language: {
+				url: __LOCALE.DATATABLES_URL
+			},
+			footerCallback: function ( row, promocodes, start, end, display ) {
+				var total_sum = promocodes.reduce(function(sum, promocode) {
+					
+					return sum + promocode.total_effort;
+				}, 0);
+				
+				$( this.api().table().footer() ).find('.EffortTotalSum').html(formatCurrency(total_sum, ' ', '.', '', '₽'));
+			}
+		});
+	};
 	
 	AdminEventSalesPage.prototype.render = function() {
 		var self = this,
@@ -124,6 +211,7 @@ AdminEventSalesPage = extending(AdminEventPage, (function() {
 			first_event_date_day: first_event_date_split[0],
 			first_event_date_month: first_event_date_split[1].capitalize(),
 			charts: $charts,
+			promocodes: this.has_promocodes ? tmpl('admin-event-sales-promocodes') : '',
 			formatted_dates: formatted_dates.map(function(date_and_time_obj) {
 			
 				return date_and_time_obj.date + ' ' + date_and_time_obj.time;
@@ -161,6 +249,11 @@ AdminEventSalesPage = extending(AdminEventPage, (function() {
 				]
 			})
 		}));
+		
+		if (this.has_promocodes) {
+			this.initPromocodesTable();
+			this.promocodesTable.rows.add(this.event.promocodes).column(-1).order('desc').draw();
+		}
 		
 		this.event.fetchEvent(dynamics_fields, function() {
 			AdminPage.buildStockChart($charts.filter('.TicketsSellingChart'), 'Выручка', [{
