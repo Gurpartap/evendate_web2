@@ -567,9 +567,9 @@ if (isset($_REQUEST['edit']) && $_REQUEST['edit'] == true) {
             ngf-drop-available="dropAvailable"
             ng-src="{{item.base64_image || (item.image.$ngfBlobUrl ? item.image.$ngfBlobUrl : item.image)}}"
             alt="{{item.name}}">
-          <blockquote contenteditable ng-model="item.text">{{item.text}}</blockquote>
           <p class="client-name" contenteditable ng-model="item.name">{{item.name}}</p>
           <p class="position" contenteditable ng-model="item.details">{{item.details}}</p>
+          <blockquote contenteditable ng-model="item.text">{{item.text}}</blockquote>
 
         </div>
       </div> <!-- /END TESTIMONIAL ITEM -->
