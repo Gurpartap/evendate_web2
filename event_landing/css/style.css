@@ -1561,6 +1561,9 @@ button:focus {
           transform: rotate(0);
   top: 29px;
 }
+@media (max-width: 768px) {
+  .navbar-nemo {display: none}
+}
 @media (min-width: 768px) {
   .navbar-transparent {
     background-color: transparent !important;

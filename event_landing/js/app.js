@@ -375,7 +375,7 @@ __app.controller('WholeWorldController', ['$scope', 'Upload', '$timeout', functi
                 width: 'auto', // can be an integer or 'auto'. 'auto' scales gridster to be the full width of its containing element
                 colWidth: 'auto', // can be an integer or 'auto'.  'auto' uses the pixel width of the element divided by 'columns'
                 rowHeight: '55', // can be an integer or 'match'.  Match uses the colWidth, giving you square widgets.
-                margins: [40, 10], // the pixel distance between each widget
+                margins: [0, 10], // the pixel distance between each widget
                 outerMargin: true, // whether margins apply to outer edges of the grid
                 sparse: false, // "true" can increase performance of dragging and resizing for big grid (e.g. 20x50)
                 isMobile: false, // stacks the grid items if true
