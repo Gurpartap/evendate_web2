@@ -2796,11 +2796,11 @@ button:focus {
 }
 .testimonials-3 blockquote:before,
 .testimonials-4 blockquote:before {
-  content: '"';
+  /*content: '"';*/
 }
 .testimonials-3 blockquote:after,
 .testimonials-4 blockquote:after {
-  content: '"';
+  /*content: '"';*/
 }
 /******************** TESTIMONIALS 1 ********************/
 .testimonials-1 {
