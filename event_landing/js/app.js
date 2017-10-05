@@ -901,6 +901,12 @@ __app.controller('WholeWorldController', ['$scope', 'Upload', '$timeout', functi
                 $scope.data.sponsors.gridOptions.resizable.enabled = false;
                 $scope.data.faq.gridOptions.resizable.enabled = false;
                 $scope.data.speakers.gridOptions.resizable.enabled = false;
+                $scope.data.schedule.itemsGridOptions.resizable.enabled = false;
+                $scope.data.schedule.gridOptions.resizable.enabled = false;
+                $scope.data.testimonials.gridOptions.resizable.enabled = false;
+                $scope.data.gallery.gridOptions.resizable.enabled = false;
+                $scope.data.sponsors.gridOptions.resizable.enabled = false;
+                $scope.data.faq.gridOptions.resizable.enabled = false;
             } else {
                 window.no_saved_data = false;
                 $scope.updateBackgroundSuggests(event.tags);
