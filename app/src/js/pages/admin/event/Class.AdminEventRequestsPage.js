@@ -160,7 +160,8 @@ AdminEventRequestsPage = extending(AdminEventPage, (function() {
 				user: {
 					fields: new Fields('email')
 				}
-			});
+			}
+		);
 		
 		this.$loader = $();
 		this.$new_requests_list = $();
