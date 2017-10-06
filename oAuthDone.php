@@ -89,7 +89,7 @@ require_once('footer.php');
 				}
 				$pr_text.text(texts_array[text_number++]);
 			}, 3000),
-			data = Object.assign(searchToObject(), hashToObject());
+			data = mergeObjects(searchToObject(), hashToObject());
 
 		$.ajax({
 			url: '/api/v1/auth/' + window.location.search,
