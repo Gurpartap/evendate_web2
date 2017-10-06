@@ -1799,6 +1799,68 @@ function getFilenameFromURL(url) {
 
 /**
  *
+ * Creating new object by merging enumerable properties of given objects.
+ * Better analogue of Object.assign and $.extend.
+ * Note that parameters are not mutate, result is always new object.
+ *
+ * @param {...object} - given objects
+ * @param {boolean} [recursive=false] - merge recursively nested objects
+ * @param {boolean} [deep=false] - merge inherited properties
+ *
+ * @returns {object}
+ */
+function mergeObjects(/**...objects, */recursive, deep) {
+	var res,
+		length = arguments.length,
+		is_recursive,
+		is_deep,
+		i,
+		name,
+		current_el,
+		target_el;
+	
+	try {
+		res = Object.create(arguments[0].constructor.prototype);
+	} catch (e) {
+		res = {};
+	}
+	
+	if (typeof arguments[length - 1] === 'boolean' && typeof arguments[length - 2] === 'boolean') {
+		is_recursive = arguments[length - 2];
+		is_deep = arguments[length - 1];
+		length -= 2;
+	} else if (typeof arguments[length - 1] === 'boolean') {
+		is_recursive = arguments[length - 1];
+		is_deep = false;
+		length--;
+	} else {
+		is_recursive = false;
+		is_deep = false;
+	}
+	
+	for ( i = 0; i < length; i++) {
+		for (name in arguments[i]) {
+			if (!is_deep && arguments[i].hasOwnProperty(name) || is_deep) {
+				current_el = arguments[i][name];
+				target_el = res[name];
+				
+				if (typeof current_el === 'undefined' || current_el === res) {
+					continue;
+				}
+				
+				if (is_recursive && typeof current_el === 'object' && typeof target_el === 'object') {
+					res[name] = mergeObjects(is_recursive, target_el, current_el);
+				} else if (!(isVoid(current_el) && !isVoid(res[name]))) {
+					res[name] = current_el;
+				}
+			}
+		}
+	}
+	
+	return res;
+}
+/**
+ *
  * @param {?string} string
  * @return {?string}
  */
@@ -1871,9 +1933,19 @@ function isKeyPressed(event, key) {
  *
  * @return {boolean}
  */
+function isVoid(variable) {
+	
+	return variable === null || typeof variable === 'undefined';
+}
+/**
+ *
+ * @param {*} variable
+ *
+ * @return {boolean}
+ */
 function empty(variable) {
 	
-	return variable == null || (typeof variable === 'object' && $.isEmptyObject(variable)) || (variable instanceof Array && variable.length === 0);
+	return isVoid(variable) || (typeof variable === 'object' && $.isEmptyObject(variable)) || (variable instanceof Array && variable.length === 0);
 }
 /**
  *
