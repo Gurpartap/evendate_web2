@@ -21,7 +21,7 @@ require_once 'footer.php';
 ?>
 <script>
 	$(document).ready(function () {
-		var data = Object.assign(searchToObject(), hashToObject()),
+		var data = mergeObjects(searchToObject(), hashToObject()),
 			link = '/oAuthDone.php?' + objectToQueryString(data);
 
 		if (data.mobile === 'true') {
