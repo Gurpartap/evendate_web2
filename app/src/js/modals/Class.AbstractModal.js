@@ -2,18 +2,28 @@
  * @requires Class.Modals.js
  */
 /**
- * @class
  * @abstract
+ * @class
  */
 AbstractModal = (function() {
 	/**
+	 *
+	 * @param {AbstractModal.STYLES} [style]
+	 *
 	 * @abstract
 	 * @constructor
-	 * @param {AbstractModal.STYLES} [style]
+	 * @constructs AbstractModal
+	 *
 	 * @property {jQuery} modal
 	 * @property {jQuery} content_wrapper
 	 * @property {(string|jQuery)} content
 	 * @property {boolean} block_scroll
+	 *
+	 * @property {boolean} is_rendered
+	 * @property {boolean} is_inited
+	 * @property {boolean} is_shown
+	 *
+	 * @property {boolean} is_hidable
 	 */
 	function AbstractModal(style) {
 		this.id = 0;
@@ -28,9 +38,22 @@ AbstractModal = (function() {
 		this.wrapper_is_scrollable = false;
 		this.content_is_scrollable = false;
 		this.is_upload_disabled = false;
+		/**
+		 *
+		 * @protected
+		 */
 		this.is_rendered = false;
+		/**
+		 *
+		 * @protected
+		 */
 		this.is_inited = false;
+		/**
+		 *
+		 * @protected
+		 */
 		this.is_shown = false;
+		this.is_hidable = true;
 		
 		__APP.MODALS.collection.push(this);
 	}
@@ -281,19 +304,21 @@ AbstractModal = (function() {
 	AbstractModal.prototype.__hide = function() {
 		var self = this;
 		
-		this.scrollTop = this.modal_wrapper.scrollTop();
-		$(document).off('keyup.CloseModal');
-		
-		$('body').removeClass('-open_modal');
-		
-		__APP.MODALS.active_modal = undefined;
-		
-		this.modal.addClass('-faded');
-		this.modal.trigger('modal:disappear');
-		setTimeout(function() {
-			self.modal.addClass(__C.CLASSES.HIDDEN).trigger('modal:close');
-			self.is_shown = false;
-		}, 200);
+		if (this.is_hidable) {
+			this.scrollTop = this.modal_wrapper.scrollTop();
+			$(document).off('keyup.CloseModal');
+			
+			$('body').removeClass('-open_modal');
+			
+			__APP.MODALS.active_modal = undefined;
+			
+			this.modal.addClass('-faded');
+			this.modal.trigger('modal:disappear');
+			setTimeout(function() {
+				self.modal.addClass(__C.CLASSES.HIDDEN).trigger('modal:close');
+				self.is_shown = false;
+			}, 200);
+		}
 		
 		return this;
 	};

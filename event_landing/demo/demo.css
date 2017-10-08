@@ -423,43 +423,53 @@
 }
 
 .board-settings-btn {
-	right: 60px;
-	top: -110px;
-	display: inline-block;
-	vertical-align: bottom;
-	float: right;
-	margin: 0 4px 0 0;
-	position: relative;
+    right: 60px;
+    top: -110px;
+    display: inline-block;
+    vertical-align: bottom;
+    float: right;
+    margin: 0 4px 0 0;
+    position: relative;
 
-	height: 30px;
-	min-width: 30px;
-	font-family: inherit;
-	font-size: 11pt;
-	font-weight: 500;
-	color: rgb(255, 255, 255);
-	border: 0;
-	border-radius: 2px;
-	background-color: transparent;
-	text-align: center;
-	text-transform: uppercase;
-	overflow: hidden;
-	cursor: pointer;
-	word-wrap: normal;
-	z-index: 1;
-	-webkit-transition: box-shadow .3s ease, background-color .3s ease, color .3s ease, opacity .3s ease;
-	transition: box-shadow .3s ease, background-color .3s ease, color .3s ease, opacity .3s ease;
-	-webkit-transform: translate3d(0, 0, 0);
-	transform: translate3d(0, 0, 0);
+    height: 30px;
+    min-width: 30px;
+    font-family: inherit;
+    font-size: 11pt;
+    font-weight: 500;
+    color: rgb(255, 255, 255);
+    border: 0;
+    border-radius: 2px;
+    background-color: transparent;
+    text-align: center;
+    text-transform: uppercase;
+    overflow: hidden;
+    cursor: pointer;
+    word-wrap: normal;
+    z-index: 1;
+    -webkit-transition: box-shadow .3s ease, background-color .3s ease, color .3s ease, opacity .3s ease;
+    transition: box-shadow .3s ease, background-color .3s ease, color .3s ease, opacity .3s ease;
+    -webkit-transform: translate3d(0, 0, 0);
+    transform: translate3d(0, 0, 0);
 }
 
-.board-settings-btn:not(:empty) {padding: 0 1rem}
+.board-settings-btn:not(:empty) {
+    padding: 0 1rem
+}
+
 a.board-settings-btn,
-div.board-settings-btn {line-height: 28px}
+div.board-settings-btn {
+    line-height: 28px
+}
+
 a.board-settings-btn,
-a.board-settings-btn:hover {text-decoration: none !important}
+a.board-settings-btn:hover {
+    text-decoration: none !important
+}
 
 .board-settings-btn.not-main:not(:disabled):hover,
-.board-settings-btn.not-main:not(:disabled):focus {box-shadow: 0 1px 6px #b3b3b3}
+.board-settings-btn.not-main:not(:disabled):focus {
+    box-shadow: 0 1px 6px #b3b3b3
+}
 
 .board-settings-btn.mod-add-block {
     float: right;
@@ -784,11 +794,6 @@ input::-moz-focus-outer {
     border: 0;
 }
 
-.navbar-collapse.navbar-center {
-    display: table ! important;
-    margin: 0 auto;
-}
-
 #message-text {
     resize: vertical;
     min-height: 80px;
@@ -800,33 +805,51 @@ input::-moz-focus-outer {
     outline: none;
 }
 
-.modal-content button.btn.btn-primary{
+.modal-content button.btn.btn-primary {
     background-color: var(--base);
 }
 
-.feedback-btn{
+.feedback-btn {
     background-color: var(--accent);
 }
 
 .btn {
-	border: none;
-	line-height: inherit;
+    border: none;
+    line-height: inherit;
 }
+
 a.btn,
-div.btn {line-height: 1.42857143}
+div.btn {
+    line-height: 1.42857143
+}
+
 .btn:not(:disabled):hover,
-.btn:not(:disabled):focus {box-shadow: 0 1px 6px #b3b3b3}
+.btn:not(:disabled):focus {
+    box-shadow: 0 1px 6px #b3b3b3
+}
 
 .btn-trans {
-	border: none;
+    border: none;
 }
+
 .btn-trans.btn-lg {
-	padding-top: 10px;
-	padding-bottom: 10px;
+    padding-top: 10px;
+    padding-bottom: 10px;
 }
 
 .btn-primary:hover {
-	color: #fff;
-	background-color: #286090;
-	border-color: #204d74;
+    color: #fff;
+    background-color: #286090;
+    border-color: #204d74;
+}
+
+.navbar-fixed-top .navbar-collapse, .navbar-fixed-bottom .navbar-collapse {
+    max-height: 510px;
+}
+
+@media (min-width: 768px){
+    .navbar-collapse.navbar-center {
+        display: table ! important;
+        margin: 0 auto;
+    }
 }

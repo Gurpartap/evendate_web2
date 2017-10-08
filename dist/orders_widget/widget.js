@@ -36029,6 +36029,14 @@ __C = {
 	/**
 	 * @enum {string}
 	 */
+	SOCIAL_NETWORKS: {
+		VK: 'vk',
+		GOOGLE: 'google',
+		FACEBOOK: 'facebook'
+	},
+	/**
+	 * @enum {string}
+	 */
 	ENTITIES: {
 		USER: 'user',
 		EVENT: 'event',
@@ -36048,6 +36056,11 @@ __C = {
 	KEY_CODES: {
 		ENTER: 13,
 		ESC: 27
+	},
+	
+	MOMENTJS_CALENDAR: {
+		DATE_AND_MONTH: 'D MMMM',
+		HOURS_AND_MINUTES: 'HH:mm'
 	}
 };
 Object.freeze(__C);
@@ -37525,7 +37538,6 @@ function unixTimestampToISO(timestamp, format) {
 	
 	return moment.unix(timestamp).format(format || __C.DATE_FORMAT);
 }
-
 /**
  *
  * @param {string} hex
@@ -37593,7 +37605,7 @@ function randomString(length) {
 function isFormValid($form) {
 	$form = $form instanceof Element ? $($form) : $form;
 	var is_valid = true,
-		$elements = $form.find('input, textarea'),
+		$elements = $form.find('input, textarea, select'),
 		$rest = $elements,
 		lookup = {};
 	
@@ -37654,6 +37666,98 @@ function isFormValid($form) {
 function getFilenameFromURL(url) {
 	return url ? url.split('\\').pop().split('/').pop() : '';
 }
+
+/**
+ *
+ * Creating new object by merging enumerable properties of given objects.
+ * Better analogue of Object.assign and $.extend.
+ * Note that parameters are not mutate, result is always new object.
+ *
+ * @param {...object} - given objects
+ * @param {boolean} [recursive=false] - merge recursively nested objects
+ * @param {boolean} [deep=false] - merge inherited properties
+ *
+ * @returns {object}
+ */
+function mergeObjects(/**...objects, */recursive, deep) {
+	var res,
+		length = arguments.length,
+		is_recursive,
+		is_deep,
+		i,
+		name,
+		current_el,
+		target_el;
+	
+	try {
+		res = Object.create(arguments[0].constructor.prototype);
+	} catch (e) {
+		res = {};
+	}
+	
+	if (typeof arguments[length - 1] === 'boolean' && typeof arguments[length - 2] === 'boolean') {
+		is_recursive = arguments[length - 2];
+		is_deep = arguments[length - 1];
+		length -= 2;
+	} else if (typeof arguments[length - 1] === 'boolean') {
+		is_recursive = arguments[length - 1];
+		is_deep = false;
+		length--;
+	} else {
+		is_recursive = false;
+		is_deep = false;
+	}
+	
+	for ( i = 0; i < length; i++) {
+		for (name in arguments[i]) {
+			if (!is_deep && arguments[i].hasOwnProperty(name) || is_deep) {
+				current_el = arguments[i][name];
+				target_el = res[name];
+				
+				if (typeof current_el === 'undefined' || current_el === res) {
+					continue;
+				}
+				
+				if (is_recursive && typeof current_el === 'object' && typeof target_el === 'object') {
+					res[name] = mergeObjects(is_recursive, target_el, current_el);
+				} else if (!(isVoid(current_el) && !isVoid(res[name]))) {
+					res[name] = current_el;
+				}
+			}
+		}
+	}
+	
+	return res;
+}
+/**
+ *
+ * @param {?string} string
+ * @return {?string}
+ */
+function escapeHtml(string) {
+	var html_escapes = {
+		'&': '&amp;',
+		'<': '&lt;',
+		'>': '&gt;',
+		'"': '&quot;',
+		"'": '&#x27;',
+		'/': '&#x2F;'
+	};
+
+	// Regex containing the keys listed immediately above.
+	var html_escaper = /[&<>"'\/]/g;
+	
+	if (!string) {
+		
+		return string;
+	}
+
+	// Escape a string for HTML interpolation.
+	return ('' + string).replace(html_escaper, function(match) {
+		
+		return html_escapes[match];
+	});
+}
 /**
  *
  * @param {string} string
@@ -37699,9 +37803,19 @@ function isKeyPressed(event, key) {
  *
  * @return {boolean}
  */
+function isVoid(variable) {
+	
+	return variable === null || typeof variable === 'undefined';
+}
+/**
+ *
+ * @param {*} variable
+ *
+ * @return {boolean}
+ */
 function empty(variable) {
 	
-	return variable == null || (typeof variable === 'object' && $.isEmptyObject(variable)) || (variable instanceof Array && variable.length === 0);
+	return isVoid(variable) || (typeof variable === 'object' && $.isEmptyObject(variable)) || (variable instanceof Array && variable.length === 0);
 }
 /**
  *
@@ -39718,11 +39832,11 @@ EntitiesCollection = extending(Array, (function() {
 		this.last_pushed.splice(0);
 		
 		for (var i = 0, entity = entities[i]; i < entities.length; entity = entities[++i]) {
-			if (!entity[ID_PROP_NAME] || (entity[ID_PROP_NAME] && !this.has(entity[ID_PROP_NAME]))) {
+			if (empty(entity[ID_PROP_NAME]) || (!empty(entity[ID_PROP_NAME]) && !this.has(entity[ID_PROP_NAME]))) {
 				item = (entity instanceof this.collection_of) ? entity : (new this.collection_of()).setData(entity);
 				this.last_pushed.push(item);
 				this[this.length++] = item;
-				if (item[ID_PROP_NAME]) {
+				if (!empty(item[ID_PROP_NAME])) {
 					this.__lookup[item[ID_PROP_NAME]] = item;
 				}
 				this.createAdditionalLookup(item);
@@ -39769,6 +39883,8 @@ EntitiesCollection = extending(Array, (function() {
 	 *
 	 * @param {string} key
 	 * @param {boolean} [ascending=false]
+	 *
+	 * @return {EntitiesCollection}
 	 */
 	EntitiesCollection.prototype.sortBy = function(key, ascending) {
 		var key_spliced = key.split('.');
@@ -40075,7 +40191,9 @@ PromocodeModel = extending(OneEntity, (function() {
 	 * @property {?boolean} is_fixed
 	 * @property {?boolean} is_percentage
 	 * @property {?number} effort
-	 * @property {?number| use_limit
+	 * @property {?number} total_effort
+	 * @property {?number} use_limit
+	 * @property {?number} use_count
 	 * @property {?timestamp} start_date
 	 * @property {?timestamp} end_date
 	 * @property {?boolean} enabled
@@ -40090,7 +40208,9 @@ PromocodeModel = extending(OneEntity, (function() {
 		this.is_fixed = null;
 		this.is_percentage = null;
 		this.effort = null;
+		this.total_effort = null;
 		this.use_limit = null;
+		this.use_count = null;
 		this.start_date = null;
 		this.end_date = null;
 		this.enabled = null;
@@ -41520,6 +41640,35 @@ AbstractEventTicketsCollection = extending(TicketsCollection, (function() {
 			}
 		});
 	};
+	/**
+	 *
+	 * @param {(Fields|string)} [fields]
+	 * @param {object} [filters]
+	 * @param {(string|Array)} [order_by]
+	 * @param {AJAXCallback} [success]
+	 *
+	 * @return {jqPromise}
+	 */
+	AbstractEventTicketsCollection.prototype.fetchAllTickets = function(fields, filters, order_by, success) {
+		var self = this;
+		
+		this.empty();
+		
+		return this.constructor.fetchTickets(this.event_id, Object.assign({
+			fields: fields || undefined,
+			offset: 0,
+			length: ServerConnection.MAX_ENTITIES_LENGTH,
+			order_by: order_by || undefined
+		}, filters), function(data) {
+			self.setData(data);
+			if (isFunction(success)) {
+				success.call(self, self.last_pushed);
+			}
+		}).then(function() {
+			
+			return self.last_pushed;
+		});
+	};
 	
 	return AbstractEventTicketsCollection;
 }()));
@@ -42639,7 +42788,8 @@ OneOrganization = extending(OneEntity, (function() {
 	
 	OneOrganization.ENDPOINT = Object.freeze({
 		FEEDBACK: '/organizations/{org_id}/feedback',
-		WITHDRAW: '/organizations/{org_id}/withdraws'
+		WITHDRAW: '/organizations/{org_id}/withdraws',
+		REQUISITES: '/organizations/{org_id}/requisites'
 	});
 	/**
 	 *
@@ -42770,6 +42920,29 @@ OneOrganization = extending(OneEntity, (function() {
 	OneOrganization.sendFeedback = function(org_id, data, success) {
 	
 		return __APP.SERVER.addData(OneOrganization.ENDPOINT.FEEDBACK.format({org_id: org_id}), data, false, success);
+	};
+	/**
+	 *
+	 * @param {(string|number)} org_id
+	 * @param {AJAXCallback} [success]
+	 *
+	 * @returns {jqPromise}
+	 */
+	OneOrganization.fetchRequisites = function(org_id, success) {
+		
+		return __APP.SERVER.getData(OneOrganization.ENDPOINT.REQUISITES.format({org_id: org_id}), {}, success);
+	};
+	/**
+	 *
+	 * @param {(string|number)} org_id
+	 * @param {object} requisites
+	 * @param {AJAXCallback} [success]
+	 *
+	 * @returns {jqPromise}
+	 */
+	OneOrganization.saveRequisites = function(org_id, requisites, success) {
+		
+		return __APP.SERVER.addData(OneOrganization.ENDPOINT.REQUISITES.format({org_id: org_id}), requisites, success);
 	};
 	/**
 	 *
@@ -44742,9 +44915,32 @@ CurrentUser = extending(OneUser, (function() {
 	};
 	/**
 	 *
+	 * @param {__C.SOCIAL_NETWORKS} social_network
+	 * @param {string} [redirect_after]
+	 */
+	CurrentUser.prototype.auth = function(social_network, redirect_after) {
+		if (__APP.YA_METRIKA) {
+			__APP.YA_METRIKA.reachGoal(social_network.toUpperCase() + 'AuthStart');
+		}
+		
+		if (redirect_after) {
+			try {
+				window.localStorage.setItem('redirect_after_auth', redirect_after);
+			} catch (e) {}
+		}
+		
+		if (isNotDesktop() && !__APP.IS_WIDGET) {
+			window.location.href = __APP.AUTH_URLS[social_network];
+		} else {
+			window.open(__APP.AUTH_URLS[social_network], social_network.toUpperCase() + '_AUTH_WINDOW', 'status=1,toolbar=0,menubar=0&height=500,width=700');
+		}
+	};
+	/**
+	 *
 	 * @returns {jqPromise}
 	 */
 	CurrentUser.prototype.logout = function() {
+		
 		return $.ajax({
 			url: '/index.php',
 			data: {logout: true},
@@ -45336,18 +45532,28 @@ Modals = (function() {
  * @requires Class.Modals.js
  */
 /**
- * @class
  * @abstract
+ * @class
  */
 AbstractModal = (function() {
 	/**
+	 *
+	 * @param {AbstractModal.STYLES} [style]
+	 *
 	 * @abstract
 	 * @constructor
-	 * @param {AbstractModal.STYLES} [style]
+	 * @constructs AbstractModal
+	 *
 	 * @property {jQuery} modal
 	 * @property {jQuery} content_wrapper
 	 * @property {(string|jQuery)} content
 	 * @property {boolean} block_scroll
+	 *
+	 * @property {boolean} is_rendered
+	 * @property {boolean} is_inited
+	 * @property {boolean} is_shown
+	 *
+	 * @property {boolean} is_hidable
 	 */
 	function AbstractModal(style) {
 		this.id = 0;
@@ -45362,9 +45568,22 @@ AbstractModal = (function() {
 		this.wrapper_is_scrollable = false;
 		this.content_is_scrollable = false;
 		this.is_upload_disabled = false;
+		/**
+		 *
+		 * @protected
+		 */
 		this.is_rendered = false;
+		/**
+		 *
+		 * @protected
+		 */
 		this.is_inited = false;
+		/**
+		 *
+		 * @protected
+		 */
 		this.is_shown = false;
+		this.is_hidable = true;
 		
 		__APP.MODALS.collection.push(this);
 	}
@@ -45615,19 +45834,21 @@ AbstractModal = (function() {
 	AbstractModal.prototype.__hide = function() {
 		var self = this;
 		
-		this.scrollTop = this.modal_wrapper.scrollTop();
-		$(document).off('keyup.CloseModal');
-		
-		$('body').removeClass('-open_modal');
-		
-		__APP.MODALS.active_modal = undefined;
-		
-		this.modal.addClass('-faded');
-		this.modal.trigger('modal:disappear');
-		setTimeout(function() {
-			self.modal.addClass(__C.CLASSES.HIDDEN).trigger('modal:close');
-			self.is_shown = false;
-		}, 200);
+		if (this.is_hidable) {
+			this.scrollTop = this.modal_wrapper.scrollTop();
+			$(document).off('keyup.CloseModal');
+			
+			$('body').removeClass('-open_modal');
+			
+			__APP.MODALS.active_modal = undefined;
+			
+			this.modal.addClass('-faded');
+			this.modal.trigger('modal:disappear');
+			setTimeout(function() {
+				self.modal.addClass(__C.CLASSES.HIDDEN).trigger('modal:close');
+				self.is_shown = false;
+			}, 200);
+		}
 		
 		return this;
 	};
@@ -45728,31 +45949,40 @@ AuthModal = extending(AbstractModal, (function() {
 	/**
 	 *
 	 * @param {string} [redirect_to]
-	 * @param {boolean} [is_hideable]
+	 * @param {object} [options]
 	 *
 	 * @constructor
 	 * @constructs AuthModal
+	 *
+	 * @property {object} options
+	 * @property {string} redirect_to
 	 */
-	function AuthModal(redirect_to, is_hideable) {
+	function AuthModal(redirect_to, options) {
 		AbstractModal.call(this);
-		this.content = tmpl('modal-auth-content', {
-			heading: 'Войдите через социальную сеть, чтобы совершить это действие'
-		});
+		this.options = options || {};
 		this.redirect_to = redirect_to;
-		
-		if (is_hideable === false) {
-			this.hide = function() {};
-		}
+		this.title = 'Вход в профиль';
 	}
-	
 	/**
 	 *
 	 * @return {AuthModal}
 	 */
 	AuthModal.prototype.render = function(props) {
+		var self = this;
+		
+		this.content = tmpl('modal-auth-content', (function() {
+			var props = {};
+			
+			if (self.options.note) {
+				props.note = self.options.note;
+			}
+			
+			return props;
+		}()));
+		
 		this.__render({
-			classes: [__C.CLASSES.FLOATING_MATERIAL, __C.CLASSES.MODAL_STATES.SIZE.TINY],
-			content_classes: [__C.CLASSES.ALIGN.CENTER]
+			classes: [__C.CLASSES.FLOATING_MATERIAL],
+			width: 480
 		});
 		
 		return this;
@@ -45766,23 +45996,8 @@ AuthModal = extending(AbstractModal, (function() {
 		
 		this.modal.find('.AuthButton').each(function() {
 			$(this).on('click', function (e) {
-				var network = $(this).data('auth_network');
+				__APP.USER.auth($(this).data('auth_network'), self.redirect_to);
 				
-				if (window.yaCounter32442130) {
-					window.yaCounter32442130.reachGoal(network.toUpperCase() + 'AuthStart');
-				}
-				
-				if (self.redirect_to) {
-					try {
-						window.localStorage.setItem('redirect_after_auth', self.redirect_to);
-					} catch (e) {}
-				}
-				
-				if (isNotDesktop() && !__APP.IS_WIDGET) {
-					window.location.href = __APP.AUTH_URLS[network];
-				} else {
-					window.open(__APP.AUTH_URLS[network], network.toUpperCase() + '_AUTH_WINDOW', 'status=1,toolbar=0,menubar=0&height=500,width=700');
-				}
 				e.preventDefault();
 			});
 		});
@@ -45992,8 +46207,11 @@ Builder = (function() {
 		var props = Array.prototype.slice.call(arguments);
 		
 		return tmpl('button', props.map(function(arg) {
+			var normalized_props = Builder.normalizeBuildProps(arg);
 			
-			return Builder.normalizeBuildProps(arg);
+			normalized_props.classes.push(__C.CLASSES.COMPONENT.BUTTON);
+			
+			return normalized_props;
 		})).each(function(i, button) {
 			var prop = props[i],
 				$button = $(button);
@@ -46208,9 +46426,12 @@ Builder = (function() {
 	Builder.prototype.actionButton = function buildActionButton(props) {
 		var _props = props instanceof Array ? props : [].slice.call(arguments);
 		
-		return tmpl('action-button', _props.map(function(prop) {
+		return tmpl('button', _props.map(function(prop) {
+			var normalized_props = Builder.normalizeBuildProps(prop);
 			
-			return Builder.normalizeBuildProps(prop);
+			normalized_props.classes.push(__C.CLASSES.COMPONENT.ACTION);
+			
+			return normalized_props;
 		})).each(function(i) {
 			$(this).data(_props[i].dataset);
 		});
@@ -46283,12 +46504,13 @@ Builder = (function() {
 	 * @param {string} type - checkbox or radio
 	 * @param {buildProps} props
 	 * @param {(Array<string>|string)} [props.unit_classes]
+	 * @param {(Array<string>|string)} [props.unit_dataset]
 	 *
 	 * @returns {jQuery}
 	 */
 	Builder.prototype.radioCheckbox = function buildRadioCheckbox(type, props) {
 		if (type === 'checkbox' || type === 'radio') {
-			props = Builder.normalizeBuildProps(props, ['unit_classes']);
+			props = Builder.normalizeBuildProps(props, ['unit_classes'], ['unit_dataset']);
 			if (props.classes.indexOf('form_checkbox') === -1 && props.classes.indexOf('form_radio') === -1) {
 				props.classes.unshift('form_' + type);
 			}
@@ -47484,8 +47706,8 @@ Builder = (function() {
 		} else if(normalized_props.title) {
 			vars.modal_header = tmpl('modal-header', {
 				title: normalized_props.title,
-				close_button: this.button({
-					classes: [__C.CLASSES.UNIVERSAL_STATES.EMPTY, '-modal_destroyer', __C.CLASSES.HOOKS.CLOSE_MODAL, __C.CLASSES.HOOKS.RIPPLE],
+				close_button: tmpl('button', {
+					classes: ['modal_destroy_button', __C.CLASSES.HOOKS.CLOSE_MODAL, __C.CLASSES.HOOKS.RIPPLE].join(' '),
 					title: '×'
 				})
 			});
@@ -47917,6 +48139,21 @@ OrderPage = extending(Page, (function() {
 			$payload,
 			$selected_type;
 		
+		function isTicketTypeSelected() {
+			var $inputs = self.$wrapper.find('.TicketType').find('.QuantityInput'),
+				i = 0;
+			
+			while (!empty($inputs[i])) {
+				if ($inputs[i].value !== 0) {
+					
+					return true;
+				}
+				i++;
+			}
+			
+			return false;
+		}
+		
 		function countTicketTypeSum($ticket_type) {
 			var $sum = $ticket_type.find('.TicketTypeSum'),
 				value = $ticket_type.find('.QuantityInput').val();
@@ -47937,6 +48174,12 @@ OrderPage = extending(Page, (function() {
 			}, 0);
 			
 			self.$wrapper.find('.TicketsOverallSum').text(formatCurrency(self.overall_sum));
+			
+			if (isTicketTypeSelected()) {
+				$footer.removeAttr('disabled');
+			} else {
+				$footer.attr('disabled', true);
+			}
 			
 			if (self.is_promocode_active) {
 				self.$wrapper.find('.TicketsTotalSum').text(formatCurrency(self.total_sum));
@@ -48020,7 +48263,9 @@ OrderPage = extending(Page, (function() {
 				send_data;
 			
 			if (__APP.USER.isLoggedOut()) {
-				(new AuthModal(window.location.href)).show();
+				(new AuthModal(window.location.href, {
+					note: 'Вам необходимо войти через социальную сеть чтобы сделать заказ'
+				})).show();
 				
 				return false;
 			} else {
@@ -48046,16 +48291,6 @@ OrderPage = extending(Page, (function() {
 			}
 		}
 		
-		$quantity_inputs.on('QuantityInput::change', function() {
-			countTicketTypeSum($(this).closest('.TicketType'));
-			countTotalSum();
-		});
-		
-		this.$wrapper.find('.TicketType').each(function() {
-			countTicketTypeSum($(this));
-		});
-		countTotalSum();
-		
 		if (ticket_selected) {
 			ticket_selected = decodeURIComponent(ticket_selected);
 			$selected_type = this.$wrapper.find('.TicketType').filter(function() {
@@ -48066,6 +48301,31 @@ OrderPage = extending(Page, (function() {
 			if ($selected_type.length) {
 				$selected_type.find('.QuantityInput').resolveInstance().increment();
 			}
+		}
+		
+		if (this.event.ticketing_locally) {
+			$quantity_inputs.on('QuantityInput::change', function() {
+				countTicketTypeSum($(this).closest('.TicketType'));
+				countTotalSum();
+			});
+			
+			this.$wrapper.find('.TicketType').each(function() {
+				countTicketTypeSum($(this));
+			});
+			
+			countTotalSum();
+			
+			this.render_vars.legal_entity_payment_button.on('click.LegalEntityPayment', function() {
+				var result = makeOrder();
+				
+				if (result !== false) {
+					result.done(function(data) {
+						var parsed_uri = parseUri(location);
+						
+						__APP.changeState(parsed_uri.path + '/' + data.order.uuid + '/from_legal_entity');
+					});
+				}
+			});
 		}
 		
 		this.render_vars.pay_button.on('click.MakeOrder', function() {
@@ -48137,19 +48397,6 @@ OrderPage = extending(Page, (function() {
 			}
 		});
 		
-		if (this.event.ticketing_locally) {
-			this.render_vars.legal_entity_payment_button.on('click.LegalEntityPayment', function() {
-				var result = makeOrder();
-				
-				if (result !== false) {
-					result.done(function(data) {
-						var parsed_uri = parseUri(location);
-						
-						__APP.changeState(parsed_uri.path + '/' + data.order.uuid + '/from_legal_entity');
-					});
-				}
-			});
-		}
 		if (this.event.accept_bitcoins) {
 			this.render_vars.bitcoin_payment_button.on('click.BitcoinPayment', function() {
 				var $this = $(this),
@@ -48171,11 +48418,15 @@ OrderPage = extending(Page, (function() {
 	};
 	
 	OrderPage.prototype.preRender = function() {
-		var self = this;
+		var self = this,
+			selling_ticket_types = this.event.ticket_types.filter(function(ticket_type) {
+				
+				return ticket_type.is_selling;
+			});
 		
 		if (this.event.ticketing_locally) {
 			this.render_vars.tickets_selling = tmpl('order-tickets-selling', {
-				ticket_types: tmpl('order-ticket-type', this.event.ticket_types.map(function(ticket_type) {
+				ticket_types: tmpl('order-ticket-type', selling_ticket_types.map(function(ticket_type) {
 					
 					return {
 						name: ticket_type.name,
@@ -48197,9 +48448,9 @@ OrderPage = extending(Page, (function() {
 			this.render_vars.tickets_selling.find('.TicketType').each(function(i) {
 				var $this = $(this);
 				
-				$this.data('ticket_type', self.event.ticket_types[i]);
+				$this.data('ticket_type', selling_ticket_types[i]);
 				
-				if (!self.event.ticket_types[i].is_selling) {
+				if (!selling_ticket_types[i].is_selling) {
 					$this.attr('disabled', true);
 				}
 			});
@@ -48270,8 +48521,13 @@ OrderPage = extending(Page, (function() {
 	
 	OrderPage.prototype.render = function() {
 		if (__APP.USER.isLoggedOut()) {
+			var auth_modal = new AuthModal(window.location.href, {
+				note: 'Вам необходимо войти через социальную сеть чтобы сделать заказ'
+			});
 			
-			return (new AuthModal(window.location.href, false)).show();
+			auth_modal.is_hidable = false;
+			
+			return auth_modal.show();
 		}
 		
 		this.$wrapper.html(tmpl('order-page', this.render_vars));
@@ -48615,7 +48871,13 @@ LegalEntityPayment = extending(Page, (function() {
 	
 	LegalEntityPayment.prototype.render = function() {
 		if (__APP.USER.isLoggedOut()) {
-			return (new AuthModal(window.location.href, false)).show();
+			var auth_modal = new AuthModal(window.location.href, {
+				note: 'Для оплаты вам необходимо войти через социальную сеть'
+			});
+			
+			auth_modal.is_hidable = false;
+			
+			return auth_modal.show();
 		}
 		
 		this.$wrapper.html(tmpl('legal-entity-payment-page', this.render_vars));
@@ -48823,6 +49085,7 @@ __APP = {
 	},
 	MODALS: new Modals(),
 	BUILD: new Builder(),
+	YA_METRIKA: window.yaCounter32442130 || null,
 	IS_WIDGET: true,
 	IS_REPAINTED: false,
 	/**

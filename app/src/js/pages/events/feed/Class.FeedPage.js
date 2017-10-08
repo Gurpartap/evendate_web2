@@ -201,7 +201,9 @@ FeedPage = extending(Page, (function() {
 			PAGE.$view.find('.BecomeOrg').on('click', function(e) {
 				cookies.removeItem('auth_command');
 				cookies.removeItem('auth_entity_id');
-				(new AuthModal(location.origin + '/add/organization')).show();
+				(new AuthModal(location.origin + '/add/organization', {
+					note: 'Для выполнения этого действия, нужно войти через социальную сеть'
+				})).show();
 				
 				return false;
 			});

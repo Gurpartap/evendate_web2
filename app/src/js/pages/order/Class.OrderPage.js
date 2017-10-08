@@ -355,7 +355,9 @@ OrderPage = extending(Page, (function() {
 				send_data;
 			
 			if (__APP.USER.isLoggedOut()) {
-				(new AuthModal(window.location.href)).show();
+				(new AuthModal(window.location.href, {
+					note: 'Вам необходимо войти через социальную сеть чтобы сделать заказ'
+				})).show();
 				
 				return false;
 			} else {
@@ -611,8 +613,13 @@ OrderPage = extending(Page, (function() {
 	
 	OrderPage.prototype.render = function() {
 		if (__APP.USER.isLoggedOut()) {
+			var auth_modal = new AuthModal(window.location.href, {
+				note: 'Вам необходимо войти через социальную сеть чтобы сделать заказ'
+			});
 			
-			return (new AuthModal(window.location.href, false)).show();
+			auth_modal.is_hidable = false;
+			
+			return auth_modal.show();
 		}
 		
 		this.$wrapper.html(tmpl('order-page', this.render_vars));

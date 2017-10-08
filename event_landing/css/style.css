@@ -1561,6 +1561,9 @@ button:focus {
           transform: rotate(0);
   top: 29px;
 }
+@media (max-width: 768px) {
+  /*.navbar-nemo {display: none}*/
+}
 @media (min-width: 768px) {
   .navbar-transparent {
     background-color: transparent !important;
@@ -1599,6 +1602,7 @@ button:focus {
   position: relative;
   color: #fff;
   text-align: center;
+  overflow: hidden;
 }
 .home .heading-text {
   color: #fff;
@@ -2792,11 +2796,11 @@ button:focus {
 }
 .testimonials-3 blockquote:before,
 .testimonials-4 blockquote:before {
-  content: '"';
+  /*content: '"';*/
 }
 .testimonials-3 blockquote:after,
 .testimonials-4 blockquote:after {
-  content: '"';
+  /*content: '"';*/
 }
 /******************** TESTIMONIALS 1 ********************/
 .testimonials-1 {
@@ -2980,7 +2984,7 @@ button:focus {
   border: 3px solid #fff;
 }
 .testimonials-4 .client-name {
-  margin-top: 27px;
+  margin-top: -13px;
   margin-bottom: 0;
 }
 .testimonials-4 .position {
@@ -3212,7 +3216,7 @@ button:focus {
   opacity: 1;
 }
 .recap-gallery-item .img-scale {
-  max-height: 449px;
+  /*max-height: 449px;*/
 }
 .recap-gallery-item img {
   transition: all 0.3s;

@@ -29,6 +29,7 @@ __APP = {
 	},
 	MODALS: new Modals(),
 	BUILD: new Builder(),
+	YA_METRIKA: window.yaCounter32442130 || null,
 	IS_WIDGET: true,
 	IS_REPAINTED: false,
 	/**

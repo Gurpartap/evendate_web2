@@ -1,5 +1,5 @@
 <!doctype html>
-<html class="no-js">
+<html lang="ru" class="no-js">
 <head>
     <meta charset="utf-8">
     <title>Evendate</title>

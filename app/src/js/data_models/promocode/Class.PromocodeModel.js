@@ -18,7 +18,9 @@ PromocodeModel = extending(OneEntity, (function() {
 	 * @property {?boolean} is_fixed
 	 * @property {?boolean} is_percentage
 	 * @property {?number} effort
-	 * @property {?number| use_limit
+	 * @property {?number} total_effort
+	 * @property {?number} use_limit
+	 * @property {?number} use_count
 	 * @property {?timestamp} start_date
 	 * @property {?timestamp} end_date
 	 * @property {?boolean} enabled
@@ -33,7 +35,9 @@ PromocodeModel = extending(OneEntity, (function() {
 		this.is_fixed = null;
 		this.is_percentage = null;
 		this.effort = null;
+		this.total_effort = null;
 		this.use_limit = null;
+		this.use_count = null;
 		this.start_date = null;
 		this.end_date = null;
 		this.enabled = null;

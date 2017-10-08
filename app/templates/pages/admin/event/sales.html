@@ -85,6 +85,7 @@
 				</div>
 			</div>
 			{charts}
+			{promocodes}
 		</div>
 	</div>
 </script>
@@ -101,5 +102,29 @@
 			<span class="event_admin_sales_ticket_type_price">{price}</span>
 		</p>
 		{progress_bar}
+	</div>
+</script>
+
+<script type="javascript/template" id="tmpl-admin-event-sales-promocodes">
+	<h4>Промокоды</h4>
+	<div class="-edge_to_edge">
+		<table class="table -data_table_override PromocodesTable">
+			<thead>
+				<tr>
+					<th>Код</th>
+					<th>Скидка</th>
+					<th>Период активности</th>
+					<th>Использовано</th>
+					<th>Общая сумма скидки</th>
+				</tr>
+			</thead>
+			<tbody></tbody>
+			<tfoot>
+				<tr>
+					<th colspan="4" align="right">Суммарная скидка по промокадам:</th>
+					<th class="EffortTotalSum"></th>
+				</tr>
+			</tfoot>
+		</table>
 	</div>
 </script>

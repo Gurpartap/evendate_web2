@@ -64,9 +64,14 @@ AdminOrganizationRequisitesPage = extending(AdminOrganizationPage, (function() {
 			$bodies.not('.'+__C.CLASSES.ACTIVE).prop('disabled', true);
 			$bodies.filter('.'+__C.CLASSES.ACTIVE).prop('disabled', false);
 		});
+		$tabs.resolveInstance().disconnectMutationObserver();
 		
 		if (this.requisites.agent_type) {
 			$tabs.resolveInstance().setToTab($tabs.find('.Tab').filter('[data-type="'+this.requisites.agent_type+'"]').index());
+		}
+		
+		if (this.requisites.taxation_type) {
+			this.$wrapper.find('.TaxationTypeSelect').val(this.requisites.taxation_type);
 		}
 		
 		if (this.requisites.company_name) {
@@ -155,6 +160,8 @@ AdminOrganizationRequisitesPage = extending(AdminOrganizationPage, (function() {
 				$person_correspondent_account.val(suggestion.data.correspondent_account).trigger('change');
 			}
 		});
+		
+		$tabs.resolveInstance().connectMutationObserver();
 		
 		this.render_vars.submit_button.on('click.Submit', function() {
 			var $form = self.$wrapper.find('.RequisitesForm'),
