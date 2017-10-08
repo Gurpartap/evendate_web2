@@ -70,7 +70,7 @@
 </script>
 
 <script type="javascript/template" id="tmpl-button">
-	<button class="button {classes}" type="button" {attributes}><span class="Text">{title}</span></button>
+	<button class="{classes}" type="button" {attributes}><span class="Text">{title}</span></button>
 </script>
 
 <script type="javascript/template" id="tmpl-external-link">
@@ -87,10 +87,6 @@
 
 <script type="javascript/template" id="tmpl-action-link">
 	<a href="{href}" class="action {classes}" {dataset} {attributes}>{title}</a>
-</script>
-
-<script type="javascript/template" id="tmpl-action-button">
-	<button class="action {classes}" type="button" {attributes}><span class="Text">{title}</span></button>
 </script>
 
 <script type="javascript/template" id="tmpl-tag">
@@ -470,19 +466,33 @@
 	</form>
 </script>
 <script type="javascript/template" id="tmpl-modal-auth-content">
-	<h4 class="auth_modal_heading">{heading}</h4>
-	<div class="auth_buttons_wrapper">
-		<a href="#" data-auth_network="vk" class="button -size_wide -rounded -no_uppercase -align_left -color_vk RippleEffect AuthButton">
-			<span class="Text"><i class="fa fa-vk fa-lg"></i><span>Войти через ВКонтакте</span></span>
-		</a>
-		<a href="#" data-auth_network="google" class="button -size_wide -rounded -no_uppercase -align_left -color_google RippleEffect AuthButton">
-			<span class="Text"><i class="fa fa-google-plus fa-lg"></i><span>Войти через Google+</span></span>
-		</a>
-		<a href="#" data-auth_network="facebook" class="button -size_wide -rounded -no_uppercase -align_left -color_facebook RippleEffect AuthButton">
-			<span class="Text"><i class="fa fa-facebook-official fa-lg"></i><span>Войти через Facebook</span></span>
-		</a>
+	<p class="auth_modal_heading">{note}</p>
+	<div class="auth_modal_buttons_wrapper">
+		<button class="auth_modal_button -color_vk AuthButton" data-auth_network="vk">
+			<span class="auth_modal_button_icon fa fa-vk"></span>
+			<span class="auth_modal_button_main">
+				<span class="auth_modal_button_title">Войти через VK</span>
+				<span class="auth_modal_button_note">Мы не публикуем записи без вашего разрешения</span>
+			</span>
+		</button>
+		<button class="auth_modal_button -color_facebook AuthButton" data-auth_network="google">
+			<span class="auth_modal_button_icon fa fa-facebook-official"></span>
+			<span class="auth_modal_button_main">
+				<span class="auth_modal_button_title">Войти через Facebook</span>
+				<span class="auth_modal_button_note">Мы не публикуем записи без вашего разрешения</span>
+			</span>
+		</button>
+		<button class="auth_modal_button -color_google AuthButton" data-auth_network="facebook">
+			<img src="/app/img/google_icon.svg" class="auth_modal_button_icon">
+			<span class="auth_modal_button_main">
+				<span class="auth_modal_button_title">Войти через Google</span>
+				<span class="auth_modal_button_note">Мы не рассылаем спам на вашу электронную почту</span>
+			</span>
+		</button>
 	</div>
-	<p class="auth_modal_bottom">{bottom}</p>
+	<footer class="auth_modal_bottom -align_center">
+		<button class="action -color_neutral -no_uppercase -font_weight_lighter" type="button">Зачем мы используем вход через соц. сети</button>
+	</footer>
 </script>
 <script type="javascript/template" id="tmpl-modal-bitcoin-content">
 	<h6 class="bitcoin_modal_title">Заказ № {order_number}</h6>
@@ -618,6 +628,63 @@
 		{amount_form_unit}
 		{comment_form_unit}
 	</form>
+</script>
+<script type="javascript/template" id="tmpl-app-inspector">
+	<div class="app_inspector material -floating_material AppInspector">
+		<header class="app_inspector_header">
+			<button class="app_inspector_remover AppInspectorRemoveButton" type="button">&times;</button>
+			<span class="app_inspector_title AppInspectorTitle">{title}</span>
+		</header>
+		<div class="app_inspector_content_wrapper scrollbar-outer AppInspectorScroll">
+			<div class="app_inspector_content AppInspectorContent">{content}</div>
+		</div>
+	</div>
+</script>
+<script type="javascript/template" id="tmpl-order-app-inspector">
+	{orderer}
+	<div class="app_inspector_wrapper -align_right">
+		{status_block}
+	</div>
+	<div class="app_inspector_wrapper">
+		{payment_info}
+	</div>
+	{tickets_title}
+	{tickets}
+	{registration_form_title}
+	{registration_fields}
+	{event_title}
+	{event}
+</script>
+
+<script type="javascript/template" id="tmpl-client-app-inspector">
+	{client}
+	{interests_title}
+	{interests_spiderweb_chart}
+</script>
+<script type="javascript/template" id="tmpl-app-inspector-title">
+	<h6 class="app_inspector_subtitle">{title}</h6>
+</script>
+
+<script type="javascript/template" id="tmpl-app-inspector-ticket">
+	<div class="app_inspector_ticket">
+		<div class="app_inspector_ticket_body">
+			{fields}
+		</div>
+		{footer}
+	</div>
+</script>
+
+<script type="javascript/template" id="tmpl-app-inspector-ticket-footer">
+	<footer class="app_inspector_ticket_footer"><span>Билет использован</span></footer>
+</script>
+
+<script type="javascript/template" id="tmpl-app-inspector-event">
+	<a class="app_inspector_event Link" href="/event/{id}">
+		<img src="{image_horizontal_url}?width=108" width="108" height="60">
+		<div class="app_inspector_event_body">
+			<span class="app_inspector_event_title">{title}</span>
+		</div>
+	</a>
 </script>
 <script type="javascript/template" id="tmpl-add-organization-page">
 
@@ -1948,63 +2015,6 @@
 			</div>
 		</div>
 	</div>
-</script>
-<script type="javascript/template" id="tmpl-app-inspector">
-	<div class="app_inspector material -floating_material AppInspector">
-		<header class="app_inspector_header">
-			<button class="app_inspector_remover AppInspectorRemoveButton" type="button">&times;</button>
-			<span class="app_inspector_title AppInspectorTitle">{title}</span>
-		</header>
-		<div class="app_inspector_content_wrapper scrollbar-outer AppInspectorScroll">
-			<div class="app_inspector_content AppInspectorContent">{content}</div>
-		</div>
-	</div>
-</script>
-<script type="javascript/template" id="tmpl-order-app-inspector">
-	{orderer}
-	<div class="app_inspector_wrapper -align_right">
-		{status_block}
-	</div>
-	<div class="app_inspector_wrapper">
-		{payment_info}
-	</div>
-	{tickets_title}
-	{tickets}
-	{registration_form_title}
-	{registration_fields}
-	{event_title}
-	{event}
-</script>
-
-<script type="javascript/template" id="tmpl-client-app-inspector">
-	{client}
-	{interests_title}
-	{interests_spiderweb_chart}
-</script>
-<script type="javascript/template" id="tmpl-app-inspector-title">
-	<h6 class="app_inspector_subtitle">{title}</h6>
-</script>
-
-<script type="javascript/template" id="tmpl-app-inspector-ticket">
-	<div class="app_inspector_ticket">
-		<div class="app_inspector_ticket_body">
-			{fields}
-		</div>
-		{footer}
-	</div>
-</script>
-
-<script type="javascript/template" id="tmpl-app-inspector-ticket-footer">
-	<footer class="app_inspector_ticket_footer"><span>Билет использован</span></footer>
-</script>
-
-<script type="javascript/template" id="tmpl-app-inspector-event">
-	<a class="app_inspector_event Link" href="/event/{id}">
-		<img src="{image_horizontal_url}?width=108" width="108" height="60">
-		<div class="app_inspector_event_body">
-			<span class="app_inspector_event_title">{title}</span>
-		</div>
-	</a>
 </script>
 <script type="javascript/template" id="tmpl-calendar">
 	<div class="{wrapper_class} -unselectable">

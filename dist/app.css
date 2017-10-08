@@ -420,6 +420,7 @@ body {
 	-webkit-font-smoothing: antialiased;
 	cursor: default;
 	overflow-y: scroll;
+	hyphens: auto;
 }
 
 .-state_admin,
@@ -4441,16 +4442,19 @@ body.-open_modal > .modal_wrapper {
 	color: #3e4d66;
 }
 
-.-modal_destroyer {
+.modal_destroy_button {
 	width: 60px;
 	height: 60px;
-	font-size: 2.4em;
-	font-weight: 100;
+	font-size: 1.9em;
+	font-weight: 400;
+	background-color: transparent;
+	border: none;
+	opacity: .4;
 }
-.-modal_destroyer:hover {background-color: transparent !important}
-.-modal_destroyer > * {top: -1px}
+.modal_destroy_button:hover {opacity: 1}
+.modal_destroy_button > * {top: -3px}
 
-.modal_content {padding: 18px}
+.modal_content {padding: 6px 18px 18px}
 .modal_content.-no_padding {padding: 0}
 
 .modal_content + .modal_content {margin-top: 36px}
@@ -4481,14 +4485,83 @@ body.-open_modal > .modal_wrapper {
 
 .add_staff_modal_form .button {margin-top: 20px}
 .auth_modal_heading {
-	font-size: 1em;
-	font-weight: 500;
-	margin: .5em 0 1.5em;
+	margin: 1em 0 1.5em;
+	font-size: 1.5em;
+	font-weight: 300;
+	line-height: 1.25;
 }
 
-.auth_buttons_wrapper {padding: 0 15px}
-.auth_buttons_wrapper > .button {margin: .5em 0}
-.auth_buttons_wrapper .fa {width: 1em}
+.auth_modal_button {
+	display: flex;
+	width: 100%;
+	height: 60px;
+	padding: 12px 0;
+	margin-bottom: 12px;
+	font-size: 1em;
+	border-radius: 3px;
+	border: 1px solid transparent;
+	text-align: left;
+}
+
+.auth_modal_button.-color_vk {
+	color: #fff;
+	background-color: #507299;
+}
+.auth_modal_button.-color_facebook {
+	color: #fff;
+	background-color: #4267b2;
+}
+.auth_modal_button.-color_google {
+	color: rgba(0, 0, 0, 0.54);
+	background-color: #fff;
+	border-color: rgba(197, 201, 209, 0.5);
+}
+
+.auth_modal_button_icon {
+	flex: 0 0 68px;
+	width: 32px;
+	height: 32px;
+	margin: 0 !important;
+	padding: 4px 18px;
+	font-size: 1.5em;
+	box-sizing: border-box;
+	text-align: center;
+}
+
+.auth_modal_button_main {
+	width: 100%;
+	height: 32px;
+	padding-right: 18px;
+}
+
+.auth_modal_button_title {
+	display: block;
+	font-size: 1em;
+	font-weight: 400;
+}
+
+.auth_modal_button_note {
+	display: block;
+	font-size: .75em;
+	opacity: .8;
+}
+
+.auth_modal_bottom {
+	margin-top: 36px;
+}
+
+@media (max-width: 526px) {
+	.auth_modal_buttons_wrapper {
+		display: flex;
+		justify-content: space-around;
+		flex-wrap: wrap;
+	}
+	.auth_modal_button {
+		flex: none;
+		width: 70px;
+	}
+	.auth_modal_button_main {display: none}
+}
 .bitcoin_modal_title {
 	padding: 0 18px;
 	font-size: 1em;

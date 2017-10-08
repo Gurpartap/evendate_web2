@@ -80,8 +80,11 @@ Builder = (function() {
 		var props = Array.prototype.slice.call(arguments);
 		
 		return tmpl('button', props.map(function(arg) {
+			var normalized_props = Builder.normalizeBuildProps(arg);
 			
-			return Builder.normalizeBuildProps(arg);
+			normalized_props.classes.push(__C.CLASSES.COMPONENT.BUTTON);
+			
+			return normalized_props;
 		})).each(function(i, button) {
 			var prop = props[i],
 				$button = $(button);
@@ -296,9 +299,12 @@ Builder = (function() {
 	Builder.prototype.actionButton = function buildActionButton(props) {
 		var _props = props instanceof Array ? props : [].slice.call(arguments);
 		
-		return tmpl('action-button', _props.map(function(prop) {
+		return tmpl('button', _props.map(function(prop) {
+			var normalized_props = Builder.normalizeBuildProps(prop);
 			
-			return Builder.normalizeBuildProps(prop);
+			normalized_props.classes.push(__C.CLASSES.COMPONENT.ACTION);
+			
+			return normalized_props;
 		})).each(function(i) {
 			$(this).data(_props[i].dataset);
 		});
@@ -1573,8 +1579,8 @@ Builder = (function() {
 		} else if(normalized_props.title) {
 			vars.modal_header = tmpl('modal-header', {
 				title: normalized_props.title,
-				close_button: this.button({
-					classes: [__C.CLASSES.UNIVERSAL_STATES.EMPTY, '-modal_destroyer', __C.CLASSES.HOOKS.CLOSE_MODAL, __C.CLASSES.HOOKS.RIPPLE],
+				close_button: tmpl('button', {
+					classes: ['modal_destroy_button', __C.CLASSES.HOOKS.CLOSE_MODAL, __C.CLASSES.HOOKS.RIPPLE].join(' '),
 					title: '×'
 				})
 			});

@@ -251,7 +251,13 @@ MyOrdersPage = extending(Page, (function() {
 	
 	MyOrdersPage.prototype.render = function() {
 		if (__APP.USER.isLoggedOut()) {
-			return (new AuthModal(window.location.href, false)).show();
+			var auth_modal = new AuthModal(window.location.href, {
+				note: 'Войдите чтобы увидеть список ваших заказов'
+			});
+			
+			auth_modal.is_hidable = false;
+			
+			return auth_modal.show();
 		}
 		
 		this.orders.sortBy('created_at');

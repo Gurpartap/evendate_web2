@@ -167,6 +167,14 @@ __C = {
 	/**
 	 * @enum {string}
 	 */
+	SOCIAL_NETWORKS: {
+		VK: 'vk',
+		GOOGLE: 'google',
+		FACEBOOK: 'facebook'
+	},
+	/**
+	 * @enum {string}
+	 */
 	ENTITIES: {
 		USER: 'user',
 		EVENT: 'event',

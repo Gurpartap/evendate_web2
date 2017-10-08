@@ -45,7 +45,9 @@ SubscribeButton = extending(ActionButton, (function() {
 		var modal;
 		
 		if (!(modal = this.data('modal'))) {
-			modal = new AuthModal(location.origin + '/organization/' + this.org_id);
+			modal = new AuthModal(location.origin + '/organization/' + this.org_id, {
+				note: 'Чтобы подписаться на организатора необходимво войти через социальную сеть'
+			});
 			this.data('modal', modal);
 		}
 		

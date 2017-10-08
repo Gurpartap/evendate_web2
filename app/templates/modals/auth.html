@@ -1,15 +1,29 @@
 <script type="javascript/template" id="tmpl-modal-auth-content">
-	<h4 class="auth_modal_heading">{heading}</h4>
-	<div class="auth_buttons_wrapper">
-		<a href="#" data-auth_network="vk" class="button -size_wide -rounded -no_uppercase -align_left -color_vk RippleEffect AuthButton">
-			<span class="Text"><i class="fa fa-vk fa-lg"></i><span>Войти через ВКонтакте</span></span>
-		</a>
-		<a href="#" data-auth_network="google" class="button -size_wide -rounded -no_uppercase -align_left -color_google RippleEffect AuthButton">
-			<span class="Text"><i class="fa fa-google-plus fa-lg"></i><span>Войти через Google+</span></span>
-		</a>
-		<a href="#" data-auth_network="facebook" class="button -size_wide -rounded -no_uppercase -align_left -color_facebook RippleEffect AuthButton">
-			<span class="Text"><i class="fa fa-facebook-official fa-lg"></i><span>Войти через Facebook</span></span>
-		</a>
+	<p class="auth_modal_heading">{note}</p>
+	<div class="auth_modal_buttons_wrapper">
+		<button class="auth_modal_button -color_vk AuthButton" data-auth_network="vk">
+			<span class="auth_modal_button_icon fa fa-vk"></span>
+			<span class="auth_modal_button_main">
+				<span class="auth_modal_button_title">Войти через VK</span>
+				<span class="auth_modal_button_note">Мы не публикуем записи без вашего разрешения</span>
+			</span>
+		</button>
+		<button class="auth_modal_button -color_facebook AuthButton" data-auth_network="google">
+			<span class="auth_modal_button_icon fa fa-facebook-official"></span>
+			<span class="auth_modal_button_main">
+				<span class="auth_modal_button_title">Войти через Facebook</span>
+				<span class="auth_modal_button_note">Мы не публикуем записи без вашего разрешения</span>
+			</span>
+		</button>
+		<button class="auth_modal_button -color_google AuthButton" data-auth_network="facebook">
+			<img src="/app/img/google_icon.svg" class="auth_modal_button_icon">
+			<span class="auth_modal_button_main">
+				<span class="auth_modal_button_title">Войти через Google</span>
+				<span class="auth_modal_button_note">Мы не рассылаем спам на вашу электронную почту</span>
+			</span>
+		</button>
 	</div>
-	<p class="auth_modal_bottom">{bottom}</p>
+	<footer class="auth_modal_bottom -align_center -hidden">
+		<button class="action -color_neutral -no_uppercase -font_weight_lighter" type="button">Зачем мы используем вход через соц. сети</button>
+	</footer>
 </script>

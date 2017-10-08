@@ -36029,6 +36029,14 @@ __C = {
 	/**
 	 * @enum {string}
 	 */
+	SOCIAL_NETWORKS: {
+		VK: 'vk',
+		GOOGLE: 'google',
+		FACEBOOK: 'facebook'
+	},
+	/**
+	 * @enum {string}
+	 */
 	ENTITIES: {
 		USER: 'user',
 		EVENT: 'event',
@@ -44907,9 +44915,32 @@ CurrentUser = extending(OneUser, (function() {
 	};
 	/**
 	 *
+	 * @param {__C.SOCIAL_NETWORKS} social_network
+	 * @param {string} [redirect_after]
+	 */
+	CurrentUser.prototype.auth = function(social_network, redirect_after) {
+		if (__APP.YA_METRIKA) {
+			__APP.YA_METRIKA.reachGoal(social_network.toUpperCase() + 'AuthStart');
+		}
+		
+		if (redirect_after) {
+			try {
+				window.localStorage.setItem('redirect_after_auth', redirect_after);
+			} catch (e) {}
+		}
+		
+		if (isNotDesktop() && !__APP.IS_WIDGET) {
+			window.location.href = __APP.AUTH_URLS[social_network];
+		} else {
+			window.open(__APP.AUTH_URLS[social_network], social_network.toUpperCase() + '_AUTH_WINDOW', 'status=1,toolbar=0,menubar=0&height=500,width=700');
+		}
+	};
+	/**
+	 *
 	 * @returns {jqPromise}
 	 */
 	CurrentUser.prototype.logout = function() {
+		
 		return $.ajax({
 			url: '/index.php',
 			data: {logout: true},
@@ -45501,18 +45532,28 @@ Modals = (function() {
  * @requires Class.Modals.js
  */
 /**
- * @class
  * @abstract
+ * @class
  */
 AbstractModal = (function() {
 	/**
+	 *
+	 * @param {AbstractModal.STYLES} [style]
+	 *
 	 * @abstract
 	 * @constructor
-	 * @param {AbstractModal.STYLES} [style]
+	 * @constructs AbstractModal
+	 *
 	 * @property {jQuery} modal
 	 * @property {jQuery} content_wrapper
 	 * @property {(string|jQuery)} content
 	 * @property {boolean} block_scroll
+	 *
+	 * @property {boolean} is_rendered
+	 * @property {boolean} is_inited
+	 * @property {boolean} is_shown
+	 *
+	 * @property {boolean} is_hidable
 	 */
 	function AbstractModal(style) {
 		this.id = 0;
@@ -45527,9 +45568,22 @@ AbstractModal = (function() {
 		this.wrapper_is_scrollable = false;
 		this.content_is_scrollable = false;
 		this.is_upload_disabled = false;
+		/**
+		 *
+		 * @protected
+		 */
 		this.is_rendered = false;
+		/**
+		 *
+		 * @protected
+		 */
 		this.is_inited = false;
+		/**
+		 *
+		 * @protected
+		 */
 		this.is_shown = false;
+		this.is_hidable = true;
 		
 		__APP.MODALS.collection.push(this);
 	}
@@ -45780,19 +45834,21 @@ AbstractModal = (function() {
 	AbstractModal.prototype.__hide = function() {
 		var self = this;
 		
-		this.scrollTop = this.modal_wrapper.scrollTop();
-		$(document).off('keyup.CloseModal');
-		
-		$('body').removeClass('-open_modal');
-		
-		__APP.MODALS.active_modal = undefined;
-		
-		this.modal.addClass('-faded');
-		this.modal.trigger('modal:disappear');
-		setTimeout(function() {
-			self.modal.addClass(__C.CLASSES.HIDDEN).trigger('modal:close');
-			self.is_shown = false;
-		}, 200);
+		if (this.is_hidable) {
+			this.scrollTop = this.modal_wrapper.scrollTop();
+			$(document).off('keyup.CloseModal');
+			
+			$('body').removeClass('-open_modal');
+			
+			__APP.MODALS.active_modal = undefined;
+			
+			this.modal.addClass('-faded');
+			this.modal.trigger('modal:disappear');
+			setTimeout(function() {
+				self.modal.addClass(__C.CLASSES.HIDDEN).trigger('modal:close');
+				self.is_shown = false;
+			}, 200);
+		}
 		
 		return this;
 	};
@@ -45893,31 +45949,40 @@ AuthModal = extending(AbstractModal, (function() {
 	/**
 	 *
 	 * @param {string} [redirect_to]
-	 * @param {boolean} [is_hideable]
+	 * @param {object} [options]
 	 *
 	 * @constructor
 	 * @constructs AuthModal
+	 *
+	 * @property {object} options
+	 * @property {string} redirect_to
 	 */
-	function AuthModal(redirect_to, is_hideable) {
+	function AuthModal(redirect_to, options) {
 		AbstractModal.call(this);
-		this.content = tmpl('modal-auth-content', {
-			heading: 'Войдите через социальную сеть, чтобы совершить это действие'
-		});
+		this.options = options || {};
 		this.redirect_to = redirect_to;
-		
-		if (is_hideable === false) {
-			this.hide = function() {};
-		}
+		this.title = 'Вход в профиль';
 	}
-	
 	/**
 	 *
 	 * @return {AuthModal}
 	 */
 	AuthModal.prototype.render = function(props) {
+		var self = this;
+		
+		this.content = tmpl('modal-auth-content', (function() {
+			var props = {};
+			
+			if (self.options.note) {
+				props.note = self.options.note;
+			}
+			
+			return props;
+		}()));
+		
 		this.__render({
-			classes: [__C.CLASSES.FLOATING_MATERIAL, __C.CLASSES.MODAL_STATES.SIZE.TINY],
-			content_classes: [__C.CLASSES.ALIGN.CENTER]
+			classes: [__C.CLASSES.FLOATING_MATERIAL],
+			width: 480
 		});
 		
 		return this;
@@ -45931,23 +45996,8 @@ AuthModal = extending(AbstractModal, (function() {
 		
 		this.modal.find('.AuthButton').each(function() {
 			$(this).on('click', function (e) {
-				var network = $(this).data('auth_network');
+				__APP.USER.auth($(this).data('auth_network'), self.redirect_to);
 				
-				if (window.yaCounter32442130) {
-					window.yaCounter32442130.reachGoal(network.toUpperCase() + 'AuthStart');
-				}
-				
-				if (self.redirect_to) {
-					try {
-						window.localStorage.setItem('redirect_after_auth', self.redirect_to);
-					} catch (e) {}
-				}
-				
-				if (isNotDesktop() && !__APP.IS_WIDGET) {
-					window.location.href = __APP.AUTH_URLS[network];
-				} else {
-					window.open(__APP.AUTH_URLS[network], network.toUpperCase() + '_AUTH_WINDOW', 'status=1,toolbar=0,menubar=0&height=500,width=700');
-				}
 				e.preventDefault();
 			});
 		});
@@ -46157,8 +46207,11 @@ Builder = (function() {
 		var props = Array.prototype.slice.call(arguments);
 		
 		return tmpl('button', props.map(function(arg) {
+			var normalized_props = Builder.normalizeBuildProps(arg);
 			
-			return Builder.normalizeBuildProps(arg);
+			normalized_props.classes.push(__C.CLASSES.COMPONENT.BUTTON);
+			
+			return normalized_props;
 		})).each(function(i, button) {
 			var prop = props[i],
 				$button = $(button);
@@ -46373,9 +46426,12 @@ Builder = (function() {
 	Builder.prototype.actionButton = function buildActionButton(props) {
 		var _props = props instanceof Array ? props : [].slice.call(arguments);
 		
-		return tmpl('action-button', _props.map(function(prop) {
+		return tmpl('button', _props.map(function(prop) {
+			var normalized_props = Builder.normalizeBuildProps(prop);
 			
-			return Builder.normalizeBuildProps(prop);
+			normalized_props.classes.push(__C.CLASSES.COMPONENT.ACTION);
+			
+			return normalized_props;
 		})).each(function(i) {
 			$(this).data(_props[i].dataset);
 		});
@@ -47650,8 +47706,8 @@ Builder = (function() {
 		} else if(normalized_props.title) {
 			vars.modal_header = tmpl('modal-header', {
 				title: normalized_props.title,
-				close_button: this.button({
-					classes: [__C.CLASSES.UNIVERSAL_STATES.EMPTY, '-modal_destroyer', __C.CLASSES.HOOKS.CLOSE_MODAL, __C.CLASSES.HOOKS.RIPPLE],
+				close_button: tmpl('button', {
+					classes: ['modal_destroy_button', __C.CLASSES.HOOKS.CLOSE_MODAL, __C.CLASSES.HOOKS.RIPPLE].join(' '),
 					title: '×'
 				})
 			});
@@ -48207,7 +48263,9 @@ OrderPage = extending(Page, (function() {
 				send_data;
 			
 			if (__APP.USER.isLoggedOut()) {
-				(new AuthModal(window.location.href)).show();
+				(new AuthModal(window.location.href, {
+					note: 'Вам необходимо войти через социальную сеть чтобы сделать заказ'
+				})).show();
 				
 				return false;
 			} else {
@@ -48463,8 +48521,13 @@ OrderPage = extending(Page, (function() {
 	
 	OrderPage.prototype.render = function() {
 		if (__APP.USER.isLoggedOut()) {
+			var auth_modal = new AuthModal(window.location.href, {
+				note: 'Вам необходимо войти через социальную сеть чтобы сделать заказ'
+			});
 			
-			return (new AuthModal(window.location.href, false)).show();
+			auth_modal.is_hidable = false;
+			
+			return auth_modal.show();
 		}
 		
 		this.$wrapper.html(tmpl('order-page', this.render_vars));
@@ -48808,7 +48871,13 @@ LegalEntityPayment = extending(Page, (function() {
 	
 	LegalEntityPayment.prototype.render = function() {
 		if (__APP.USER.isLoggedOut()) {
-			return (new AuthModal(window.location.href, false)).show();
+			var auth_modal = new AuthModal(window.location.href, {
+				note: 'Для оплаты вам необходимо войти через социальную сеть'
+			});
+			
+			auth_modal.is_hidable = false;
+			
+			return auth_modal.show();
 		}
 		
 		this.$wrapper.html(tmpl('legal-entity-payment-page', this.render_vars));
@@ -49016,6 +49085,7 @@ __APP = {
 	},
 	MODALS: new Modals(),
 	BUILD: new Builder(),
+	YA_METRIKA: window.yaCounter32442130 || null,
 	IS_WIDGET: true,
 	IS_REPAINTED: false,
 	/**
