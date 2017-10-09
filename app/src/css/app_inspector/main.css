@@ -1,22 +1,21 @@
 .app_inspectors_wrapper {
 	position: fixed;
-	height: calc(100% - 54px);
-	right: 0;
-	z-index: 5;
+	z-index: 25;
 }
-
-#main_header.-with_tabs ~ #main_section .app_inspectors_wrapper {height: calc(100% - 90px)}
 
 .app_inspector {
-	position: absolute;
+	position: fixed;
 	width: 500px;
-	height: 100%;
-	transform: translateX(10%);
+	max-width: 100%;
+	height: calc(100% - 54px);
+	right: 0;
+	transform: translateX(110%);
 	transition: transform .3s ease;
 }
+#main_header.-with_tabs ~ #main_section .app_inspector {height: calc(100% - 90px)}
 
 .app_inspector.-show {
-	transform: translateX(-100%);
+	transform: translateX(0%);
 }
 
 .app_inspector_header {

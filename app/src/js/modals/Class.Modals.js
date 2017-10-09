@@ -55,8 +55,8 @@ Modals = (function() {
 		/**
 		 * @type {jQuery}
 		 */
-		this.modal_wrapper = $('.modal_wrapper');
-		this.modal_destroyer = new ModalDestroyer($('.modal_destroyer'));
+		this.modal_wrapper = $('.ModalsWrapper');
+		this.modal_destroyer = new ModalDestroyer($('.ModalDestroyer'));
 		
 		Modals.instance = this;
 	}

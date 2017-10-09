@@ -297,6 +297,7 @@ require_once( 'parts/sidebar.php' );
     </div>
   </header>
   <div id="main_section">
+		<div class="modal_wrapper ModalsWrapper"><div class="modal_destroyer ModalDestroyer"></div></div>
 		<div class="app_inspectors_wrapper AppInspectorsWrapper"></div>
     <div class="app_view -hidden PageView">
       <div class="page_wrapper Content -fadeable"></div>
@@ -313,10 +314,6 @@ require_once( 'parts/sidebar.php' );
 		<a href="https://play.google.com/store/apps/details?id=ru.evendate.android" class="button -color_default fa_icon fa-android -empty"></a>
 	</div>
 	<button id="download_app_close_button" class="CloseDownloadAppBand" type="button">&times;</button>
-</div>
-
-<div class="modal_wrapper">
-  <div class="modal_destroyer"></div>
 </div>
 
 <?php

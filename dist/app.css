@@ -4238,23 +4238,22 @@ fieldset:disabled .form_select {cursor: default}
 }
 .app_inspectors_wrapper {
 	position: fixed;
-	height: calc(100% - 54px);
-	right: 0;
-	z-index: 5;
+	z-index: 25;
 }
-
-#main_header.-with_tabs ~ #main_section .app_inspectors_wrapper {height: calc(100% - 90px)}
 
 .app_inspector {
-	position: absolute;
+	position: fixed;
 	width: 500px;
-	height: 100%;
-	transform: translateX(10%);
+	max-width: 100%;
+	height: calc(100% - 54px);
+	right: 0;
+	transform: translateX(110%);
 	transition: transform .3s ease;
 }
+#main_header.-with_tabs ~ #main_section .app_inspector {height: calc(100% - 90px)}
 
 .app_inspector.-show {
-	transform: translateX(-100%);
+	transform: translateX(0%);
 }
 
 .app_inspector_header {
@@ -4438,7 +4437,7 @@ html.-noscroll {
 	text-align: center;
 	-webkit-overflow-scrolling: touch;
 	background-color: hsla(218,24%,32%,.6);
-	z-index: 1050;
+	z-index: 20;
 }
 
 .modal_destroyer {
@@ -4489,7 +4488,7 @@ html.-noscroll {
 }
 
 .modal_unit,
-body.-open_modal > .modal_wrapper {
+body.-open_modal .modal_wrapper {
 	opacity: 1;
 	visibility: visible;
 }
@@ -6896,7 +6895,7 @@ body,
 }
 .-open_sidebar #main_section_cap {
 	display: block;
-	z-index: 10;
+	z-index: 30;
 }
 #main_header {
 	right: 0;
@@ -7182,9 +7181,8 @@ body,
 }
 
 #main_sidebar,
-.-open_sidebar #main_sidebar {
-	transform: translateX(0);
-}
+.-open_sidebar #main_sidebar {transform: translateX(0)}
+.-open_sidebar #main_sidebar {z-index: 35}
 
 @supports (--custom_properties: 1) {
 

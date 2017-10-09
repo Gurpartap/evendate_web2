@@ -17,7 +17,7 @@ html.-noscroll {
 	text-align: center;
 	-webkit-overflow-scrolling: touch;
 	background-color: hsla(218,24%,32%,.6);
-	z-index: 1050;
+	z-index: 20;
 }
 
 .modal_destroyer {
@@ -68,7 +68,7 @@ html.-noscroll {
 }
 
 .modal_unit,
-body.-open_modal > .modal_wrapper {
+body.-open_modal .modal_wrapper {
 	opacity: 1;
 	visibility: visible;
 }

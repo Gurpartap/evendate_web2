@@ -140,9 +140,8 @@
 }
 
 #main_sidebar,
-.-open_sidebar #main_sidebar {
-	transform: translateX(0);
-}
+.-open_sidebar #main_sidebar {transform: translateX(0)}
+.-open_sidebar #main_sidebar {z-index: 35}
 
 @supports (--custom_properties: 1) {
 
