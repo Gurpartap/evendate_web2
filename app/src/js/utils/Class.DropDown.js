@@ -40,7 +40,7 @@ DropDown = extendingJQuery((function() {
 		
 		build_props = Builder.normalizeBuildProps(build_props);
 		
-		jQuery.fn.init.call(this, tmpl('button', {
+		jQuery.fn.init.call(this, __APP.BUILD.button({
 			title: title,
 			classes: build_props.classes,
 			attributes: build_props.attributes

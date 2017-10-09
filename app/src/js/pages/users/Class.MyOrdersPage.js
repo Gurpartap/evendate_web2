@@ -116,7 +116,7 @@ MyOrdersPage = extending(Page, (function() {
 			
 			self.$detail_wrapper.html(tmpl('my-orders-order-detail-info', {
 				order_number: formatTicketNumber(order.number),
-				pain_info: MyOrdersPage.buildPayInfo(order),
+				pay_info: MyOrdersPage.buildPayInfo(order),
 				pay_button: (function(order) {
 					var $buttons;
 					
@@ -162,6 +162,8 @@ MyOrdersPage = extending(Page, (function() {
 									]
 								}));
 							}
+							
+							$buttons = $buttons.add(__APP.BUILD.helpLink(HelpCenterConnection.ARTICLE.HOW_TO_PAY_FROM_LEGAL_ENTITY, 'Как оплатить со счета компании'));
 							
 							return $buttons;
 						}

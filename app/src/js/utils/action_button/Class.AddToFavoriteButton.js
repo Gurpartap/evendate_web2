@@ -46,7 +46,7 @@ AddToFavoriteButton = extending(ActionButton, (function() {
 		
 		if (!(modal = this.data('modal'))) {
 			modal = new AuthModal(location.origin + '/event/' + this.event_id, {
-				note: 'Чтобы добавить событие в избранное, необходимво войти через социальную сеть'
+				note: 'Чтобы добавить событие в избранное, необходимо войти через социальную сеть'
 			});
 			this.data('modal', modal);
 		}

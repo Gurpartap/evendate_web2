@@ -1817,7 +1817,7 @@ function getFilenameFromURL(url) {
  *
  * @returns {object}
  */
-function mergeObjects(/**...objects, */recursive, deep) {
+function mergeObjects(objects, recursive, deep) {
 	var res,
 		length = arguments.length,
 		is_recursive,
@@ -2103,6 +2103,32 @@ function trimAvatarsCollection($parent) {
 		}
 		$collection.addClass('-trimmed');
 	});
+}
+
+/**
+ *
+ * @param {jQuery} [$parent]
+ * @returns {jQuery}
+ */
+function bindHelpLink($parent) {
+	$parent = $parent ? $parent : $('body');
+	var $links = $parent.is('.HelpLink') ? $parent : $parent.find('.HelpLink');
+	
+	$links.not('.-Handled_HelpLink').each(function(i, elem) {
+		var $this = $(elem);
+		
+		$this.on('click.openHelpAppInspector', function() {
+			var inspector = $this.data('inspector');
+			
+			if (!(inspector instanceof HelpAppInspector)) {
+				inspector = new HelpAppInspector($this.data('article_id'));
+				$this.data('inspector', inspector);
+			}
+			inspector.show();
+		});
+	}).addClass('-Handled_HelpLink');
+	
+	return $parent;
 }
 
 function bindDatePickers($parent) {

@@ -18,6 +18,7 @@ AbstractAppInspector = extendingJQuery((function() {
 		this.id = AbstractAppInspector.collection.push(this) - 1;
 		this.title = setDefaultValue(this.title, null);
 		this.$content = setDefaultValue(this.$content, __APP.BUILD.loaderBlock());
+		this.is_fetched = false;
 		this.is_shown = false;
 		this.is_rendered = false;
 		
@@ -104,13 +105,20 @@ AbstractAppInspector = extendingJQuery((function() {
 		AbstractAppInspector.currentInspector = this;
 		this.is_shown = true;
 		
-		this.fetchData().done(function() {
-			AbstractAppInspector.$wrapper.trigger('inspector:data_fetched');
-			self.fetchDone.apply(self, arguments);
-			if (!self.is_rendered) {
-				self.callWithAncestors('render');
+		if (!this.is_fetched) {
+			this.fetchData().done(function() {
+				AbstractAppInspector.$wrapper.trigger('inspector:data_fetched');
+				self.fetchDone.apply(self, arguments);
+				self.is_fetched = true;
+				if (!self.is_rendered) {
+					self.callWithAncestors('render');
+				}
+			});
+		} else {
+			if (!this.is_rendered) {
+				this.callWithAncestors('render');
 			}
-		});
+		}
 	};
 	
 	AbstractAppInspector.prototype.changeTitle = function(title) {

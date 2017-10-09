@@ -311,6 +311,29 @@ Builder = (function() {
 	};
 	/**
 	 *
+	 * @param {number} article_id
+	 * @param {string} title
+	 * @param {(string|Array<string>)} [classes]
+	 * @param {HTMLDataset} [dataset]
+	 * @param {HTMLAttributes} [attributes]
+	 *
+	 * @returns {jQuery}
+	 */
+	Builder.prototype.helpLink = function(article_id, title, classes, dataset, attributes) {
+		var props = Builder.normalizeBuildProps({
+			title: title,
+			classes: classes,
+			dataset: dataset,
+			attributes: attributes
+		});
+		
+		props.dataset['article_id'] = article_id;
+		props.classes.push('HelpLink');
+		
+		return bindHelpLink(tmpl('help-link', props));
+	};
+	/**
+	 *
 	 * @param {string} name
 	 * @param {buildProps} [props]
 	 *

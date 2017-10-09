@@ -19,6 +19,19 @@ HelpCenterConnection = extending(AsynchronousConnection, (function() {
 		ARTICLE: HelpCenterConnection.URL_BASE + '{id}'
 	});
 	
+	HelpCenterConnection.ARTICLE = Object.freeze({
+		PROMOCODES: 51,
+		TICKETS: 55,
+		HOW_TO_ENABLE_REGISTRATION: 61,
+		MEMBERS_LIMITATION: 65,
+		SITE_DESIGN: 77,
+		PREMIUM_TARIFF: 79,
+		HOW_PUSH_WORKS: 83,
+		HOW_TO_PAY_FROM_LEGAL_ENTITY: 121,
+		REQUEST_APPROVAL: 127,
+		ORDER_STATUSES: 170
+	});
+	
 	HelpCenterConnection.prototype.fetchArticle = function(id) {
 		
 		return this.dealAjax(AsynchronousConnection.HTTP_METHODS.GET, HelpCenterConnection.ENDPOINT.ARTICLE.format({id: id})).then(function(data) {

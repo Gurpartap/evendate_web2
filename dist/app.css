@@ -2219,6 +2219,47 @@ table.table.-data_table_override.-data_table_row_selection tr {cursor: pointer}
 	.field_value {color: var(--color_primary)}
 	.fields_wrapper.-field_big > .field > .field_value {color: var(--color_dark_primary)}
 }
+.help_link {
+	cursor: pointer;
+}
+
+button.help_link {
+	font-size: .9em;
+	color: #337ab7;
+	border: none;
+	border-bottom: 1px dashed;
+	background-color: transparent;
+}
+
+h1.help_link:hover,
+h2.help_link:hover,
+h3.help_link:hover,
+h4.help_link:hover,
+h5.help_link:hover,
+h6.help_link:hover {
+	color: #337ab7;
+	text-decoration: underline dashed;
+}
+
+h1.help_link:after,
+h2.help_link:after,
+h3.help_link:after,
+h4.help_link:after,
+h5.help_link:after,
+h6.help_link:after,
+button.help_link:before {
+	display: inline;
+	font-family: FontAwesome;
+}
+
+h1.help_link:after,
+h2.help_link:after,
+h3.help_link:after,
+h4.help_link:after,
+h5.help_link:after,
+h6.help_link:after {content: ' \f059'}
+
+button.help_link:before {content: '\f059\ '}
 .link {
 	color: inherit;
 	outline: none !important;
@@ -6367,6 +6408,7 @@ fieldset + .org_admin_settings_wrapper,
 
 .order_page_buttons {
 	display: inline-block;
+	margin-bottom: 1em;
 }
 
 .order_page_contact {

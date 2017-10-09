@@ -593,6 +593,8 @@ OrderPage = extending(Page, (function() {
 					__C.CLASSES.UNIVERSAL_STATES.NO_UPPERCASE
 				]
 			});
+			
+			this.render_vars.legal_entity_payment_help = __APP.BUILD.helpLink(HelpCenterConnection.ARTICLE.HOW_TO_PAY_FROM_LEGAL_ENTITY, 'Как оплатить со счета компании');
 		}
 		
 		if (this.event.accept_bitcoins) {

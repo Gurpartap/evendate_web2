@@ -186,7 +186,7 @@
 
 								<h2>Настройка регистрации на событие</h2>
 								<p class="form_text">Если на ваше событие требуется регистрация, вы можете настроить её параметры здесь. Вы можете задать крайний срок регистрации, максимальное количество мест, </p>
-
+								{registration_help}
 								<div class="form_unit form_accent_block">
 									<input id="edit_event_registration_required" class="form_checkbox Switch OnChangeCrossPost" type="checkbox" name="registration_required" data-switch_id="registration">
 									<label class="form_label" for="edit_event_registration_required"><span>Обязательная регистрация на событие</span></label>
@@ -227,9 +227,13 @@
 										<label class="form_label" for="edit_event_registration_limit_by_quantity"><span>По максимальному количеству регистраций</span></label>
 									</div>
 
-									<fieldset class="Switching" data-switch_id="registration_limit_by_quantity" disabled>
+									<fieldset class="form_unit Switching" data-switch_id="registration_limit_by_quantity" disabled>
 										{registration_limit_count_input}
 									</fieldset>
+
+									<div class="form_unit -align_right">
+										{registration_limit_help}
+									</div>
 
 									<fieldset class="Switching" data-switch_id="registration_locally" disabled>
 										<wbr>
@@ -247,7 +251,7 @@
 											<button class="button -color_neutral_accent RippleEffect RegistrationPreview" type="button"><span class="Text">Предпросмотр</span></button>
 										</div>
 
-										<h3>Подтверждение анкеты</h3>
+										<h3 class="help_link HelpLink" data-article_id="127">Подтверждение анкеты</h3>
 										<p class="form_text">Подписчик будет зарегистрирован только после подтверждения заявки модератором или администратором</p>
 										<div class="form_unit">
 											<input id="edit_event_registration_approvement_required" class="form_checkbox" type="checkbox" name="registration_approvement_required">
@@ -266,6 +270,7 @@
 							<fieldset>
 								<h2>Продажа билетов</h2>
 								<p class="form_text">Настройте продажу билетов на ваше событие через Evendate</p>
+								{auto_price_change_help}
 								<table class="event_edit_table table -simple_table -full_page_width TicketTypes Collapsing">
 									<thead>
 										<tr>
@@ -278,12 +283,16 @@
 								</table>
 								<div class="form_unit -align_center">{add_ticket_type_button}</div>
 
+								<div class="form_unit">
+									{tickets_help}
+								</div>
+
 								<div class="form_unit form_accent_block">
 									<input id="edit_event_accept_bitcoins" class="form_checkbox AcceptBitcoinsCheckbox" type="checkbox" name="accept_bitcoins">
 									<label class="form_label" for="edit_event_accept_bitcoins"><span>Принимать биткоины</span></label>
 								</div>
 								{booking_time_input}
-								<h3>Промокоды</h3>
+								<h3 class="help_link HelpLink" data-article_id="51">Промокоды</h3>
 								<table class="event_edit_table table -simple_table -full_page_width Promocodes Collapsing">
 									<thead>
 										<tr>
@@ -353,6 +362,7 @@
 										{additional_notification_time_input}
 									</div>
 								</fieldset>
+								{push_help}
 
 
 
