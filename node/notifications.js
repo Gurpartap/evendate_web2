@@ -245,7 +245,7 @@ class Notifications {
 
                         var note = _this.notifications_manager.create(notification, device, 'events');
 
-                        note.send(function (err, message_id) {
+                        note.send(function (err, message_id, response) {
                             if (err) return _this.logger.error(err);
 
                             var q_ins_notification = stat_notifications.insert({
@@ -253,7 +253,8 @@ class Notifications {
                                 token_id: device.id,
                                 click_time: null,
                                 received: true,
-                                message_id: message_id
+                                message_id: message_id,
+                                push_response: response
                             }).toQuery();
 
                             _this.settings.client.query(q_ins_notification, function (err) {
@@ -308,7 +309,7 @@ class Notifications {
 
                         let note = _this.notifications_manager.create(notification, device, 'recommendations_organizations');
 
-                        note.send(function (err, message_id) {
+                        note.send(function (err, message_id, response) {
                             if (err) return _this.logger.error(err);
 
 
@@ -326,7 +327,8 @@ class Notifications {
                             let q_ins_notification = Entities.stat_notifications_recommendations.insert({
                                 notifications_recommendation_id: notification.id,
                                 message_id: message_id,
-                                token_id: device.id
+                                token_id: device.id,
+                                push_response: response
                             }).toQuery();
 
                             _this.settings.client.query(q_ins_notification, function (err) {
@@ -395,7 +397,7 @@ WHERE done = FALSE AND notifications_recommendations.notification_type_id = 51`;
 
                         let note = _this.notifications_manager.create(notification, device, 'events');
 
-                        note.send(function (err, message_id) {
+                        note.send(function (err, message_id, response) {
                             if (err) return _this.logger.error(err);
 
 
@@ -413,7 +415,8 @@ WHERE done = FALSE AND notifications_recommendations.notification_type_id = 51`;
                             let q_ins_notification = Entities.stat_notifications_recommendations.insert({
                                 notifications_recommendation_id: notification.id,
                                 message_id: message_id,
-                                token_id: device.id
+                                token_id: device.id,
+                                push_response: response
                             }).toQuery();
 
                             _this.settings.client.query(q_ins_notification, function (err) {

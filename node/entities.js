@@ -188,7 +188,8 @@ module.exports = {
             'updated_at',
             'click_time',
             'message_id',
-            'received'
+            'received',
+            'push_response'
         ]
     }),
     stat_users_notifications: sql.define({
@@ -202,7 +203,8 @@ module.exports = {
             'updated_at',
             'click_time',
             'received',
-            'message_id'
+            'message_id',
+            'push_response'
         ]
     }),
     stat_notifications_recommendations: sql.define({
@@ -213,7 +215,8 @@ module.exports = {
             'message_id',
             'token_id',
             'created_at',
-            'updated_at'
+            'updated_at',
+            'push_response'
         ]
     }),
     view_notifications_send_devices_for_user: sql.define({
