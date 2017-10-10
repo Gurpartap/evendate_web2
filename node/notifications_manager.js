@@ -76,9 +76,9 @@ NotificationsManager.prototype.create = function (notification, device, type) {
             .postJson(ONE_SIGNAL_URL.CREATE, send_data)
             .on('complete', function (res) {
                 if (res instanceof Error) {
-                    callback(res, null);
+                    callback(res, null, res);
                 } else {
-                    callback(null, res.id);
+                    callback(null, res.id, res);
                 }
             });
     };

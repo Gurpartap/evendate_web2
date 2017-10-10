@@ -162,15 +162,15 @@ class Notifications {
 
                         var note = _this.notifications_manager.create(notification, device, 'events');
 
-                        note.send(function (err, message_id) {
-                            if (err) return _this.logger.error(err);
+                        note.send(function (err, message_id, response) {
 
                             var q_ins_notification = stat_users_notifications.insert({
                                 user_notification_id: notification.user_notification_id,
                                 token_id: device.id,
                                 click_time: null,
                                 received: true,
-                                message_id: message_id
+                                message_id: message_id,
+                                push_response: response
                             }).toQuery();
 
                             _this.settings.client.query(q_ins_notification, function (err) {
@@ -245,15 +245,15 @@ class Notifications {
 
                         var note = _this.notifications_manager.create(notification, device, 'events');
 
-                        note.send(function (err, message_id) {
-                            if (err) return _this.logger.error(err);
+                        note.send(function (err, message_id, response) {
 
                             var q_ins_notification = stat_notifications.insert({
                                 event_notification_id: notification.id,
                                 token_id: device.id,
                                 click_time: null,
-                                received: true,
-                                message_id: message_id
+                                received: !err,
+                                message_id: message_id,
+                                push_response: response
                             }).toQuery();
 
                             _this.settings.client.query(q_ins_notification, function (err) {
@@ -308,8 +308,7 @@ class Notifications {
 
                         let note = _this.notifications_manager.create(notification, device, 'recommendations_organizations');
 
-                        note.send(function (err, message_id) {
-                            if (err) return _this.logger.error(err);
+                        note.send(function (err, message_id, response) {
 
 
                             let q_upd_events_notifications = Entities.notifications_recommendations
@@ -326,7 +325,8 @@ class Notifications {
                             let q_ins_notification = Entities.stat_notifications_recommendations.insert({
                                 notifications_recommendation_id: notification.id,
                                 message_id: message_id,
-                                token_id: device.id
+                                token_id: device.id,
+                                push_response: response
                             }).toQuery();
 
                             _this.settings.client.query(q_ins_notification, function (err) {
@@ -395,8 +395,7 @@ WHERE done = FALSE AND notifications_recommendations.notification_type_id = 51`;
 
                         let note = _this.notifications_manager.create(notification, device, 'events');
 
-                        note.send(function (err, message_id) {
-                            if (err) return _this.logger.error(err);
+                        note.send(function (err, message_id, response) {
 
 
                             let q_upd_events_notifications = Entities.notifications_recommendations
@@ -413,7 +412,8 @@ WHERE done = FALSE AND notifications_recommendations.notification_type_id = 51`;
                             let q_ins_notification = Entities.stat_notifications_recommendations.insert({
                                 notifications_recommendation_id: notification.id,
                                 message_id: message_id,
-                                token_id: device.id
+                                token_id: device.id,
+                                push_response: response
                             }).toQuery();
 
                             _this.settings.client.query(q_ins_notification, function (err) {
