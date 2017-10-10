@@ -61,6 +61,7 @@ class Event extends AbstractEntity
 	const MY_TICKETS_COUNT_FIELD_NAME = 'my_tickets_count';
 	const SOLD_TICKETS_COUNT_FIELD_NAME = 'sold_tickets_count';
 	const LANDING_DATA_FIELD_NAME = 'landing_data';
+	const HAS_LANDING_FIELD_NAME = 'has_landing';
 
 
 	const RANDOM_FIELD_NAME = 'random';
@@ -233,6 +234,7 @@ class Event extends AbstractEntity
 
 		self::SEARCH_SCORE_FIELD_NAME => '(SELECT get_event_search_score(view_events.id)) AS ' . self::SEARCH_SCORE_FIELD_NAME,
 		self::LANDING_DATA_FIELD_NAME => '(SELECT data FROM event_landings WHERE event_id = view_events.id ORDER BY id, updated_at DESC LIMIT 1 ) AS ' . self::LANDING_DATA_FIELD_NAME,
+		self::HAS_LANDING_FIELD_NAME => '(SELECT id FROM event_landings WHERE event_id = view_events.id ORDER BY id DESC LIMIT 1 ) IS NOT NULL AS ' . self::HAS_LANDING_FIELD_NAME,
 		self::IS_SEEN_FIELD_NAME => '(
 		SELECT
 			COUNT(ve.id)
