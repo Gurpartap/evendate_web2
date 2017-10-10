@@ -122,6 +122,28 @@ $__modules['events'] = array(
 			echo file_get_contents($ROOT_PATH . '/email_files/' . $filename);
 			die();
 		},
+		'{/(id:[0-9]+)/orders/(uuid:\w+-\w+-\w+-\w+-\w+)/legal_entity/utd}' => function ($id, $uuid) use ($__db, $__request, $__offset, $__length, $__user, $__fields) {
+			$event = EventsCollection::one(
+				$__db,
+				$__user,
+				intval($id),
+				$__fields);
+
+			$order = OrdersCollection::oneByUUID($__db, $__user, $uuid, array());
+
+			global $ROOT_PATH;
+			header('Content-type: application/pdf');
+			$filename = 'Evendate-UTD-' . $order->getUUID() . '.pdf';
+			if (isset($__request['download']) && filter_var($__request['download']) == true) {
+				header('Content-Disposition: attachment; filename=' . $filename);
+			}
+			header('Pragma: no-cache');
+
+
+			file_get_contents(App::DEFAULT_NODE_LOCATION . '/utils/pdf/events/' . $event->getId() . '/orders-utd/' . $uuid . '?token=' . $__user->getToken());
+			echo file_get_contents($ROOT_PATH . '/email_files/' . $filename);
+			die();
+		},
 		'{/(id:[0-9]+)/orders/(uuid:\w+-\w+-\w+-\w+-\w+)/bitcoin/qr}' => function ($event_id, $uuid) use ($__db, $__request, $__offset, $__length, $__user, $__fields) {
 
 			$event = EventsCollection::one($__db, $__user, $event_id, array());

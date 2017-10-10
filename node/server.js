@@ -975,9 +975,26 @@ pg.connect(pg_conn_string, function (err, client, done) {
         let event_id = req.params.event_id;
         let domain = process.env.ENV === 'prod' ? 'https://evendate.io/' : 'http://localhost/';
 
-        console.log(domain + 'email_files/email-offer-template.php?event_id=' + event_id + '&uuid=' + uuid+ '&authorization=' + req.params.token);
+        console.log(domain + 'email_files/email-offer-template.php?event_id=' + event_id + '&uuid=' + uuid + '&authorization=' + req.params.token);
 
         pdf_render.generateSinglePdf(domain + 'email_files/email-offer-template.php?event_id=' + event_id + '&uuid=' + uuid + '&authorization=' + req.query.token, '../email_files/Evendate-Bill-' + uuid + '.pdf')
+            .then(() => {
+                res.json({status: true});
+            })
+            .catch((err) => {
+                console.log(err);
+                res.json({status: false});
+            });
+    });
+
+    app.get('/utils/pdf/events/:event_id/orders-utd/:uuid', function (req, res) {
+        let uuid = req.params.uuid;
+        let event_id = req.params.event_id;
+        let domain = process.env.ENV === 'prod' ? 'https://evendate.io/' : 'http://localhost/';
+
+        console.log(domain + 'email_files/UTD-template.php?event_id=' + event_id + '&uuid=' + uuid + '&authorization=' + req.params.token);
+
+        pdf_render.generateSinglePdf(domain + 'email_files/UTD-template.php?event_id=' + event_id + '&uuid=' + uuid + '&authorization=' + req.query.token, '../email_files/Evendate-UTD-' + uuid + '.pdf', {'landscape': true})
             .then(() => {
                 res.json({status: true});
             })
