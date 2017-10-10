@@ -135,7 +135,9 @@ ActionButton = extendingJQuery((function() {
 		var modal;
 		
 		if (!(modal = this.data('modal'))) {
-			modal = new AuthModal();
+			modal = new AuthModal(null, {
+				note: 'Для выполнения этого действия, нужно войти через социальную сеть'
+			});
 			this.data('modal', modal);
 		}
 		

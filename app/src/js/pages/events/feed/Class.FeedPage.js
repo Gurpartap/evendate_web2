@@ -63,10 +63,12 @@ FeedPage = extending(Page, (function() {
 			$this.on('click', function() {
 				$event.addClass('-cancel');
 				OneEvent.changeEventStatus(event_id, OneEvent.STATUS.HIDE, function() {
-					$event.after(tmpl('button', {
-						classes: '-color_neutral ReturnEvent',
+					$event.after(__APP.BUILD.button({
+						classes: [__C.CLASSES.COLORS.NEUTRAL, 'ReturnEvent'],
 						title: 'Вернуть событие',
-						dataset: 'data-event-id="' + event_id + '"'
+						dataset: {
+							'event-id': event_id
+						}
 					}));
 					$event.siblings('.ReturnEvent').not('.-Handled_ReturnEvent').on('click', function() {
 						var $remove_button = $(this);
@@ -201,7 +203,9 @@ FeedPage = extending(Page, (function() {
 			PAGE.$view.find('.BecomeOrg').on('click', function(e) {
 				cookies.removeItem('auth_command');
 				cookies.removeItem('auth_entity_id');
-				(new AuthModal(location.origin + '/add/organization')).show();
+				(new AuthModal(location.origin + '/add/organization', {
+					note: 'Для выполнения этого действия, нужно войти через социальную сеть'
+				})).show();
 				
 				return false;
 			});

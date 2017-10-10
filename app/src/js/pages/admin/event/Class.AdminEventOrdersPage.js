@@ -126,6 +126,7 @@ AdminEventOrdersPage = extending(AdminEventPage, (function() {
 		
 		this.$wrapper.html(tmpl('admin-event-orders-page', {
 			header_buttons: $header_buttons,
+			statuses_help: __APP.BUILD.helpLink(HelpCenterConnection.ARTICLE.ORDER_STATUSES, 'Какие существуют статусы заказов'),
 			loader: (this.$loader = __APP.BUILD.overlayLoader())
 		}));
 		

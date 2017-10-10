@@ -122,7 +122,8 @@ OneOrder = extending(OneEntity, (function() {
 	OneOrder.prototype.ID_PROP_NAME = 'uuid';
 	
 	OneOrder.ENDPOINT = Object.freeze({
-		LEGAL_ENTITY_CONTRACT: '/events/{event_id}/orders/{order_uuid}/legal_entity/contract'
+		LEGAL_ENTITY_CONTRACT: '/events/{event_id}/orders/{order_uuid}/legal_entity/contract',
+		LEGAL_ENTITY_UTD: '/events/{event_id}/orders/{order_uuid}/legal_entity/utd'
 	});
 	
 	/**

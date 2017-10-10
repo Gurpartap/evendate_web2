@@ -52,6 +52,8 @@ EditOrganizationPage = extending(AbstractEditOrganizationPage, (function() {
 			additional_fields.logo_filename = additional_fields.img_url.split('/').reverse()[0];
 		}
 		
+		additional_fields.branding_help = __APP.BUILD.helpLink(HelpCenterConnection.ARTICLE.SITE_DESIGN, 'Как настроить дизайн страницы организации');
+		
 		this.$wrapper.html(tmpl('add-organization-page', additional_fields));
 		
 		

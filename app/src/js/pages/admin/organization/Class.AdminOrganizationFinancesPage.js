@@ -56,6 +56,7 @@ AdminOrganizationFinancesPage = extending(AdminOrganizationPage, (function() {
 		
 		this.render_vars = {
 			withdraw_funds_button: null,
+			withdraw_funds_help: null,
 			transactions_loader: null,
 			orders_loader: null,
 			events_loader: null
@@ -128,6 +129,7 @@ AdminOrganizationFinancesPage = extending(AdminOrganizationPage, (function() {
 				__C.CLASSES.COLORS.NEUTRAL_ACCENT
 			]
 		});
+		this.render_vars.withdraw_funds_help = __APP.BUILD.helpLink(HelpCenterConnection.ARTICLE.FUNDS_WITHDRAW, 'Как происходит вывод средств');
 		this.render_vars.transactions_loader = __APP.BUILD.floatingLoader();
 		this.render_vars.charts = tmpl('admin-organization-finances-chart', [{
 			classes: 'TicketsSellingChart'

@@ -65,6 +65,7 @@ AdminOrganizationSettingsPage = extending(AdminOrganizationPage, (function() {
 			other_domain_radio: null,
 			other_domain: null,
 			tariff_button: null,
+			premium_tariff_help: null,
 			tariff_service_info: null
 		};
 		
@@ -124,6 +125,7 @@ AdminOrganizationSettingsPage = extending(AdminOrganizationPage, (function() {
 		var self = this;
 		
 		bindCallModal(this.$wrapper);
+		bindHelpLink(this.$wrapper);
 		bindRippleEffect(this.$wrapper);
 		
 		this.$wrapper.find('#org_admin_settings_is_private').on('change', function() {
@@ -271,6 +273,8 @@ AdminOrganizationSettingsPage = extending(AdminOrganizationPage, (function() {
 			title: 'Оплатить',
 			classes: [__C.CLASSES.COLORS.ACCENT, __C.CLASSES.HOOKS.RIPPLE, 'ActivatePayment']
 		});
+		
+		this.render_vars.premium_tariff_help = __APP.BUILD.helpLink(HelpCenterConnection.ARTICLE.PREMIUM_TARIFF, 'Что дает premium подписка');
 		
 		this.render_vars.tariff_service_info = service_info_string.format({
 			date: moment.unix(this.organization.tariff.till).calendar(null, {

@@ -1,7 +1,7 @@
 <!doctype html>
 <!--Conditionals for IE9 Support-->
 <!--[if IE 9]>
-<html lang="en" class="ie ie9"><![endif]-->
+<html lang="ru" class="ie ie9"><![endif]-->
 <html>
 <head>
   <meta charset="utf-8">

@@ -58,13 +58,16 @@ AbstractEditEventPage = extending(Page, (function() {
 			min_price_input: null,
 			image_horizontal_filename: null,
 			
+			registration_help: null,
 			registration_till_date_select: null,
 			registration_till_time_input: null,
 			registration_limit_count_input: null,
+			registration_limit_help: null,
 			registration_predefined_fields: null,
 			registration_custom_fields: null,
 			
 			ticket_types: null,
+			tickets_help: null,
 			add_ticket_type_button: null,
 			booking_time_input: null,
 			promocodes: null,
@@ -74,6 +77,7 @@ AbstractEditEventPage = extending(Page, (function() {
 			public_at_time_input: null,
 			additional_notification_date_select: null,
 			additional_notification_time_input: null,
+			push_help: null,
 			vk_image_base64: null,
 			vk_image_filename: null,
 			vk_image_url: null,
@@ -962,6 +966,7 @@ AbstractEditEventPage = extending(Page, (function() {
 		bindDatePickers(PAGE.$wrapper);
 		bindSelect2(PAGE.$wrapper);
 		bindTabs(PAGE.$wrapper);
+		bindHelpLink(PAGE.$wrapper);
 		bindControlSwitch(PAGE.$wrapper);
 		bindCallModal(PAGE.$wrapper);
 		bindLimitInputSize(PAGE.$wrapper);
@@ -1370,6 +1375,8 @@ AbstractEditEventPage = extending(Page, (function() {
 		
 		
 		
+		this.render_vars.registration_help = __APP.BUILD.helpLink(HelpCenterConnection.ARTICLE.HOW_TO_ENABLE_REGISTRATION, 'Как включить регистрацию');
+		
 		this.render_vars.registration_till_date_select = __APP.BUILD.formUnit({
 			label: 'Дата окончания регистрации',
 			name: 'registration_till_date',
@@ -1408,6 +1415,8 @@ AbstractEditEventPage = extending(Page, (function() {
 			required: true
 		});
 		
+		this.render_vars.registration_limit_help = __APP.BUILD.helpLink(HelpCenterConnection.ARTICLE.MEMBERS_LIMITATION, 'Как установить лимит участников события');
+		
 		this.render_vars.registration_predefined_fields = tmpl('edit-event-registration-predefined-field', [
 			{
 				id: AbstractEditEventPage.lastRegistrationFieldId++,
@@ -1440,6 +1449,9 @@ AbstractEditEventPage = extending(Page, (function() {
 		]);
 		
 		
+		this.render_vars.auto_price_change_help = __APP.BUILD.helpLink(HelpCenterConnection.ARTICLE.TICKETS, 'Как организовать автоматическое изменение цен');
+		
+		this.render_vars.tickets_help = __APP.BUILD.helpLink(HelpCenterConnection.ARTICLE.TICKETS, 'Как выглядит электронный билет');
 		
 		this.render_vars.add_ticket_type_button = __APP.BUILD.actionButton({
 			title: 'Добавить билет',
@@ -1470,6 +1482,10 @@ AbstractEditEventPage = extending(Page, (function() {
 		
 		this.render_vars.booking_time_input = __APP.BUILD.formUnit({
 			label: 'Срок брони билета',
+			label_classes: ['help_link', 'HelpLink'],
+			label_dataset: {
+				article_id: HelpCenterConnection.ARTICLE.BOOKING
+			},
 			id: 'edit_event_booking_time',
 			name: 'booking_time',
 			type: 'number',
@@ -1579,6 +1595,10 @@ AbstractEditEventPage = extending(Page, (function() {
 			value: additional_notification ? m_additional_notification_time.format(__C.TIME_FORMAT) : undefined,
 			required: true
 		});
+		
+		this.render_vars.push_help = __APP.BUILD.helpLink(HelpCenterConnection.ARTICLE.HOW_PUSH_WORKS, 'Как работают push-уведомления');
+		
+		this.render_vars.crossposting_help = __APP.BUILD.helpLink(HelpCenterConnection.ARTICLE.CROSSPOSTING_VK, 'Как публиковать в VK');
 	};
 	
 	AbstractEditEventPage.prototype.render = function() {
