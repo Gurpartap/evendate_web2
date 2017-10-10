@@ -222,6 +222,7 @@ class Event extends AbstractEntity
 			WHERE view_tickets.event_id = view_events.id 
 			AND status = TRUE 
 			AND is_active = TRUE 
+			AND order_status_type = \'green\'
 			AND view_tickets.user_id = :user_id)::INT AS ' . self::MY_TICKETS_COUNT_FIELD_NAME,
 
 //		self::ORDERS_COUNT_FIELD_NAME => '(SELECT COALESCE(COUNT(view_tickets.id)::INT, 0)

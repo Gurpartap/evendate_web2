@@ -84,6 +84,7 @@ class Order extends AbstractEntity
 
 	const TICKETS_FIELD_NAME = 'tickets';
 	const USER_FIELD_NAME = 'user';
+	const EVENT_FIELD_NAME = 'event';
 	const PROMOCODE_FIELD_NAME = 'promocode';
 	const PAYER_LEGAL_ENTITY_FIELD_NAME = 'payer_legal_entity';
 	const REGISTRATION_FIELDS_FIELD_NAME = 'registration_fields';
@@ -94,6 +95,7 @@ class Order extends AbstractEntity
 	protected $id;
 	protected $uuid;
 	protected $user_id;
+	protected $event_id;
 
 
 	protected static $DEFAULT_COLS = array(
@@ -289,6 +291,17 @@ class Order extends AbstractEntity
 					'offset' => $fields[self::USER_FIELD_NAME]['offset'] ?? App::DEFAULT_OFFSET
 				),
 				Fields::parseOrderBy($fields[self::USER_FIELD_NAME]['order_by'] ?? ''))->getParams($user, $user_fields)->getData();
+		}
+
+		if (isset($fields[self::EVENT_FIELD_NAME]) && $user instanceof User) {
+			$event_fields = Fields::parseFields($fields[self::EVENT_FIELD_NAME]['fields'] ?? '');
+			$result[self::EVENT_FIELD_NAME] = EventsCollection::one(
+				App::DB(),
+				$user,
+				$this->event_id,
+				$event_fields
+			)->getParams($user, $event_fields)
+				->getData();
 		}
 
 		if (isset($fields[self::PROMOCODE_FIELD_NAME]) && $user instanceof User) {
