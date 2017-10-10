@@ -93,6 +93,10 @@ AbstractAppInspector = extendingJQuery((function() {
 		var self = this;
 		
 		if (AbstractAppInspector.currentInspector) {
+			if (AbstractAppInspector.currentInspector === this) {
+				
+				return this;
+			}
 			AbstractAppInspector.currentInspector.hide();
 		}
 		

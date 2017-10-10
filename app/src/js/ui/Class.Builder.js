@@ -508,6 +508,7 @@ Builder = (function() {
 	 * @param {HTMLAttributes} [props.helptext_attributes]
 	 * @param {(Array<string>|string)} [props.unit_classes]
 	 * @param {(Array<string>|string)} [props.label_classes]
+	 * @param {HTMLDataset} [props.label_dataset]
 	 * @returns {jQuery}
 	 */
 	Builder.prototype.formUnit = function buildFormUnit(props) {
@@ -546,8 +547,9 @@ Builder = (function() {
 						label: props.label ? tmpl('label', Builder.normalizeBuildProps({
 							id: props.id,
 							label: props.label,
-							label_classes: props.label_classes
-						}, ['label_classes'])) : '',
+							classes: props.label_classes,
+							dataset: props.label_dataset
+						})) : '',
 						helptext: props.helptext ? self.formHelpText(props.helptext, props.helptext_dataset, props.helptext_attributes) : '',
 						form_element: (function(props) {
 							var classes = props.classes ? props.classes instanceof Array ? props.classes : props.classes.split(',') : [],

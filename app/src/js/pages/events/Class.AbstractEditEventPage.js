@@ -1482,6 +1482,10 @@ AbstractEditEventPage = extending(Page, (function() {
 		
 		this.render_vars.booking_time_input = __APP.BUILD.formUnit({
 			label: 'Срок брони билета',
+			label_classes: ['help_link', 'HelpLink'],
+			label_dataset: {
+				article_id: HelpCenterConnection.ARTICLE.BOOKING
+			},
 			id: 'edit_event_booking_time',
 			name: 'booking_time',
 			type: 'number',
@@ -1593,6 +1597,8 @@ AbstractEditEventPage = extending(Page, (function() {
 		});
 		
 		this.render_vars.push_help = __APP.BUILD.helpLink(HelpCenterConnection.ARTICLE.HOW_PUSH_WORKS, 'Как работают push-уведомления');
+		
+		this.render_vars.crossposting_help = __APP.BUILD.helpLink(HelpCenterConnection.ARTICLE.CROSSPOSTING_VK, 'Как публиковать в VK');
 	};
 	
 	AbstractEditEventPage.prototype.render = function() {

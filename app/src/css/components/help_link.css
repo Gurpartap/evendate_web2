@@ -10,22 +10,13 @@ button.help_link {
 	background-color: transparent;
 }
 
-h1.help_link:hover,
-h2.help_link:hover,
-h3.help_link:hover,
-h4.help_link:hover,
-h5.help_link:hover,
-h6.help_link:hover {
-	color: #337ab7;
-	text-decoration: underline dashed;
-}
-
 h1.help_link:after,
 h2.help_link:after,
 h3.help_link:after,
 h4.help_link:after,
 h5.help_link:after,
 h6.help_link:after,
+label.help_link:after,
 button.help_link:before {
 	display: inline;
 	font-family: FontAwesome;
@@ -36,6 +27,15 @@ h2.help_link:after,
 h3.help_link:after,
 h4.help_link:after,
 h5.help_link:after,
-h6.help_link:after {content: ' \f059'}
+h6.help_link:after,
+label.help_link:after {content: ' \f059'}
 
 button.help_link:before {content: '\f059\ '}
+
+h1.help_link:hover:after,
+h2.help_link:hover:after,
+h3.help_link:hover:after,
+h4.help_link:hover:after,
+h5.help_link:hover:after,
+h6.help_link:hover:after,
+label.help_link:hover:after {color: #337ab7}
