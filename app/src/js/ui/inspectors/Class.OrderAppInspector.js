@@ -53,7 +53,7 @@ OrderAppInspector = extending(AbstractAppInspector, (function() {
 							value: formatCurrency(self.order.final_sum, ' ', '.', '', '₽')
 						},  {
 							key: 'Способ оплаты',
-							value: OneOrder.PAYMENT_PROVIDERS[self.order.payment_type].toLowerCase()
+							value: OneOrder.PAYMENT_PROVIDERS_TEXT[self.order.payment_type].toLowerCase()
 						},  {
 							key: 'Комиссия за способ оплаты',
 							value: formatCurrency(self.order.final_sum - self.order.shop_sum_amount, ' ', '.', '', '₽')

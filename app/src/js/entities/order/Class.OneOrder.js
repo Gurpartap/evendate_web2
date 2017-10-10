@@ -157,6 +157,28 @@ OneOrder = extending(OneEntity, (function() {
 	 * @enum {string}
 	 */
 	OneOrder.PAYMENT_PROVIDERS = {
+		PC: 'PC',
+		AC: 'AC',
+		MC: 'MC',
+		GP: 'GP',
+		EP: 'EP',
+		WM: 'WM',
+		SB: 'SB',
+		MP: 'MP',
+		AB: 'AB',
+		MASTER_PASS: 'MA',
+		PB: 'PB',
+		QIWI_WALLET: 'QW',
+		KV: 'KV',
+		BITCOIN: 'BTC',
+		LEGAL_ENTITY_PAYMENT: 'LEP',
+		OTHER: 'OTH',
+	};
+	/**
+	 *
+	 * @enum {string}
+	 */
+	OneOrder.PAYMENT_PROVIDERS_TEXT = {
 		PC: 'Яндекс.Деньги',
 		AC: 'Банковская карта',
 		MC: 'Баланс телефона',

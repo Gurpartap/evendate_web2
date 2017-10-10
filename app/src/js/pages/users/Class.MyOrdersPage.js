@@ -167,27 +167,35 @@ MyOrdersPage = extending(Page, (function() {
 							
 							return $buttons;
 						}
+						case OneOrder.ORDER_STATUSES.PAYED:
 						case OneOrder.ORDER_STATUSES.PAYED_LEGAL_ENTITY:
 						case OneOrder.ORDER_STATUSES.WAITING_PAYMENT_LEGAL_ENTITY: {
-							$buttons = __APP.BUILD.externalLink({
-								title: 'Договор-счет',
-								page: '/api/v1' + OneOrder.ENDPOINT.LEGAL_ENTITY_CONTRACT.format({
-									event_id: order.event.id,
-									order_uuid: order.uuid
-								}),
-								classes: [
-									'orders_page_pay_button',
-									__C.CLASSES.COMPONENT.BUTTON,
-									__C.CLASSES.COLORS.ACCENT,
-									__C.CLASSES.HOOKS.RIPPLE,
-									__C.CLASSES.SIZES.WIDE
-								],
-								attributes: {
-									target: '__blank'
-								}
-							});
+							if (
+								(order.status_type_code === OneOrder.ORDER_STATUSES.PAYED
+								&& order.payment_type === OneOrder.PAYMENT_PROVIDERS.LEGAL_ENTITY_PAYMENT)
+								|| order.status_type_code === OneOrder.ORDER_STATUSES.PAYED_LEGAL_ENTITY
+								|| order.status_type_code === OneOrder.ORDER_STATUSES.WAITING_PAYMENT_LEGAL_ENTITY
+							) {
+								$buttons = __APP.BUILD.externalLink({
+									title: 'Договор-счет',
+									page: '/api/v1' + OneOrder.ENDPOINT.LEGAL_ENTITY_CONTRACT.format({
+										event_id: order.event.id,
+										order_uuid: order.uuid
+									}),
+									classes: [
+										'orders_page_pay_button',
+										__C.CLASSES.COMPONENT.BUTTON,
+										__C.CLASSES.COLORS.ACCENT,
+										__C.CLASSES.HOOKS.RIPPLE,
+										__C.CLASSES.SIZES.WIDE
+									],
+									attributes: {
+										target: '__blank'
+									}
+								});
+							}
 							
-							if (order.status_type_code === OneOrder.ORDER_STATUSES.PAYED_LEGAL_ENTITY) {
+							if (order.payment_type === OneOrder.PAYMENT_PROVIDERS.LEGAL_ENTITY_PAYMENT) {
 								$buttons = $buttons.add(__APP.BUILD.externalLink({
 									title: 'Универсальный передаточный документ',
 									page: '/api/v1' + OneOrder.ENDPOINT.LEGAL_ENTITY_UTD.format({
