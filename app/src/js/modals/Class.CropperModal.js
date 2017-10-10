@@ -43,9 +43,23 @@ CropperModal = extending(AbstractModal, (function() {
 		this.__render({
 			classes: [__C.CLASSES.FLOATING_MATERIAL, __C.CLASSES.MODAL_STATES.SIZE.WIDE],
 			content_classes: [__C.CLASSES.MODAL_STATES.NO_PADDING, __C.CLASSES.IMG_HOLDER],
-			footer_buttons: tmpl('button', [
-				{classes: [__C.CLASSES.COLORS.PRIMARY, 'CropButton', __C.CLASSES.HOOKS.RIPPLE].join(' '), title: 'Кадрировать'},
-				{classes: [__C.CLASSES.COLORS.DEFAULT, 'DestroyCropButton', __C.CLASSES.HOOKS.RIPPLE].join(' '), title: 'Отмена'}
+			footer_buttons: __APP.BUILD.button([
+				{
+					classes: [
+						__C.CLASSES.COLORS.PRIMARY,
+						'CropButton',
+						__C.CLASSES.HOOKS.RIPPLE
+					],
+					title: 'Кадрировать'
+				},
+				{
+					classes: [
+						__C.CLASSES.COLORS.DEFAULT,
+						'DestroyCropButton',
+						__C.CLASSES.HOOKS.RIPPLE
+					],
+					title: 'Отмена'
+				}
 			])
 		});
 		

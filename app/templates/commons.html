@@ -15,7 +15,7 @@
 </script>
 
 <script type="javascript/template" id="tmpl-label">
-	<label class="form_label {label_classes}" for="{id}">{label}</label>
+	<label class="form_label {classes}" for="{id}" {dataset}>{label}</label>
 </script>
 
 <script type="javascript/template" id="tmpl-switch">
@@ -70,7 +70,7 @@
 </script>
 
 <script type="javascript/template" id="tmpl-button">
-	<button class="button {classes}" type="button" {attributes}><span class="Text">{title}</span></button>
+	<button class="{classes}" type="button" {attributes}><span class="Text">{title}</span></button>
 </script>
 
 <script type="javascript/template" id="tmpl-external-link">
@@ -89,12 +89,12 @@
 	<a href="{href}" class="action {classes}" {dataset} {attributes}>{title}</a>
 </script>
 
-<script type="javascript/template" id="tmpl-action-button">
-	<button class="action {classes}" type="button" {attributes}><span class="Text">{title}</span></button>
-</script>
-
 <script type="javascript/template" id="tmpl-tag">
 	<a class="tag_unit link Link {classes}" href="{page}" {dataset} {attributes}>{name}</a>
+</script>
+
+<script type="javascript/template" id="tmpl-help-link">
+	<button class="help_link {classes}" type="button" {dataset} {attributes}>{title}</button>
 </script>
 
 <script type="javascript/template" id="tmpl-user-tombstone">

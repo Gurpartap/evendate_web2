@@ -332,7 +332,13 @@ LegalEntityPayment = extending(Page, (function() {
 	
 	LegalEntityPayment.prototype.render = function() {
 		if (__APP.USER.isLoggedOut()) {
-			return (new AuthModal(window.location.href, false)).show();
+			var auth_modal = new AuthModal(window.location.href, {
+				note: 'Для оплаты вам необходимо войти через социальную сеть'
+			});
+			
+			auth_modal.is_hidable = false;
+			
+			return auth_modal.show();
 		}
 		
 		this.$wrapper.html(tmpl('legal-entity-payment-page', this.render_vars));

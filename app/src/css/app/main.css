@@ -36,5 +36,5 @@ body,
 }
 .-open_sidebar #main_section_cap {
 	display: block;
-	z-index: 10;
+	z-index: 30;
 }

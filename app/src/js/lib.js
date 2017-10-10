@@ -29,6 +29,7 @@ __C = {
 		},
 		COLORS: {
 			ACCENT: '-color_accent',
+			FRANKLIN: '-color_franklin',
 			PRIMARY: '-color_primary',
 			DEFAULT: '-color_default',
 			NEUTRAL: '-color_neutral',
@@ -163,6 +164,14 @@ __C = {
 		ORGANIZATION_OPEN_SITE: 'open_site',
 		EVENT_ENTITY: 'event',
 		ORGANIZATION_ENTITY: 'organization'
+	},
+	/**
+	 * @enum {string}
+	 */
+	SOCIAL_NETWORKS: {
+		VK: 'vk',
+		GOOGLE: 'google',
+		FACEBOOK: 'facebook'
 	},
 	/**
 	 * @enum {string}
@@ -1809,7 +1818,7 @@ function getFilenameFromURL(url) {
  *
  * @returns {object}
  */
-function mergeObjects(/**...objects, */recursive, deep) {
+function mergeObjects(objects, recursive, deep) {
 	var res,
 		length = arguments.length,
 		is_recursive,
@@ -2095,6 +2104,32 @@ function trimAvatarsCollection($parent) {
 		}
 		$collection.addClass('-trimmed');
 	});
+}
+
+/**
+ *
+ * @param {jQuery} [$parent]
+ * @returns {jQuery}
+ */
+function bindHelpLink($parent) {
+	$parent = $parent ? $parent : $('body');
+	var $links = $parent.is('.HelpLink') ? $parent : $parent.find('.HelpLink');
+	
+	$links.not('.-Handled_HelpLink').each(function(i, elem) {
+		var $this = $(elem);
+		
+		$this.on('click.openHelpAppInspector', function() {
+			var inspector = $this.data('inspector');
+			
+			if (!(inspector instanceof HelpAppInspector)) {
+				inspector = new HelpAppInspector($this.data('article_id'));
+				$this.data('inspector', inspector);
+			}
+			inspector.show();
+		});
+	}).addClass('-Handled_HelpLink');
+	
+	return $parent;
 }
 
 function bindDatePickers($parent) {

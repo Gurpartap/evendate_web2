@@ -167,7 +167,7 @@ $__modules['organizations'] = array(
 				$__order_by ?? array(Organization::RATING_OVERALL)
 			);
 		},
-		'types' => function () use ($__db, $__request, $__request, $__pagination, $__user, $__fields, $__order_by) {
+		'types' => function () use ($__db, $__request, $__pagination, $__user, $__fields, $__order_by) {
 			$result = OrganizationTypesCollection::filter(
 				$__db,
 				$__user,
