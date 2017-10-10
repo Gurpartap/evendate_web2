@@ -78,15 +78,7 @@
 </script>
 
 <script type="javascript/template" id="tmpl-link">
-	<a href="{page}" class="link {classes} Link" {dataset} {attributes}>{title}</a>
-</script>
-
-<script type="javascript/template" id="tmpl-link-button">
-	<a href="{page}" class="button {classes} Link" {dataset} {attributes}>{title}</a>
-</script>
-
-<script type="javascript/template" id="tmpl-action-link">
-	<a href="{href}" class="action {classes}" {dataset} {attributes}>{title}</a>
+	<a href="{page}" class="{classes}" {dataset} {attributes}>{title}</a>
 </script>
 
 <script type="javascript/template" id="tmpl-tag">
@@ -229,27 +221,6 @@
 	<div class="loader_block {classes}">{loader}</div>
 </script>
 
-<script type="javascript/template" id="tmpl-vk-share-button">
-	<button class="ShareButton share_icon {classes}" data-title="VK" data-href="http://vk.com/share.php?url=http://evendate.ru/event/{id}?title={title}&description={description}&image={image_horizontal_url}&noparse=false"></button>
-</script>
-
-<script type="javascript/template" id="tmpl-facebook-share-button">
-	<button class="ShareButton share_icon {classes}" data-title="Facebook" data-href="http://www.facebook.com/dialog/share?app_id=1692270867652630&display=popup&title={title}&quote={description}&href=http://evendate.ru/event/{id}&redirect_uri=http://evendate.ru/event/{id}image[0][url]={image_horizontal_large_url}&image[0][user_generated]=true"></button>
-</script>
-
-<script type="javascript/template" id="tmpl-twitter-share-button">
-	<button class="ShareButton share_icon twitter {classes}" data-title="Twitter" data-href="https://twitter.com/share?url=http://evendate.ru/event/{id}?text={title}&via=evendate.ru&hashtags=#evendate"></button>
-</script>
-<!--
-<script type="javascript/template" id="tmpl-event-card">
-	<div class="event_card">
-		<div class="event_card_img" style="background-image: url('{image_horizontal_small_url}')"></div>
-		<div class="event_card_description">
-			<span>{title}</span>
-		</div>
-	</div>
-</script>-->
-
 <script type="javascript/template" id="tmpl-event-card">
 	<div class="page feed_event FeedEvent">
 		<a href="/event/{id}" class="feed_event_img_side img_holder link Link">
@@ -342,7 +313,7 @@
 
 <script type="javascript/template" id="tmpl-overlay-cap">
 	<div class="overlay_cap -unselectable -centering OverlayCap {classes}" {dataset} {attributes}>
-		<div class="overlay_cap_wrapper">{content}</div>
+		<div class="overlay_cap_wrapper CapWrapper">{content}</div>
 	</div>
 </script>
 
@@ -1489,36 +1460,43 @@
 	</tr>
 </script>
 <script type="javascript/template" id="tmpl-event-page">
-	<div class="page event_page EventPage">
-		<div class="event_main_content">
+	<div class="event_page EventPage">
+		<div class="event_main_content material">
 			<header class="event_header">
 				<div class="event_image img_holder">
 					<img class="CallModal" data-modal_type="media" src="{image_horizontal_url}?width={cover_width}" width="{cover_width}">
-				</div>
-				<div class="event_image_bottom AddAvatarWrapper">
-					<div class="event_image_bottom_wrap">{avatars_collection}</div>
-					<div class="event_image_bottom_wrap">
-						{action_buttons}
-					</div>
 				</div>
 			</header>
 			<div class="event_content">
 				<h3 class="event_title" title="{title}">{title}</h3>
 				<div class="event_description">{description}</div>
-				{event_map}
 			</div>
 		</div>
 		<div class="event_additional_content">
-			{event_edit_functions}
-			{event_additional_info}
+			{event_functions}
 			<div class="event_additional_field">
-				<label class="event_additional_field_label">Организатор</label>
+				<h6 class="event_additional_field_label">Организатор</h6>
 				{organization_avatar_block}
 			</div>
-			<div class="event_calendar EventCalendar"></div>
+			<div class="event_additional_field">
+				{event_additional_info}
+				<div class="form_unit">
+					{event_action}
+				</div>
+				<div class="form_unit">
+					{event_notifications_button}
+				</div>
+			</div>
+			<div class="event_additional_field AddAvatarWrapper">
+				{action_button}
+				{avatars_collection}
+			</div>
+			<div class="event_additional_field">
+				<div class="event_calendar EventCalendar"></div>
+			</div>
 			{event_additional_fields}<!--
 			<div class="share_block">
-				<label class="share_title -color_primary -transform_uppercase">Поделиться</label>
+				<h6 class="share_title -color_primary -transform_uppercase">Поделиться</h6>
 				<div class="share_icons -size_small">{share_block}</div>
 			</div>-->
 		</div>
@@ -1526,34 +1504,26 @@
 	</div>
 </script>
 
-<script type="javascript/template" id="tmpl-event-edit-functions">
-	<button class="button -color_neutral -size_wide RippleEffect DropdownButton" data-dropdown="redact_event" data-dd-width="self" type="button">Редактирование события</button>
-	<div class="dropdown_box DropdownBox" data-dropdown_id="redact_event">
-		<div class="dropdown_list"><button class="dropdown_button -size_wide -color_accent RippleEffect CloseDropdown DropdownButton" data-dropdown="cancel_event" data-dd-width="self" type="button">Отменить событие</button></div>
-		<div class="dropdown_list"><a href="/event_landing/?id={id}&edit=true" target="_blank" class="dropdown_button link -size_wide -color_franklin RippleEffect CloseDropdown">Создать лендинг</a></div>
-		<div class="dropdown_list"><a href="/admin/event/{id}/edit" class="dropdown_button link -size_wide -color_default RippleEffect CloseDropdown Link">Редактировать</a></div>
-	</div>
-	<div class="dropdown_box DropdownBox" data-dropdown_id="cancel_event">
-		<div class="dropdown_box_wrapper">
-			<p>Вы уверены, что хотите отменить событие?</p>
+<script type="javascript/template" id="tmpl-event-functions">
+	<div class="event_additional_field">
+		<h6 class="event_additional_field_label">Действия</h6>
+		{functions}
+
+		<div class="dropdown_box DropdownBox" data-dropdown_id="cancel_event">
+			<div class="dropdown_box_wrapper">
+				<p>Вы уверены, что хотите отменить событие?</p>
+			</div>
+			<footer class="dropdown_box_footer">
+				<span class="action -color_neutral CloseDropdown">Отмена</span>
+				<span class="action -color_error CloseDropdown CancelEvent">Да</span>
+			</footer>
 		</div>
-		<footer class="dropdown_box_footer">
-			<span class="action -color_neutral CloseDropdown">Отмена</span>
-			<span class="action -color_error CloseDropdown CancelEvent">Да</span>
-		</footer>
 	</div>
 </script>
 
 <script type="javascript/template" id="tmpl-event-map">
 	<div class="event_map CallModal EventMap" data-modal_type="map" style="background-image: url('https://maps.googleapis.com/maps/api/staticmap?markers={location_sanitized}&zoom=15&size=640x640&scale=2&format=png&maptype=roadmap&key=AIzaSyCKu_xeHhtme8b1awA_rHjpfV3wVg1fZDg')" data-modal_map_location="{location_sanitized}"></div>
-</script>
-
-<script type="javascript/template" id="tmpl-event-registration-info">
-	<p class="event_additional_info -text_color_accent -transform_uppercase">Регистрация до {registration_till}</p>
-</script>
-
-<script type="javascript/template" id="tmpl-event-price-info">
-	<p class="event_additional_info -text_color_accent">от {min_price} руб.</p>
+	<p class="-font_weight_bolder">{location}</p>
 </script>
 
 <script type="javascript/template" id="tmpl-event-additional-info">
@@ -1565,8 +1535,8 @@
 		<div class="collapsing_wrapper CollapsingWrapper -fading" data-collapsing_id="event_dates">
 			<div class="collapsing_content CollapsingContent">
 				<div class="event_additional_field_split">
-					<div class="event_additional_field"><label class="event_additional_field_label">Дата</label></div>
-					<div class="event_additional_field"><label class="event_additional_field_label">Время</label></div>
+					<div class="event_additional_field"><h6 class="event_additional_field_label">Дата</h6></div>
+					<div class="event_additional_field"><h6 class="event_additional_field_label">Время</h6></div>
 				</div>
 				{date_times}
 			</div>
@@ -1584,15 +1554,15 @@
 
 <script type="javascript/template" id="tmpl-event-additional-field">
 	<div class="event_additional_field">
-		<label class="event_additional_field_label">{key}</label>
+		<h6 class="event_additional_field_label">{key}</h6>
 		<p>{value}</p>
 	</div>
 </script>
 
 <script type="javascript/template" id="tmpl-event-detail-link">
 	<div class="event_additional_field">
-		<label class="event_additional_field_label">Подробнее</label>
-		<a class="fa_icon fa-external-link external_link ExternalLink" href="{detail_info_url}" target="_blank">{detail_info_url}</a>
+		<h6 class="event_additional_field_label">Подробнее</h6>
+		<a class="external_link ExternalLink" href="{detail_info_url}" target="_blank">{detail_info_url}</a>
 	</div>
 </script>
 

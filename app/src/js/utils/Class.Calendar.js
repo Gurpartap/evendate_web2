@@ -634,7 +634,7 @@ Calendar = (function() {
 				
 				if ($tr.length) {
 					$tr
-						.html(tmpl('link', {
+						.html(__APP.BUILD.link({
 							title: $tr.children().text(),
 							classes: calendar.options.classes.day_class,
 							page: '/feed/day/'+$tr.data('date')

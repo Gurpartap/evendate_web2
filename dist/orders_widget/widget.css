@@ -3151,6 +3151,47 @@ fieldset:disabled .form_select {cursor: default}
 	.link:not(.button):not([class*="color"]):hover,
 	.link:not(.button):not([class*="color"]):focus {color: var(--color_accent)}
 }
+.help_link {
+	cursor: pointer;
+}
+
+button.help_link {
+	font-size: .9em;
+	color: #337ab7;
+	border: none;
+	border-bottom: 1px dashed;
+	background-color: transparent;
+}
+
+h1.help_link:after,
+h2.help_link:after,
+h3.help_link:after,
+h4.help_link:after,
+h5.help_link:after,
+h6.help_link:after,
+label.help_link:after,
+button.help_link:before {
+	display: inline;
+	font-family: FontAwesome;
+}
+
+h1.help_link:after,
+h2.help_link:after,
+h3.help_link:after,
+h4.help_link:after,
+h5.help_link:after,
+h6.help_link:after,
+label.help_link:after {content: ' \f059'}
+
+button.help_link:before {content: '\f059\ '}
+
+h1.help_link:hover:after,
+h2.help_link:hover:after,
+h3.help_link:hover:after,
+h4.help_link:hover:after,
+h5.help_link:hover:after,
+h6.help_link:hover:after,
+label.help_link:hover:after {color: #337ab7}
 .loader_dot,
 .loader:only-child {position: absolute}
 
@@ -3342,7 +3383,7 @@ html.-noscroll {
 	text-align: center;
 	-webkit-overflow-scrolling: touch;
 	background-color: hsla(218,24%,32%,.6);
-	z-index: 1050;
+	z-index: 20;
 }
 
 .modal_destroyer {
@@ -3393,7 +3434,7 @@ html.-noscroll {
 }
 
 .modal_unit,
-body.-open_modal > .modal_wrapper {
+body.-open_modal .modal_wrapper {
 	opacity: 1;
 	visibility: visible;
 }
@@ -3662,6 +3703,7 @@ body.-open_modal > .modal_wrapper {
 
 .order_page_buttons {
 	display: inline-block;
+	margin-bottom: 1em;
 }
 
 .order_page_contact {
@@ -3725,7 +3767,7 @@ body,
 }
 .-open_sidebar #main_section_cap {
 	display: block;
-	z-index: 10;
+	z-index: 30;
 }
 .widget_view {
 	background-color: #fff;

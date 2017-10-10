@@ -250,8 +250,11 @@ Builder = (function() {
 	Builder.prototype.link = function buildLink(props) {
 		
 		return bindPageLinks(tmpl('link', [].map.call(arguments, function(arg) {
+			var props = Builder.normalizeBuildProps(arg);
 			
-			return Builder.normalizeBuildProps(arg);
+			props.classes.push(__C.CLASSES.COMPONENT.LINK, __C.CLASSES.HOOKS.LINK);
+			
+			return props;
 		})));
 	};
 	/**
@@ -264,30 +267,31 @@ Builder = (function() {
 	 */
 	Builder.prototype.linkButton = function buildLinkButton(props) {
 		
-		return bindPageLinks(tmpl('link-button', [].map.call(arguments, function(arg) {
+		return bindPageLinks(tmpl('link', [].map.call(arguments, function(arg) {
+			var props = Builder.normalizeBuildProps(arg);
 			
-			return Builder.normalizeBuildProps(arg);
+			props.classes.push(__C.CLASSES.COMPONENT.BUTTON, __C.CLASSES.HOOKS.LINK);
+			
+			return props;
 		})));
 	};
 	/**
 	 *
-	 * @param {string} href
-	 * @param {string} title
-	 * @param {(string|Array<string>)} [classes]
-	 * @param {HTMLDataset} [dataset]
-	 * @param {HTMLAttributes} [attributes]
+	 * @param {...buildProps} props
+	 * @param {string} props.page
+	 * @param {string} props.title
 	 *
 	 * @returns {jQuery}
 	 */
-	Builder.prototype.actionLink = function buildActionLink(href, title, classes, dataset, attributes) {
+	Builder.prototype.actionLink = function buildActionLink(props) {
 		
-		return tmpl('action-link', Builder.normalizeBuildProps({
-			href: href,
-			title: title,
-			classes: classes,
-			dataset: dataset,
-			attributes: attributes
-		}));
+		return bindPageLinks(tmpl('link', [].map.call(arguments, function(arg) {
+			var props = Builder.normalizeBuildProps(arg);
+			
+			props.classes.push(__C.CLASSES.COMPONENT.ACTION, __C.CLASSES.HOOKS.LINK);
+			
+			return props;
+		})));
 	};
 	/**
 	 *
@@ -833,6 +837,37 @@ Builder = (function() {
 		});
 		
 		return tmpl('user-social-links-wrapper', {links: tmpl('user-social-link', props_array)});
+	};
+	/**
+	 *
+	 * @param {object} sharing_object
+	 * @param {string} sharing_object.title
+	 * @param {string} sharing_object.url
+	 * @param {string} [sharing_object.image_url]
+	 * @param {(__C.SOCIAL_NETWORKS|Array<__C.SOCIAL_NETWORKS>)} social_networks
+	 *
+	 * @return {jQuery}
+	 */
+	Builder.prototype.shareLinks = function(sharing_object, social_networks) {
+		social_networks = social_networks instanceof Array ? social_networks : [social_networks];
+		
+		return this.externalLink.apply(this, social_networks.map(function(network) {
+			var link = getByValue(network, __C.SOCIAL_NETWORKS, __C.SHARE_LINK);
+			
+			return {
+				page: link.format(sharing_object),
+				classes: [
+					'share_icon',
+					network
+				]
+			};
+		})).on('click', function(e) {
+			window.open(this.href, 'share', 'height=570,width=650,status=yes,toolbar=no,menubar=no');
+			
+			e.preventDefault();
+			
+			return false;
+		});
 	};
 	/**
 	 *

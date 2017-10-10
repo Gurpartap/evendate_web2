@@ -1,11 +1,10 @@
 .event_page {
-	display: inline-flex;
-	vertical-align: top;
+	display: flex;
+	align-items: flex-start;
 	min-width: 750px;
-	width: 75%;
+	max-width: 1044px;
 	margin: 24px 0;
 	border-radius: 2px;
-	overflow: hidden;
 }
 
 .event_main_content {
@@ -14,7 +13,6 @@
 }
 
 .event_image {
-	border-bottom: 1px solid #c5c9d1;
 	cursor: pointer;
 }
 .event_image > img {width: 100%}
@@ -29,8 +27,6 @@
 	padding: 0 24px;
 	z-index: 1;
 }
-
-.event_image_bottom .avatars_collection {cursor: pointer}
 
 .event_image_bottom .button + .button {margin-left: .88em}
 
@@ -51,8 +47,7 @@
 }
 
 .event_map {
-	height: 300px;
-	margin-top: 3em;
+	height: 150px;
 	background-size: 100% auto;
 	background-position: 50%;
 	cursor: pointer;
@@ -61,14 +56,14 @@
 .event_additional_content {
 	flex-shrink: 0;
 	width: 30%;
-	padding: 24px;
-	border-left: 1px solid #c5c9d1;
+	padding-left: 24px;
 }
 
 .event_additional_field {
 	font-size: .88rem;
-	margin: 2em 0 .5em;
+	margin: .5em 0;
 }
+.event_additional_field:not(:first-child) {margin-top: 36px}
 .event_additional_field > p {margin: .4em 0}
 .event_additional_field_split {font-size: 0}
 .event_additional_field_split > .event_additional_field {
@@ -78,11 +73,21 @@
 	margin: 0 0 .4em;
 }
 
+.event_additional_field > .button {margin-right: 1em}
+.event_additional_field > .avatars_collection {
+	margin-left: 1em;
+	cursor: pointer;
+}
+
 .event_additional_field > .external_link {
 	display: block;
 	white-space: nowrap;
 	overflow: hidden;
 	text-overflow: ellipsis;
+}
+
+.event_calendar {
+	width: 225px;
 }
 
 .event_date {
@@ -92,17 +97,20 @@
 
 .event_additional_field_label {
 	display: block;
-	margin-bottom: .5em;
+	margin-bottom: 12px;
+	font-size: 1em;
 	font-weight: 500;
-	color: #3e4d66;
+	color: #9fa6b3;
+	text-transform: uppercase;
 }
-.event_additional_content > .event_additional_field:first-child {margin-top: 0}
 
 .event_additional_info {
 	margin: 0;
 	font-size: .88rem;
 	font-weight: 500;
 }
+
+.event_function_button {padding: .4em}
 
 .event_additional_content > .button:first-child {margin-bottom: 1em}
 
@@ -131,8 +139,7 @@
 }
 
 @supports (--custom_properties: 1) {
-	.event_image {border-bottom-color: 1var(--color_primary_30)}
 	.event_additional_content {border-left-color: var(--color_primary_30)}
-	.event_additional_field_label {color: var(--color_primary)}
+	.event_additional_field_label {color: var(--color_primary_50)}
 	.event_vulcan_header {color: var(--color_primary)}
 }

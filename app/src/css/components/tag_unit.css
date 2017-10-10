@@ -1,9 +1,10 @@
 .tag_unit {
 	display: inline-block;
 	vertical-align: middle;
-	padding: 4px 6px;
+	padding: 10px 12px;
 	margin: 0 6px 6px 0;
-	border-radius: 2px;
+	font-weight: 500;
+	border-radius: 3px;
 	background-color: #fff;
-	box-shadow: 0 0 4px 0 hsla(0,0%,0%,.2);
+	box-shadow: 0 0 3px 0 rgba(0, 0, 0, 0.06);;
 }

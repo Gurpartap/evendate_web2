@@ -21,9 +21,9 @@ OrderButton = extending(ActionButton, (function() {
 		this.options = {
 			labels: {
 				checked: event.ticketing_locally ? 'Куплен' : 'Зарегистрирован',
-				unchecked: event.ticketing_locally ? 'Купить' : 'Регистрация',
+				unchecked: event.ticketing_locally ? 'Купить билет' : 'Регистрация',
 				checked_hover: 'Открыть билеты',
-				unchecked_hover: event.ticketing_locally ? 'Купить' : 'Регистрация'
+				unchecked_hover: event.ticketing_locally ? 'Купить билет' : 'Регистрация'
 			},
 			colors: {
 				checked: __C.CLASSES.COLORS.ACCENT,
