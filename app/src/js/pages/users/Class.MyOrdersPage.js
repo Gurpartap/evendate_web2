@@ -118,7 +118,7 @@ MyOrdersPage = extending(Page, (function() {
 				order_number: formatTicketNumber(order.number),
 				pay_info: MyOrdersPage.buildPayInfo(order),
 				pay_button: (function(order) {
-					var $buttons;
+					var $buttons = $();
 					
 					switch (order.status_type_code) {
 						case OneOrder.ORDER_STATUSES.WAITING_FOR_PAYMENT: {
@@ -169,8 +169,7 @@ MyOrdersPage = extending(Page, (function() {
 						}
 						case OneOrder.ORDER_STATUSES.PAYED_LEGAL_ENTITY:
 						case OneOrder.ORDER_STATUSES.WAITING_PAYMENT_LEGAL_ENTITY: {
-							
-							return __APP.BUILD.externalLink({
+							$buttons = __APP.BUILD.externalLink({
 								title: 'Договор-счет',
 								page: '/api/v1' + OneOrder.ENDPOINT.LEGAL_ENTITY_CONTRACT.format({
 									event_id: order.event.id,
@@ -181,13 +180,34 @@ MyOrdersPage = extending(Page, (function() {
 									__C.CLASSES.COMPONENT.BUTTON,
 									__C.CLASSES.COLORS.ACCENT,
 									__C.CLASSES.HOOKS.RIPPLE,
-									__C.CLASSES.SIZES.WIDE,
-									__C.CLASSES.SIZES.HUGE
+									__C.CLASSES.SIZES.WIDE
 								],
 								attributes: {
 									target: '__blank'
 								}
 							});
+							
+							if (order.status_type_code === OneOrder.ORDER_STATUSES.PAYED_LEGAL_ENTITY) {
+								$buttons = $buttons.add(__APP.BUILD.externalLink({
+									title: 'Универсальный передаточный документ',
+									page: '/api/v1' + OneOrder.ENDPOINT.LEGAL_ENTITY_UTD.format({
+										event_id: order.event.id,
+										order_uuid: order.uuid
+									}),
+									classes: [
+										'orders_page_pay_button',
+										__C.CLASSES.COMPONENT.BUTTON,
+										__C.CLASSES.COLORS.FRANKLIN,
+										__C.CLASSES.HOOKS.RIPPLE,
+										__C.CLASSES.SIZES.WIDE
+									],
+									attributes: {
+										target: '__blank'
+									}
+								}));
+							}
+							
+							return $buttons;
 						}
 						default: {
 							
