@@ -281,6 +281,32 @@ class EventsCollection extends AbstractCollection
 					}
 					break;
 				}
+				case 'with_tickets': {
+					$val = filter_var($value, FILTER_VALIDATE_BOOLEAN, FILTER_NULL_ON_FAILURE);
+
+					if ($val != null) {
+						if ($val) {
+							$q_get_events->where('(SELECT COALESCE(COUNT(view_tickets.id)::INT, 0)
+									FROM view_tickets
+									WHERE view_tickets.event_id = view_events.id 
+									AND status = TRUE 
+									AND is_active = TRUE 
+									AND order_status_type = \'green\'
+									AND view_tickets.user_id = :user_id)::INT > 0');
+							$statement_array[':user_id'] = $user->getId();
+						} else {
+							$q_get_events->where('(SELECT COALESCE(COUNT(view_tickets.id)::INT, 0)
+									FROM view_tickets
+									WHERE view_tickets.event_id = view_events.id 
+									AND status = TRUE 
+									AND is_active = TRUE 
+									AND order_status_type = \'green\'
+									AND view_tickets.user_id = :user_id)::INT = 0');
+							$statement_array[':user_id'] = $user->getId();
+						}
+					}
+					break;
+				}
 				case 'bounds': {
 					$points = explode(',', $value);
 
@@ -745,7 +771,7 @@ class EventsCollection extends AbstractCollection
 		return new Result(true, '', $responses);
 	}
 
-	public static function getIdByAlias(ExtendedPDO $db, string $alias) : int
+	public static function getIdByAlias(ExtendedPDO $db, string $alias): int
 	{
 		$q_get_event_id = App::queryFactory()->newSelect();
 		$q_get_event_id->from('event_landings')
@@ -754,7 +780,7 @@ class EventsCollection extends AbstractCollection
 			->orderBy(array('updated_at DESC', 'id DESC'))
 			->limit(1);
 
-		if (is_int($alias)){
+		if (is_int($alias)) {
 			$q_get_event_id->orWhere('event_id = ?', $alias);
 		}
 
