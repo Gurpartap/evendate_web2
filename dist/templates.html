@@ -15,7 +15,7 @@
 </script>
 
 <script type="javascript/template" id="tmpl-label">
-	<label class="form_label {label_classes}" for="{id}">{label}</label>
+	<label class="form_label {classes}" for="{id}" {dataset}>{label}</label>
 </script>
 
 <script type="javascript/template" id="tmpl-switch">
@@ -70,7 +70,7 @@
 </script>
 
 <script type="javascript/template" id="tmpl-button">
-	<button class="button {classes}" type="button" {attributes}><span class="Text">{title}</span></button>
+	<button class="{classes}" type="button" {attributes}><span class="Text">{title}</span></button>
 </script>
 
 <script type="javascript/template" id="tmpl-external-link">
@@ -89,12 +89,12 @@
 	<a href="{href}" class="action {classes}" {dataset} {attributes}>{title}</a>
 </script>
 
-<script type="javascript/template" id="tmpl-action-button">
-	<button class="action {classes}" type="button" {attributes}><span class="Text">{title}</span></button>
-</script>
-
 <script type="javascript/template" id="tmpl-tag">
 	<a class="tag_unit link Link {classes}" href="{page}" {dataset} {attributes}>{name}</a>
+</script>
+
+<script type="javascript/template" id="tmpl-help-link">
+	<button class="help_link {classes}" type="button" {dataset} {attributes}>{title}</button>
 </script>
 
 <script type="javascript/template" id="tmpl-user-tombstone">
@@ -470,19 +470,33 @@
 	</form>
 </script>
 <script type="javascript/template" id="tmpl-modal-auth-content">
-	<h4 class="auth_modal_heading">{heading}</h4>
-	<div class="auth_buttons_wrapper">
-		<a href="#" data-auth_network="vk" class="button -size_wide -rounded -no_uppercase -align_left -color_vk RippleEffect AuthButton">
-			<span class="Text"><i class="fa fa-vk fa-lg"></i><span>Войти через ВКонтакте</span></span>
-		</a>
-		<a href="#" data-auth_network="google" class="button -size_wide -rounded -no_uppercase -align_left -color_google RippleEffect AuthButton">
-			<span class="Text"><i class="fa fa-google-plus fa-lg"></i><span>Войти через Google+</span></span>
-		</a>
-		<a href="#" data-auth_network="facebook" class="button -size_wide -rounded -no_uppercase -align_left -color_facebook RippleEffect AuthButton">
-			<span class="Text"><i class="fa fa-facebook-official fa-lg"></i><span>Войти через Facebook</span></span>
-		</a>
+	<p class="auth_modal_heading">{note}</p>
+	<div class="auth_modal_buttons_wrapper">
+		<button class="auth_modal_button -color_vk AuthButton" data-auth_network="vk">
+			<span class="auth_modal_button_icon fa fa-vk"></span>
+			<span class="auth_modal_button_main">
+				<span class="auth_modal_button_title">Войти через VK</span>
+				<span class="auth_modal_button_note">Мы не публикуем записи без вашего разрешения</span>
+			</span>
+		</button>
+		<button class="auth_modal_button -color_facebook AuthButton" data-auth_network="google">
+			<span class="auth_modal_button_icon fa fa-facebook-official"></span>
+			<span class="auth_modal_button_main">
+				<span class="auth_modal_button_title">Войти через Facebook</span>
+				<span class="auth_modal_button_note">Мы не публикуем записи без вашего разрешения</span>
+			</span>
+		</button>
+		<button class="auth_modal_button -color_google AuthButton" data-auth_network="facebook">
+			<img src="/app/img/google_icon.svg" class="auth_modal_button_icon">
+			<span class="auth_modal_button_main">
+				<span class="auth_modal_button_title">Войти через Google</span>
+				<span class="auth_modal_button_note">Мы не рассылаем спам на вашу электронную почту</span>
+			</span>
+		</button>
 	</div>
-	<p class="auth_modal_bottom">{bottom}</p>
+	<footer class="auth_modal_bottom -align_center -hidden">
+		<button class="action -color_neutral -no_uppercase -font_weight_lighter" type="button">Зачем мы используем вход через соц. сети</button>
+	</footer>
 </script>
 <script type="javascript/template" id="tmpl-modal-bitcoin-content">
 	<h6 class="bitcoin_modal_title">Заказ № {order_number}</h6>
@@ -618,6 +632,63 @@
 		{amount_form_unit}
 		{comment_form_unit}
 	</form>
+</script>
+<script type="javascript/template" id="tmpl-app-inspector">
+	<div class="app_inspector material -floating_material AppInspector">
+		<header class="app_inspector_header">
+			<button class="app_inspector_remover AppInspectorRemoveButton" type="button">&times;</button>
+			<span class="app_inspector_title AppInspectorTitle">{title}</span>
+		</header>
+		<div class="app_inspector_content_wrapper scrollbar-outer AppInspectorScroll">
+			<div class="app_inspector_content AppInspectorContent">{content}</div>
+		</div>
+	</div>
+</script>
+<script type="javascript/template" id="tmpl-order-app-inspector">
+	{orderer}
+	<div class="app_inspector_wrapper -align_right">
+		{status_block}
+	</div>
+	<div class="app_inspector_wrapper">
+		{payment_info}
+	</div>
+	{tickets_title}
+	{tickets}
+	{registration_form_title}
+	{registration_fields}
+	{event_title}
+	{event}
+</script>
+
+<script type="javascript/template" id="tmpl-client-app-inspector">
+	{client}
+	{interests_title}
+	{interests_spiderweb_chart}
+</script>
+<script type="javascript/template" id="tmpl-app-inspector-title">
+	<h6 class="app_inspector_subtitle">{title}</h6>
+</script>
+
+<script type="javascript/template" id="tmpl-app-inspector-ticket">
+	<div class="app_inspector_ticket">
+		<div class="app_inspector_ticket_body">
+			{fields}
+		</div>
+		{footer}
+	</div>
+</script>
+
+<script type="javascript/template" id="tmpl-app-inspector-ticket-footer">
+	<footer class="app_inspector_ticket_footer"><span>Билет использован</span></footer>
+</script>
+
+<script type="javascript/template" id="tmpl-app-inspector-event">
+	<a class="app_inspector_event Link" href="/event/{id}">
+		<img src="{image_horizontal_url}?width=108" width="108" height="60">
+		<div class="app_inspector_event_body">
+			<span class="app_inspector_event_title">{title}</span>
+		</div>
+	</a>
 </script>
 <script type="javascript/template" id="tmpl-add-organization-page">
 
@@ -778,6 +849,10 @@
 						<input id="add_organization_background_filename" class="FileName" type="hidden" name="background_filename" value="{background_filename}">
 					</div>
 				</div>
+			</div>
+
+			<div class="form_unit">
+				{branding_help}
 			</div>
 
 			<div class="form_unit -align_center">
@@ -1002,7 +1077,7 @@
 
 								<h2>Настройка регистрации на событие</h2>
 								<p class="form_text">Если на ваше событие требуется регистрация, вы можете настроить её параметры здесь. Вы можете задать крайний срок регистрации, максимальное количество мест, </p>
-
+								{registration_help}
 								<div class="form_unit form_accent_block">
 									<input id="edit_event_registration_required" class="form_checkbox Switch OnChangeCrossPost" type="checkbox" name="registration_required" data-switch_id="registration">
 									<label class="form_label" for="edit_event_registration_required"><span>Обязательная регистрация на событие</span></label>
@@ -1043,9 +1118,13 @@
 										<label class="form_label" for="edit_event_registration_limit_by_quantity"><span>По максимальному количеству регистраций</span></label>
 									</div>
 
-									<fieldset class="Switching" data-switch_id="registration_limit_by_quantity" disabled>
+									<fieldset class="form_unit Switching" data-switch_id="registration_limit_by_quantity" disabled>
 										{registration_limit_count_input}
 									</fieldset>
+
+									<div class="form_unit -align_right">
+										{registration_limit_help}
+									</div>
 
 									<fieldset class="Switching" data-switch_id="registration_locally" disabled>
 										<wbr>
@@ -1063,7 +1142,7 @@
 											<button class="button -color_neutral_accent RippleEffect RegistrationPreview" type="button"><span class="Text">Предпросмотр</span></button>
 										</div>
 
-										<h3>Подтверждение анкеты</h3>
+										<h3 class="help_link HelpLink" data-article_id="127">Подтверждение анкеты</h3>
 										<p class="form_text">Подписчик будет зарегистрирован только после подтверждения заявки модератором или администратором</p>
 										<div class="form_unit">
 											<input id="edit_event_registration_approvement_required" class="form_checkbox" type="checkbox" name="registration_approvement_required">
@@ -1082,6 +1161,7 @@
 							<fieldset>
 								<h2>Продажа билетов</h2>
 								<p class="form_text">Настройте продажу билетов на ваше событие через Evendate</p>
+								{auto_price_change_help}
 								<table class="event_edit_table table -simple_table -full_page_width TicketTypes Collapsing">
 									<thead>
 										<tr>
@@ -1094,12 +1174,16 @@
 								</table>
 								<div class="form_unit -align_center">{add_ticket_type_button}</div>
 
+								<div class="form_unit">
+									{tickets_help}
+								</div>
+
 								<div class="form_unit form_accent_block">
 									<input id="edit_event_accept_bitcoins" class="form_checkbox AcceptBitcoinsCheckbox" type="checkbox" name="accept_bitcoins">
 									<label class="form_label" for="edit_event_accept_bitcoins"><span>Принимать биткоины</span></label>
 								</div>
 								{booking_time_input}
-								<h3>Промокоды</h3>
+								<h3 class="help_link HelpLink" data-article_id="51">Промокоды</h3>
 								<table class="event_edit_table table -simple_table -full_page_width Promocodes Collapsing">
 									<thead>
 										<tr>
@@ -1169,6 +1253,7 @@
 										{additional_notification_time_input}
 									</div>
 								</fieldset>
+								{push_help}
 
 
 
@@ -1209,6 +1294,9 @@
 										</div>
 									</fieldset>
 								</fieldset>
+								<div class="form_unit">
+									{crossposting_help}
+								</div>
 								{vk_post_link}
 
 							</fieldset>
@@ -1680,7 +1768,7 @@
 <script type="javascript/template" id="tmpl-my-orders-order-detail-info">
 	<div class="orders_page_detail_info">
 		<h3>Заказ {order_number}</h3>
-		{pain_info}
+		{pay_info}
 		{pay_button}
 		{event_title}
 		{event}
@@ -1750,6 +1838,9 @@
 							</div>
 							<div class="form_unit">
 								{bitcoin_payment_button}
+							</div>
+							<div class="form_unit">
+								{legal_entity_payment_help}
 							</div>
 						</div>
 					</fieldset>
@@ -1949,63 +2040,6 @@
 		</div>
 	</div>
 </script>
-<script type="javascript/template" id="tmpl-app-inspector">
-	<div class="app_inspector material -floating_material AppInspector">
-		<header class="app_inspector_header">
-			<button class="app_inspector_remover AppInspectorRemoveButton" type="button">&times;</button>
-			<span class="app_inspector_title AppInspectorTitle">{title}</span>
-		</header>
-		<div class="app_inspector_content_wrapper scrollbar-outer AppInspectorScroll">
-			<div class="app_inspector_content AppInspectorContent">{content}</div>
-		</div>
-	</div>
-</script>
-<script type="javascript/template" id="tmpl-order-app-inspector">
-	{orderer}
-	<div class="app_inspector_wrapper -align_right">
-		{status_block}
-	</div>
-	<div class="app_inspector_wrapper">
-		{payment_info}
-	</div>
-	{tickets_title}
-	{tickets}
-	{registration_form_title}
-	{registration_fields}
-	{event_title}
-	{event}
-</script>
-
-<script type="javascript/template" id="tmpl-client-app-inspector">
-	{client}
-	{interests_title}
-	{interests_spiderweb_chart}
-</script>
-<script type="javascript/template" id="tmpl-app-inspector-title">
-	<h6 class="app_inspector_subtitle">{title}</h6>
-</script>
-
-<script type="javascript/template" id="tmpl-app-inspector-ticket">
-	<div class="app_inspector_ticket">
-		<div class="app_inspector_ticket_body">
-			{fields}
-		</div>
-		{footer}
-	</div>
-</script>
-
-<script type="javascript/template" id="tmpl-app-inspector-ticket-footer">
-	<footer class="app_inspector_ticket_footer"><span>Билет использован</span></footer>
-</script>
-
-<script type="javascript/template" id="tmpl-app-inspector-event">
-	<a class="app_inspector_event Link" href="/event/{id}">
-		<img src="{image_horizontal_url}?width=108" width="108" height="60">
-		<div class="app_inspector_event_body">
-			<span class="app_inspector_event_title">{title}</span>
-		</div>
-	</a>
-</script>
 <script type="javascript/template" id="tmpl-calendar">
 	<div class="{wrapper_class} -unselectable">
 		<div class="{header_class}">
@@ -2144,7 +2178,9 @@
 					</div>
 				</div>
 			</header>
-
+			<div class="event_admin_orders_page_header">
+				{statuses_help}
+			</div>
 			<table class="table -data_table_override -data_table_row_selection OrdersTable">
 				<thead>
 					<tr>
@@ -2638,7 +2674,12 @@
 					</div>
 				</div>
 				<div class="grid_box">
-					{withdraw_funds_button}
+					<div class="form_unit">
+						{withdraw_funds_button}
+					</div>
+					<div class="form_unit">
+						{withdraw_funds_help}
+					</div>
 				</div>
 			</div>
 		</div>
@@ -2887,7 +2928,7 @@
 		</div>
 
 		<div class="org_admin_settings_wrapper">
-			<h3>Права доступа</h3>
+			<h3 class="help_link HelpLink" data-article_id="71">Права доступа</h3>
 			<div class="org_admin_settings_staff">
 				<div class="org_admin_settings_staff_wrapper">
 					<span class="small_title">Администраторы</span>
@@ -2936,7 +2977,7 @@
 
 		<fieldset class="SaveLocalWrapper">
 			<div class="org_admin_settings_wrapper">
-				<h3>Брендирование</h3>
+				<h3 class="help_link HelpLink" data-article_id="77">Брендирование</h3>
 				<p class="-text_color_marginal">Вы можете изменить цвет элементов страницы организации в соответствии с вашей стилистикой</p>
 				<div class="form_group -parts_e_2">
 					{brand_color_field}
@@ -2980,7 +3021,7 @@
 			</div>
 			<div class="org_admin_settings_tariff">
 				<div class="org_admin_settings_tariff_head">
-					<span class="org_admin_settings_tariff_title -text_color_accent">Полный</span>
+					<span class="org_admin_settings_tariff_title -text_color_accent">Premium</span>
 					<span class="org_admin_settings_tariff_price -text_color_accent">800 руб./мес.</span>
 					<div class="org_admin_settings_tariff_button">
 						{tariff_button}
@@ -2988,6 +3029,7 @@
 				</div>
 				<p class="-text_color_marginal -align_right">{tariff_service_info}</p>
 			</div>
+			{premium_tariff_help}
 		</fieldset>
 	</div>
 </script>

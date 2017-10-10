@@ -51,7 +51,9 @@ OrderButton = extending(ActionButton, (function() {
 		var modal;
 		
 		if (!(modal = this.data('modal'))) {
-			modal = new AuthModal(location.origin + '/event/' + this.event.id + '/order');
+			modal = new AuthModal(location.origin + '/event/' + this.event.id + '/order', {
+				note: 'Для выполнения этого действия, нужно войти через социальную сеть'
+			});
 			this.data('modal', modal);
 		}
 		

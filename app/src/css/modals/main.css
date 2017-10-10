@@ -17,7 +17,7 @@ html.-noscroll {
 	text-align: center;
 	-webkit-overflow-scrolling: touch;
 	background-color: hsla(218,24%,32%,.6);
-	z-index: 1050;
+	z-index: 20;
 }
 
 .modal_destroyer {
@@ -68,7 +68,7 @@ html.-noscroll {
 }
 
 .modal_unit,
-body.-open_modal > .modal_wrapper {
+body.-open_modal .modal_wrapper {
 	opacity: 1;
 	visibility: visible;
 }
@@ -85,16 +85,19 @@ body.-open_modal > .modal_wrapper {
 	color: #3e4d66;
 }
 
-.-modal_destroyer {
+.modal_destroy_button {
 	width: 60px;
 	height: 60px;
-	font-size: 2.4em;
-	font-weight: 100;
+	font-size: 1.9em;
+	font-weight: 400;
+	background-color: transparent;
+	border: none;
+	opacity: .4;
 }
-.-modal_destroyer:hover {background-color: transparent !important}
-.-modal_destroyer > * {top: -1px}
+.modal_destroy_button:hover {opacity: 1}
+.modal_destroy_button > * {top: -3px}
 
-.modal_content {padding: 18px}
+.modal_content {padding: 6px 18px 18px}
 .modal_content.-no_padding {padding: 0}
 
 .modal_content + .modal_content {margin-top: 36px}

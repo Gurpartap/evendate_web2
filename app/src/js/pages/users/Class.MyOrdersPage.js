@@ -116,7 +116,7 @@ MyOrdersPage = extending(Page, (function() {
 			
 			self.$detail_wrapper.html(tmpl('my-orders-order-detail-info', {
 				order_number: formatTicketNumber(order.number),
-				pain_info: MyOrdersPage.buildPayInfo(order),
+				pay_info: MyOrdersPage.buildPayInfo(order),
 				pay_button: (function(order) {
 					var $buttons;
 					
@@ -162,6 +162,8 @@ MyOrdersPage = extending(Page, (function() {
 									]
 								}));
 							}
+							
+							$buttons = $buttons.add(__APP.BUILD.helpLink(HelpCenterConnection.ARTICLE.HOW_TO_PAY_FROM_LEGAL_ENTITY, 'Как оплатить со счета компании'));
 							
 							return $buttons;
 						}
@@ -251,7 +253,13 @@ MyOrdersPage = extending(Page, (function() {
 	
 	MyOrdersPage.prototype.render = function() {
 		if (__APP.USER.isLoggedOut()) {
-			return (new AuthModal(window.location.href, false)).show();
+			var auth_modal = new AuthModal(window.location.href, {
+				note: 'Войдите чтобы увидеть список ваших заказов'
+			});
+			
+			auth_modal.is_hidable = false;
+			
+			return auth_modal.show();
 		}
 		
 		this.orders.sortBy('created_at');

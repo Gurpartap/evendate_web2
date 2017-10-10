@@ -80,8 +80,11 @@ Builder = (function() {
 		var props = Array.prototype.slice.call(arguments);
 		
 		return tmpl('button', props.map(function(arg) {
+			var normalized_props = Builder.normalizeBuildProps(arg);
 			
-			return Builder.normalizeBuildProps(arg);
+			normalized_props.classes.push(__C.CLASSES.COMPONENT.BUTTON);
+			
+			return normalized_props;
 		})).each(function(i, button) {
 			var prop = props[i],
 				$button = $(button);
@@ -296,12 +299,38 @@ Builder = (function() {
 	Builder.prototype.actionButton = function buildActionButton(props) {
 		var _props = props instanceof Array ? props : [].slice.call(arguments);
 		
-		return tmpl('action-button', _props.map(function(prop) {
+		return tmpl('button', _props.map(function(prop) {
+			var normalized_props = Builder.normalizeBuildProps(prop);
 			
-			return Builder.normalizeBuildProps(prop);
+			normalized_props.classes.push(__C.CLASSES.COMPONENT.ACTION);
+			
+			return normalized_props;
 		})).each(function(i) {
 			$(this).data(_props[i].dataset);
 		});
+	};
+	/**
+	 *
+	 * @param {number} article_id
+	 * @param {string} title
+	 * @param {(string|Array<string>)} [classes]
+	 * @param {HTMLDataset} [dataset]
+	 * @param {HTMLAttributes} [attributes]
+	 *
+	 * @returns {jQuery}
+	 */
+	Builder.prototype.helpLink = function(article_id, title, classes, dataset, attributes) {
+		var props = Builder.normalizeBuildProps({
+			title: title,
+			classes: classes,
+			dataset: dataset,
+			attributes: attributes
+		});
+		
+		props.dataset['article_id'] = article_id;
+		props.classes.push('HelpLink');
+		
+		return bindHelpLink(tmpl('help-link', props));
 	};
 	/**
 	 *
@@ -479,6 +508,7 @@ Builder = (function() {
 	 * @param {HTMLAttributes} [props.helptext_attributes]
 	 * @param {(Array<string>|string)} [props.unit_classes]
 	 * @param {(Array<string>|string)} [props.label_classes]
+	 * @param {HTMLDataset} [props.label_dataset]
 	 * @returns {jQuery}
 	 */
 	Builder.prototype.formUnit = function buildFormUnit(props) {
@@ -517,8 +547,9 @@ Builder = (function() {
 						label: props.label ? tmpl('label', Builder.normalizeBuildProps({
 							id: props.id,
 							label: props.label,
-							label_classes: props.label_classes
-						}, ['label_classes'])) : '',
+							classes: props.label_classes,
+							dataset: props.label_dataset
+						})) : '',
 						helptext: props.helptext ? self.formHelpText(props.helptext, props.helptext_dataset, props.helptext_attributes) : '',
 						form_element: (function(props) {
 							var classes = props.classes ? props.classes instanceof Array ? props.classes : props.classes.split(',') : [],
@@ -1573,8 +1604,8 @@ Builder = (function() {
 		} else if(normalized_props.title) {
 			vars.modal_header = tmpl('modal-header', {
 				title: normalized_props.title,
-				close_button: this.button({
-					classes: [__C.CLASSES.UNIVERSAL_STATES.EMPTY, '-modal_destroyer', __C.CLASSES.HOOKS.CLOSE_MODAL, __C.CLASSES.HOOKS.RIPPLE],
+				close_button: tmpl('button', {
+					classes: ['modal_destroy_button', __C.CLASSES.HOOKS.CLOSE_MODAL, __C.CLASSES.HOOKS.RIPPLE].join(' '),
 					title: '×'
 				})
 			});
