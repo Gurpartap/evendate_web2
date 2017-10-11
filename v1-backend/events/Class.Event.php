@@ -60,6 +60,7 @@ class Event extends AbstractEntity
 	const ORDERS_FIELD_NAME = 'orders';
 	const MY_TICKETS_COUNT_FIELD_NAME = 'my_tickets_count';
 	const SOLD_TICKETS_COUNT_FIELD_NAME = 'sold_tickets_count';
+	const BOOKED_TICKETS_COUNT_FIELD_NAME = 'booked_tickets_count';
 	const LANDING_DATA_FIELD_NAME = 'landing_data';
 	const HAS_LANDING_FIELD_NAME = 'has_landing';
 
@@ -204,11 +205,21 @@ class Event extends AbstractEntity
 			FROM view_tickets
 			INNER JOIN events ON events.id = view_tickets.event_id
 			INNER JOIN users_organizations ON users_organizations.organization_id = events.organization_id
+			WHERE view_tickets.event_id = view_events.id
+			AND users_organizations.status = TRUE 
+			AND view_tickets.order_status_type = \'green\'
+			AND users_organizations.user_id = :user_id)::INT AS ' . self::SOLD_TICKETS_COUNT_FIELD_NAME,
+
+		self::BOOKED_TICKETS_COUNT_FIELD_NAME => '(SELECT COALESCE(COUNT(view_tickets.id)::INT, 0)
+			FROM view_tickets
+			INNER JOIN events ON events.id = view_tickets.event_id
+			INNER JOIN users_organizations ON users_organizations.organization_id = events.organization_id
 			WHERE view_tickets.event_id = view_events.id 
 			AND view_tickets.status = TRUE 
 			AND users_organizations.status = TRUE 
 			AND view_tickets.is_active = TRUE
-			AND users_organizations.user_id = :user_id)::INT AS ' . self::SOLD_TICKETS_COUNT_FIELD_NAME,
+			AND view_tickets.order_status_type = \'yellow\'
+			AND users_organizations.user_id = :user_id)::INT AS ' . self::BOOKED_TICKETS_COUNT_FIELD_NAME,
 
 		self::ORDERS_COUNT_FIELD_NAME => '(SELECT COALESCE(COUNT(view_tickets_orders.id)::INT, 0) ' . self::ORDERS_COUNT_FIELD_NAME . '
 			FROM view_tickets_orders

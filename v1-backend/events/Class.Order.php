@@ -106,6 +106,7 @@ class Order extends AbstractEntity
 		'number',
 		'status_name',
 		'sum',
+		'ticket_order_status_type',
 		'final_sum'
 	);
 
@@ -443,6 +444,34 @@ class Order extends AbstractEntity
 		}
 	}
 
+	public function getCustomerName(): array
+	{
+		$q_get_name = App::queryFactory()->newSelect();
+		$q_get_name->from('users')
+			->join('inner', 'ticket_orders', 'users.id = ticket_orders.user_id')
+			->cols(array('users.first_name', 'users.last_name',
+				'(SELECT value 
+					FROM view_registration_field_values 
+					WHERE view_registration_field_values.ticket_order_id = ticket_orders.id
+					AND view_registration_field_values.form_field_type = \'first_name\'
+					ORDER BY value DESC LIMIT 1) AS form_first_name',
+				'(SELECT value 
+					FROM view_registration_field_values 
+					WHERE view_registration_field_values.ticket_order_id = ticket_orders.id
+					AND view_registration_field_values.form_field_type = \'last_name\'
+					ORDER BY value DESC LIMIT 1) AS form_last_name'))
+			->where('ticket_orders.id = ?', $this->id);
+
+		$names = App::DB()->prepareExecute($q_get_name)->fetch();
+
+		if (!is_null($names['form_first_name'])) {
+			return array('first_name' => $names['form_first_name'], 'last_name' => $names['form_last_name']);
+		} else {
+			return array('first_name' => $names['first_name'], 'last_name' => $names['last_name']);
+		}
+
+	}
+
 	private static function getOrderEmail($order_uuid)
 	{
 		$q_get_email = App::queryFactory()->newSelect();
@@ -458,14 +487,14 @@ class Order extends AbstractEntity
 
 		$emails = App::DB()->prepareExecute($q_get_email)->fetch();
 
-		if (!filter_var($emails['email'], FILTER_VALIDATE_EMAIL)) {
-			if (!filter_var($emails['form_email'], FILTER_VALIDATE_EMAIL)) {
+		if (!filter_var($emails['form_email'], FILTER_VALIDATE_EMAIL)) {
+			if (!filter_var($emails['email'], FILTER_VALIDATE_EMAIL)) {
 				return null;
 			} else {
-				return $emails['form_email'];
+				return $emails['email'];
 			}
 		} else {
-			return $emails['email'];
+			return $emails['form_email'];
 		}
 
 	}

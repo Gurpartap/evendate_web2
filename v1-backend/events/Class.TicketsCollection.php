@@ -46,7 +46,6 @@ class TicketsCollection extends AbstractCollection
 				case 'event': {
 					if ($value instanceof Event) {
 						$q_get_tickets->where('event_id = ?', $value->getId());
-
 					}
 					break;
 				}
