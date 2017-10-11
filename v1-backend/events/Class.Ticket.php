@@ -10,6 +10,7 @@ class Ticket extends AbstractEntity
 	protected $uuid;
 	protected $type;
 	protected $user_id;
+	protected $event_id;
 	protected $created_at;
 	protected $updated_at;
 	protected $ticket_type_uuid;
@@ -19,6 +20,7 @@ class Ticket extends AbstractEntity
 	const ORDER_FIELD_NAME = 'order';
 	const TYPE_FIELD_NAME = 'ticket_type';
 	const USER_FIELD_NAME = 'user';
+	const EVENT_FIELD_NAME = 'event';
 
 	protected static $DEFAULT_COLS = array(
 		'user_id',
@@ -233,6 +235,17 @@ class Ticket extends AbstractEntity
 			} else {
 				$result_data[self::USER_FIELD_NAME] = null;
 			}
+		}
+
+		if (isset($fields[self::EVENT_FIELD_NAME])) {
+			$event_fields = Fields::parseFields($fields[self::EVENT_FIELD_NAME]['fields'] ?? '');
+			$result_data[self::EVENT_FIELD_NAME] = EventsCollection::one(
+				App::DB(),
+				$user,
+				$this->event_id,
+				$event_fields
+			)->getParams($user, $event_fields)
+				->getData();
 		}
 
 		return new Result(true, '', $result_data);

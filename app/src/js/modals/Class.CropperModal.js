@@ -43,7 +43,7 @@ CropperModal = extending(AbstractModal, (function() {
 		this.__render({
 			classes: [__C.CLASSES.FLOATING_MATERIAL, __C.CLASSES.MODAL_STATES.SIZE.WIDE],
 			content_classes: [__C.CLASSES.MODAL_STATES.NO_PADDING, __C.CLASSES.IMG_HOLDER],
-			footer_buttons: __APP.BUILD.button([
+			footer_buttons: __APP.BUILD.button(
 				{
 					classes: [
 						__C.CLASSES.COLORS.PRIMARY,
@@ -60,7 +60,7 @@ CropperModal = extending(AbstractModal, (function() {
 					],
 					title: 'Отмена'
 				}
-			])
+			)
 		});
 		
 		$image.on('load', function() {
