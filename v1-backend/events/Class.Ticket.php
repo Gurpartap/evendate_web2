@@ -37,7 +37,8 @@ class Ticket extends AbstractEntity
 
 	protected static $ADDITIONAL_COLS = array(
 		'created_at',
-		'updated_at'
+		'updated_at',
+		'order_status_type',
 	);
 
 	private static function getTicketTypeInfo(Event $event, ExtendedPDO $db, string $uuid = null, string $type_code = null): array
@@ -170,7 +171,7 @@ class Ticket extends AbstractEntity
 				self::checkTicketTypeData($type, $ticket, $db);
 
 				$tickets_count = $ticket['count'] ?? 1;
-				for($k = 0; $k < $tickets_count; $k++){
+				for ($k = 0; $k < $tickets_count; $k++) {
 					$result[] = self::create($event, $order_id, $db, $ticket);
 				}
 			} else {
@@ -179,6 +180,11 @@ class Ticket extends AbstractEntity
 				$result[] = self::createRegistrationTicket($event, $order_id, $db, $ticket);
 			}
 		}
+	}
+
+	public function getOrderUUID()
+	{
+		return $this->ticket_order_uuid;
 	}
 
 	public function getParams(AbstractUser $user = null, array $fields = null): Result
@@ -245,7 +251,8 @@ class Ticket extends AbstractEntity
 		return new Result(true, '', $result_data);
 	}
 
-	public function setCheckOut($checkout){
+	public function setCheckOut($checkout)
+	{
 
 		$db = App::DB();
 		$value = filter_var($checkout, FILTER_VALIDATE_BOOLEAN) ? 'true' : 'false';
@@ -262,7 +269,8 @@ class Ticket extends AbstractEntity
 
 	}
 
-	public function getUserId(){
+	public function getUserId()
+	{
 		return $this->user_id;
 	}
 
@@ -273,7 +281,6 @@ class Ticket extends AbstractEntity
 	{
 		return $this->ticket_type_uuid;
 	}
-
 
 
 }

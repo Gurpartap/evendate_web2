@@ -37,9 +37,14 @@ $ticket_instance = TicketsCollection::oneByUUID($__db, $user, $_GET['uuid'], Fie
 $ticket = $ticket_instance->getParams($user, Fields::parseFields('order,user,number,ticket_type'))
 	->getData();
 
+$order = OrdersCollection::oneByUUID($__db, $user, $ticket_instance->getOrderUUID(), array());
+$user_names = $order->getCustomerName();
+
 $event = EventsCollection::filter($__db, $user, array('id' => $ticket['event_id'], 'ticket' => $ticket_instance), Fields::parseFields('location,dates,organization_logo_small_url,organization_short_name,organization_name'))
-	->getParams($user, Fields::parseFields('location,dates,organization_short_name,organization_logo_small_url,organization_name'))
+	->getParams($user, Fields::parseFields('location,dates{fields:"start_time,end_time,start_datetime_utc,end_datetime_utc",order_by:"start_datetime_utc"},organization_short_name,organization_logo_small_url,organization_name'))
 	->getData();
+
+$first_date_time = $event['dates'][0]['start_time'];
 
 function formatNumber($number)
 {
@@ -49,6 +54,7 @@ function formatNumber($number)
 
 function formatDates($start_date_timestamp, $end_timestamp)
 {
+  global $first_date_time;
 	$first_date = new DateTimeImmutable('@' . $start_date_timestamp);
 	$last_date = new DateTimeImmutable('@' . $end_timestamp);
 	$interval = $first_date->diff($last_date);
@@ -99,7 +105,7 @@ function formatDates($start_date_timestamp, $end_timestamp)
 	$formatted_string = str_replace($month, $ru_month, $formatted_string);
 
 	if ($interval->format('s') == 0) {
-		$formatted_string .= ', ' . $first_date->format('H:i');
+		$formatted_string .= ', ' . $first_date_time;
 	}
 
 	return $formatted_string;
@@ -133,13 +139,13 @@ function formatDates($start_date_timestamp, $end_timestamp)
     <div class="ticket_header_unit"><span class="ticket_header_unit_key">Заказ</span> <span
         class="ticket_header_unit_value"><?= formatNumber($ticket['order']['number']) ?></span></div>
     <div class="ticket_header_unit">
-      <span><?= "{$ticket['user']['last_name']} {$ticket['user']['first_name']} {$ticket['user']['middle_name']}" ?></span>
+      <span><?= "{$user_names['last_name']} {$user_names['first_name']}" ?></span>
     </div>
   </header>
   <h1 class="ticket_title"><?= $event['title'] ?></h1>
   <div class="fields_wrapper -columns_2">
     <div class="field" style="width: 50%"><span class="field_name">Тип билета</span><span
-        class="field_value"><?= $ticket['ticket_type']['name'] ?></span></div>
+        class="field_value"><?=$ticket['ticket_type']['name'] ?></span></div>
     <div class="field" style="width: 50%"><span class="field_name">Цена билета</span><span
         class="field_value"><?= $ticket['price'] == 0 ? 'Бесплатный' : $ticket['price'] ?></span></div>
   </div>
