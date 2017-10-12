@@ -39,7 +39,6 @@ NotificationsManager.prototype.create = function (notification, device, type, ch
             icon: notification.image,
             organization_logo: notification.img_medium_url
         },
-        android_channel_id: android_channel_id,
         notification_id: notification.id
     };
 
@@ -59,6 +58,7 @@ NotificationsManager.prototype.create = function (notification, device, type, ch
             en: note.alert,
             ru: note.alert
         },
+        android_channel_id: android_channel_id,
         include_player_ids: [device.device_token],
         data: note.payload,
         __client_type: device.client_type
