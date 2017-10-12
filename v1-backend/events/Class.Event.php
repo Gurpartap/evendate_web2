@@ -60,7 +60,9 @@ class Event extends AbstractEntity
 	const ORDERS_FIELD_NAME = 'orders';
 	const MY_TICKETS_COUNT_FIELD_NAME = 'my_tickets_count';
 	const SOLD_TICKETS_COUNT_FIELD_NAME = 'sold_tickets_count';
+	const BOOKED_TICKETS_COUNT_FIELD_NAME = 'booked_tickets_count';
 	const LANDING_DATA_FIELD_NAME = 'landing_data';
+	const HAS_LANDING_FIELD_NAME = 'has_landing';
 
 
 	const RANDOM_FIELD_NAME = 'random';
@@ -203,11 +205,21 @@ class Event extends AbstractEntity
 			FROM view_tickets
 			INNER JOIN events ON events.id = view_tickets.event_id
 			INNER JOIN users_organizations ON users_organizations.organization_id = events.organization_id
+			WHERE view_tickets.event_id = view_events.id
+			AND users_organizations.status = TRUE 
+			AND view_tickets.order_status_type = \'green\'
+			AND users_organizations.user_id = :user_id)::INT AS ' . self::SOLD_TICKETS_COUNT_FIELD_NAME,
+
+		self::BOOKED_TICKETS_COUNT_FIELD_NAME => '(SELECT COALESCE(COUNT(view_tickets.id)::INT, 0)
+			FROM view_tickets
+			INNER JOIN events ON events.id = view_tickets.event_id
+			INNER JOIN users_organizations ON users_organizations.organization_id = events.organization_id
 			WHERE view_tickets.event_id = view_events.id 
 			AND view_tickets.status = TRUE 
 			AND users_organizations.status = TRUE 
 			AND view_tickets.is_active = TRUE
-			AND users_organizations.user_id = :user_id)::INT AS ' . self::SOLD_TICKETS_COUNT_FIELD_NAME,
+			AND view_tickets.order_status_type = \'yellow\'
+			AND users_organizations.user_id = :user_id)::INT AS ' . self::BOOKED_TICKETS_COUNT_FIELD_NAME,
 
 		self::ORDERS_COUNT_FIELD_NAME => '(SELECT COALESCE(COUNT(view_tickets_orders.id)::INT, 0) ' . self::ORDERS_COUNT_FIELD_NAME . '
 			FROM view_tickets_orders
@@ -234,6 +246,7 @@ class Event extends AbstractEntity
 
 		self::SEARCH_SCORE_FIELD_NAME => '(SELECT get_event_search_score(view_events.id)) AS ' . self::SEARCH_SCORE_FIELD_NAME,
 		self::LANDING_DATA_FIELD_NAME => '(SELECT data FROM event_landings WHERE event_id = view_events.id ORDER BY id, updated_at DESC LIMIT 1 ) AS ' . self::LANDING_DATA_FIELD_NAME,
+		self::HAS_LANDING_FIELD_NAME => '(SELECT id FROM event_landings WHERE event_id = view_events.id ORDER BY id DESC LIMIT 1 ) IS NOT NULL AS ' . self::HAS_LANDING_FIELD_NAME,
 		self::IS_SEEN_FIELD_NAME => '(
 		SELECT
 			COUNT(ve.id)
