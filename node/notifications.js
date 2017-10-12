@@ -270,7 +270,6 @@ class Notifications {
         });
     }
 
-
     sendRecommendationsOrganizations() {
         let _this = this,
             q_get_notifications = `SELECT 
@@ -306,7 +305,7 @@ class Notifications {
 
                         notification.title = 'Evendate';
 
-                        let note = _this.notifications_manager.create(notification, device, 'recommendations_organizations');
+                        let note = _this.notifications_manager.create(notification, device, 'recommendations_organizations', 'recommendations');
 
                         note.send(function (err, message_id, response) {
 
@@ -393,7 +392,7 @@ WHERE done = FALSE AND notifications_recommendations.notification_type_id = 51`;
                             notification.friends_count = '';
                         }
 
-                        let note = _this.notifications_manager.create(notification, device, 'events');
+                        let note = _this.notifications_manager.create(notification, device, 'events', 'friends');
 
                         note.send(function (err, message_id, response) {
 
