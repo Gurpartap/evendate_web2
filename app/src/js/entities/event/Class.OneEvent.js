@@ -114,7 +114,8 @@ OneEvent = extending(OneEntity, (function() {
 				'organization_short_name',
 				'organization_logo_large_url',
 				'organization_logo_medium_url',
-				'organization_logo_small_url'
+				'organization_logo_small_url',
+				'organization_is_private'
 			];
 		
 		this.id = event_id ? event_id : 0;

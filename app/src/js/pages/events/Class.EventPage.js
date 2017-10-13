@@ -67,6 +67,7 @@ EventPage = extending(Page, (function() {
 		'min_price',
 		'organization_logo_small_url',
 		'organization_short_name',
+		'organization_is_private',
 		'is_same_time',
 		'tags',
 		'detail_info_url',
@@ -246,7 +247,6 @@ EventPage = extending(Page, (function() {
 	
 	EventPage.prototype.preRender = function() {
 		var self = this;
-		
 		
 		this.$overlay_cap = __APP.BUILD.overlayCap($('<p>Организатор отменил событие</p>'));
 		
@@ -459,6 +459,12 @@ EventPage = extending(Page, (function() {
 			);
 		}
 		
+		if (this.event.detail_info_url) {
+			this.render_vars.event_additional_fields = this.render_vars.event_additional_fields.add(
+				tmpl('event-detail-link', {detail_info_url: this.event.detail_info_url})
+			);
+		}
+		
 		this.render_vars.event_additional_fields = this.render_vars.event_additional_fields.add(
 			tmpl('event-additional-field', {
 				key: 'Теги',
@@ -466,20 +472,16 @@ EventPage = extending(Page, (function() {
 			})
 		);
 		
-		this.render_vars.event_additional_fields = this.render_vars.event_additional_fields.add(
-			tmpl('event-additional-field', {
-				key: 'Поделиться',
-				value: __APP.BUILD.shareLinks({
-					url: encodeURIComponent(window.location),
-					title: this.event.title,
-					image_url: this.event.image_horizontal_url
-				}, [__C.SOCIAL_NETWORKS.VK, __C.SOCIAL_NETWORKS.TWITTER, __C.SOCIAL_NETWORKS.GOOGLE, __C.SOCIAL_NETWORKS.FACEBOOK])
-			})
-		);
-		
-		if (this.event.detail_info_url) {
+		if (!this.event.organization.is_private) {
 			this.render_vars.event_additional_fields = this.render_vars.event_additional_fields.add(
-				tmpl('event-detail-link', {detail_info_url: this.event.detail_info_url})
+				tmpl('event-additional-field', {
+					key: 'Поделиться',
+					value: __APP.BUILD.shareLinks({
+						url: encodeURIComponent(window.location),
+						title: this.event.title,
+						image_url: this.event.image_horizontal_url
+					}, [__C.SOCIAL_NETWORKS.VK, __C.SOCIAL_NETWORKS.TWITTER, __C.SOCIAL_NETWORKS.GOOGLE, __C.SOCIAL_NETWORKS.FACEBOOK])
+				})
 			);
 		}
 		
