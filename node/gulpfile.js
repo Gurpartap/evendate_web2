@@ -149,5 +149,5 @@ gulp.task('watch', function() {
 
 gulp.task('build', function(cb) {
 	
-	return runSequence(['minify_css', 'minify_js'], 'rev', cb);
+	return runSequence(['minify_css', 'minify_js', 'tmpl'], 'rev', cb);
 });
