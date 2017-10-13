@@ -66,6 +66,7 @@ AuthModal = extending(AbstractModal, (function() {
 		this.__init();
 		
 		bindRippleEffect(this.modal);
+		bindHelpLink(this.modal);
 		
 		return this;
 	};

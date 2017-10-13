@@ -20,10 +20,6 @@ MyProfilePage = extending(UserPage, (function() {
 	MyProfilePage.prototype.fetchData = function() {
 		var promises = [];
 		
-		if(!this.user.favored.length){
-			promises.push(this.user.fetchFavored(this.favored_fetch_data));
-		}
-		
 		if(!this.user.friends.length){
 			promises.push(this.user.fetchFriends({
 				fields: ['is_friend'],
@@ -35,7 +31,8 @@ MyProfilePage = extending(UserPage, (function() {
 	};
 	
 	MyProfilePage.prototype.render = function() {
-		var $activities,
+		var self = this,
+			$activities,
 			$subscribed_orgs,
 			$favored_events,
 			$subscribed_users;
@@ -66,12 +63,6 @@ MyProfilePage = extending(UserPage, (function() {
 			$subscribed_users = __APP.BUILD.cap('Нет друзей');
 		}
 		
-		if(this.user.favored.length) {
-			$favored_events = __APP.BUILD.eventBlocks(this.user.favored, this.events_metadata);
-		} else {
-			$favored_events = __APP.BUILD.cap('Событий нет');
-		}
-		
 		this.$wrapper.append(tmpl('user-page', {
 			wrapper_classes: '-this_user',
 			tombstone: __APP.BUILD.userTombstones(this.user, {avatar_classes: [__C.CLASSES.UNIVERSAL_STATES.BORDERED, __C.CLASSES.UNIVERSAL_STATES.SHADOWED]}),
@@ -99,17 +90,28 @@ MyProfilePage = extending(UserPage, (function() {
 					modal_entity: this.user
 				},
 				title: 'Показать все'
-			}) : '',
-			favored_event_blocks: $favored_events
+			}) : ''
 		}));
 		
-		if(this.user.actions.length){
+		if (this.user.actions.length) {
 			$activities = __APP.BUILD.activity(this.user.actions);
-			this.$wrapper.find('.TabsBody').filter('[data-tab_body_type="activities"]').append($activities);
+			this.$wrapper.find('.TabsBody').filter('[data-tab_body_type="{type}"]'.format({type: __C.ENTITIES.ACTIVITY})).append($activities);
 			UserPage.bindEvents($activities);
 		} else {
-			this.uploadEntities('activities');
+			this.uploadEntities(__C.ENTITIES.ACTIVITY);
 		}
+		
+		if (this.user.favored.length) {
+			$favored_events = __APP.BUILD.eventBlocks(this.user.favored, this.events_metadata);
+			this.$wrapper.find('.TabsBody').filter('[data-tab_body_type="{type}"]'.format({type: __C.ENTITIES.EVENT})).append($favored_events);
+			UserPage.bindEvents($favored_events);
+			this.bindScrollEvents();
+		} else {
+			this.uploadEntities(__C.ENTITIES.EVENT).done(function() {
+				self.bindScrollEvents();
+			});
+		}
+		
 		this.$wrapper.find('.LogoutButton').on('click', __APP.USER.logout);
 		this.init();
 	};

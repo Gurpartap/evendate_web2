@@ -33,7 +33,8 @@ HelpCenterConnection = extending(AsynchronousConnection, (function() {
 		CROSSPOSTING_VK: 105,
 		HOW_TO_PAY_FROM_LEGAL_ENTITY: 121,
 		REQUEST_APPROVAL: 127,
-		ORDER_STATUSES: 170
+		ORDER_STATUSES: 170,
+		WHY_AUTH_BY_SOC_NETWORK: 471
 	});
 	
 	HelpCenterConnection.prototype.fetchArticle = function(id) {
