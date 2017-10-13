@@ -32,11 +32,11 @@
 
 .event_main_action_button {width: 200px}
 
-.event_content {padding: 42px 24px 24px}
+.event_content {padding: 24px 24px 42px}
 
 .event_title {
 	display: block;
-	font-size: 1.6em;
+	font-size: 1.5em;
 	font-weight: 500;
 	margin: 0 0 1em;
 }
@@ -111,6 +111,8 @@
 }
 
 .event_function_button {padding: .4em}
+
+.event_hide_function_button:hover {color: #f8190d}
 
 .event_additional_content > .button:first-child {margin-bottom: 1em}
 

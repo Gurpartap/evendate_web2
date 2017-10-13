@@ -161,7 +161,7 @@ AdminEventCheckInPage = extending(AdminEventPage, (function() {
 	};
 	/**
 	 *
-	 * @param {(Array<OneTicket>|OneTicket)} tickets
+	 * @param {(TicketsCollection|Array<OneTicket>|OneTicket)} tickets
 	 * @param {string} [no_tickets_text='Нет билетов']
 	 * @return {jQuery}
 	 */
@@ -270,7 +270,8 @@ AdminEventCheckInPage = extending(AdminEventPage, (function() {
 		});
 		
 		this.$wrapper.find('.SearchTickets').on('input', function(e) {
-			var value = $(e.target).val();
+			var value = $(e.target).val(),
+				collection = new TicketsCollection();
 			
 			if (!self.is_searching_state) {
 				self.initSearch();
@@ -279,7 +280,9 @@ AdminEventCheckInPage = extending(AdminEventPage, (function() {
 			if (value === '') {
 				self.deInitSearch();
 			} else {
-				self.table_body.html(self.buildTableRows(self.searching_tickets_fuse.search(value)));
+				collection.setData(self.searching_tickets_fuse.search(value));
+				collection.setData(self.searching_tickets_fuse.search(transl(value)));
+				self.table_body.html(self.buildTableRows(collection));
 			}
 		});
 	};
