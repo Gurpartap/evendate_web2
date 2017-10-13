@@ -315,8 +315,9 @@ EventPage = extending(Page, (function() {
 					}
 					
 					$function = $function.add(__APP.BUILD.actionButton({
-						title: 'Контроль входа',
+						title: 'Отменить событие',
 						classes: default_classes.concat([
+							'event_hide_function_button',
 							'DropdownButton',
 							__C.CLASSES.COLORS.NEUTRAL,
 							__C.CLASSES.ICONS.TIMES_CIRCLE
