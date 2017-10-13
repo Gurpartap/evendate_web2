@@ -2,12 +2,9 @@
 	position: absolute;
 	border-radius: 3px;
 	background-color: #fff;
-	box-shadow: 0 1px 14px 0 rgba(0, 0, 0, 0.3);
+	box-shadow: 0 2px 15px hsla(0,0%,0%,.2);
 	opacity: 0;
 	visibility: hidden;
-	-webkit-transition: opacity .5s ease, visibility .5s ease;
-	-moz-transition: opacity .5s ease, visibility .5s ease;
-	-o-transition: opacity .5s ease, visibility .5s ease;
 	transition: opacity .5s ease, visibility .5s ease;
 	z-index: 10;
 }
@@ -55,7 +52,10 @@
 .dropdown_box_footer > .action + .action {margin-left: 24px}
 
 @supports (--custom_properties: 1) {
-	.dropdown_box {background-color: var(--color_page)}
+	.dropdown_box {
+		box-shadow: var(--floating_material_shadow);
+		background-color: var(--color_page);
+	}
 
 	.dropdown_header {color: var(--color_primary)}
 

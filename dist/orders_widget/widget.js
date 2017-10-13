@@ -35878,6 +35878,7 @@ __C = {
 		FLOATING_MATERIAL: 'material -floating_material',
 		IMG_HOLDER: 'img_holder',
 		COMPONENT: {
+			LINK: 'link',
 			ACTION: 'action',
 			BUTTON: 'button'
 		},
@@ -35891,6 +35892,7 @@ __C = {
 		},
 		COLORS: {
 			ACCENT: '-color_accent',
+			FRANKLIN: '-color_franklin',
 			PRIMARY: '-color_primary',
 			DEFAULT: '-color_default',
 			NEUTRAL: '-color_neutral',
@@ -35951,6 +35953,7 @@ __C = {
 			ADD_STAFF: 'AddStaff',
 			ADD_TO_FAVORITES: 'AddToFavorites',
 			TEXT: 'Text',
+			LINK: 'Link',
 			CALL_MODAL: 'CallModal',
 			CLOSE_MODAL: 'CloseModal',
 			DROPDOWN_BUTTON: 'DropdownButton',
@@ -35975,6 +35978,7 @@ __C = {
 			STAR_O: 'fa-star-o',
 			BELL_O: 'fa-bell-o',
 			TIMES: 'fa-times',
+			TIMES_CIRCLE: 'fa-times-circle',
 			PLUS: 'fa-plus',
 			MINUS: 'fa-minus',
 			CHECK: 'fa-check',
@@ -35982,7 +35986,8 @@ __C = {
 			EYE: 'fa-eye',
 			EYE_CLOSE: 'fa-eye-slash',
 			TICKET: 'fa-ticket',
-			DOWNLOAD: 'fa-download'
+			DOWNLOAD: 'fa-download',
+			USER_PLUS: 'fa-user-plus'
 		},
 		ICON_CLASS: 'fa_icon'
 	},
@@ -36031,8 +36036,16 @@ __C = {
 	 */
 	SOCIAL_NETWORKS: {
 		VK: 'vk',
+		TWITTER: 'twitter',
 		GOOGLE: 'google',
 		FACEBOOK: 'facebook'
+	},
+	
+	SHARE_LINK: {
+		VK: 'https://vk.com/share.php?url={url}&title={title}&image={image_url}&noparse=false',
+		TWITTER: 'https://twitter.com/intent/tweet?url={url}&text={title}&via=evendate&hashtags=evendate',
+		GOOGLE: 'https://plus.google.com/share?url={url}&hl=ru',
+		FACEBOOK: 'https://www.facebook.com/dialog/share?app_id=1692270867652630&display=popup&title={title}&href={url}&redirect_uri={url}image[0][url]={image_url}&image[0][user_generated]=true'
 	},
 	/**
 	 * @enum {string}
@@ -37679,7 +37692,7 @@ function getFilenameFromURL(url) {
  *
  * @returns {object}
  */
-function mergeObjects(/**...objects, */recursive, deep) {
+function mergeObjects(objects, recursive, deep) {
 	var res,
 		length = arguments.length,
 		is_recursive,
@@ -37967,6 +37980,32 @@ function trimAvatarsCollection($parent) {
 	});
 }
 
+/**
+ *
+ * @param {jQuery} [$parent]
+ * @returns {jQuery}
+ */
+function bindHelpLink($parent) {
+	$parent = $parent ? $parent : $('body');
+	var $links = $parent.is('.HelpLink') ? $parent : $parent.find('.HelpLink');
+	
+	$links.not('.-Handled_HelpLink').each(function(i, elem) {
+		var $this = $(elem);
+		
+		$this.on('click.openHelpAppInspector', function() {
+			var inspector = $this.data('inspector');
+			
+			if (!(inspector instanceof HelpAppInspector)) {
+				inspector = new HelpAppInspector($this.data('article_id'));
+				$this.data('inspector', inspector);
+			}
+			inspector.show();
+		});
+	}).addClass('-Handled_HelpLink');
+	
+	return $parent;
+}
+
 function bindDatePickers($parent) {
 	$parent = $parent ? $parent : $('body');
 	$parent.find('.DatePicker').not('.-Handled_DatePicker').each(function(i, elem) {
@@ -38158,7 +38197,10 @@ function bindDropdown($parent) {
 		var $button = $(this),
 			instance = $button.resolveInstance(),
 			data = $button.data(),
-			$dropbox = $('.DropdownBox').filter('[data-dropdown_id="' + data.dropdown + '"]'),
+			$dropbox = $('.DropdownBox').filter(function(i, el) {
+				
+				return $(el).data('dropdown_id') === data.dropdown;
+			}),
 			button_pos;
 		
 		if (instance.initiate) {
@@ -38945,6 +38987,61 @@ AsynchronousConnection = (function() {
 	
 	return AsynchronousConnection;
 }());
+/**
+ *
+ * @class HelpCenterConnection
+ * @extends AsynchronousConnection
+ */
+HelpCenterConnection = extending(AsynchronousConnection, (function() {
+	/**
+	 *
+	 * @constructor
+	 * @constructs HelpCenterConnection
+	 */
+	function HelpCenterConnection() {
+		AsynchronousConnection.call(this);
+	}
+	
+	HelpCenterConnection.URL_BASE = 'https://evendate.io/help/wp-json/wp/v2/article/';
+	
+	HelpCenterConnection.ENDPOINT = Object.freeze({
+		ARTICLE: HelpCenterConnection.URL_BASE + '{id}'
+	});
+	
+	HelpCenterConnection.ARTICLE = Object.freeze({
+		FUNDS_WITHDRAW: 47,
+		BOOKING: 49,
+		PROMOCODES: 51,
+		TICKETS: 55,
+		HOW_TO_ENABLE_REGISTRATION: 61,
+		MEMBERS_LIMITATION: 65,
+		ADMIN_ACCESS: 71,
+		SITE_DESIGN: 77,
+		PREMIUM_TARIFF: 79,
+		HOW_PUSH_WORKS: 83,
+		CROSSPOSTING_VK: 105,
+		HOW_TO_PAY_FROM_LEGAL_ENTITY: 121,
+		REQUEST_APPROVAL: 127,
+		ORDER_STATUSES: 170
+	});
+	
+	HelpCenterConnection.prototype.fetchArticle = function(id) {
+		
+		return this.dealAjax(AsynchronousConnection.HTTP_METHODS.GET, HelpCenterConnection.ENDPOINT.ARTICLE.format({id: id})).then(function(data) {
+			
+			return (new HelpArticleModel()).setData({
+				id: data.id,
+				title: data.title.rendered,
+				link: data.link,
+				create_at: new Date(data.date_gmt),
+				updated_at: new Date(data.modified_gmt),
+				content: data.content.rendered
+			});
+		});
+	};
+	
+	return HelpCenterConnection;
+}()));
 /**
  * @requires Class.AsynchronousConnection.js
  */
@@ -40975,7 +41072,8 @@ OneOrder = extending(OneEntity, (function() {
 	OneOrder.prototype.ID_PROP_NAME = 'uuid';
 	
 	OneOrder.ENDPOINT = Object.freeze({
-		LEGAL_ENTITY_CONTRACT: '/events/{event_id}/orders/{order_uuid}/legal_entity/contract'
+		LEGAL_ENTITY_CONTRACT: '/events/{event_id}/orders/{order_uuid}/legal_entity/contract',
+		LEGAL_ENTITY_UTD: '/events/{event_id}/orders/{order_uuid}/legal_entity/utd'
 	});
 	
 	/**
@@ -41009,6 +41107,28 @@ OneOrder = extending(OneEntity, (function() {
 	 * @enum {string}
 	 */
 	OneOrder.PAYMENT_PROVIDERS = {
+		PC: 'PC',
+		AC: 'AC',
+		MC: 'MC',
+		GP: 'GP',
+		EP: 'EP',
+		WM: 'WM',
+		SB: 'SB',
+		MP: 'MP',
+		AB: 'AB',
+		MASTER_PASS: 'MA',
+		PB: 'PB',
+		QIWI_WALLET: 'QW',
+		KV: 'KV',
+		BITCOIN: 'BTC',
+		LEGAL_ENTITY_PAYMENT: 'LEP',
+		OTHER: 'OTH',
+	};
+	/**
+	 *
+	 * @enum {string}
+	 */
+	OneOrder.PAYMENT_PROVIDERS_TEXT = {
 		PC: 'Яндекс.Деньги',
 		AC: 'Банковская карта',
 		MC: 'Баланс телефона',
@@ -44019,6 +44139,7 @@ OneEvent = extending(OneEntity, (function() {
 	 * @property {?string} image_horizontal_medium_url
 	 * @property {?string} image_horizontal_small_url
 	 *
+	 * @property {?boolean} has_landing
 	 * @property {?boolean} is_free
 	 * @property {?number} min_price
 	 *
@@ -44105,6 +44226,7 @@ OneEvent = extending(OneEntity, (function() {
 		this.image_horizontal_medium_url = null;
 		this.image_horizontal_small_url = null;
 		
+		this.has_landing = null;
 		this.is_free = null;
 		this.min_price = null;
 		
@@ -45514,8 +45636,8 @@ Modals = (function() {
 		/**
 		 * @type {jQuery}
 		 */
-		this.modal_wrapper = $('.modal_wrapper');
-		this.modal_destroyer = new ModalDestroyer($('.modal_destroyer'));
+		this.modal_wrapper = $('.ModalsWrapper');
+		this.modal_destroyer = new ModalDestroyer($('.ModalDestroyer'));
 		
 		Modals.instance = this;
 	}
@@ -46377,8 +46499,11 @@ Builder = (function() {
 	Builder.prototype.link = function buildLink(props) {
 		
 		return bindPageLinks(tmpl('link', [].map.call(arguments, function(arg) {
+			var props = Builder.normalizeBuildProps(arg);
 			
-			return Builder.normalizeBuildProps(arg);
+			props.classes.push(__C.CLASSES.COMPONENT.LINK, __C.CLASSES.HOOKS.LINK);
+			
+			return props;
 		})));
 	};
 	/**
@@ -46391,30 +46516,31 @@ Builder = (function() {
 	 */
 	Builder.prototype.linkButton = function buildLinkButton(props) {
 		
-		return bindPageLinks(tmpl('link-button', [].map.call(arguments, function(arg) {
+		return bindPageLinks(tmpl('link', [].map.call(arguments, function(arg) {
+			var props = Builder.normalizeBuildProps(arg);
 			
-			return Builder.normalizeBuildProps(arg);
+			props.classes.push(__C.CLASSES.COMPONENT.BUTTON, __C.CLASSES.HOOKS.LINK);
+			
+			return props;
 		})));
 	};
 	/**
 	 *
-	 * @param {string} href
-	 * @param {string} title
-	 * @param {(string|Array<string>)} [classes]
-	 * @param {HTMLDataset} [dataset]
-	 * @param {HTMLAttributes} [attributes]
+	 * @param {...buildProps} props
+	 * @param {string} props.page
+	 * @param {string} props.title
 	 *
 	 * @returns {jQuery}
 	 */
-	Builder.prototype.actionLink = function buildActionLink(href, title, classes, dataset, attributes) {
+	Builder.prototype.actionLink = function buildActionLink(props) {
 		
-		return tmpl('action-link', Builder.normalizeBuildProps({
-			href: href,
-			title: title,
-			classes: classes,
-			dataset: dataset,
-			attributes: attributes
-		}));
+		return bindPageLinks(tmpl('link', [].map.call(arguments, function(arg) {
+			var props = Builder.normalizeBuildProps(arg);
+			
+			props.classes.push(__C.CLASSES.COMPONENT.ACTION, __C.CLASSES.HOOKS.LINK);
+			
+			return props;
+		})));
 	};
 	/**
 	 *
@@ -46435,6 +46561,29 @@ Builder = (function() {
 		})).each(function(i) {
 			$(this).data(_props[i].dataset);
 		});
+	};
+	/**
+	 *
+	 * @param {number} article_id
+	 * @param {string} title
+	 * @param {(string|Array<string>)} [classes]
+	 * @param {HTMLDataset} [dataset]
+	 * @param {HTMLAttributes} [attributes]
+	 *
+	 * @returns {jQuery}
+	 */
+	Builder.prototype.helpLink = function(article_id, title, classes, dataset, attributes) {
+		var props = Builder.normalizeBuildProps({
+			title: title,
+			classes: classes,
+			dataset: dataset,
+			attributes: attributes
+		});
+		
+		props.dataset['article_id'] = article_id;
+		props.classes.push('HelpLink');
+		
+		return bindHelpLink(tmpl('help-link', props));
 	};
 	/**
 	 *
@@ -46612,6 +46761,7 @@ Builder = (function() {
 	 * @param {HTMLAttributes} [props.helptext_attributes]
 	 * @param {(Array<string>|string)} [props.unit_classes]
 	 * @param {(Array<string>|string)} [props.label_classes]
+	 * @param {HTMLDataset} [props.label_dataset]
 	 * @returns {jQuery}
 	 */
 	Builder.prototype.formUnit = function buildFormUnit(props) {
@@ -46650,8 +46800,9 @@ Builder = (function() {
 						label: props.label ? tmpl('label', Builder.normalizeBuildProps({
 							id: props.id,
 							label: props.label,
-							label_classes: props.label_classes
-						}, ['label_classes'])) : '',
+							classes: props.label_classes,
+							dataset: props.label_dataset
+						})) : '',
 						helptext: props.helptext ? self.formHelpText(props.helptext, props.helptext_dataset, props.helptext_attributes) : '',
 						form_element: (function(props) {
 							var classes = props.classes ? props.classes instanceof Array ? props.classes : props.classes.split(',') : [],
@@ -46935,6 +47086,37 @@ Builder = (function() {
 		});
 		
 		return tmpl('user-social-links-wrapper', {links: tmpl('user-social-link', props_array)});
+	};
+	/**
+	 *
+	 * @param {object} sharing_object
+	 * @param {string} sharing_object.title
+	 * @param {string} sharing_object.url
+	 * @param {string} [sharing_object.image_url]
+	 * @param {(__C.SOCIAL_NETWORKS|Array<__C.SOCIAL_NETWORKS>)} social_networks
+	 *
+	 * @return {jQuery}
+	 */
+	Builder.prototype.shareLinks = function(sharing_object, social_networks) {
+		social_networks = social_networks instanceof Array ? social_networks : [social_networks];
+		
+		return this.externalLink.apply(this, social_networks.map(function(network) {
+			var link = getByValue(network, __C.SOCIAL_NETWORKS, __C.SHARE_LINK);
+			
+			return {
+				page: link.format(sharing_object),
+				classes: [
+					'share_icon',
+					network
+				]
+			};
+		})).on('click', function(e) {
+			window.open(this.href, 'share', 'height=570,width=650,status=yes,toolbar=no,menubar=no');
+			
+			e.preventDefault();
+			
+			return false;
+		});
 	};
 	/**
 	 *
@@ -48501,6 +48683,8 @@ OrderPage = extending(Page, (function() {
 					__C.CLASSES.UNIVERSAL_STATES.NO_UPPERCASE
 				]
 			});
+			
+			this.render_vars.legal_entity_payment_help = __APP.BUILD.helpLink(HelpCenterConnection.ARTICLE.HOW_TO_PAY_FROM_LEGAL_ENTITY, 'Как оплатить со счета компании');
 		}
 		
 		if (this.event.accept_bitcoins) {

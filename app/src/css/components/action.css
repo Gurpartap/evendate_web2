@@ -1,4 +1,5 @@
 .action {
+	font-size: .875rem;
 	font-weight: 500;
 	text-transform: uppercase;
 	border: 0;
@@ -13,12 +14,18 @@
 	opacity: 1;
 }
 
+.action.-size_wide {
+	display: block;
+	margin: .5em 0;
+}
+
 @supports not (--custom_properties: 0) {
 	.action.-color_primary {color: #3e4d66}
 	.action.-color_accent {color: #f82969}
 	.-state_admin .action.-color_accent {color: #00dc88}
 	.action.-color_error {color: #ff5f9e}
 	.action.-color_neutral {color: #9fa6b3}
+	.action.-color_marginal {color: #657184}
 }
 
 @supports (--custom_properties: 1) {
@@ -26,4 +33,5 @@
 	.action.-color_accent {color: var(--color_accent)}
 	.action.-color_error {color: var(--color_bubblegum_alt)}
 	.action.-color_neutral {color: var(--color_primary_50)}
+	.action.-color_marginal {color: var(--color_primary_80)}
 }

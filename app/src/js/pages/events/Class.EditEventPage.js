@@ -77,13 +77,12 @@ EditEventPage = extending(AbstractEditEventPage, (function() {
 		                              AbstractEditEventPage.promocodeRowsBuilder(this.event.promocodes) :
 		                              tmpl('edit-event-promocode-row-empty');
 		
-		this.render_vars.vk_post_link = this.event.vk_post_link ? __APP.BUILD.actionLink(
-			this.event.vk_post_link,
-			'Страница публикации во Вконтакте',
-			[__C.CLASSES.COLORS.ACCENT, '-no_uppercase'],
-			{},
-			{target: '_blank'}
-		) : '';
+		this.render_vars.vk_post_link = this.event.vk_post_link ? __APP.BUILD.externalLink({
+			page: this.event.vk_post_link,
+			title: 'Страница публикации во Вконтакте',
+			classes: [__C.CLASSES.COLORS.ACCENT, '-no_uppercase'],
+			attributes: {target: '_blank'}
+		}) : '';
 		
 		if (this.event.registration_fields.length) {
 			this.event.registration_fields.filter(RegistrationFieldModel.isPredefinedField).sort(function(a, b) {
