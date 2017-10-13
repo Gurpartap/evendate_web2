@@ -3591,6 +3591,13 @@ ServerExports = extending(AsynchronousConnection, (function() {
 		XLSX: 'xlsx',
 		HTML: 'html'
 	};
+	
+	ServerExports.ENDPOINT = Object.freeze({
+		ORGANIZATION_SUBSCRIBERS: '/statistics/organizations/{organization_id}/subscribers/export',
+		EVENT_ORDERS: '/statistics/events/{event_id}/orders/export',
+		EVENT_TICKETS: '/statistics/events/{event_id}/tickets/export',
+		EVENT_TICKET: '/events/{event_id}/tickets/{ticket_uuid}/export',
+	});
 	/**
 	 *
 	 * @param {string} url
@@ -3599,6 +3606,7 @@ ServerExports = extending(AsynchronousConnection, (function() {
 	 * @return {jqPromise}
 	 */
 	ServerExports.prototype.export = function(url, format) {
+		url = url.contains('/api/v1') ? url : '/api/v1' + url;
 		
 		return $.fileDownload(url, {
 			data: {
@@ -3615,7 +3623,7 @@ ServerExports = extending(AsynchronousConnection, (function() {
 	 */
 	ServerExports.prototype.organizationSubscribers = function(organization_id, format) {
 	
-		return this.export('/api/v1/statistics/organizations/'+organization_id+'/subscribers/export', format);
+		return this.export(ServerExports.ENDPOINT.ORGANIZATION_SUBSCRIBERS.format({organization_id: organization_id}), format);
 	};
 	/**
 	 *
@@ -3626,7 +3634,7 @@ ServerExports = extending(AsynchronousConnection, (function() {
 	 */
 	ServerExports.prototype.eventOrders = function(event_id, format) {
 		
-		return this.export('/api/v1/statistics/events/'+event_id+'/orders/export', format);
+		return this.export(ServerExports.ENDPOINT.EVENT_ORDERS.format({event_id: event_id}), format);
 	};
 	/**
 	 *
@@ -3637,7 +3645,7 @@ ServerExports = extending(AsynchronousConnection, (function() {
 	 */
 	ServerExports.prototype.eventTickets = function(event_id, format) {
 		
-		return this.export('/api/v1/statistics/events/'+event_id+'/tickets/export', format);
+		return this.export(ServerExports.ENDPOINT.EVENT_TICKETS.format({event_id: event_id}), format);
 	};
 	/**
 	 *
@@ -3648,7 +3656,7 @@ ServerExports = extending(AsynchronousConnection, (function() {
 	 */
 	ServerExports.prototype.eventTicket = function(event_id, uuid) {
 		
-		return this.export('/events/{event_id}/tickets/{ticket_uuid}/export'.format({
+		return this.export(ServerExports.ENDPOINT.EVENT_TICKET.format({
 			event_id: event_id,
 			ticket_uuid: uuid
 		}));
@@ -24853,7 +24861,7 @@ AdminEventOrdersPage = extending(AdminEventPage, (function() {
 		var self = this,
 			$header_buttons = $();
 		
-		$header_buttons = $header_buttons.add(new DropDown('export-formats', 'Выгрузка', {
+		$header_buttons = $header_buttons.add(new DropDown('export-formats', 'Выгрузка билетов', {
 			classes: [
 				__C.CLASSES.SIZES.LOW,
 				__C.CLASSES.ICON_CLASS,
@@ -24869,8 +24877,28 @@ AdminEventOrdersPage = extending(AdminEventPage, (function() {
 				y: 5
 			}
 		}, {
-			xlsx_href: '/api/v1/statistics/events/'+this.event.id+'/orders/export?format=xlsx',
-			html_href: '/api/v1/statistics/events/'+this.event.id+'/orders/export?format=html'
+			xlsx_href: '/api/v1' + ServerExports.ENDPOINT.EVENT_TICKETS.format({event_id: this.event.id}) + '?format=xlsx',
+			html_href: '/api/v1' + ServerExports.ENDPOINT.EVENT_TICKETS.format({event_id: this.event.id}) + '?format=html'
+		}));
+		
+		$header_buttons = $header_buttons.add(new DropDown('export-formats', 'Выгрузка заказов', {
+			classes: [
+				__C.CLASSES.SIZES.LOW,
+				__C.CLASSES.ICON_CLASS,
+				__C.CLASSES.ICONS.DOWNLOAD,
+				__C.CLASSES.COLORS.MARGINAL_PRIMARY,
+				__C.CLASSES.HOOKS.RIPPLE,
+				__C.CLASSES.HOOKS.DROPDOWN_BUTTON
+			]
+		}, {
+			width: 'self',
+			position: {
+				x: 'right',
+				y: 5
+			}
+		}, {
+			xlsx_href: '/api/v1' + ServerExports.ENDPOINT.EVENT_ORDERS.format({event_id: this.event.id}) + '?format=xlsx',
+			html_href: '/api/v1' + ServerExports.ENDPOINT.EVENT_ORDERS.format({event_id: this.event.id}) + '?format=html'
 		}));
 		
 		this.$wrapper.html(tmpl('admin-event-orders-page', {
