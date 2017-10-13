@@ -92,7 +92,7 @@ AdminEventOrdersPage = extending(AdminEventPage, (function() {
 		});
 		
 		this.$wrapper.find('.OrdersTableSearch').on('input', function() {
-			self.ordersTable.search(this.value).draw();
+			self.ordersTable.search(this.value + '|' + transl(this.value), true, false).draw();
 		});
 	};
 	
