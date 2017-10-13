@@ -172,6 +172,16 @@ AbstractEditOrganizationPage = extending(Page, (function() {
 	};
 	
 	AbstractEditOrganizationPage.prototype.render = function() {
+		if (__APP.USER.isLoggedOut()) {
+			var auth_modal = new AuthModal(window.location, {
+				note: 'Для выполнения этого действия Вам необходимо авторизоваться через социальную сеть'
+			});
+			
+			auth_modal.is_hidable = false;
+			auth_modal.show();
+			
+			return void(0);
+		}
 		
 		if (!checkRedirect('organization/add', '/add/organization')) {
 			return null;

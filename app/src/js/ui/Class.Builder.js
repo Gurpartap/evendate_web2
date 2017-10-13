@@ -1640,7 +1640,7 @@ Builder = (function() {
 			vars.modal_header = tmpl('modal-header', {
 				title: normalized_props.title,
 				close_button: tmpl('button', {
-					classes: ['modal_destroy_button', __C.CLASSES.HOOKS.CLOSE_MODAL, __C.CLASSES.HOOKS.RIPPLE].join(' '),
+					classes: ['modal_destroy_button', __C.CLASSES.HOOKS.CLOSE_MODAL].join(' '),
 					title: '×'
 				})
 			});
