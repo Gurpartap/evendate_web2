@@ -293,7 +293,8 @@ class App
 		}
 	}
 
-	public static function loadColumnNames(){
+	public static function loadColumnNames()
+	{
 		global $BACKEND_FULL_PATH;
 		return json_decode(file_get_contents($BACKEND_FULL_PATH . '/events/column_names.json'), true);
 	}
@@ -328,6 +329,28 @@ class App
 	public static function getBodyJSON(\GuzzleHttp\Psr7\Response $response, bool $object = true)
 	{
 		return json_decode($response->getBody()->getContents(), $object);
+	}
+
+	public static function transliterate(string $from, string $text)
+	{
+		$cyr = [
+			'а', 'б', 'в', 'г', 'д', 'е', 'ё', 'ж', 'з', 'и', 'й', 'к', 'л', 'м', 'н', 'о', 'п',
+			'р', 'с', 'т', 'у', 'ф', 'х', 'ц', 'ч', 'ш', 'щ', 'ъ', 'ы', 'ь', 'э', 'ю', 'я',
+			'А', 'Б', 'В', 'Г', 'Д', 'Е', 'Ё', 'Ж', 'З', 'И', 'Й', 'К', 'Л', 'М', 'Н', 'О', 'П',
+			'Р', 'С', 'Т', 'У', 'Ф', 'Х', 'Ц', 'Ч', 'Ш', 'Щ', 'Ъ', 'Ы', 'Ь', 'Э', 'Ю', 'Я'
+		];
+		$lat = [
+			'a', 'b', 'v', 'g', 'd', 'e', 'io', 'zh', 'z', 'i', 'y', 'k', 'l', 'm', 'n', 'o', 'p',
+			'r', 's', 't', 'u', 'f', 'h', 'ts', 'ch', 'sh', 'sht', 'a', 'i', 'y', 'e', 'yu', 'ya',
+			'A', 'B', 'V', 'G', 'D', 'E', 'Io', 'Zh', 'Z', 'I', 'Y', 'K', 'L', 'M', 'N', 'O', 'P',
+			'R', 'S', 'T', 'U', 'F', 'H', 'Ts', 'Ch', 'Sh', 'Sht', 'A', 'I', 'Y', 'e', 'Yu', 'Ya'
+		];
+		if ($from == 'cyr'){
+			return str_replace($cyr, $lat, $text);
+		}elseif ($from == 'lat'){
+			return str_replace($lat, $cyr, $text);
+		}
+		else throw new InvalidArgumentException('BAD_TRANSLITERATE');
 	}
 
 }

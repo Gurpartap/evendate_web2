@@ -8,6 +8,12 @@ var DEVICE_TYPES = {
     },
     ONE_SIGNAL_URL = {
         CREATE: 'https://onesignal.com/api/v1/notifications'
+    },
+    ANDROID_CHANNEL_IDS = {
+        'events': 'ab2714b9-3eda-44b6-8b54-469ab5a3c838',
+        'recommendations': 'ef3fedda-42f2-4002-8e0b-0a2b83207da0',
+        'marketing': '26df66ba-9ffb-45b7-8ca5-b9f363fdfeb3',
+        'friends': '291bde0e-694d-47c6-a200-65ec619adffd'
     };
 
 
@@ -16,10 +22,11 @@ function NotificationsManager(settings) {
 }
 
 
-NotificationsManager.prototype.create = function (notification, device, type) {
+NotificationsManager.prototype.create = function (notification, device, type, channel_type) {
 
     var _this = this;
     var _text = Utils.replaceTags(notification.notification_type_text, notification);
+    var android_channel_id = channel_type ? ANDROID_CHANNEL_IDS[channel_type] : ANDROID_CHANNEL_IDS[type];
     var note = {
         alert: _text,
         body: _text,
@@ -51,6 +58,7 @@ NotificationsManager.prototype.create = function (notification, device, type) {
             en: note.alert,
             ru: note.alert
         },
+        android_channel_id: android_channel_id,
         include_player_ids: [device.device_token],
         data: note.payload,
         __client_type: device.client_type

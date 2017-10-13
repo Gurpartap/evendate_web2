@@ -149,17 +149,44 @@ class UsersCollection extends AbstractCollection
 				}
 				case 'name': {
 					$value = mb_strtolower(trim($value));
+					$lat_translit = App::transliterate('cyr', $value);
+					$cyr_translit = App::transliterate('lat', $value);
+
+					if ($value == $lat_translit) {
+						$transliterated = $cyr_translit;
+					} elseif ($value == $cyr_translit) {
+						$transliterated = $lat_translit;
+					} else {
+						$transliterated = $cyr_translit;
+					}
 					if (empty($value)) break;
 					if (isset($filters['strict']) && filter_var($filters['strict'], FILTER_VALIDATE_BOOLEAN) == true) {
-						$q_get_users->where('LOWER(CONCAT(last_name, \' \', first_name)) = LOWER(:name) 
-                                OR 
-                                    LOWER(CONCAT(first_name, \' \', last_name)) = LOWER(:name) ');
+						$q_get_users->where('
+						(LOWER(CONCAT(last_name, \' \', first_name)) = LOWER(:name) 
+							OR 
+							LOWER(CONCAT(first_name, \' \', last_name)) = LOWER(:name)
+						) 
+						OR 
+						(LOWER(CONCAT(last_name, \' \', first_name)) = LOWER(:transliterated_name) 
+							OR 
+						LOWER(CONCAT(first_name, \' \', last_name)) = LOWER(:transliterated_name)
+						)
+						');
 						$statement_array[':name'] = $value;
+						$statement_array[':transliterated_name'] = $transliterated;
 					} else {
-						$q_get_users->where('LOWER(CONCAT(last_name,\' \', first_name)) LIKE LOWER(:name)
-                            OR 
-                            LOWER(CONCAT(first_name,\' \', last_name)) LIKE LOWER(:name)');
+						$q_get_users->where('
+						(LOWER(CONCAT(last_name,\' \', first_name)) LIKE LOWER(:name)
+							OR 
+							LOWER(CONCAT(first_name,\' \', last_name)) LIKE LOWER(:name)
+						)
+						OR
+						(LOWER(CONCAT(last_name,\' \', first_name)) LIKE LOWER(:transliterated_name)
+							OR 
+						LOWER(CONCAT(first_name,\' \', last_name)) LIKE LOWER(:transliterated_name)
+						)');
 						$statement_array[':name'] = $value . '%';
+						$statement_array[':transliterated_name'] = $transliterated . '%';
 					}
 					break;
 				}
@@ -322,9 +349,9 @@ class UsersCollection extends AbstractCollection
 				$column_names[App::$__LANG]['user']['google_uid'] => $user['google_uid']
 			);
 
-			try{
+			try {
 				$user['interests'] = json_decode($user['interests'], true);
-			}catch (Exception $e){
+			} catch (Exception $e) {
 				$user['interests'] = array();
 			}
 

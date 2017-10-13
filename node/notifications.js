@@ -158,29 +158,29 @@ class Notifications {
 
                     devices.forEach(function (device) {
 
-                        if (device.device_token == null) return true;
+                    if (device.device_token == null) return true;
 
-                        var note = _this.notifications_manager.create(notification, device, 'events');
+                    var note = _this.notifications_manager.create(notification, device, 'events');
 
-                        note.send(function (err, message_id, response) {
+                    note.send(function (err, message_id, response) {
 
-                            var q_ins_notification = stat_users_notifications.insert({
-                                user_notification_id: notification.user_notification_id,
-                                token_id: device.id,
-                                click_time: null,
-                                received: true,
-                                message_id: message_id,
-                                push_response: response
-                            }).toQuery();
+                        var q_ins_notification = stat_users_notifications.insert({
+                            user_notification_id: notification.user_notification_id,
+                            token_id: device.id,
+                            click_time: null,
+                            received: true,
+                            message_id: message_id,
+                            push_response: response
+                        }).toQuery();
 
-                            _this.settings.client.query(q_ins_notification, function (err) {
-                                if (err) {
-                                    _this.logger.error(err);
-                                }
-                            });
+                        _this.settings.client.query(q_ins_notification, function (err) {
+                            if (err) {
+                                _this.logger.error(err);
+                            }
                         });
                     });
-                })
+                });
+        })
             })
         });
     }
@@ -270,7 +270,6 @@ class Notifications {
         });
     }
 
-
     sendRecommendationsOrganizations() {
         let _this = this,
             q_get_notifications = `SELECT 
@@ -306,7 +305,7 @@ class Notifications {
 
                         notification.title = 'Evendate';
 
-                        let note = _this.notifications_manager.create(notification, device, 'recommendations_organizations');
+                        let note = _this.notifications_manager.create(notification, device, 'recommendations_organizations', 'recommendations');
 
                         note.send(function (err, message_id, response) {
 
@@ -393,7 +392,7 @@ WHERE done = FALSE AND notifications_recommendations.notification_type_id = 51`;
                             notification.friends_count = '';
                         }
 
-                        let note = _this.notifications_manager.create(notification, device, 'events');
+                        let note = _this.notifications_manager.create(notification, device, 'events', 'friends');
 
                         note.send(function (err, message_id, response) {
 
