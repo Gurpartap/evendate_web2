@@ -40,11 +40,11 @@
 				<a href="https://play.google.com/store/apps/details?id=ru.evendate.android" class="button -color_default fa_icon fa-android" target="_blank">Android</a>
 			</div>
 			<div class="sidebar_links">
-				<a href="/landing.php" class="link">О нас</a>
-				<a href="//evendate.io/blog" class="link">Наш блог</a>
-				<a href="/organization.php" class="link">Стать организатором</a>
-				<a href="//evendate.io/docs/terms.pdf" class="link">Условия пользования</a>
-				<a href="//evendate.io/docs/useragreement.pdf" class="link">Пользовательское соглашение</a>
+				<a href="/about" class="link">О нас</a>
+				<a href="/blog" class="link">Наш блог</a>
+				<a href="/to-organization" class="link">Стать организатором</a>
+				<a href="/docs/terms.pdf" class="link">Условия пользования</a>
+				<a href="/docs/useragreement.pdf" class="link">Пользовательское соглашение</a>
 			</div>
 			<p>Evendate 2015-<?= (new DateTimeImmutable())->format('Y'); ?></p>
 		</footer>

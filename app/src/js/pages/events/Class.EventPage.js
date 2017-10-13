@@ -28,7 +28,7 @@ EventPage = extending(Page, (function() {
 		this.render_vars = {
 			cover_width: 630,
 			avatars_collection: null,
-			action_buttons: null,
+			action_button: null,
 			event_map: null,
 			event_edit_functions: null,
 			event_additional_info: null,
@@ -72,6 +72,7 @@ EventPage = extending(Page, (function() {
 		'detail_info_url',
 		'canceled',
 		'public_at',
+		'has_landing',
 		'is_registered',
 		'registration_locally',
 		'registration_available',
@@ -244,60 +245,148 @@ EventPage = extending(Page, (function() {
 	};
 	
 	EventPage.prototype.preRender = function() {
-		var self = this,
-			add_to_favorite_button_props = {
-			is_add_avatar: true,
-			is_checked: this.event.is_favorite,
-			classes: [
-				__C.CLASSES.SIZES.LOW,
-				__C.CLASSES.UNIVERSAL_STATES.ROUNDED,
-				__C.CLASSES.HOOKS.RIPPLE
-			],
-			colors: {
-				unchecked: __C.CLASSES.COLORS.NEUTRAL_ACCENT,
-				unchecked_hover: __C.CLASSES.COLORS.NEUTRAL_ACCENT
-			}
-		},
-		$cancel_cancellation_button = $();
+		var self = this;
 		
-		if (this.event.registration_locally || this.event.ticketing_locally) {
-			add_to_favorite_button_props.labels = null;
-			add_to_favorite_button_props.classes.push(__C.CLASSES.UNIVERSAL_STATES.EMPTY);
-		} else {
-			add_to_favorite_button_props.classes.push('event_main_action_button');
-		}
+		
+		this.$overlay_cap = __APP.BUILD.overlayCap($('<p>Организатор отменил событие</p>'));
 		
 		if (this.event.can_edit) {
-			$cancel_cancellation_button = __APP.BUILD.button({
+			this.$overlay_cap.find('.CapWrapper').append(bindRippleEffect(__APP.BUILD.button({
 				title: 'Вернуть событие',
 				classes: [
 					__C.CLASSES.COLORS.PRIMARY,
 					__C.CLASSES.HOOKS.RIPPLE
 				]
-			});
-			
-			$cancel_cancellation_button.on('click.CancelCancellation', function() {
+			}).on('click.CancelCancellation', function() {
 				self.event.changeEventStatus(OneEvent.STATUS.BRING_BACK, function() {
 					self.$overlay_cap.detach();
 				});
-			});
-			
-			bindRippleEffect($cancel_cancellation_button);
+			})));
 		}
 		
-		this.$overlay_cap = __APP.BUILD.overlayCap($('<p>Организатор отменил событие</p>').add($cancel_cancellation_button));
+		if (this.event.can_edit) {
+			this.render_vars.event_functions = tmpl('event-functions', {
+				functions: (function() {
+					var $function,
+						default_classes = [
+							'event_function_button',
+							__C.CLASSES.SIZES.WIDE,
+							__C.CLASSES.ICON_CLASS
+						];
+					
+					$function = __APP.BUILD.actionLink({
+						page: '/admin/event/{event_id}/edit'.format({event_id: self.event.id}),
+						title: 'Редактировать событие',
+						classes: default_classes.concat([
+							__C.CLASSES.COLORS.MARGINAL,
+							__C.CLASSES.ICONS.PENCIL
+						])
+					});
+					
+					$function = $function.add(__APP.BUILD.externalLink({
+						page: '/event_landing/?id={event_id}&edit=true'.format({event_id: self.event.id}),
+						title: self.event.has_landing ? 'Изменить лендинг' : 'Создать лендинг',
+						classes: default_classes.concat([
+							__C.CLASSES.COLORS.MARGINAL,
+							__C.CLASSES.COMPONENT.ACTION,
+							'fa-file-text'
+						]),
+						attributes: {
+							target: '__blank'
+						}
+					}));
+					
+					if (self.event.registration_approvement_required) {
+						$function = $function.add(__APP.BUILD.actionLink({
+							page: '/admin/event/{event_id}/requests'.format({event_id: self.event.id}),
+							title: 'Просмотреть заявки',
+							classes: default_classes.concat([
+								__C.CLASSES.COLORS.MARGINAL,
+								__C.CLASSES.ICONS.USER_PLUS
+							])
+						}, {
+							page: '/admin/event/{event_id}/check_in'.format({event_id: self.event.id}),
+							title: 'Контроль входа',
+							classes: default_classes.concat([
+								__C.CLASSES.COLORS.MARGINAL,
+								'fa-calendar-check-o'
+							])
+						}));
+					}
+					
+					$function = $function.add(__APP.BUILD.actionButton({
+						title: 'Контроль входа',
+						classes: default_classes.concat([
+							'DropdownButton',
+							__C.CLASSES.COLORS.NEUTRAL,
+							__C.CLASSES.ICONS.TIMES_CIRCLE
+						]),
+						dataset: {
+							'dd-width': 'self',
+							dropdown: 'cancel_event'
+						}
+					}));
+					
+					return $function;
+				}())
+			});
+		}
 		
+		if (this.event.ticketing_locally || this.event.registration_locally) {
+			this.render_vars.event_action = new OrderButton(this.event, {
+				classes: [
+					'event_main_action_button',
+					__C.CLASSES.SIZES.BIG,
+					__C.CLASSES.HOOKS.RIPPLE
+				],
+				colors: {
+					unchecked: __C.CLASSES.COLORS.ACCENT,
+					unchecked_hover: __C.CLASSES.COLORS.ACCENT
+				}
+			});
+		}
 		
+		if (!__APP.USER.isLoggedOut()) {
+			this.render_vars.event_notifications_button = new DropDown('event-edit-notifications', 'Напоминания', {
+				classes: [
+					__C.CLASSES.ICON_CLASS,
+					__C.CLASSES.ICONS.BELL_O,
+					__C.CLASSES.COLORS.MARGINAL_PRIMARY,
+					__C.CLASSES.HOOKS.RIPPLE,
+					__C.CLASSES.HOOKS.DROPDOWN_BUTTON
+				]
+			}, {
+				width: 190,
+				position: {
+					x: 'center',
+					y: 3
+				}
+			}, {
+				notifications: EventPage.buildNotifications(this.event)
+			});
+		}
 		
+		this.render_vars.action_button = new AddToFavoriteButton(this.event.id, {
+			is_add_avatar: true,
+			is_checked: this.event.is_favorite,
+			labels: null,
+			classes: [
+				__C.CLASSES.UNIVERSAL_STATES.EMPTY,
+				__C.CLASSES.HOOKS.RIPPLE
+			],
+			colors: {
+				unchecked: __C.CLASSES.COLORS.DEFAULT,
+				unchecked_hover: __C.CLASSES.COLORS.DEFAULT
+			}
+		});
 		
-		this.render_vars.avatars_collection = __APP.BUILD.avatarCollection(this.event.favored, 6, {
+		this.render_vars.avatars_collection = __APP.BUILD.avatarCollection(this.event.favored, 4, {
 			dataset: {
 				modal_type: 'favors',
 				modal_event_id: this.event.id
 			},
 			classes: [
 				__C.CLASSES.UNIVERSAL_STATES.ROUNDED,
-				__C.CLASSES.UNIVERSAL_STATES.BORDERED,
 				__C.CLASSES.SIZES.SMALL,
 				__C.CLASSES.HOOKS.ADD_AVATAR.COLLECTION,
 				__C.CLASSES.HOOKS.CALL_MODAL,
@@ -305,75 +394,16 @@ EventPage = extending(Page, (function() {
 			],
 			counter_classes: [
 				__C.CLASSES.SIZES.X30,
-				__C.CLASSES.UNIVERSAL_STATES.BORDERED,
 				__C.CLASSES.COLORS.MARGINAL,
 				__C.CLASSES.HOOKS.ADD_AVATAR.STATES.CASTABLE
 			]
 		}, this.event.favored_users_count);
-		
-		
-		this.render_vars.action_buttons = $();
-		
-		if (!__APP.USER.isLoggedOut()) {
-			this.render_vars.action_buttons = this.render_vars.action_buttons.add(
-				new DropDown('event-edit-notifications', '', {
-					classes: [
-						__C.CLASSES.UNIVERSAL_STATES.EMPTY,
-						__C.CLASSES.UNIVERSAL_STATES.ROUNDED,
-						__C.CLASSES.SIZES.LOW,
-						__C.CLASSES.ICON_CLASS,
-						__C.CLASSES.ICONS.BELL_O,
-						__C.CLASSES.COLORS.NEUTRAL,
-						__C.CLASSES.HOOKS.RIPPLE,
-						__C.CLASSES.HOOKS.DROPDOWN_BUTTON
-					]
-				}, {
-					width: 190,
-					position: {
-						x: 'center',
-						y: 6
-					}
-				}, {
-					notifications: EventPage.buildNotifications(this.event)
-				})
-			);
-		}
-		
-		this.render_vars.action_buttons = this.render_vars.action_buttons.add(new AddToFavoriteButton(this.event.id, add_to_favorite_button_props));
-		
-		if (this.event.ticketing_locally || this.event.registration_locally) {
-			this.render_vars.action_buttons = this.render_vars.action_buttons.add(
-				new OrderButton(this.event, {
-					classes: [
-						'event_main_action_button',
-						__C.CLASSES.SIZES.LOW,
-						__C.CLASSES.UNIVERSAL_STATES.ROUNDED,
-						__C.CLASSES.HOOKS.RIPPLE
-					],
-					colors: {
-						unchecked: __C.CLASSES.COLORS.NEUTRAL_ACCENT,
-						unchecked_hover: __C.CLASSES.COLORS.NEUTRAL_ACCENT
-					}
-				})
-			);
-		}
-		
-		
-		if (this.event.location) {
-			this.render_vars.event_map = tmpl('event-map', {location_sanitized: encodeURI(this.event.location)});
-		}
-		
-		if (this.event.can_edit) {
-			this.render_vars.event_edit_functions = tmpl('event-edit-functions', this.event);
-		}
-		
 		
 		this.render_vars.event_additional_info = $();
 		
 		if (this.event.registration_required) {
 			this.render_vars.event_additional_info = this.render_vars.event_additional_info.add(
 				tmpl('event-additional-info', {
-					classes: __C.CLASSES.TEXT_COLORS.ACCENT + ' ' + __C.CLASSES.UNIVERSAL_STATES.UPPERCASE,
 					text: (this.event.registration_till ? 'Регистрация до ' + moment.unix(this.event.registration_till).calendar(null, __LOCALES.ru_RU.DATE.CALENDAR_DATE_TIME) : 'Регистрация обязательна')
 				})
 			);
@@ -382,7 +412,6 @@ EventPage = extending(Page, (function() {
 		if (!this.event.is_free) {
 			this.render_vars.event_additional_info = this.render_vars.event_additional_info.add(
 				tmpl('event-additional-info', {
-					classes: __C.CLASSES.TEXT_COLORS.ACCENT,
 					text: 'от ' + (this.event.min_price ? formatCurrency(this.event.min_price) : '0') + ' руб.'
 				})
 			);
@@ -391,7 +420,6 @@ EventPage = extending(Page, (function() {
 		if (this.event.is_online) {
 			this.render_vars.event_additional_info = this.render_vars.event_additional_info.add(
 				tmpl('event-additional-info', {
-					classes: __C.CLASSES.TEXT_COLORS.ACCENT,
 					text: 'Online'
 				})
 			);
@@ -422,7 +450,10 @@ EventPage = extending(Page, (function() {
 			this.render_vars.event_additional_fields = this.render_vars.event_additional_fields.add(
 				tmpl('event-additional-field', {
 					key: 'Место',
-					value: this.event.location
+					value: tmpl('event-map', {
+						location_sanitized: encodeURI(this.event.location),
+						location: this.event.location
+					})
 				})
 			);
 		}
@@ -431,6 +462,17 @@ EventPage = extending(Page, (function() {
 			tmpl('event-additional-field', {
 				key: 'Теги',
 				value: __APP.BUILD.tags(this.event.tags)
+			})
+		);
+		
+		this.render_vars.event_additional_fields = this.render_vars.event_additional_fields.add(
+			tmpl('event-additional-field', {
+				key: 'Поделиться',
+				value: __APP.BUILD.shareLinks({
+					url: encodeURIComponent(window.location),
+					title: this.event.title,
+					image_url: this.event.image_horizontal_url
+				}, [__C.SOCIAL_NETWORKS.VK, __C.SOCIAL_NETWORKS.TWITTER, __C.SOCIAL_NETWORKS.GOOGLE, __C.SOCIAL_NETWORKS.FACEBOOK])
 			})
 		);
 		
