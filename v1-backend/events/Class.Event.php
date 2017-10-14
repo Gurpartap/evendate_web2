@@ -1946,6 +1946,10 @@ class Event extends AbstractEntity
 		return $this->title;
 	}
 
+	public function getPricingRules()
+	{
+
+	}
 
 	public function checkLandingAlias(string $alias)
 	{
@@ -2016,5 +2020,6 @@ class Event extends AbstractEntity
 		$finance = new EventFinance($this->db, $this, $user);
 		return $finance->getFields($fields);
 	}
+
 
 }
