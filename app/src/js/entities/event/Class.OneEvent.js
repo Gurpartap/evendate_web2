@@ -241,7 +241,13 @@ OneEvent = extending(OneEntity, (function() {
 	 * @returns {jqPromise}
 	 */
 	OneEvent.fetchEvent = function(event_id, fields, success) {
-		return __APP.SERVER.getData('/api/v1/events/' + event_id, {fields: new Fields(fields)}, success);
+		var send_data = {
+			fields: new Fields(fields)
+		};
+		
+		send_data.utm = JSON.stringify(gatherUTMTags(window.location));
+		
+		return __APP.SERVER.getData('/api/v1/events/' + event_id, send_data, success);
 	};
 	/**
 	 * @typedef {function({
@@ -388,18 +394,20 @@ OneEvent = extending(OneEntity, (function() {
 	 *
 	 * @param {(string|number)} event_id
 	 * @param {Array<OrderRegistrationField>} registration_fields
+	 * @param {Object<string, string>} [utm]
 	 * @param {AJAXCallback} [success]
 	 *
 	 * @return {jqPromise}
 	 */
-	OneEvent.registerToEvent = function(event_id, registration_fields, success) {
+	OneEvent.registerToEvent = function(event_id, registration_fields, utm, success) {
 		
-		return __APP.SERVER.addData('/api/v1/events/' + event_id + '/orders', {
+		return __APP.SERVER.addData(OneEvent.ENDPOINT.ORDERS.format({event_id: event_id}), {
 			registration_fields: registration_fields,
 			tickets: [{
 				uuid: null,
 				count: 1
-			}]
+			}],
+			utm: utm || null
 		}, true, success);
 	};
 	/**
@@ -412,15 +420,17 @@ OneEvent = extending(OneEntity, (function() {
 	 * @param {(string|number)} event_id
 	 * @param {Array<OrderTicketType>} tickets
 	 * @param {string} [promocode]
+	 * @param {Object<string, string>} [utm]
 	 * @param {AJAXCallback} [success]
 	 *
 	 * @return {jqPromise}
 	 */
-	OneEvent.buyTickets = function(event_id, tickets, promocode, success) {
+	OneEvent.buyTickets = function(event_id, tickets, promocode, utm, success) {
 		
-		return __APP.SERVER.addData('/api/v1/events/' + event_id + '/orders', {
+		return __APP.SERVER.addData(OneEvent.ENDPOINT.ORDERS.format({event_id: event_id}), {
 			tickets: tickets,
-			promocode: promocode || null
+			promocode: promocode || null,
+			utm: utm || null
 		}, true, success);
 	};
 	/**
@@ -442,18 +452,19 @@ OneEvent = extending(OneEntity, (function() {
 	OneEvent.makeOrder = function(event_id, order_data, success) {
 		if (empty(order_data.tickets)) {
 			
-			return OneEvent.registerToEvent(event_id, order_data.registration_fields, success);
+			return OneEvent.registerToEvent(event_id, order_data.registration_fields, order_data.utm, success);
 		}
 		
 		if (empty(order_data.registration_fields)) {
 			
-			return OneEvent.buyTickets(event_id, order_data.tickets, order_data.promocode, success);
+			return OneEvent.buyTickets(event_id, order_data.tickets, order_data.promocode, order_data.utm, success);
 		}
 		
 		return __APP.SERVER.addData(OneEvent.ENDPOINT.ORDERS.format({event_id: event_id}), {
 			registration_fields: order_data.registration_fields,
 			tickets: order_data.tickets,
-			promocode: order_data.promocode || null
+			promocode: order_data.promocode || null,
+			utm: order_data.utm || null
 		}, true, success);
 	};
 	/**
@@ -548,14 +559,15 @@ OneEvent = extending(OneEntity, (function() {
 	/**
 	 *
 	 * @param {Array<OrderRegistrationField>} registration_fields
+	 * @param {Object<string, string>} [utm]
 	 * @param {AJAXCallback} [success]
 	 *
 	 * @return {jqPromise}
 	 */
-	OneEvent.prototype.registerToEvent = function(registration_fields, success) {
+	OneEvent.prototype.registerToEvent = function(registration_fields, utm, success) {
 		var self = this;
 		
-		return this.constructor.registerToEvent(this.id, registration_fields, function(data) {
+		return this.constructor.registerToEvent(this.id, registration_fields, utm, function(data) {
 			self.is_registered = true;
 			
 			if (isFunction(success)) {
@@ -567,13 +579,14 @@ OneEvent = extending(OneEntity, (function() {
 	 *
 	 * @param {Array<OrderTicketType>} tickets
 	 * @param {string} [promocode]
+	 * @param {Object<string, string>} [utm]
 	 * @param {AJAXCallback} [success]
 	 *
 	 * @return {jqPromise}
 	 */
-	OneEvent.prototype.buyTickets = function(tickets, promocode, success) {
+	OneEvent.prototype.buyTickets = function(tickets, promocode, utm, success) {
 		
-		return this.constructor.buyTickets(this.id, tickets, promocode, success);
+		return this.constructor.buyTickets(this.id, tickets, promocode, utm, success);
 	};
 	/**
 	 *

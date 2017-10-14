@@ -186,8 +186,7 @@ OrderPage = extending(Page, (function() {
 	 * @return {OrderCreateData}
 	 */
 	OrderPage.prototype.gatherSendData = function() {
-		var	parsed_uri = parseUri(window.location),
-			send_data;
+		var	send_data;
 		
 		send_data = {
 			tickets: this.$wrapper.find('.OrderFields').serializeForm('array').reduce(function(bundle, field) {
@@ -208,14 +207,8 @@ OrderPage = extending(Page, (function() {
 				};
 			}),
 			promocode: this.$wrapper.find('.PromocodeInput').val(),
-			utm: {}
+			utm: gatherUTMTags()
 		};
-		
-		for (var key in parsed_uri.queryKey) {
-			if (key.indexOf('utm_') === 0) {
-				send_data.utm[key] = parsed_uri.queryKey[key];
-			}
-		}
 		
 		if ($.isEmptyObject(send_data.utm)) {
 			delete send_data.utm;

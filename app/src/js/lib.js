@@ -1340,6 +1340,25 @@ function storeStat(entity_id, entity_type, event_type) {
 }
 
 /**
+ *
+ * @param {string} [uri]
+ *
+ * @returns {Object<string, string>}
+ */
+function gatherUTMTags(uri) {
+	var	parsed_uri = parseUri(uri || window.location),
+		utm = {};
+	
+	for (var key in parsed_uri.queryKey) {
+		if (key.indexOf('utm_') === 0) {
+			utm[key] = parsed_uri.queryKey[key];
+		}
+	}
+	
+	return utm;
+}
+
+/**
  * Возвращает единицу измерения с правильным окончанием
  *
  * @param {Number} num      Число
