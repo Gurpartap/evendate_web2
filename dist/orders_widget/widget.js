@@ -36053,7 +36053,8 @@ __C = {
 	ENTITIES: {
 		USER: 'user',
 		EVENT: 'event',
-		ORGANIZATION: 'organization'
+		ORGANIZATION: 'organization',
+		ACTIVITY: 'activity'
 	},
 	/**
 	 * @enum {string}
@@ -39022,7 +39023,8 @@ HelpCenterConnection = extending(AsynchronousConnection, (function() {
 		CROSSPOSTING_VK: 105,
 		HOW_TO_PAY_FROM_LEGAL_ENTITY: 121,
 		REQUEST_APPROVAL: 127,
-		ORDER_STATUSES: 170
+		ORDER_STATUSES: 170,
+		WHY_AUTH_BY_SOC_NETWORK: 471
 	});
 	
 	HelpCenterConnection.prototype.fetchArticle = function(id) {
@@ -39427,6 +39429,13 @@ ServerExports = extending(AsynchronousConnection, (function() {
 		XLSX: 'xlsx',
 		HTML: 'html'
 	};
+	
+	ServerExports.ENDPOINT = Object.freeze({
+		ORGANIZATION_SUBSCRIBERS: '/statistics/organizations/{organization_id}/subscribers/export',
+		EVENT_ORDERS: '/statistics/events/{event_id}/orders/export',
+		EVENT_TICKETS: '/statistics/events/{event_id}/tickets/export',
+		EVENT_TICKET: '/events/{event_id}/tickets/{ticket_uuid}/export',
+	});
 	/**
 	 *
 	 * @param {string} url
@@ -39435,6 +39444,7 @@ ServerExports = extending(AsynchronousConnection, (function() {
 	 * @return {jqPromise}
 	 */
 	ServerExports.prototype.export = function(url, format) {
+		url = url.contains('/api/v1') ? url : '/api/v1' + url;
 		
 		return $.fileDownload(url, {
 			data: {
@@ -39451,7 +39461,7 @@ ServerExports = extending(AsynchronousConnection, (function() {
 	 */
 	ServerExports.prototype.organizationSubscribers = function(organization_id, format) {
 	
-		return this.export('/api/v1/statistics/organizations/'+organization_id+'/subscribers/export', format);
+		return this.export(ServerExports.ENDPOINT.ORGANIZATION_SUBSCRIBERS.format({organization_id: organization_id}), format);
 	};
 	/**
 	 *
@@ -39462,7 +39472,7 @@ ServerExports = extending(AsynchronousConnection, (function() {
 	 */
 	ServerExports.prototype.eventOrders = function(event_id, format) {
 		
-		return this.export('/api/v1/statistics/events/'+event_id+'/orders/export', format);
+		return this.export(ServerExports.ENDPOINT.EVENT_ORDERS.format({event_id: event_id}), format);
 	};
 	/**
 	 *
@@ -39473,7 +39483,7 @@ ServerExports = extending(AsynchronousConnection, (function() {
 	 */
 	ServerExports.prototype.eventTickets = function(event_id, format) {
 		
-		return this.export('/api/v1/statistics/events/'+event_id+'/tickets/export', format);
+		return this.export(ServerExports.ENDPOINT.EVENT_TICKETS.format({event_id: event_id}), format);
 	};
 	/**
 	 *
@@ -39484,7 +39494,7 @@ ServerExports = extending(AsynchronousConnection, (function() {
 	 */
 	ServerExports.prototype.eventTicket = function(event_id, uuid) {
 		
-		return this.export('/events/{event_id}/tickets/{ticket_uuid}/export'.format({
+		return this.export(ServerExports.ENDPOINT.EVENT_TICKET.format({
 			event_id: event_id,
 			ticket_uuid: uuid
 		}));
@@ -44183,7 +44193,8 @@ OneEvent = extending(OneEntity, (function() {
 				'organization_short_name',
 				'organization_logo_large_url',
 				'organization_logo_medium_url',
-				'organization_logo_small_url'
+				'organization_logo_small_url',
+				'organization_is_private'
 			];
 		
 		this.id = event_id ? event_id : 0;
@@ -44286,6 +44297,10 @@ OneEvent = extending(OneEntity, (function() {
 			});
 		}
 	}
+	
+	OneEvent.ENDPOINT = Object.freeze({
+		ORDERS: '/events/{event_id}/orders'
+	});
 	
 	/**
 	 * @const
@@ -44488,30 +44503,36 @@ OneEvent = extending(OneEntity, (function() {
 		}, true, success);
 	};
 	/**
+	 * @typedef {object} OrderCreateData
+	 *
+	 * @property {Array<OrderTicketType>} [tickets]
+	 * @property {Array<OrderRegistrationField>} [registration_fields]
+	 * @property {string} [promocode]
+	 * @property {Object<string, string>} [utm]
+	 */
+	/**
 	 *
 	 * @param {(string|number)} event_id
-	 * @param {Array<OrderTicketType>} [tickets]
-	 * @param {Array<OrderRegistrationField>} [registration_fields]
-	 * @param {string} [promocode]
+	 * @param {OrderCreateData} order_data
 	 * @param {AJAXCallback} [success]
 	 *
 	 * @return {jqPromise}
 	 */
-	OneEvent.makeOrder = function(event_id, tickets, registration_fields, promocode, success) {
-		if (empty(tickets)) {
+	OneEvent.makeOrder = function(event_id, order_data, success) {
+		if (empty(order_data.tickets)) {
 			
-			return OneEvent.registerToEvent(event_id, registration_fields, success);
+			return OneEvent.registerToEvent(event_id, order_data.registration_fields, success);
 		}
 		
-		if (empty(registration_fields)) {
+		if (empty(order_data.registration_fields)) {
 			
-			return OneEvent.buyTickets(event_id, tickets, promocode, success);
+			return OneEvent.buyTickets(event_id, order_data.tickets, order_data.promocode, success);
 		}
 		
-		return __APP.SERVER.addData('/api/v1/events/' + event_id + '/orders', {
-			registration_fields: registration_fields,
-			tickets: tickets,
-			promocode: promocode || null
+		return __APP.SERVER.addData(OneEvent.ENDPOINT.ORDERS.format({event_id: event_id}), {
+			registration_fields: order_data.registration_fields,
+			tickets: order_data.tickets,
+			promocode: order_data.promocode || null
 		}, true, success);
 	};
 	/**
@@ -44635,17 +44656,15 @@ OneEvent = extending(OneEntity, (function() {
 	};
 	/**
 	 *
-	 * @param {Array<OrderTicketType>} tickets
-	 * @param {Array<OrderRegistrationField>} registration_fields
-	 * @param {string} [promocode]
+	 * @param {OrderCreateData} order_data
 	 * @param {AJAXCallback} [success]
 	 *
 	 * @return {jqPromise}
 	 */
-	OneEvent.prototype.makeOrder = function(tickets, registration_fields, promocode, success) {
+	OneEvent.prototype.makeOrder = function(order_data, success) {
 		var self = this;
 		
-		return this.constructor.makeOrder(this.id, tickets, registration_fields, promocode, success).then(function(data) {
+		return this.constructor.makeOrder(this.id, order_data, success).then(function(data) {
 			var order = new OneOrder(self.id);
 			
 			order.setData($.extend({
@@ -45843,6 +45862,10 @@ AbstractModal = (function() {
 		}, props));
 		this.content_wrapper = this.modal.find('.ModalContent');
 		
+		if (!this.is_hidable) {
+			this.modal.find('.'+__C.CLASSES.HOOKS.CLOSE_MODAL).addClass(__C.CLASSES.HIDDEN);
+		}
+		
 		this.is_rendered = true;
 		
 		if (!this.content) {
@@ -46076,7 +46099,8 @@ AuthModal = extending(AbstractModal, (function() {
 	 * @constructor
 	 * @constructs AuthModal
 	 *
-	 * @property {object} options
+	 * @property {object} [options]
+	 * @property {string} options.note
 	 * @property {string} redirect_to
 	 */
 	function AuthModal(redirect_to, options) {
@@ -46127,6 +46151,7 @@ AuthModal = extending(AbstractModal, (function() {
 		this.__init();
 		
 		bindRippleEffect(this.modal);
+		bindHelpLink(this.modal);
 		
 		return this;
 	};
@@ -47889,7 +47914,7 @@ Builder = (function() {
 			vars.modal_header = tmpl('modal-header', {
 				title: normalized_props.title,
 				close_button: tmpl('button', {
-					classes: ['modal_destroy_button', __C.CLASSES.HOOKS.CLOSE_MODAL, __C.CLASSES.HOOKS.RIPPLE].join(' '),
+					classes: ['modal_destroy_button', __C.CLASSES.HOOKS.CLOSE_MODAL].join(' '),
 					title: '×'
 				})
 			});
@@ -48151,6 +48176,8 @@ OrderPage = extending(Page, (function() {
 			bitcoin_payment_button: null
 		};
 		
+		this.$main_action_buttton = null;
+		
 		Object.defineProperties(this, {
 			page_title: {
 				get: function() {
@@ -48271,11 +48298,13 @@ OrderPage = extending(Page, (function() {
 	};
 	/**
 	 *
-	 * @return {{tickets: Array<{uuid: string, count: string}>, registration_fields: Array<{uuid: string, value: string}>, promocode: string}}
+	 * @return {OrderCreateData}
 	 */
 	OrderPage.prototype.gatherSendData = function() {
+		var	parsed_uri = parseUri(window.location),
+			send_data;
 		
-		return {
+		send_data = {
 			tickets: this.$wrapper.find('.OrderFields').serializeForm('array').reduce(function(bundle, field) {
 				if (+field.value) {
 					bundle.push({
@@ -48293,14 +48322,68 @@ OrderPage = extending(Page, (function() {
 					value: field.value
 				};
 			}),
-			promocode: this.$wrapper.find('.PromocodeInput').val()
+			promocode: this.$wrapper.find('.PromocodeInput').val(),
+			utm: {}
 		};
+		
+		for (var key in parsed_uri.queryKey) {
+			if (key.indexOf('utm_') === 0) {
+				send_data.utm[key] = parsed_uri.queryKey[key];
+			}
+		}
+		
+		if ($.isEmptyObject(send_data.utm)) {
+			delete send_data.utm;
+		}
+		
+		return send_data;
 	};
 	
 	OrderPage.prototype.checkRedirect = function() {
 		
 		return (this.event.ticketing_locally && !this.event.ticketing_available)
 		       || (this.event.registration_locally && !this.event.registration_available);
+	};
+	/**
+	 *
+	 * @param {boolean} [send_request=true]
+	 *
+	 * @returns {jqPromise}
+	 */
+	OrderPage.prototype.makeOrder = function(send_request) {
+		var self = this,
+			$form = this.$wrapper.find('.OrderForm'),
+			send_data;
+		
+		send_request = setDefaultValue(send_request, true);
+		
+		if (__APP.USER.isLoggedOut()) {
+			(new AuthModal(window.location.href, {
+				note: 'Вам необходимо войти через социальную сеть чтобы сделать заказ'
+			})).show();
+			
+			return $.Deferred().reject(new Error('Вы не авторизованы')).promise();
+		} else {
+			if (isFormValid($form)) {
+				send_data = this.gatherSendData();
+				
+				if (!send_request) {
+					
+					return $.Deferred().resolve(send_data).promise();
+				}
+				
+				this.$main_action_buttton.attr('disabled', true);
+				
+				return this.event.makeOrder(send_data).always(function(data) {
+					self.$main_action_buttton.removeAttr('disabled');
+					
+					return data;
+				}).promise();
+			} else {
+				
+				return $.Deferred().reject(new Error('Форма заполнена неверно')).promise();
+			}
+		}
 	};
 	
 	OrderPage.prototype.redirect = function() {
@@ -48316,10 +48399,11 @@ OrderPage = extending(Page, (function() {
 			$quantity_inputs = this.$wrapper.find('.QuantityInput'),
 			$pay_buttons = this.$wrapper.find('.PayButtons'),
 			$footer = this.$wrapper.find('.OrderFormFooter'),
-			$main_action_button = this.render_vars.register_button,
 			ticket_selected = parsed_uri.queryKey['ticket_selected'],
 			$payload,
 			$selected_type;
+		
+		this.$main_action_buttton = this.render_vars.register_button;
 		
 		function isTicketTypeSelected() {
 			var $inputs = self.$wrapper.find('.TicketType').find('.QuantityInput'),
@@ -48371,14 +48455,14 @@ OrderPage = extending(Page, (function() {
 				if ($.contains(self.$wrapper[0], self.render_vars.pay_button[0])) {
 					self.render_vars.pay_button.after(self.render_vars.register_button);
 					self.render_vars.pay_button.detach();
-					$main_action_button = self.render_vars.register_button;
+					self.$main_action_buttton = self.render_vars.register_button;
 					$pay_buttons.addClass(__C.CLASSES.HIDDEN);
 				}
 			} else {
 				if ($.contains(self.$wrapper[0], self.render_vars.register_button[0])) {
 					self.render_vars.register_button.after(self.render_vars.pay_button);
 					self.render_vars.register_button.detach();
-					$main_action_button = self.render_vars.pay_button;
+					self.$main_action_buttton = self.render_vars.pay_button;
 					$pay_buttons.removeClass(__C.CLASSES.HIDDEN);
 				}
 			}
@@ -48436,43 +48520,6 @@ OrderPage = extending(Page, (function() {
 		this.$wrapper.find('.RegistrationLastNameField').find('input').val(__APP.USER.last_name);
 		this.$wrapper.find('.RegistrationEmailField').find('input').val(__APP.USER.email);
 		
-		/**
-		 *
-		 * @return {(boolean|jqPromise)}
-		 */
-		function makeOrder(cb) {
-			var $form = self.$wrapper.find('.OrderForm'),
-				send_data;
-			
-			if (__APP.USER.isLoggedOut()) {
-				(new AuthModal(window.location.href, {
-					note: 'Вам необходимо войти через социальную сеть чтобы сделать заказ'
-				})).show();
-				
-				return false;
-			} else {
-				if (isFormValid($form)) {
-					send_data = self.gatherSendData();
-					
-					if (isFunction(cb)) {
-						
-						return cb(send_data);
-					}
-					
-					$main_action_button.attr('disabled', true);
-					
-					return self.event.makeOrder(send_data.tickets, send_data.registration_fields, send_data.promocode).always(function(data) {
-						$main_action_button.removeAttr('disabled');
-						
-						return data;
-					}).promise();
-				} else {
-					
-					return false;
-				}
-			}
-		}
-		
 		if (ticket_selected) {
 			ticket_selected = decodeURIComponent(ticket_selected);
 			$selected_type = this.$wrapper.find('.TicketType').filter(function() {
@@ -48498,21 +48545,16 @@ OrderPage = extending(Page, (function() {
 			countTotalSum();
 			
 			this.render_vars.legal_entity_payment_button.on('click.LegalEntityPayment', function() {
-				var result = makeOrder();
-				
-				if (result !== false) {
-					result.done(function(data) {
-						var parsed_uri = parseUri(location);
-						
-						__APP.changeState(parsed_uri.path + '/' + data.order.uuid + '/from_legal_entity');
-					});
-				}
+				self.makeOrder().done(function(data) {
+					var parsed_uri = parseUri(location);
+					
+					__APP.changeState(parsed_uri.path + '/' + data.order.uuid + '/from_legal_entity');
+				});
 			});
 		}
 		
 		this.render_vars.pay_button.on('click.MakeOrder', function() {
-			var result,
-				callback_url = decodeURIComponent(parsed_uri.queryKey['away_to']) || (window.location.origin + '/event/' + self.event.id),
+			var callback_url = decodeURIComponent(parsed_uri.queryKey['away_to']) || (window.location.origin + '/event/' + self.event.id),
 				is_type_selected;
 			
 			is_type_selected = Array.prototype.reduce.call($quantity_inputs, function(accumulator, input) {
@@ -48522,9 +48564,9 @@ OrderPage = extending(Page, (function() {
 			
 			if (is_type_selected) {
 				if (__APP.IS_WIDGET) {
-					makeOrder(function(send_data) {
+					self.makeOrder(false).done(function(send_data) {
 						$payload = self.$wrapper.find('.OrderFormPayload');
-						$payload.val(JSON.stringify(Object.assign({
+						$payload.val(JSON.stringify(mergeObjects({
 							redirect_to_payment: true,
 							callback_url: callback_url
 						}, send_data)));
@@ -48532,13 +48574,10 @@ OrderPage = extending(Page, (function() {
 						self.$wrapper.find('.OrderForm').submit();
 					});
 				} else {
-					result = makeOrder();
-					if (result !== false) {
-						result.done(function(data) {
-							
-							Payment.doPayment('order-' + data.order.uuid, data.order.final_sum, callback_url);
-						})
-					}
+					self.makeOrder().done(function(data) {
+						
+						Payment.doPayment('order-' + data.order.uuid, data.order.final_sum, callback_url);
+					})
 				}
 			} else {
 				showNotifier({
@@ -48549,34 +48588,30 @@ OrderPage = extending(Page, (function() {
 		});
 		
 		this.render_vars.register_button.on('click.Register', function() {
-			var result = makeOrder();
-			
-			if (result !== false) {
-				result.done(function(data) {
-					var callback_url,
-						parsed_callback;
+			self.makeOrder().done(function(data) {
+				var callback_url,
+					parsed_callback;
+				
+				if (!!parsed_uri.queryKey['away_to']) {
+					callback_url = parsed_uri.queryKey['away_to'];
 					
-					if (!!parsed_uri.queryKey['away_to']) {
-						callback_url = parsed_uri.queryKey['away_to'];
-						
-						if (self.overall_sum <= 0) {
-							parsed_callback = parseUri(decodeURIComponent(callback_url));
-							callback_url = parsed_callback.wo_query + '?' + objectToQueryString(Object.assign({
-								registration: 'free'
-							}, parsed_callback.query));
-						}
-						
-						if (__APP.IS_WIDGET) {
-							__APP.POST_MESSAGE.redirect(callback_url);
-						} else {
-							window.location = callback_url;
-						}
-					} else {
-						__APP.changeState('/event/{event_id}'.format({event_id: self.event.id}));
-						showNotifier({text: 'Регистрация прошла успешно', status: true});
+					if (self.overall_sum <= 0) {
+						parsed_callback = parseUri(decodeURIComponent(callback_url));
+						callback_url = parsed_callback.wo_query + '?' + objectToQueryString(Object.assign({
+							registration: 'free'
+						}, parsed_callback.query));
 					}
-				})
-			}
+					
+					if (__APP.IS_WIDGET) {
+						__APP.POST_MESSAGE.redirect(callback_url);
+					} else {
+						window.location = callback_url;
+					}
+				} else {
+					__APP.changeState('/event/{event_id}'.format({event_id: self.event.id}));
+					showNotifier({text: 'Регистрация прошла успешно', status: true});
+				}
+			});
 		});
 		
 		if (this.event.accept_bitcoins) {
@@ -48585,7 +48620,7 @@ OrderPage = extending(Page, (function() {
 					modal;
 				
 				if (!$this.data('modal')) {
-					makeOrder().done(function(data) {
+					self.makeOrder().done(function(data) {
 						modal = new BitcoinModal(self.event, data.order.uuid);
 						$this.data('modal', modal);
 						

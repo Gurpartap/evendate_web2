@@ -8430,6 +8430,10 @@ OneEvent = extending(OneEntity, (function() {
 		}
 	}
 	
+	OneEvent.ENDPOINT = Object.freeze({
+		ORDERS: '/events/{event_id}/orders'
+	});
+	
 	/**
 	 * @const
 	 * @enum {string}
@@ -8631,30 +8635,36 @@ OneEvent = extending(OneEntity, (function() {
 		}, true, success);
 	};
 	/**
+	 * @typedef {object} OrderCreateData
+	 *
+	 * @property {Array<OrderTicketType>} [tickets]
+	 * @property {Array<OrderRegistrationField>} [registration_fields]
+	 * @property {string} [promocode]
+	 * @property {Object<string, string>} [utm]
+	 */
+	/**
 	 *
 	 * @param {(string|number)} event_id
-	 * @param {Array<OrderTicketType>} [tickets]
-	 * @param {Array<OrderRegistrationField>} [registration_fields]
-	 * @param {string} [promocode]
+	 * @param {OrderCreateData} order_data
 	 * @param {AJAXCallback} [success]
 	 *
 	 * @return {jqPromise}
 	 */
-	OneEvent.makeOrder = function(event_id, tickets, registration_fields, promocode, success) {
-		if (empty(tickets)) {
+	OneEvent.makeOrder = function(event_id, order_data, success) {
+		if (empty(order_data.tickets)) {
 			
-			return OneEvent.registerToEvent(event_id, registration_fields, success);
+			return OneEvent.registerToEvent(event_id, order_data.registration_fields, success);
 		}
 		
-		if (empty(registration_fields)) {
+		if (empty(order_data.registration_fields)) {
 			
-			return OneEvent.buyTickets(event_id, tickets, promocode, success);
+			return OneEvent.buyTickets(event_id, order_data.tickets, order_data.promocode, success);
 		}
 		
-		return __APP.SERVER.addData('/api/v1/events/' + event_id + '/orders', {
-			registration_fields: registration_fields,
-			tickets: tickets,
-			promocode: promocode || null
+		return __APP.SERVER.addData(OneEvent.ENDPOINT.ORDERS.format({event_id: event_id}), {
+			registration_fields: order_data.registration_fields,
+			tickets: order_data.tickets,
+			promocode: order_data.promocode || null
 		}, true, success);
 	};
 	/**
@@ -8778,17 +8788,15 @@ OneEvent = extending(OneEntity, (function() {
 	};
 	/**
 	 *
-	 * @param {Array<OrderTicketType>} tickets
-	 * @param {Array<OrderRegistrationField>} registration_fields
-	 * @param {string} [promocode]
+	 * @param {OrderCreateData} order_data
 	 * @param {AJAXCallback} [success]
 	 *
 	 * @return {jqPromise}
 	 */
-	OneEvent.prototype.makeOrder = function(tickets, registration_fields, promocode, success) {
+	OneEvent.prototype.makeOrder = function(order_data, success) {
 		var self = this;
 		
-		return this.constructor.makeOrder(this.id, tickets, registration_fields, promocode, success).then(function(data) {
+		return this.constructor.makeOrder(this.id, order_data, success).then(function(data) {
 			var order = new OneOrder(self.id);
 			
 			order.setData($.extend({
@@ -14669,217 +14677,6 @@ WithdrawModal = extending(AbstractModal, (function() {
  * @requires ../Class.AbstractModal.js
  */
 /**
- * @class
- * @abstract
- * @extends AbstractModal
- */
-AbstractListModal = extending(AbstractModal, (function() {
-	/**
-	 *
-	 * @param {OneEntity} entity
-	 * @constructor
-	 * @constructs AbstractListModal
-	 */
-	function AbstractListModal(entity) {
-		AbstractModal.call(this);
-		this.content = tmpl('modal-list-content');
-		this.entity = entity;
-		this.entities = new EntitiesCollection();
-		this.content_is_scrollable = true;
-	}
-	
-	/**
-	 *
-	 * @return {AbstractListModal}
-	 */
-	AbstractListModal.prototype.render = function() {
-		this.__render({
-			width: 384,
-			height: 'calc(100% - 140px)',
-			classes: ['material', '-floating', '-fixed'],
-			content_classes: ['list_modal_content']
-		});
-		
-		return this;
-	};
-	/**
-	 *
-	 * @abstract
-	 * @return {jqPromise}
-	 */
-	AbstractListModal.prototype.uploadEntities = function() {
-		return $.Deferred.resolve().promise();
-	};
-	/**
-	 *
-	 * @abstract
-	 * @param {EntitiesCollection} entities
-	 * @return {jQuery}
-	 */
-	AbstractListModal.prototype.buildEntities = function(entities) {
-		return $();
-	};
-	/**
-	 *
-	 * @return {AbstractListModal}
-	 */
-	AbstractListModal.prototype.show = function() {
-		var self = this;
-		
-		if(this.content.children().length) {
-			this.__show();
-			return this;
-		}
-		
-		this.render();
-		this.content.append(this.buildEntities(this.entities));
-		
-		if (this.entities.length < 5) {
-			this.uploadEntities().done(function() {
-				self.__show();
-			});
-		} else {
-			this.__show();
-		}
-		
-		return this;
-	};
-	/**
-	 *
-	 * @return {AbstractListModal}
-	 */
-	AbstractListModal.prototype.onScrollToBottom = function(callback) {
-		var self = this,
-			$loader = __APP.BUILD.loaderBlock(this.content);
-		
-		this.uploadEntities()
-			.fail(function() {
-				self.block_scroll = false;
-			})
-			.done(function(){
-				$loader.remove();
-				callback.call(self);
-			});
-		
-		return this;
-	};
-	
-	return AbstractListModal;
-}()));
-/**
- * @requires Class.AbstractListModal.js
- */
-/**
- * @class
- * @extends AbstractListModal
- */
-FriendsListModal = extending(AbstractListModal, (function() {
-	/**
-	 *
-	 * @param {CurrentUser} user
-	 * @constructor
-	 * @constructs FriendsListModal
-	 * @property {CurrentUser} entity
-	 */
-	function FriendsListModal(user) {
-		if (typeof FriendsListModal.instance === 'object') {
-			return FriendsListModal.instance;
-		}
-		AbstractListModal.call(this, user);
-		this.title = 'Подписки на пользователей';
-		this.entities = this.entity.friends;
-		FriendsListModal.instance = this;
-	}
-	/**
-	 *
-	 * @return {jqPromise}
-	 */
-	FriendsListModal.prototype.uploadEntities = function() {
-		var self = this;
-		
-		return __APP.USER.fetchFriends({length: 20}).done(function(friends) {
-			if(friends.length) {
-				self.content.append(self.buildEntities(friends));
-			} else {
-				self.is_upload_disabled = true;
-			}
-		}).promise();
-	};
-	/**
-	 *
-	 * @param {UsersCollection} entities
-	 * @return {jQuery}
-	 */
-	FriendsListModal.prototype.buildEntities = function(entities) {
-		var $blocks = __APP.BUILD.avatarBlocks(entities, {
-			is_link: true,
-			entity: __C.ENTITIES.USER,
-			avatar_classes: [__C.CLASSES.SIZES.X40, __C.CLASSES.UNIVERSAL_STATES.ROUNDED]
-		});
-		bindPageLinks($blocks);
-		
-		return $blocks;
-	};
-	
-	return FriendsListModal;
-}()));
-/**
- * @requires Class.AbstractListModal.js
- */
-/**
- * @class
- * @extends AbstractListModal
- */
-SubscriptionsListModal = extending(AbstractListModal, (function() {
-	/**
-	 *
-	 * @param {OneUser} user
-	 * @constructor
-	 * @constructs SubscriptionsListModal
-	 * @property {OneUser} entity
-	 */
-	function SubscriptionsListModal(user) {
-		AbstractListModal.call(this, user);
-		this.title = 'Подписки на организации';
-		this.entities = this.entity.subscriptions;
-	}
-	/**
-	 *
-	 * @return {jqPromise}
-	 */
-	SubscriptionsListModal.prototype.uploadEntities = function() {
-		var self = this;
-		
-		return this.entity.fetchSubscriptions({length: 20}).done(function(organizations) {
-			if(organizations.length) {
-				self.content.append(self.buildEntities(organizations));
-			} else {
-				self.is_upload_disabled = true;
-			}
-		}).promise();
-	};
-	/**
-	 *
-	 * @param {UsersCollection} entities
-	 * @return {jQuery}
-	 */
-	SubscriptionsListModal.prototype.buildEntities = function(entities) {
-		var $blocks = __APP.BUILD.avatarBlocks(entities, {
-			is_link: true,
-			entity: __C.ENTITIES.ORGANIZATION,
-			avatar_classes: [__C.CLASSES.SIZES.X40, __C.CLASSES.UNIVERSAL_STATES.ROUNDED]
-		});
-		bindPageLinks($blocks);
-		
-		return $blocks;
-	};
-	
-	return SubscriptionsListModal;
-}()));
-/**
- * @requires ../Class.AbstractModal.js
- */
-/**
  * @class PreviewRegistrationModal
  * @extends AbstractModal
  */
@@ -15100,6 +14897,217 @@ RegistrationModal = extending(PreviewRegistrationModal, (function() {
 	};
 	
 	return RegistrationModal;
+}()));
+/**
+ * @requires ../Class.AbstractModal.js
+ */
+/**
+ * @class
+ * @abstract
+ * @extends AbstractModal
+ */
+AbstractListModal = extending(AbstractModal, (function() {
+	/**
+	 *
+	 * @param {OneEntity} entity
+	 * @constructor
+	 * @constructs AbstractListModal
+	 */
+	function AbstractListModal(entity) {
+		AbstractModal.call(this);
+		this.content = tmpl('modal-list-content');
+		this.entity = entity;
+		this.entities = new EntitiesCollection();
+		this.content_is_scrollable = true;
+	}
+	
+	/**
+	 *
+	 * @return {AbstractListModal}
+	 */
+	AbstractListModal.prototype.render = function() {
+		this.__render({
+			width: 384,
+			height: 'calc(100% - 140px)',
+			classes: ['material', '-floating', '-fixed'],
+			content_classes: ['list_modal_content']
+		});
+		
+		return this;
+	};
+	/**
+	 *
+	 * @abstract
+	 * @return {jqPromise}
+	 */
+	AbstractListModal.prototype.uploadEntities = function() {
+		return $.Deferred.resolve().promise();
+	};
+	/**
+	 *
+	 * @abstract
+	 * @param {EntitiesCollection} entities
+	 * @return {jQuery}
+	 */
+	AbstractListModal.prototype.buildEntities = function(entities) {
+		return $();
+	};
+	/**
+	 *
+	 * @return {AbstractListModal}
+	 */
+	AbstractListModal.prototype.show = function() {
+		var self = this;
+		
+		if(this.content.children().length) {
+			this.__show();
+			return this;
+		}
+		
+		this.render();
+		this.content.append(this.buildEntities(this.entities));
+		
+		if (this.entities.length < 5) {
+			this.uploadEntities().done(function() {
+				self.__show();
+			});
+		} else {
+			this.__show();
+		}
+		
+		return this;
+	};
+	/**
+	 *
+	 * @return {AbstractListModal}
+	 */
+	AbstractListModal.prototype.onScrollToBottom = function(callback) {
+		var self = this,
+			$loader = __APP.BUILD.loaderBlock(this.content);
+		
+		this.uploadEntities()
+			.fail(function() {
+				self.block_scroll = false;
+			})
+			.done(function(){
+				$loader.remove();
+				callback.call(self);
+			});
+		
+		return this;
+	};
+	
+	return AbstractListModal;
+}()));
+/**
+ * @requires Class.AbstractListModal.js
+ */
+/**
+ * @class
+ * @extends AbstractListModal
+ */
+FriendsListModal = extending(AbstractListModal, (function() {
+	/**
+	 *
+	 * @param {CurrentUser} user
+	 * @constructor
+	 * @constructs FriendsListModal
+	 * @property {CurrentUser} entity
+	 */
+	function FriendsListModal(user) {
+		if (typeof FriendsListModal.instance === 'object') {
+			return FriendsListModal.instance;
+		}
+		AbstractListModal.call(this, user);
+		this.title = 'Подписки на пользователей';
+		this.entities = this.entity.friends;
+		FriendsListModal.instance = this;
+	}
+	/**
+	 *
+	 * @return {jqPromise}
+	 */
+	FriendsListModal.prototype.uploadEntities = function() {
+		var self = this;
+		
+		return __APP.USER.fetchFriends({length: 20}).done(function(friends) {
+			if(friends.length) {
+				self.content.append(self.buildEntities(friends));
+			} else {
+				self.is_upload_disabled = true;
+			}
+		}).promise();
+	};
+	/**
+	 *
+	 * @param {UsersCollection} entities
+	 * @return {jQuery}
+	 */
+	FriendsListModal.prototype.buildEntities = function(entities) {
+		var $blocks = __APP.BUILD.avatarBlocks(entities, {
+			is_link: true,
+			entity: __C.ENTITIES.USER,
+			avatar_classes: [__C.CLASSES.SIZES.X40, __C.CLASSES.UNIVERSAL_STATES.ROUNDED]
+		});
+		bindPageLinks($blocks);
+		
+		return $blocks;
+	};
+	
+	return FriendsListModal;
+}()));
+/**
+ * @requires Class.AbstractListModal.js
+ */
+/**
+ * @class
+ * @extends AbstractListModal
+ */
+SubscriptionsListModal = extending(AbstractListModal, (function() {
+	/**
+	 *
+	 * @param {OneUser} user
+	 * @constructor
+	 * @constructs SubscriptionsListModal
+	 * @property {OneUser} entity
+	 */
+	function SubscriptionsListModal(user) {
+		AbstractListModal.call(this, user);
+		this.title = 'Подписки на организации';
+		this.entities = this.entity.subscriptions;
+	}
+	/**
+	 *
+	 * @return {jqPromise}
+	 */
+	SubscriptionsListModal.prototype.uploadEntities = function() {
+		var self = this;
+		
+		return this.entity.fetchSubscriptions({length: 20}).done(function(organizations) {
+			if(organizations.length) {
+				self.content.append(self.buildEntities(organizations));
+			} else {
+				self.is_upload_disabled = true;
+			}
+		}).promise();
+	};
+	/**
+	 *
+	 * @param {UsersCollection} entities
+	 * @return {jQuery}
+	 */
+	SubscriptionsListModal.prototype.buildEntities = function(entities) {
+		var $blocks = __APP.BUILD.avatarBlocks(entities, {
+			is_link: true,
+			entity: __C.ENTITIES.ORGANIZATION,
+			avatar_classes: [__C.CLASSES.SIZES.X40, __C.CLASSES.UNIVERSAL_STATES.ROUNDED]
+		});
+		bindPageLinks($blocks);
+		
+		return $blocks;
+	};
+	
+	return SubscriptionsListModal;
 }()));
 /**
  * @requires ../Class.AbstractModal.js
@@ -21474,6 +21482,8 @@ OrderPage = extending(Page, (function() {
 			bitcoin_payment_button: null
 		};
 		
+		this.$main_action_buttton = null;
+		
 		Object.defineProperties(this, {
 			page_title: {
 				get: function() {
@@ -21594,11 +21604,13 @@ OrderPage = extending(Page, (function() {
 	};
 	/**
 	 *
-	 * @return {{tickets: Array<{uuid: string, count: string}>, registration_fields: Array<{uuid: string, value: string}>, promocode: string}}
+	 * @return {OrderCreateData}
 	 */
 	OrderPage.prototype.gatherSendData = function() {
+		var	parsed_uri = parseUri(window.location),
+			send_data;
 		
-		return {
+		send_data = {
 			tickets: this.$wrapper.find('.OrderFields').serializeForm('array').reduce(function(bundle, field) {
 				if (+field.value) {
 					bundle.push({
@@ -21616,14 +21628,68 @@ OrderPage = extending(Page, (function() {
 					value: field.value
 				};
 			}),
-			promocode: this.$wrapper.find('.PromocodeInput').val()
+			promocode: this.$wrapper.find('.PromocodeInput').val(),
+			utm: {}
 		};
+		
+		for (var key in parsed_uri.queryKey) {
+			if (key.indexOf('utm_') === 0) {
+				send_data.utm[key] = parsed_uri.queryKey[key];
+			}
+		}
+		
+		if ($.isEmptyObject(send_data.utm)) {
+			delete send_data.utm;
+		}
+		
+		return send_data;
 	};
 	
 	OrderPage.prototype.checkRedirect = function() {
 		
 		return (this.event.ticketing_locally && !this.event.ticketing_available)
 		       || (this.event.registration_locally && !this.event.registration_available);
+	};
+	/**
+	 *
+	 * @param {boolean} [send_request=true]
+	 *
+	 * @returns {jqPromise}
+	 */
+	OrderPage.prototype.makeOrder = function(send_request) {
+		var self = this,
+			$form = this.$wrapper.find('.OrderForm'),
+			send_data;
+		
+		send_request = setDefaultValue(send_request, true);
+		
+		if (__APP.USER.isLoggedOut()) {
+			(new AuthModal(window.location.href, {
+				note: 'Вам необходимо войти через социальную сеть чтобы сделать заказ'
+			})).show();
+			
+			return $.Deferred().reject(new Error('Вы не авторизованы')).promise();
+		} else {
+			if (isFormValid($form)) {
+				send_data = this.gatherSendData();
+				
+				if (!send_request) {
+					
+					return $.Deferred().resolve(send_data).promise();
+				}
+				
+				this.$main_action_buttton.attr('disabled', true);
+				
+				return this.event.makeOrder(send_data).always(function(data) {
+					self.$main_action_buttton.removeAttr('disabled');
+					
+					return data;
+				}).promise();
+			} else {
+				
+				return $.Deferred().reject(new Error('Форма заполнена неверно')).promise();
+			}
+		}
 	};
 	
 	OrderPage.prototype.redirect = function() {
@@ -21639,10 +21705,11 @@ OrderPage = extending(Page, (function() {
 			$quantity_inputs = this.$wrapper.find('.QuantityInput'),
 			$pay_buttons = this.$wrapper.find('.PayButtons'),
 			$footer = this.$wrapper.find('.OrderFormFooter'),
-			$main_action_button = this.render_vars.register_button,
 			ticket_selected = parsed_uri.queryKey['ticket_selected'],
 			$payload,
 			$selected_type;
+		
+		this.$main_action_buttton = this.render_vars.register_button;
 		
 		function isTicketTypeSelected() {
 			var $inputs = self.$wrapper.find('.TicketType').find('.QuantityInput'),
@@ -21694,14 +21761,14 @@ OrderPage = extending(Page, (function() {
 				if ($.contains(self.$wrapper[0], self.render_vars.pay_button[0])) {
 					self.render_vars.pay_button.after(self.render_vars.register_button);
 					self.render_vars.pay_button.detach();
-					$main_action_button = self.render_vars.register_button;
+					self.$main_action_buttton = self.render_vars.register_button;
 					$pay_buttons.addClass(__C.CLASSES.HIDDEN);
 				}
 			} else {
 				if ($.contains(self.$wrapper[0], self.render_vars.register_button[0])) {
 					self.render_vars.register_button.after(self.render_vars.pay_button);
 					self.render_vars.register_button.detach();
-					$main_action_button = self.render_vars.pay_button;
+					self.$main_action_buttton = self.render_vars.pay_button;
 					$pay_buttons.removeClass(__C.CLASSES.HIDDEN);
 				}
 			}
@@ -21759,43 +21826,6 @@ OrderPage = extending(Page, (function() {
 		this.$wrapper.find('.RegistrationLastNameField').find('input').val(__APP.USER.last_name);
 		this.$wrapper.find('.RegistrationEmailField').find('input').val(__APP.USER.email);
 		
-		/**
-		 *
-		 * @return {(boolean|jqPromise)}
-		 */
-		function makeOrder(cb) {
-			var $form = self.$wrapper.find('.OrderForm'),
-				send_data;
-			
-			if (__APP.USER.isLoggedOut()) {
-				(new AuthModal(window.location.href, {
-					note: 'Вам необходимо войти через социальную сеть чтобы сделать заказ'
-				})).show();
-				
-				return false;
-			} else {
-				if (isFormValid($form)) {
-					send_data = self.gatherSendData();
-					
-					if (isFunction(cb)) {
-						
-						return cb(send_data);
-					}
-					
-					$main_action_button.attr('disabled', true);
-					
-					return self.event.makeOrder(send_data.tickets, send_data.registration_fields, send_data.promocode).always(function(data) {
-						$main_action_button.removeAttr('disabled');
-						
-						return data;
-					}).promise();
-				} else {
-					
-					return false;
-				}
-			}
-		}
-		
 		if (ticket_selected) {
 			ticket_selected = decodeURIComponent(ticket_selected);
 			$selected_type = this.$wrapper.find('.TicketType').filter(function() {
@@ -21821,21 +21851,16 @@ OrderPage = extending(Page, (function() {
 			countTotalSum();
 			
 			this.render_vars.legal_entity_payment_button.on('click.LegalEntityPayment', function() {
-				var result = makeOrder();
-				
-				if (result !== false) {
-					result.done(function(data) {
-						var parsed_uri = parseUri(location);
-						
-						__APP.changeState(parsed_uri.path + '/' + data.order.uuid + '/from_legal_entity');
-					});
-				}
+				self.makeOrder().done(function(data) {
+					var parsed_uri = parseUri(location);
+					
+					__APP.changeState(parsed_uri.path + '/' + data.order.uuid + '/from_legal_entity');
+				});
 			});
 		}
 		
 		this.render_vars.pay_button.on('click.MakeOrder', function() {
-			var result,
-				callback_url = decodeURIComponent(parsed_uri.queryKey['away_to']) || (window.location.origin + '/event/' + self.event.id),
+			var callback_url = decodeURIComponent(parsed_uri.queryKey['away_to']) || (window.location.origin + '/event/' + self.event.id),
 				is_type_selected;
 			
 			is_type_selected = Array.prototype.reduce.call($quantity_inputs, function(accumulator, input) {
@@ -21845,9 +21870,9 @@ OrderPage = extending(Page, (function() {
 			
 			if (is_type_selected) {
 				if (__APP.IS_WIDGET) {
-					makeOrder(function(send_data) {
+					self.makeOrder(false).done(function(send_data) {
 						$payload = self.$wrapper.find('.OrderFormPayload');
-						$payload.val(JSON.stringify(Object.assign({
+						$payload.val(JSON.stringify(mergeObjects({
 							redirect_to_payment: true,
 							callback_url: callback_url
 						}, send_data)));
@@ -21855,13 +21880,10 @@ OrderPage = extending(Page, (function() {
 						self.$wrapper.find('.OrderForm').submit();
 					});
 				} else {
-					result = makeOrder();
-					if (result !== false) {
-						result.done(function(data) {
-							
-							Payment.doPayment('order-' + data.order.uuid, data.order.final_sum, callback_url);
-						})
-					}
+					self.makeOrder().done(function(data) {
+						
+						Payment.doPayment('order-' + data.order.uuid, data.order.final_sum, callback_url);
+					})
 				}
 			} else {
 				showNotifier({
@@ -21872,34 +21894,30 @@ OrderPage = extending(Page, (function() {
 		});
 		
 		this.render_vars.register_button.on('click.Register', function() {
-			var result = makeOrder();
-			
-			if (result !== false) {
-				result.done(function(data) {
-					var callback_url,
-						parsed_callback;
+			self.makeOrder().done(function(data) {
+				var callback_url,
+					parsed_callback;
+				
+				if (!!parsed_uri.queryKey['away_to']) {
+					callback_url = parsed_uri.queryKey['away_to'];
 					
-					if (!!parsed_uri.queryKey['away_to']) {
-						callback_url = parsed_uri.queryKey['away_to'];
-						
-						if (self.overall_sum <= 0) {
-							parsed_callback = parseUri(decodeURIComponent(callback_url));
-							callback_url = parsed_callback.wo_query + '?' + objectToQueryString(Object.assign({
-								registration: 'free'
-							}, parsed_callback.query));
-						}
-						
-						if (__APP.IS_WIDGET) {
-							__APP.POST_MESSAGE.redirect(callback_url);
-						} else {
-							window.location = callback_url;
-						}
-					} else {
-						__APP.changeState('/event/{event_id}'.format({event_id: self.event.id}));
-						showNotifier({text: 'Регистрация прошла успешно', status: true});
+					if (self.overall_sum <= 0) {
+						parsed_callback = parseUri(decodeURIComponent(callback_url));
+						callback_url = parsed_callback.wo_query + '?' + objectToQueryString(Object.assign({
+							registration: 'free'
+						}, parsed_callback.query));
 					}
-				})
-			}
+					
+					if (__APP.IS_WIDGET) {
+						__APP.POST_MESSAGE.redirect(callback_url);
+					} else {
+						window.location = callback_url;
+					}
+				} else {
+					__APP.changeState('/event/{event_id}'.format({event_id: self.event.id}));
+					showNotifier({text: 'Регистрация прошла успешно', status: true});
+				}
+			});
 		});
 		
 		if (this.event.accept_bitcoins) {
@@ -21908,7 +21926,7 @@ OrderPage = extending(Page, (function() {
 					modal;
 				
 				if (!$this.data('modal')) {
-					makeOrder().done(function(data) {
+					self.makeOrder().done(function(data) {
 						modal = new BitcoinModal(self.event, data.order.uuid);
 						$this.data('modal', modal);
 						
