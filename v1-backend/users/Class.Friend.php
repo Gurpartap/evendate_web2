@@ -205,4 +205,25 @@ class Friend extends AbstractEntity implements UserInterface
 		return new Result(true, '', $result_data);
 	}
 
+	public function getOrders(Organization $organization, User $user, array $fields, array $pagination, array $order_by)
+	{
+		$db = App::DB();
+		if (!$user->isAdmin($organization)) throw new PrivilegesException('', $db);
+		$subscriptions = $this->getSubscriptions(array(), array('length' => 100000, 'offset' => 0), array())->getData();
+		$subscribed = false;
+		foreach ($subscriptions as $sub) {
+			if ($sub['id'] == $organization->getId()) {
+				$subscribed = true;
+			}
+		}
+		if (!$subscribed) throw new PrivilegesException('', $db);
+		return OrdersCollection::filter($db,
+			$user,
+			array('subscriber' => $this, 'organization' => $organization),
+			$fields,
+			$pagination,
+			$order_by
+		);
+	}
+
 }

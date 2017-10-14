@@ -70,6 +70,27 @@ $__modules['statistics'] = array(
 
 
 		},
+		'{/organizations/(id:[0-9]+)/subscribers/(user_id:[0-9]+)/orders}' => function ($organization_id, $user_id) use ($__db, $__order_by, $__request, $__user, $__fields, $__pagination) {
+			$organization = OrganizationsCollection::one(
+				$__db,
+				$__user,
+				$organization_id,
+				array()
+			);
+
+			if (!$__user->isAdmin($organization)) throw new PrivilegesException('NOT_ADMIN', $__db);
+
+			$user = UsersCollection::one($__db,
+				$__user,
+				$user_id,
+				$__fields);
+
+			return $user->getOrders($organization,
+				$__user,
+				$__fields ?? array(),
+				$__pagination ?? array(),
+				$__order_by ?? array());
+		},
 		'{/organizations/(id:[0-9]+)/subscribers/export}' => function ($id) use ($__db, $__request, $__user, $__fields, $__pagination) {
 			$__request['organization'] = OrganizationsCollection::one(
 				$__db,
