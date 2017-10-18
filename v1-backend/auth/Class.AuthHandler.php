@@ -67,8 +67,8 @@ class AuthHandler
 		$q_get_user
 			->from('users')
 			->cols(array('id', 'vk_uid', 'google_uid', 'facebook_uid'))
-			->where('email IS NOT NULL AND email = ?', $provider->getToInsData()['email'])
-			->orWhere(strtolower($type) . '_uid = ?', $provider->getUID());
+			->where('(email IS NOT NULL 
+					AND email = ?) OR (' . strtolower($type) . '_uid = ?)', $provider->getToInsData()['email'], $provider->getUID());
 
 		$p = App::DB()->prepareExecute($q_get_user, 'CANT_FIND_USER_ERROR');
 		$is_new_user = $p->rowCount() == 0;
