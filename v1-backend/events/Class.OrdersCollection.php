@@ -55,6 +55,19 @@ class OrdersCollection extends AbstractCollection
 					}
 					break;
 				}
+				case 'subscriber': {
+					if ($value instanceof Friend
+						&& isset($filters['organization'])
+						&& $filters['organization'] instanceof Organization
+						&& $user->isAdmin($filters['organization'])
+					) {
+						$q_get_orders->where('user_id = ?', $value->getId());
+						$q_get_orders->where('event_id IN (SELECT id FROM events WHERE organization_id = ?)', $filters['organization']->getId());
+						$getting_statistics = true;
+
+					}
+					break;
+				}
 				case 'status_type': {
 					$q_get_orders->where('ticket_order_status_type = ?', $value);
 				}
