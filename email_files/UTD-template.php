@@ -1216,7 +1216,7 @@ AAAAAAAAAAAAAAAHAgAAZHJzL2Rvd25yZXYueG1sUEsFBgAAAAADAAMAtwAAAPcCAAAAAA==
   <td width=711 colspan=32 valign=bottom style='width:533.5pt;border:none;
   border-bottom:solid windowtext 1.0pt;mso-border-bottom-alt:solid windowtext .75pt;
   padding:0cm 0cm 0cm 0cm;height:7.85pt'>
-  <p class=MsoNormal><span style='font-size:8.0pt;font-family:"Arial",sans-serif'><o:p>&nbsp;</o:p></span></p>
+  <p class=MsoNormal><span style='font-size:8.0pt;font-family:"Arial",sans-serif'><o:p><?=$legal_entity['company_name']?> &nbsp;</o:p></span></p>
   </td>
   <td width=9 style='width:6.4pt;border:none;padding:0cm 0cm 0cm 0cm;
   height:7.85pt'>
@@ -1244,7 +1244,7 @@ AAAAAAAAAAAAAAAHAgAAZHJzL2Rvd25yZXYueG1sUEsFBgAAAAADAAMAtwAAAPcCAAAAAA==
   border-bottom:solid windowtext 1.0pt;mso-border-top-alt:solid windowtext .75pt;
   mso-border-top-alt:solid windowtext .75pt;mso-border-bottom-alt:solid windowtext .75pt;
   padding:0cm 0cm 0cm 0cm;height:6.35pt'>
-  <p class=MsoNormal><span style='font-size:8.0pt;font-family:"Arial",sans-serif'><o:p>&nbsp;</o:p></span></p>
+  <p class=MsoNormal><span style='font-size:8.0pt;font-family:"Arial",sans-serif'><o:p><?=$legal_entity['company_address']?>&nbsp;</o:p></span></p>
   </td>
   <td width=9 style='width:6.4pt;border:none;padding:0cm 0cm 0cm 0cm;
   height:6.35pt'>
@@ -1272,7 +1272,7 @@ AAAAAAAAAAAAAAAHAgAAZHJzL2Rvd25yZXYueG1sUEsFBgAAAAADAAMAtwAAAPcCAAAAAA==
   border-bottom:solid windowtext 1.0pt;mso-border-top-alt:solid windowtext .75pt;
   mso-border-top-alt:solid windowtext .75pt;mso-border-bottom-alt:solid windowtext .75pt;
   padding:0cm 0cm 0cm 0cm;height:8.25pt'>
-  <p class=MsoNormal><span style='font-size:8.0pt;font-family:"Arial",sans-serif'><o:p>&nbsp;</o:p></span></p>
+  <p class=MsoNormal><span style='font-size:8.0pt;font-family:"Arial",sans-serif'><o:p><?=$legal_entity['company_inn'] . '/' . $legal_entity['company_kpp']?>&nbsp;</o:p></span></p>
   </td>
   <td width=9 style='width:6.4pt;border:none;padding:0cm 0cm 0cm 0cm;
   height:8.25pt'>
