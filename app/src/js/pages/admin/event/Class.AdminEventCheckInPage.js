@@ -197,9 +197,15 @@ AdminEventCheckInPage = extending(AdminEventPage, (function() {
 			 */
 			var ticket = self.tickets.getByID($(this).closest('.Ticket').data('ticket_uuid'));
 			
-			OneTicket[ticket.checkout ? 'uncheck' : 'check'](ticket.event_id, ticket.uuid, function() {
-				self.changeTicketState(ticket, ticket.checkout ? AdminEventCheckInPage.STATES.AWAITING : AdminEventCheckInPage.STATES.CHECKED);
-			});
+			if (ticket.checkout) {
+				OneTicket.uncheck(ticket.event_id, ticket.uuid).done(function() {
+					self.changeTicketState(ticket, AdminEventCheckInPage.STATES.AWAITING);
+				});
+			} else {
+				OneTicket.check(ticket.event_id, ticket.uuid).done(function() {
+					self.changeTicketState(ticket, AdminEventCheckInPage.STATES.CHECKED);
+				});
+			}
 		}).addClass('-Handled_CheckoutTicket');
 		
 		return $rows;

@@ -35895,6 +35895,7 @@ __C = {
 		COLORS: {
 			ACCENT: '-color_accent',
 			FRANKLIN: '-color_franklin',
+			BUBBLEGUM: '-color_bubblegum',
 			PRIMARY: '-color_primary',
 			DEFAULT: '-color_default',
 			NEUTRAL: '-color_neutral',
@@ -35914,6 +35915,7 @@ __C = {
 			RIGHT: '-align_right'
 		},
 		UNIVERSAL_STATES: {
+			CLICKABLE: '-clickable',
 			EMPTY: '-empty',
 			SLIGHTLY_ROUNDED: '-slightly_rounded',
 			ROUNDED: '-rounded',
@@ -41013,8 +41015,8 @@ RegistrationFieldModelsCollection = extending(EntitiesCollection, (function() {
 OneOrder = extending(OneEntity, (function() {
 	/**
 	 *
-	 * @param {(string|number)} [event_id=0]
 	 * @param {string} [uuid=null]
+	 * @param {(string|number)} [event_id=0]
 	 *
 	 * @constructor
 	 * @constructs OneOrder
@@ -41043,12 +41045,13 @@ OneOrder = extending(OneEntity, (function() {
 	 * @property {?Moment} m_payed_at
 	 * @property {?Moment} m_canceled_at
 	 *
+	 * @property {OneEvent} event
 	 * @property {PromocodeModel} promocode
 	 * @property {TicketsCollection} tickets
 	 * @property {RegistrationFieldsCollection} registration_fields
 	 * @property {OneUser} user
 	 */
-	function OneOrder(event_id, uuid) {
+	function OneOrder(uuid, event_id) {
 		var self = this;
 		
 		this.uuid = setDefaultValue(uuid, null);
@@ -41068,6 +41071,7 @@ OneOrder = extending(OneEntity, (function() {
 		this.payed_at = null;
 		this.canceled_at = null;
 		
+		this.event = new OneEvent(event_id);
 		this.promocode = new PromocodeModel();
 		this.tickets = new TicketsCollection();
 		this.registration_fields = new RegistrationFieldsCollection();
@@ -41125,8 +41129,12 @@ OneOrder = extending(OneEntity, (function() {
 	OneOrder.prototype.ID_PROP_NAME = 'uuid';
 	
 	OneOrder.ENDPOINT = Object.freeze({
+		ORDER: '/events/orders/{order_uuid}',
+		EVENT_ORDER: '/events/{event_id}/orders/{order_uuid}',
+		LEGAL_ENTITY: '/events/{event_id}/orders/{order_uuid}/legal_entity',
 		LEGAL_ENTITY_CONTRACT: '/events/{event_id}/orders/{order_uuid}/legal_entity/contract',
-		LEGAL_ENTITY_UTD: '/events/{event_id}/orders/{order_uuid}/legal_entity/utd'
+		LEGAL_ENTITY_UTD: '/events/{event_id}/orders/{order_uuid}/legal_entity/utd',
+		BITCOIN: '/events/{event_id}/orders/{order_uuid}/bitcoin'
 	});
 	
 	/**
@@ -41249,18 +41257,18 @@ OneOrder = extending(OneEntity, (function() {
 	};
 	/**
 	 *
-	 * @param {(string|number)} event_id
 	 * @param {string} uuid
 	 * @param {(Fields|string)} [fields]
-	 * @param {AJAXCallback} [success]
 	 *
 	 * @return {jqPromise}
 	 */
-	OneOrder.fetchOrder = function(event_id, uuid, fields, success) {
+	OneOrder.fetchOrder = function(uuid, fields) {
 		
-		return __APP.SERVER.getData('/api/v1/events/' + event_id + '/orders/' + uuid, {
+		return __APP.SERVER.getData(OneOrder.ENDPOINT.ORDER.format({
+			order_uuid: uuid
+		}), {
 			fields: fields
-		}, success);
+		});
 	};
 	/**
 	 *
@@ -41273,7 +41281,10 @@ OneOrder = extending(OneEntity, (function() {
 	 */
 	OneOrder.changeStatus = function(event_id, uuid, new_status, success) {
 		
-		return __APP.SERVER.updateData('/api/v1/events/' + event_id + '/orders/' + uuid, {
+		return __APP.SERVER.updateData(OneOrder.ENDPOINT.EVENT_ORDER.format({
+			order_uuid: uuid,
+			event_id: event_id
+		}), {
 			status: new_status
 		}, false, success);
 	};
@@ -41306,7 +41317,10 @@ OneOrder = extending(OneEntity, (function() {
 	 */
 	OneOrder.makeLegalEntityPayment = function(event_id, uuid, data, success) {
 		
-		return __APP.SERVER.addData('/api/v1/events/'+event_id+'/orders/'+uuid+'/legal_entity', data, true, success);
+		return __APP.SERVER.addData(OneOrder.ENDPOINT.LEGAL_ENTITY.format({
+			order_uuid: uuid,
+			event_id: event_id
+		}), data, true, success);
 	};
 	/**
 	 *
@@ -41319,7 +41333,10 @@ OneOrder = extending(OneEntity, (function() {
 	 */
 	OneOrder.updateLegalEntityPayment = function(event_id, uuid, data, success) {
 		
-		return __APP.SERVER.updateData('/api/v1/events/'+event_id+'/orders/'+uuid+'/legal_entity', data, true, success);
+		return __APP.SERVER.updateData(OneOrder.ENDPOINT.LEGAL_ENTITY.format({
+			order_uuid: uuid,
+			event_id: event_id
+		}), data, true, success);
 	};
 	/**
 	 *
@@ -41331,23 +41348,24 @@ OneOrder = extending(OneEntity, (function() {
 	 */
 	OneOrder.fetchBitcoinData = function(event_id, order_uuid, success) {
 		
-		return __APP.SERVER.addData('/api/v1/events/' + event_id + '/orders/' + order_uuid + '/bitcoin', null, false, success);
+		return __APP.SERVER.addData(OneOrder.ENDPOINT.BITCOIN.format({
+			order_uuid: uuid,
+			event_id: event_id
+		}), null, false, success);
 	};
 	/**
 	 *
 	 * @param {(Fields|string)} [fields]
-	 * @param {AJAXCallback} [success]
 	 *
 	 * @return {jqPromise}
 	 */
-	OneOrder.prototype.fetchOrder = function(fields, success) {
+	OneOrder.prototype.fetch = function(fields) {
 		var self = this;
 		
-		return this.constructor.fetchOrder(this.event_id, this.uuid, fields, function(data) {
+		return this.constructor.fetchOrder(this.uuid, fields).then(function(data) {
 			self.setData(data);
-			if (isFunction(success)) {
-				success.call(self, data);
-			}
+			
+			return self;
 		});
 	};
 	/**
@@ -41449,6 +41467,10 @@ OrdersCollection = extending(EntitiesCollection, (function() {
 	}
 	
 	OrdersCollection.prototype.collection_of = OneOrder;
+	
+	OrdersCollection.ENDPOINT = Object.freeze({
+		ORDER: '/events/orders'
+	});
 	
 	
 	return OrdersCollection;
@@ -41576,10 +41598,13 @@ OneTicket = extending(OneEntity, (function() {
 	 * @property {?timestamp} created_at
 	 *
 	 * @property {OneTicketType} ticket_type
+	 * @property {OneEvent} event
 	 * @property {OneOrder} order
 	 * @property {OneUser} user
 	 */
 	function OneTicket(event_id, uuid) {
+		var self = this;
+		
 		this.uuid = setDefaultValue(uuid, 0);
 		this.event_id = setDefaultValue(event_id, 0);
 		this.user_id = null;
@@ -41590,51 +41615,84 @@ OneTicket = extending(OneEntity, (function() {
 		this.checkout = null;
 		this.price = null;
 		this.number = null;
+		this.event = new OneEvent();
 		this.ticket_type = new OneTicketType();
 		this.order = new OneOrder();
 		this.user = new OneUser();
 		
 		this.created_at = null;
+		
+		Object.defineProperties(this, {
+			status_name: {
+				get: function() {
+					
+					return localeFromNamespace(self.order.status_type_code, OneTicket.TICKET_STATUSES, __LOCALES.ru_RU.TEXTS.TICKET_STATUSES);
+				}
+			},
+			status_type_code: {
+				get: function() {
+					
+					return self.order.status_type_code;
+				}
+			}
+		});
 	}
 	OneTicket.prototype.ID_PROP_NAME = 'uuid';
+	
+	OneTicket.TICKET_STATUSES = Object.freeze(mergeObjects({
+		USED: 'used'
+	}, OneOrder.EXTENDED_ORDER_STATUSES));
+	
+	OneTicket.ENDPOINT = Object.freeze({
+		TICKET: '/events/tickets/{ticket_uuid}',
+		ADMIN_TICKET: '/statistics/events/{event_id}/tickets/{ticket_uuid}'
+	});
 	
 	/**
 	 *
 	 * @param {(string|number)} event_id
 	 * @param {(string|number)} uuid
 	 * @param {(Fields|string)} [fields]
-	 * @param {AJAXCallback} [success]
 	 *
 	 * @return {jqPromise}
 	 */
-	OneTicket.fetchTicket = function(event_id, uuid, fields, success) {
-		return __APP.SERVER.getData('/api/v1/events/' + event_id + '/tickets/' + uuid, {
+	OneTicket.fetchTicket = function(event_id, uuid, fields) {
+		
+		return __APP.SERVER.getData(OneTicket.ENDPOINT.TICKET.format({
+			ticket_uuid: uuid
+		}), {
 			fields: fields
-		}, success);
+		});
 	};
 	/**
 	 *
 	 * @param {(string|number)} event_id
 	 * @param {(string|number)} uuid
-	 * @param {AJAXCallback} [success]
+	 *
 	 * @return {jqPromise}
 	 */
-	OneTicket.check = function(event_id, uuid, success) {
-		return __APP.SERVER.updateData('/api/v1/statistics/events/' + event_id + '/tickets/' + uuid, {
+	OneTicket.check = function(event_id, uuid) {
+		
+		return __APP.SERVER.updateData(OneTicket.ENDPOINT.ADMIN_TICKET.format({
+			ticket_uuid: uuid
+		}), {
 			checkout: true
-		}, false, success);
+		}, false);
 	};
 	/**
 	 *
 	 * @param {(string|number)} event_id
 	 * @param {(string|number)} uuid
-	 * @param {AJAXCallback} [success]
+	 *
 	 * @return {jqPromise}
 	 */
-	OneTicket.uncheck = function(event_id, uuid, success) {
-		return __APP.SERVER.updateData('/api/v1/statistics/events/' + event_id + '/tickets/' + uuid, {
+	OneTicket.uncheck = function(event_id, uuid) {
+		
+		return __APP.SERVER.updateData(OneTicket.ENDPOINT.ADMIN_TICKET.format({
+			ticket_uuid: uuid
+		}), {
 			checkout: false
-		}, false, success);
+		}, false);
 	};
 	/**
 	 *
@@ -41660,50 +41718,42 @@ OneTicket = extending(OneEntity, (function() {
 	/**
 	 *
 	 * @param {(Fields|string)} [fields]
-	 * @param {AJAXCallback} [success]
 	 *
 	 * @return {jqPromise}
 	 */
-	OneTicket.prototype.fetchTicket = function(fields, success) {
+	OneTicket.prototype.fetch = function(fields) {
 		var self = this;
 		
-		return OneTicket.fetchTicket(this.event_id, this.uuid, fields, function(data) {
+		return OneTicket.fetchTicket(this.event_id, this.uuid, fields).then(function(data) {
 			self.setData(data);
-			if (success && typeof success === 'function') {
-				success.call(self, data);
-			}
+			
+			return data;
 		});
 	};
 	/**
 	 *
-	 * @param {AJAXCallback} [success]
-	 *
 	 * @return {jqPromise}
 	 */
-	OneTicket.prototype.check = function(success) {
+	OneTicket.prototype.check = function() {
 		var self = this;
 		
-		return OneTicket.check(this.event_id, this.uuid, function() {
+		return OneTicket.check(this.event_id, this.uuid).then(function() {
 			self.checkout = true;
-			if (success && typeof success === 'function') {
-				success.call(self, self);
-			}
+			
+			return self;
 		});
 	};
 	/**
 	 *
-	 * @param {AJAXCallback} [success]
-	 *
 	 * @return {jqPromise}
 	 */
-	OneTicket.prototype.uncheck = function(success) {
+	OneTicket.prototype.uncheck = function() {
 		var self = this;
 		
-		return OneTicket.uncheck(this.event_id, this.uuid, function() {
+		return OneTicket.uncheck(this.event_id, this.uuid).then(function() {
 			self.checkout = false;
-			if (success && typeof success === 'function') {
-				success.call(self, self);
-			}
+			
+			return self;
 		});
 	};
 	/**
@@ -44356,10 +44406,12 @@ OneEvent = extending(OneEntity, (function() {
 	}
 	
 	OneEvent.ENDPOINT = Object.freeze({
-		NOTIFICATION: '/events/{event_id}/notifications/{notification_uuid}',
-		NOTIFICATIONS: '/events/{event_id}/notifications',
+		EVENT: '/events/{event_id}',
+		STATUS: '/events/{event_id}/status',
+		ORDERS: '/events/{event_id}/orders',
 		FAVORITES: '/events/{event_id}/favorites',
-		ORDERS: '/events/{event_id}/orders'
+		NOTIFICATIONS: '/events/{event_id}/notifications',
+		NOTIFICATION: '/events/{event_id}/notifications/{notification_uuid}'
 	});
 	
 	/**
@@ -44454,11 +44506,12 @@ OneEvent = extending(OneEntity, (function() {
 	 *
 	 * @param {(string|number)} event_id
 	 * @param {(OneEvent.STATUS|Array<OneEvent.STATUS>)} status
-	 * @param {AJAXCallback} [success]
+	 *
 	 * @returns {jqPromise}
 	 */
-	OneEvent.changeEventStatus = function(event_id, status, success) {
+	OneEvent.changeEventStatus = function(event_id, status) {
 		var data = {};
+		
 		status = Array.isArray(status) ? status : [status];
 		status.forEach(function(el) {
 			switch (el) {
@@ -44480,10 +44533,12 @@ OneEvent = extending(OneEntity, (function() {
 				}
 			}
 		});
-		return __APP.SERVER.updateData('/api/v1/events/' + event_id + '/status', data, false, function() {
-			if (success && typeof success == 'function') {
-				success.call(self, data);
-			}
+		
+		return __APP.SERVER.updateData(OneEvent.ENDPOINT.STATUS.format({
+			event_id: event_id
+		}), data, false).then(function() {
+			
+			return data;
 		});
 	};
 	/**
@@ -44702,18 +44757,54 @@ OneEvent = extending(OneEntity, (function() {
 	};
 	/**
 	 *
-	 * @param {(OneEvent.STATUS|Array<OneEvent.STATUS>)} status
-	 * @param {AJAXCallback} [success]
-	 * @returns {jqPromise}
+	 * @return {jqPromise}
 	 */
-	OneEvent.prototype.changeEventStatus = function(status, success) {
+	OneEvent.prototype.cancel = function() {
 		var self = this;
 		
-		return this.constructor.changeEventStatus(self.id, status, function(data) {
-			self.setData(data);
-			if (isFunction(success)) {
-				success.call(self, data);
-			}
+		return OneEvent.changeEventStatus(this.id, OneEvent.STATUS.CANCEL).then(function() {
+			self.canceled = true;
+			
+			return self;
+		});
+	};
+	/**
+	 *
+	 * @return {jqPromise}
+	 */
+	OneEvent.prototype.restore = function() {
+		var self = this;
+		
+		return OneEvent.changeEventStatus(this.id, OneEvent.STATUS.BRING_BACK).then(function() {
+			self.canceled = false;
+			
+			return self;
+		});
+	};
+	/**
+	 *
+	 * @return {jqPromise}
+	 */
+	OneEvent.prototype.hide = function() {
+		var self = this;
+		
+		return OneEvent.changeEventStatus(this.id, OneEvent.STATUS.HIDE).then(function() {
+			self.hidden = true;
+			
+			return self;
+		});
+	};
+	/**
+	 *
+	 * @return {jqPromise}
+	 */
+	OneEvent.prototype.bringBach = function() {
+		var self = this;
+		
+		return OneEvent.changeEventStatus(this.id, OneEvent.STATUS.SHOW).then(function() {
+			self.hidden = false;
+			
+			return self;
 		});
 	};
 	/**
@@ -44798,7 +44889,7 @@ OneEvent = extending(OneEntity, (function() {
 		var self = this;
 		
 		return this.constructor.makeOrder(this.id, order_data, success).then(function(data) {
-			var order = new OneOrder(self.id);
+			var order = new OneOrder();
 			
 			order.setData($.extend({
 				registration_fields: data.registration_fields,
@@ -45464,14 +45555,13 @@ OneExtendedOrder = extending(OneOrder, (function() {
 	};
 	/**
 	 *
-	 * @param {(string|number)} event_id
 	 * @param {(string|number)} uuid
 	 * @param {(Fields|string)} [fields]
 	 * @param {AJAXCallback} [success]
 	 *
 	 * @return {jqPromise}
 	 */
-	OneExtendedOrder.fetchOrder = function(event_id, uuid, fields, success) {
+	OneExtendedOrder.fetchOrder = function(uuid, fields, success) {
 		fields = Fields.parseFields(fields);
 		
 		
@@ -45846,6 +45936,11 @@ AbstractModal = (function() {
 		 *
 		 * @protected
 		 */
+		this.is_fetched = false;
+		/**
+		 *
+		 * @protected
+		 */
 		this.is_rendered = false;
 		/**
 		 *
@@ -46077,31 +46172,53 @@ AbstractModal = (function() {
 	 * @return {AbstractModal}
 	 */
 	AbstractModal.prototype.__show = function() {
-		var self = this;
+		var self = this,
+			$loader;
 		
-		if (!this.is_rendered)
-			return this.render().show();
-		
-		AbstractModal.hideCurrent();
-		$('body').addClass('-open_modal');
-		__APP.MODALS.active_modal = this;
-		
-		this.modal_wrapper.append(this.modal.addClass('-faded').removeClass(__C.CLASSES.HIDDEN));
-		this.adjustDestroyerHeight();
-		
-		this.modal.trigger('modal:show');
-		setTimeout(function() {
-			self.modal.removeClass('-faded');
-			self.modal_wrapper.scrollTop(self.scrollTop);
-			self.modal.trigger('modal:appear');
-			self.is_shown = true;
-		}, 200);
-		
-		if (!this.is_inited) {
-			this.init();
+		function show() {
+			if (!self.is_rendered)
+				return self.render().show();
+			
+			self.modal_wrapper.append(self.modal.addClass('-faded').removeClass(__C.CLASSES.HIDDEN));
+			
+			self.adjustDestroyerHeight();
+			
+			self.modal.trigger('modal:show');
+			setTimeout(function() {
+				self.modal.removeClass('-faded');
+				self.modal_wrapper.scrollTop(self.scrollTop);
+				self.modal.trigger('modal:appear');
+				self.is_shown = true;
+			}, 200);
+			
+			if (!self.is_inited) {
+				self.init();
+			}
+			
+			return self;
 		}
 		
-		return this;
+		if (__APP.MODALS.active_modal !== self) {
+			AbstractModal.hideCurrent();
+			__APP.MODALS.active_modal = self;
+			$('body').addClass('-open_modal');
+			
+			if (!this.is_fetched) {
+				$loader = __APP.BUILD.overlayLoader(this.modal_wrapper);
+				this.adjustDestroyerHeight();
+				this.modal.trigger('modal:fetch/start');
+				this.fetchData().done(function() {
+					$loader.remove();
+					self.is_fetched = true;
+					self.modal.trigger('modal:fetch/done');
+					show();
+				});
+				
+				return this;
+			}
+		}
+		
+		return show();
 	};
 	/**
 	 *
@@ -46169,6 +46286,14 @@ AbstractModal = (function() {
 		return this.__render($.extend({
 			classes: [__C.CLASSES.FLOATING_MATERIAL]
 		}, props));
+	};
+	/**
+	 *
+	 * @return {jqPromise}
+	 */
+	AbstractModal.prototype.fetchData = function() {
+		
+		return $.Deferred().resolve().promise();
 	};
 	/**
 	 * @return {AbstractModal}
@@ -46344,7 +46469,7 @@ BitcoinModal = extending(AbstractModal, (function() {
 			deferreds.push(this.event.fetchEvent());
 		}
 		if (empty(order) || typeof order === 'string') {
-			deferreds.push(this.order.fetchOrder());
+			deferreds.push(this.order.fetch());
 		}
 		
 		this.fetching_promise = __APP.SERVER.multipleAjax.apply(__APP.SERVER, deferreds);
@@ -47958,7 +48083,7 @@ Builder = (function() {
 	
 	/**
 	 *
-	 * @param {(OneExtendedTicket|Array<OneExtendedTicket>|ExtendedTicketsCollection)} tickets
+	 * @param {(OneTicket|Array<OneTicket>|TicketsCollection)} tickets
 	 * @return Array
 	 */
 	Builder.normalizeTicketProps = function(tickets) {
@@ -47996,7 +48121,10 @@ Builder = (function() {
 			
 			if (ticket.event.is_same_time) {
 				event_date = ticket.event.dates[0];
-				props.formatted_dates = displayDateRange(event_date.event_date, ticket.event.dates[ticket.event.dates.length - 1].event_date) + ', ' + displayTimeRange(event_date.start_time, event_date.end_time);
+				props.formatted_dates = '{date}, {time}'.format({
+					date: displayDateRange(event_date.event_date, ticket.event.dates[ticket.event.dates.length - 1].event_date),
+					time: displayTimeRange(event_date.start_time, event_date.end_time)
+				});
 			} else {
 				event_date = ticket.event.nearest_event_date;
 				props.formatted_dates = displayDateRange(event_date, event_date);
@@ -48007,7 +48135,7 @@ Builder = (function() {
 	};
 	/**
 	 *
-	 * @param {(OneExtendedTicket|Array<OneExtendedTicket>|ExtendedTicketsCollection)} tickets
+	 * @param {(OneTicket|Array<OneTicket>|TicketsCollection)} tickets
 	 * @return {jQuery}
 	 */
 	Builder.prototype.ticketCards = function buildTicketCard(tickets) {
@@ -48122,6 +48250,7 @@ Page = (function() {
 		 * @type jQuery
 		 */
 		this.$wrapper = setDefaultValue(this.$wrapper, $());
+		this.$loader = $();
 		this.wrapper_tmpl = setDefaultValue(this.wrapper_tmpl, 'std');
 		this.with_header_tabs = setDefaultValue(this.with_header_tabs, false);
 		
@@ -48174,12 +48303,14 @@ Page = (function() {
 		var PAGE = this,
 			is_other_page = __APP.PREVIOUS_PAGE.wrapper_tmpl !== PAGE.wrapper_tmpl,
 			wrapper_field = is_other_page ? '$view' : '$wrapper',
-			$prev = __APP.PREVIOUS_PAGE[wrapper_field].length ? __APP.PREVIOUS_PAGE[wrapper_field] : is_other_page ? $('.PageView') : $('.PageView').find('.Content'),
+			$page_view = $('.PageView'),
+			$prev = __APP.PREVIOUS_PAGE[wrapper_field].length ? __APP.PREVIOUS_PAGE[wrapper_field] : is_other_page ? $page_view : $page_view.find('.Content'),
 			state = History.getState(),
 			$scroll_to;
 		
 		$prev.addClass('-faded');
 		$('body').trigger('Page:change/start', [__APP.CURRENT_PAGE, __APP.PREVIOUS_PAGE]);
+		__APP.LOADER.appendTo($page_view);
 		
 		setTimeout(function() {
 			$prev.addClass(__C.CLASSES.HIDDEN);
@@ -48228,6 +48359,7 @@ Page = (function() {
 			$('body').trigger('Page:change/end', [__APP.CURRENT_PAGE, __APP.PREVIOUS_PAGE]);
 			setTimeout(function() {
 				PAGE[wrapper_field].removeClass('-faded');
+				__APP.LOADER.detach();
 				scrollTo($scroll_to, 400);
 			}, 200);
 		});
@@ -48963,7 +49095,7 @@ LegalEntityPayment = extending(Page, (function() {
 	
 	LegalEntityPayment.prototype.fetchData = function() {
 		
-		return this.fetching_data_defer = this.order.fetchOrder(this.order_fields);
+		return this.fetching_data_defer = this.order.fetch(this.order_fields);
 	};
 	
 	LegalEntityPayment.prototype.init = function() {
@@ -49444,6 +49576,7 @@ __APP = {
 	YA_METRIKA: window.yaCounter32442130 || null,
 	IS_WIDGET: true,
 	IS_REPAINTED: false,
+	LOADER: $(),
 	/**
 	 *
 	 * @param {object} colors
@@ -49730,6 +49863,8 @@ $(document)
 				__APP.init();
 			}
 		});
+		
+		__APP.LOADER = __APP.BUILD.overlayLoader();
 		
 		user_jqhxr = __APP.USER.fetchUser(new Fields('email'));
 		auth_urls_jqxhr = AsynchronousConnection.dealAjax(AsynchronousConnection.HTTP_METHODS.GET, '/auth.php', {

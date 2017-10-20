@@ -10,8 +10,8 @@
 OneOrder = extending(OneEntity, (function() {
 	/**
 	 *
-	 * @param {(string|number)} [event_id=0]
 	 * @param {string} [uuid=null]
+	 * @param {(string|number)} [event_id=0]
 	 *
 	 * @constructor
 	 * @constructs OneOrder
@@ -40,12 +40,13 @@ OneOrder = extending(OneEntity, (function() {
 	 * @property {?Moment} m_payed_at
 	 * @property {?Moment} m_canceled_at
 	 *
+	 * @property {OneEvent} event
 	 * @property {PromocodeModel} promocode
 	 * @property {TicketsCollection} tickets
 	 * @property {RegistrationFieldsCollection} registration_fields
 	 * @property {OneUser} user
 	 */
-	function OneOrder(event_id, uuid) {
+	function OneOrder(uuid, event_id) {
 		var self = this;
 		
 		this.uuid = setDefaultValue(uuid, null);
@@ -65,6 +66,7 @@ OneOrder = extending(OneEntity, (function() {
 		this.payed_at = null;
 		this.canceled_at = null;
 		
+		this.event = new OneEvent(event_id);
 		this.promocode = new PromocodeModel();
 		this.tickets = new TicketsCollection();
 		this.registration_fields = new RegistrationFieldsCollection();
@@ -122,8 +124,12 @@ OneOrder = extending(OneEntity, (function() {
 	OneOrder.prototype.ID_PROP_NAME = 'uuid';
 	
 	OneOrder.ENDPOINT = Object.freeze({
+		ORDER: '/events/orders/{order_uuid}',
+		EVENT_ORDER: '/events/{event_id}/orders/{order_uuid}',
+		LEGAL_ENTITY: '/events/{event_id}/orders/{order_uuid}/legal_entity',
 		LEGAL_ENTITY_CONTRACT: '/events/{event_id}/orders/{order_uuid}/legal_entity/contract',
-		LEGAL_ENTITY_UTD: '/events/{event_id}/orders/{order_uuid}/legal_entity/utd'
+		LEGAL_ENTITY_UTD: '/events/{event_id}/orders/{order_uuid}/legal_entity/utd',
+		BITCOIN: '/events/{event_id}/orders/{order_uuid}/bitcoin'
 	});
 	
 	/**
@@ -246,18 +252,18 @@ OneOrder = extending(OneEntity, (function() {
 	};
 	/**
 	 *
-	 * @param {(string|number)} event_id
 	 * @param {string} uuid
 	 * @param {(Fields|string)} [fields]
-	 * @param {AJAXCallback} [success]
 	 *
 	 * @return {jqPromise}
 	 */
-	OneOrder.fetchOrder = function(event_id, uuid, fields, success) {
+	OneOrder.fetchOrder = function(uuid, fields) {
 		
-		return __APP.SERVER.getData('/api/v1/events/' + event_id + '/orders/' + uuid, {
+		return __APP.SERVER.getData(OneOrder.ENDPOINT.ORDER.format({
+			order_uuid: uuid
+		}), {
 			fields: fields
-		}, success);
+		});
 	};
 	/**
 	 *
@@ -270,7 +276,10 @@ OneOrder = extending(OneEntity, (function() {
 	 */
 	OneOrder.changeStatus = function(event_id, uuid, new_status, success) {
 		
-		return __APP.SERVER.updateData('/api/v1/events/' + event_id + '/orders/' + uuid, {
+		return __APP.SERVER.updateData(OneOrder.ENDPOINT.EVENT_ORDER.format({
+			order_uuid: uuid,
+			event_id: event_id
+		}), {
 			status: new_status
 		}, false, success);
 	};
@@ -303,7 +312,10 @@ OneOrder = extending(OneEntity, (function() {
 	 */
 	OneOrder.makeLegalEntityPayment = function(event_id, uuid, data, success) {
 		
-		return __APP.SERVER.addData('/api/v1/events/'+event_id+'/orders/'+uuid+'/legal_entity', data, true, success);
+		return __APP.SERVER.addData(OneOrder.ENDPOINT.LEGAL_ENTITY.format({
+			order_uuid: uuid,
+			event_id: event_id
+		}), data, true, success);
 	};
 	/**
 	 *
@@ -316,7 +328,10 @@ OneOrder = extending(OneEntity, (function() {
 	 */
 	OneOrder.updateLegalEntityPayment = function(event_id, uuid, data, success) {
 		
-		return __APP.SERVER.updateData('/api/v1/events/'+event_id+'/orders/'+uuid+'/legal_entity', data, true, success);
+		return __APP.SERVER.updateData(OneOrder.ENDPOINT.LEGAL_ENTITY.format({
+			order_uuid: uuid,
+			event_id: event_id
+		}), data, true, success);
 	};
 	/**
 	 *
@@ -328,23 +343,24 @@ OneOrder = extending(OneEntity, (function() {
 	 */
 	OneOrder.fetchBitcoinData = function(event_id, order_uuid, success) {
 		
-		return __APP.SERVER.addData('/api/v1/events/' + event_id + '/orders/' + order_uuid + '/bitcoin', null, false, success);
+		return __APP.SERVER.addData(OneOrder.ENDPOINT.BITCOIN.format({
+			order_uuid: uuid,
+			event_id: event_id
+		}), null, false, success);
 	};
 	/**
 	 *
 	 * @param {(Fields|string)} [fields]
-	 * @param {AJAXCallback} [success]
 	 *
 	 * @return {jqPromise}
 	 */
-	OneOrder.prototype.fetchOrder = function(fields, success) {
+	OneOrder.prototype.fetch = function(fields) {
 		var self = this;
 		
-		return this.constructor.fetchOrder(this.event_id, this.uuid, fields, function(data) {
+		return this.constructor.fetchOrder(this.uuid, fields).then(function(data) {
 			self.setData(data);
-			if (isFunction(success)) {
-				success.call(self, data);
-			}
+			
+			return self;
 		});
 	};
 	/**

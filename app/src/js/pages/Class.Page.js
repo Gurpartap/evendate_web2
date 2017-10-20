@@ -36,6 +36,7 @@ Page = (function() {
 		 * @type jQuery
 		 */
 		this.$wrapper = setDefaultValue(this.$wrapper, $());
+		this.$loader = $();
 		this.wrapper_tmpl = setDefaultValue(this.wrapper_tmpl, 'std');
 		this.with_header_tabs = setDefaultValue(this.with_header_tabs, false);
 		
@@ -88,12 +89,14 @@ Page = (function() {
 		var PAGE = this,
 			is_other_page = __APP.PREVIOUS_PAGE.wrapper_tmpl !== PAGE.wrapper_tmpl,
 			wrapper_field = is_other_page ? '$view' : '$wrapper',
-			$prev = __APP.PREVIOUS_PAGE[wrapper_field].length ? __APP.PREVIOUS_PAGE[wrapper_field] : is_other_page ? $('.PageView') : $('.PageView').find('.Content'),
+			$page_view = $('.PageView'),
+			$prev = __APP.PREVIOUS_PAGE[wrapper_field].length ? __APP.PREVIOUS_PAGE[wrapper_field] : is_other_page ? $page_view : $page_view.find('.Content'),
 			state = History.getState(),
 			$scroll_to;
 		
 		$prev.addClass('-faded');
 		$('body').trigger('Page:change/start', [__APP.CURRENT_PAGE, __APP.PREVIOUS_PAGE]);
+		__APP.LOADER.appendTo($page_view);
 		
 		setTimeout(function() {
 			$prev.addClass(__C.CLASSES.HIDDEN);
@@ -142,6 +145,7 @@ Page = (function() {
 			$('body').trigger('Page:change/end', [__APP.CURRENT_PAGE, __APP.PREVIOUS_PAGE]);
 			setTimeout(function() {
 				PAGE[wrapper_field].removeClass('-faded');
+				__APP.LOADER.detach();
 				scrollTo($scroll_to, 400);
 			}, 200);
 		});

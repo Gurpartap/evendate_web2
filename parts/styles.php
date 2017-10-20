@@ -1,9 +1,9 @@
 <link href="https://fonts.googleapis.com/css?family=Roboto:300,400,500,700" rel="stylesheet">
 <?php
 if ($DEBUG_MODE) { ?>
-	<link rel="stylesheet" href="/dist/vendor.css?rev=a93186c7ed5703bfd44f6008248a8ddf">
-	<link rel="stylesheet" href="/dist/app.css?rev=f02a80330049c7831ff109bac4198017"><?php
+	<link rel="stylesheet" href="/dist/vendor.css?rev=a995609783ea62a5dc4d8873afb9aca9">
+	<link rel="stylesheet" href="/dist/app.css?rev=08f3e3ed1667460c4c6be0dece2e36e1"><?php
 } else { ?>
-	<link rel="stylesheet" href="/dist/vendor.min.css?rev=51b229d9eddd24339f3de39bbceae297">
-	<link rel="stylesheet" href="/dist/app.min.css?rev=71cbbc8700e90a97c9d5a94cb20eeaf5"><?php
+	<link rel="stylesheet" href="/dist/vendor.min.css?rev=8eee378d51e4264aebe97d3b5a21f27c">
+	<link rel="stylesheet" href="/dist/app.min.css?rev=56157bbf0695fa486c822c67ff66beb2"><?php
 } ?>

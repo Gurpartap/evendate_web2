@@ -50,7 +50,7 @@ BitcoinModal = extending(AbstractModal, (function() {
 			deferreds.push(this.event.fetchEvent());
 		}
 		if (empty(order) || typeof order === 'string') {
-			deferreds.push(this.order.fetchOrder());
+			deferreds.push(this.order.fetch());
 		}
 		
 		this.fetching_promise = __APP.SERVER.multipleAjax.apply(__APP.SERVER, deferreds);

@@ -8,27 +8,61 @@
 TicketsModal = extending(AbstractModal, (function() {
 	/**
 	 *
-	 * @param {(ExtendedTicketsCollection|Array<OneExtendedTicket>|OneExtendedTicket)} tickets
+	 * @param {(TicketsCollection|Array<OneTicket>|OneTicket|string)} tickets
 	 * @constructor
 	 * @constructs TicketsModal
 	 *
-	 * @property {ExtendedTicketsCollection} tickets
+	 * @property {TicketsCollection} tickets
 	 * @property {string} ticket_uuid
-	 * @property {boolean} is_ticket_exists
+	 * @property {{event_id: string, uuid: string}} fetch_needed
 	 */
 	function TicketsModal(tickets) {
 		AbstractModal.call(this);
 		
-		if (tickets instanceof ExtendedTicketsCollection) {
+		this.fetch_ticket_data = null;
+		
+		if (tickets instanceof TicketsCollection) {
 			this.tickets = tickets;
-		} else if (tickets instanceof Array || tickets instanceof OneExtendedTicket) {
-			this.tickets = new ExtendedTicketsCollection();
+		} else if (tickets instanceof Array || tickets instanceof OneTicket) {
+			this.tickets = new TicketsCollection();
 			this.tickets.setData(tickets);
+		} else if (!empty(tickets) && tickets.event_id && tickets.uuid) {
+			this.tickets = new TicketsCollection();
+			this.fetch_ticket_data = tickets;
 		} else {
 			throw Error('Constructor needs instance of OneExtendedTicket class to create new instance of TicketsModal');
 		}
-		//this.width = 450;
 	}
+	
+	TicketsModal.NECESSARY_FIELDS = new Fields(
+		'created_at',
+		'number',
+		'ticket_type',
+		'order', {
+			event: {
+				fields: new Fields(
+					'dates',
+					'is_same_time',
+					'location'
+				)
+			}
+		}
+	);
+	
+	TicketsModal.prototype.fetchData = function() {
+		var self = this,
+			ticket;
+		
+		if (this.fetch_ticket_data) {
+			ticket = new OneTicket(this.fetch_ticket_data.event_id, this.fetch_ticket_data.uuid);
+			
+			return ticket.fetch(TicketsModal.NECESSARY_FIELDS).done(function() {
+				self.tickets.push(ticket);
+			});
+		}
+		
+		return AbstractModal.prototype.fetchData.call(this);
+	};
 	/**
 	 *
 	 * @return {TicketsModal}
@@ -53,7 +87,6 @@ TicketsModal = extending(AbstractModal, (function() {
 		}));
 		
 		this.__render({
-			//width: this.width,
 			content_classes: [__C.CLASSES.MODAL_STATES.NO_PADDING]
 		});
 		

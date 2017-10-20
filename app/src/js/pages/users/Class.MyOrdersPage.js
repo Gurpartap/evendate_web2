@@ -18,30 +18,33 @@ MyOrdersPage = extending(Page, (function() {
 		
 		this.orders = new MyOrdersCollection();
 		
-		this.fetch_order_fields = new Fields(
-			'registration_fields',
+		this.fetch_orders_fields = new Fields(
 			'final_sum',
 			'sum', {
 				event: {
+					fields: new Fields('dates')
+				}
+			}
+		);
+		
+		this.fetch_order_fields = new Fields(
+			'registration_fields', {
+				event: {
 					fields: new Fields(
 						'accept_bitcoins',
-						'dates',
-						'nearest_event_date',
-						'is_same_time',
-						'location',
-						'ticketing_locally'
+						'location'
 					)
 				},
 				tickets: {
 					fields: new Fields(
 						'ticket_type',
-						'created_at',
-						'number',
-						'order'
+						'number'
 					)
 				}
 			}
 		);
+		
+		this.block_scroll = false;
 		
 		this.$orders = $();
 		this.$detail_wrapper = $();
@@ -67,7 +70,7 @@ MyOrdersPage = extending(Page, (function() {
 			};
 		})).each(function(i) {
 			
-			$(this).data('order', _orders[i]);
+			$(this).data('order_uuid', _orders[i].uuid);
 		});
 	};
 	/**
@@ -97,23 +100,21 @@ MyOrdersPage = extending(Page, (function() {
 	
 	MyOrdersPage.prototype.fetchData = function() {
 		
-		return this.fetching_data_defer = this.orders.fetchAllOrders(this.fetch_order_fields);
+		return this.fetching_data_defer = this.orders.fetch(this.fetch_orders_fields, 12, '-created_at');
 	};
-	
-	MyOrdersPage.prototype.init = function() {
+	/**
+	 *
+	 * @param {string} uuid
+	 */
+	MyOrdersPage.prototype.selectOrderItem = function(uuid) {
 		var self = this,
-		parsed_uri = parseUri(location),
-		$selected_order = $();
+			order = this.orders.getByID(uuid);
 		
-		this.$wrapper.find('.Scroll').scrollbar();
-		this.$orders.on('click.SelectOrder', function() {
-			var $this = $(this),
-				order = $this.data('order'),
-				$tickets = AbstractAppInspector.build.tickets(order.tickets);
-			
-			self.$orders.not($this).removeClass('-item_selected');
-			$this.addClass('-item_selected');
-			
+		if (empty(order)) {
+			order = new OneOrder(uuid);
+		}
+		
+		function renderOrder() {
 			self.$detail_wrapper.html(tmpl('my-orders-order-detail-info', {
 				order_number: formatTicketNumber(order.number),
 				pay_info: MyOrdersPage.buildPayInfo(order),
@@ -172,7 +173,7 @@ MyOrdersPage = extending(Page, (function() {
 						case OneOrder.ORDER_STATUSES.WAITING_PAYMENT_LEGAL_ENTITY: {
 							if (
 								(order.status_type_code === OneOrder.ORDER_STATUSES.PAYED
-								&& order.payment_type === OneOrder.PAYMENT_PROVIDERS.LEGAL_ENTITY_PAYMENT)
+								 && order.payment_type === OneOrder.PAYMENT_PROVIDERS.LEGAL_ENTITY_PAYMENT)
 								|| order.status_type_code === OneOrder.ORDER_STATUSES.PAYED_LEGAL_ENTITY
 								|| order.status_type_code === OneOrder.ORDER_STATUSES.WAITING_PAYMENT_LEGAL_ENTITY
 							) {
@@ -226,19 +227,8 @@ MyOrdersPage = extending(Page, (function() {
 				event_title: AbstractAppInspector.build.title('Событие'),
 				event: AbstractAppInspector.build.event(order.event),
 				tickets_title: AbstractAppInspector.build.title('Билеты'),
-				tickets: order.tickets.length ? $tickets : 'Билетов нет'
+				tickets: OneOrder.isGreenStatus(order.status_type_code) ? AbstractAppInspector.build.tickets(order.tickets, true) : 'Билетов нет'
 			}));
-			
-			$tickets.on('click.OpenTicket', function() {
-				var $this = $(this),
-					ticket = OneExtendedTicket.createFrom($this.data('ticket'), order.event);
-				
-				if (!$this.data('modal')) {
-					$this.data('modal', new TicketsModal(ticket));
-				}
-				$this.data('modal').show();
-				
-			});
 			
 			self.$registration_fields_wrapper.html(tmpl('my-orders-order-registration-fields', {
 				registration_fields_title: AbstractAppInspector.build.title('Анкета'),
@@ -250,7 +240,7 @@ MyOrdersPage = extending(Page, (function() {
 			});
 			
 			self.$detail_wrapper.find('.LegalEntityPaymentButton').on('click.PayByLegalEntity', function() {
-				__APP.changeState('event/' + order.event.id + '/order/' + order.uuid + '/from_legal_entity');
+				__APP.changeState('/event/' + order.event.id + '/order/' + order.uuid + '/from_legal_entity');
 			});
 			
 			self.$detail_wrapper.find('.BitcoinPaymentButton').on('click.BitcoinPayment', function() {
@@ -264,22 +254,70 @@ MyOrdersPage = extending(Page, (function() {
 				
 				modal.show();
 			});
-		});
-		
-		if (parsed_uri.queryKey['uuid']) {
-			$selected_order = this.$orders.filter(function() {
-				
-				return $(this).data('order').uuid === parsed_uri.queryKey['uuid'];
-			});
-			
-			if ($selected_order.length) {
-				$selected_order.trigger('click.SelectOrder');
-			}
 		}
 		
+		if (!empty(order.tickets)) {
+			renderOrder();
+		} else {
+			this.$detail_wrapper.html(__APP.BUILD.floatingLoader());
+			this.$registration_fields_wrapper.html('');
+			order.fetch(this.fetch_order_fields).done(function() {
+				renderOrder();
+			}).fail(function() {
+				self.$detail_wrapper.html('');
+			});
+		}
+	};
+	/**
+	 *
+	 * @param {jQuery} $orders
+	 *
+	 * @return {jQuery}
+	 */
+	MyOrdersPage.prototype.bindSelectOrder = function($orders) {
+		var self = this;
+		
+		$orders.on('click.SelectOrder', function() {
+			var $this = $(this);
+			
+			$orders.not($this).removeClass('-item_selected');
+			$this.addClass('-item_selected');
+			
+			self.selectOrderItem($this.data('order_uuid'));
+		});
+		
+		return $orders;
+	};
+	
+	MyOrdersPage.prototype.init = function() {
+		var self = this,
+			$orders_wrapper = this.$wrapper.find('.OrdersWrapper');
+		
+		$orders_wrapper.scrollbar({
+			onScroll: function(y) {
+				var $loader;
+				
+				if (y.scroll + 200 >= y.maxScroll && !self.block_scroll) {
+					self.block_scroll = true;
+					$loader = __APP.BUILD.loaderBlock($orders_wrapper);
+					self.orders.fetch(self.fetch_orders_fields, 5, '-created_at').done(function(orders) {
+						$loader.remove();
+						if (orders.length) {
+							self.block_scroll = false;
+							self.$wrapper.find('.OrdersWrapper').append(self.bindSelectOrder(MyOrdersPage.orderItemsBuilder(orders)));
+						}
+					});
+				}
+			}
+		});
+		this.$wrapper.find('.Scroll').not('.OrdersWrapper').scrollbar();
+		
+		this.bindSelectOrder(this.$orders);
 	};
 	
 	MyOrdersPage.prototype.render = function() {
+		var parsed_uri = parseUri(location);
+		
 		if (__APP.USER.isLoggedOut()) {
 			var auth_modal = new AuthModal(window.location.href, {
 				note: 'Войдите чтобы увидеть список ваших заказов'
@@ -300,6 +338,10 @@ MyOrdersPage = extending(Page, (function() {
 		
 		this.$detail_wrapper = this.$wrapper.find('.OrderDetailInfo');
 		this.$registration_fields_wrapper = this.$wrapper.find('.OrderRegistrationFields');
+		
+		if (parsed_uri.queryKey['uuid']) {
+			this.selectOrderItem(parsed_uri.queryKey['uuid']);
+		}
 		
 		this.init();
 		

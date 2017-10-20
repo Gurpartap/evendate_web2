@@ -220,11 +220,12 @@ OneEvent = extending(OneEntity, (function() {
 	}
 	
 	OneEvent.ENDPOINT = Object.freeze({
-		NOTIFICATION: '/events/{event_id}/notifications/{notification_uuid}',
-		NOTIFICATIONS: '/events/{event_id}/notifications',
-		FAVORITES: '/events/{event_id}/favorites',
+		EVENT: '/events/{event_id}',
+		STATUS: '/events/{event_id}/status',
 		ORDERS: '/events/{event_id}/orders',
-		STATUS: '/events/{event_id}/status'
+		FAVORITES: '/events/{event_id}/favorites',
+		NOTIFICATIONS: '/events/{event_id}/notifications',
+		NOTIFICATION: '/events/{event_id}/notifications/{notification_uuid}'
 	});
 	
 	/**
@@ -702,7 +703,7 @@ OneEvent = extending(OneEntity, (function() {
 		var self = this;
 		
 		return this.constructor.makeOrder(this.id, order_data, success).then(function(data) {
-			var order = new OneOrder(self.id);
+			var order = new OneOrder();
 			
 			order.setData($.extend({
 				registration_fields: data.registration_fields,

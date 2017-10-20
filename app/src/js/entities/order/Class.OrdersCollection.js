@@ -19,6 +19,10 @@ OrdersCollection = extending(EntitiesCollection, (function() {
 	
 	OrdersCollection.prototype.collection_of = OneOrder;
 	
+	OrdersCollection.ENDPOINT = Object.freeze({
+		ORDER: '/events/orders'
+	});
+	
 	
 	return OrdersCollection;
 }()));

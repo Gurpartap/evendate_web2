@@ -147,7 +147,7 @@ function formatDates($start_date_timestamp, $end_timestamp)
     <div class="field" style="width: 50%"><span class="field_name">Тип билета</span><span
         class="field_value"><?=$ticket['ticket_type']['name'] ?></span></div>
     <div class="field" style="width: 50%"><span class="field_name">Цена билета</span><span
-        class="field_value"><?= $ticket['price'] == 0 ? 'Бесплатный' : $ticket['price'] ?></span></div>
+        class="field_value"><?= $ticket['price'] == 0 ? 'Бесплатный' : number_format($ticket['price'], 0, ',', ' ') . ' ₽' ?></span></div>
   </div>
   <div class="fields_wrapper -columns_2">
     <div class="field" style="width: 50%"><span class="field_name">Место</span><span
