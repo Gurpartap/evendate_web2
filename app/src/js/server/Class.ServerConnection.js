@@ -212,36 +212,47 @@ ServerConnection = extending(AsynchronousConnection, (function() {
 	 * @returns {jqPromise}
 	 */
 	ServerConnection.prototype.updateData = function(url, ajax_data, is_payload, success, error) {
-		if(is_payload){
+		if (is_payload) {
+			
 			return this.dealAjax(AsynchronousConnection.HTTP_METHODS.PUT, url, JSON.stringify(ajax_data), 'application/json', success, error);
 		}
+		
 		return this.dealAjax(AsynchronousConnection.HTTP_METHODS.PUT, url, ajax_data, 'application/x-www-form-urlencoded; charset=UTF-8', success, error);
 	};
 	/**
 	 *
 	 * @param {string} url
-	 * @param {(object|string)} ajax_data
+	 * @param {(object|string)} [ajax_data]
 	 * @param {boolean} [is_payload=false]
 	 * @param {AJAXCallback} [success]
 	 * @param {function} [error]
 	 * @returns {jqPromise}
 	 */
 	ServerConnection.prototype.addData = function(url, ajax_data, is_payload, success, error) {
-		if(is_payload){
+		if (is_payload) {
+			
 			return this.dealAjax(AsynchronousConnection.HTTP_METHODS.POST, url, JSON.stringify(ajax_data), 'application/json', success, error);
 		}
+		
 		return this.dealAjax(AsynchronousConnection.HTTP_METHODS.POST, url, ajax_data, 'application/x-www-form-urlencoded; charset=UTF-8', success, error);
 	};
 	/**
 	 *
 	 * @param {string} url
-	 * @param {AJAXData} ajax_data
+	 * @param {AJAXData} [ajax_data]
 	 * @param {AJAXCallback} [success]
 	 * @param {function} [error]
 	 * @returns {jqPromise}
 	 */
 	ServerConnection.prototype.deleteData = function(url, ajax_data, success, error) {
-		return this.dealAjax(AsynchronousConnection.HTTP_METHODS.DELETE, url + '?' + $.param(ajax_data), {}, 'application/json', success, error);
+		if (!empty(ajax_data)) {
+			url = '{path}?{params}'.format({
+				path: url,
+				params: $.param(ajax_data)
+			});
+		}
+		
+		return this.dealAjax(AsynchronousConnection.HTTP_METHODS.DELETE, url, {}, 'application/json', success, error);
 	};
 	/**
 	 *

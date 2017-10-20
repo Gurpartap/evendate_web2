@@ -69,6 +69,7 @@
 .avatars_collection.-trimmed.-subscribed.-max_5 > .avatar:nth-child(6),
 .avatars_collection.-trimmed.-subscribed.-max_6 > .avatar:nth-child(7),
 .avatars_collection.-trimmed.-subscribed.-max_7 > .avatar:nth-child(8),
+.avatars_collection.-trimmed.-subscribed.-max_8 > .avatar:nth-child(9),
 
 .avatars_collection.-trimmed.-shifted.-max_1 > .avatar:nth-child(2),
 .avatars_collection.-trimmed.-shifted.-max_2 > .avatar:nth-child(3),
@@ -76,7 +77,8 @@
 .avatars_collection.-trimmed.-shifted.-max_4 > .avatar:nth-child(5),
 .avatars_collection.-trimmed.-shifted.-max_5 > .avatar:nth-child(6),
 .avatars_collection.-trimmed.-shifted.-max_6 > .avatar:nth-child(7),
-.avatars_collection.-trimmed.-shifted.-max_7 > .avatar:nth-child(8) {
+.avatars_collection.-trimmed.-shifted.-max_7 > .avatar:nth-child(8),
+.avatars_collection.-trimmed.-shifted.-max_8 > .avatar:nth-child(9) {
 	left: 6px;
 	opacity: 0;
 }
