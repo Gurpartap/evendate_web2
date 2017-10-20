@@ -35883,7 +35883,9 @@ __C = {
 			BUTTON: 'button'
 		},
 		TEXT_COLORS: {
-			ACCENT: '-text_color_accent'
+			ACCENT: '-text_color_accent',
+			MUTED_80: '-text_color_primary_80',
+			MUTED_50: '-text_color_primary_50'
 		},
 		TEXT_WEIGHT: {
 			BOLD: '-font_weight_bold',
@@ -35897,6 +35899,7 @@ __C = {
 			DEFAULT: '-color_default',
 			NEUTRAL: '-color_neutral',
 			NEUTRAL_ACCENT: '-color_neutral_accent',
+			MUTED: '-color_muted',
 			MARGINAL: '-color_marginal',
 			MARGINAL_ACCENT: '-color_marginal_accent',
 			MARGINAL_PRIMARY: '-color_marginal_primary',
@@ -35976,6 +35979,7 @@ __C = {
 		ICONS: {
 			STAR: 'fa-star',
 			STAR_O: 'fa-star-o',
+			BELL: 'fa-bell',
 			BELL_O: 'fa-bell-o',
 			TIMES: 'fa-times',
 			TIMES_CIRCLE: 'fa-times-circle',
@@ -38145,16 +38149,6 @@ function bindTabs($parent, is_height_dynamic) {
 	}).addClass('-Handled_Tabs');
 }
 
-function bindShareButtons($parent) {
-	$parent = $parent ? $parent : $('body');
-	$parent.find('.ShareButton').not('.-Handled_ShareButton').each(function(i, elem) {
-		var $this = $(elem);
-		$this.on('click', function() {
-			window.open($this.data('href'), $this.data('title'), 'width=600,height=440,resizable=yes,scrollbars=no,status=no');
-		});
-	}).addClass('-Handled_ShareButton');
-}
-
 function bindSelect2($parent) {
 	$parent = $parent ? $parent : $('body');
 	var $selects = $parent.is('.ToSelect2') ? $parent : $parent.find('.ToSelect2');
@@ -39042,6 +39036,7 @@ HelpCenterConnection = extending(AsynchronousConnection, (function() {
 		CROSSPOSTING_VK: 105,
 		HOW_TO_PAY_FROM_LEGAL_ENTITY: 121,
 		REQUEST_APPROVAL: 127,
+		DYNAMIC_PRICING: 138,
 		ORDER_STATUSES: 170,
 		WHY_AUTH_BY_SOC_NETWORK: 471
 	});
@@ -39338,36 +39333,47 @@ ServerConnection = extending(AsynchronousConnection, (function() {
 	 * @returns {jqPromise}
 	 */
 	ServerConnection.prototype.updateData = function(url, ajax_data, is_payload, success, error) {
-		if(is_payload){
+		if (is_payload) {
+			
 			return this.dealAjax(AsynchronousConnection.HTTP_METHODS.PUT, url, JSON.stringify(ajax_data), 'application/json', success, error);
 		}
+		
 		return this.dealAjax(AsynchronousConnection.HTTP_METHODS.PUT, url, ajax_data, 'application/x-www-form-urlencoded; charset=UTF-8', success, error);
 	};
 	/**
 	 *
 	 * @param {string} url
-	 * @param {(object|string)} ajax_data
+	 * @param {(object|string)} [ajax_data]
 	 * @param {boolean} [is_payload=false]
 	 * @param {AJAXCallback} [success]
 	 * @param {function} [error]
 	 * @returns {jqPromise}
 	 */
 	ServerConnection.prototype.addData = function(url, ajax_data, is_payload, success, error) {
-		if(is_payload){
+		if (is_payload) {
+			
 			return this.dealAjax(AsynchronousConnection.HTTP_METHODS.POST, url, JSON.stringify(ajax_data), 'application/json', success, error);
 		}
+		
 		return this.dealAjax(AsynchronousConnection.HTTP_METHODS.POST, url, ajax_data, 'application/x-www-form-urlencoded; charset=UTF-8', success, error);
 	};
 	/**
 	 *
 	 * @param {string} url
-	 * @param {AJAXData} ajax_data
+	 * @param {AJAXData} [ajax_data]
 	 * @param {AJAXCallback} [success]
 	 * @param {function} [error]
 	 * @returns {jqPromise}
 	 */
 	ServerConnection.prototype.deleteData = function(url, ajax_data, success, error) {
-		return this.dealAjax(AsynchronousConnection.HTTP_METHODS.DELETE, url + '?' + $.param(ajax_data), {}, 'application/json', success, error);
+		if (!empty(ajax_data)) {
+			url = '{path}?{params}'.format({
+				path: url,
+				params: $.param(ajax_data)
+			});
+		}
+		
+		return this.dealAjax(AsynchronousConnection.HTTP_METHODS.DELETE, url, {}, 'application/json', success, error);
 	};
 	/**
 	 *
@@ -39970,6 +39976,24 @@ EntitiesCollection = extending(Array, (function() {
 		}
 		
 		return this.length;
+	};
+	/**
+	 *
+	 * @param {(string|number)} id
+	 *
+	 * @returns {(OneEntity|null)}
+	 */
+	EntitiesCollection.prototype.pull = function(id) {
+		var entity;
+		
+		if (this.has(id)) {
+			entity = this.getByID(id);
+			this.remove(id);
+			
+			return entity;
+		}
+		
+		return null;
 	};
 	
 	EntitiesCollection.prototype.createAdditionalLookup = function() {};
@@ -43884,9 +43908,23 @@ NotificationsCollection = extending(EntitiesCollection, (function() {
 	 *
 	 * @constructor
 	 * @constructs NotificationsCollection
+	 *
+	 * @property {Array<OneNotification>} future
 	 */
 	function NotificationsCollection() {
 		EntitiesCollection.call(this);
+		
+		Object.defineProperties(this, {
+			future: {
+				get: function() {
+					
+					return this.filter(function(notification) {
+						
+						return !notification.done;
+					});
+				}
+			}
+		});
 	}
 	NotificationsCollection.prototype.collection_of = OneNotification;
 	
@@ -44318,6 +44356,9 @@ OneEvent = extending(OneEntity, (function() {
 	}
 	
 	OneEvent.ENDPOINT = Object.freeze({
+		NOTIFICATION: '/events/{event_id}/notifications/{notification_uuid}',
+		NOTIFICATIONS: '/events/{event_id}/notifications',
+		FAVORITES: '/events/{event_id}/favorites',
 		ORDERS: '/events/{event_id}/orders'
 	});
 	
@@ -44448,40 +44489,55 @@ OneEvent = extending(OneEntity, (function() {
 	/**
 	 *
 	 * @param {(string|number)} event_id
-	 * @param {function} [success]
+	 *
 	 * @returns {jqPromise}
 	 */
-	OneEvent.addFavored = function(event_id, success) {
-		return __APP.SERVER.addData('/api/v1/events/' + event_id + '/favorites', {}, false, success);
+	OneEvent.addFavored = function(event_id) {
+		
+		return __APP.SERVER.addData(OneEvent.ENDPOINT.FAVORITES.format({
+			event_id: event_id
+		}), {}, false);
 	};
 	/**
 	 *
 	 * @param {(string|number)} event_id
-	 * @param {AJAXCallback} [success]
+	 *
 	 * @returns {jqPromise}
 	 */
-	OneEvent.deleteFavored = function(event_id, success) {
-		return __APP.SERVER.deleteData('/api/v1/events/' + event_id + '/favorites', {}, success);
+	OneEvent.deleteFavored = function(event_id) {
+		
+		return __APP.SERVER.deleteData(OneEvent.ENDPOINT.FAVORITES.format({
+			event_id: event_id
+		}));
 	};
 	/**
 	 *
 	 * @param {(string|number)} event_id
 	 * @param {string} notification_type
-	 * @param {function} [success]
+	 *
 	 * @returns {jqPromise}
 	 */
-	OneEvent.addEventNotification = function(event_id, notification_type, success) {
-		return __APP.SERVER.addData('/api/v1/events/' + event_id + '/notifications', {notification_type: notification_type}, false, success);
+	OneEvent.addEventNotification = function(event_id, notification_type) {
+		
+		return __APP.SERVER.addData(OneEvent.ENDPOINT.NOTIFICATIONS.format({
+			event_id: event_id
+		}), {
+			notification_type: notification_type
+		}, false);
 	};
 	/**
 	 *
 	 * @param {(string|number)} event_id
 	 * @param {string} notification_uuid
-	 * @param {AJAXCallback} [success]
+	 *
 	 * @returns {jqPromise}
 	 */
-	OneEvent.deleteEventNotification = function(event_id, notification_uuid, success) {
-		return __APP.SERVER.deleteData('/api/v1/events/' + event_id + '/notifications/' + notification_uuid, {}, success);
+	OneEvent.deleteEventNotification = function(event_id, notification_uuid) {
+		
+		return __APP.SERVER.deleteData(OneEvent.ENDPOINT.NOTIFICATION.format({
+			event_id: event_id,
+			notification_uuid: notification_uuid
+		}));
 	};
 	/**
 	 * @typedef {object} OrderRegistrationField
@@ -44620,6 +44676,32 @@ OneEvent = extending(OneEntity, (function() {
 	};
 	/**
 	 *
+	 * @return {jqPromise}
+	 */
+	OneEvent.prototype.favour = function() {
+		var self = this;
+		
+		return OneEvent.addFavored(this.id).then(function() {
+			self.favored.push(__APP.USER);
+			
+			return __APP.USER;
+		});
+	};
+	/**
+	 *
+	 * @return {jqPromise}
+	 */
+	OneEvent.prototype.unfavour = function() {
+		var self = this;
+		
+		return OneEvent.deleteFavored(this.id).then(function() {
+			self.favored.remove(__APP.USER.id);
+			
+			return self.favored;
+		});
+	};
+	/**
+	 *
 	 * @param {(OneEvent.STATUS|Array<OneEvent.STATUS>)} status
 	 * @param {AJAXCallback} [success]
 	 * @returns {jqPromise}
@@ -44637,22 +44719,41 @@ OneEvent = extending(OneEntity, (function() {
 	/**
 	 *
 	 * @param {string} notification_type
-	 * @param {function} [success]
+	 *
 	 * @returns {jqPromise}
 	 */
-	OneEvent.prototype.addNotification = function(notification_type, success) {
+	OneEvent.prototype.addNotification = function(notification_type) {
+		var self = this;
 		
-		return this.constructor.addEventNotification(this.id, notification_type, success);
+		return this.constructor.addEventNotification(this.id, notification_type).then(function(raw_notification) {
+			var notification = new OneNotification();
+			
+			notification.setData({
+				uuid: raw_notification.uuid,
+				notification_type: notification_type,
+				notification_time: raw_notification.notification_time,
+				done: false,
+				event_id: self.id,
+				created_at: (new Date()).valueOf()
+			});
+			
+			self.notifications.push(notification);
+			
+			return notification;
+		});
 	};
 	/**
 	 *
 	 * @param {string} notification_uuid
-	 * @param {AJAXCallback} [success]
+	 *
 	 * @returns {jqPromise}
 	 */
-	OneEvent.prototype.deleteNotification = function(notification_uuid, success) {
+	OneEvent.prototype.deleteNotification = function(notification_uuid) {
+		var self = this;
 		
-		return this.constructor.deleteEventNotification(this.id, notification_uuid, success);
+		return this.constructor.deleteEventNotification(this.id, notification_uuid).then(function() {
+			self.notifications.remove(notification_uuid);
+		});
 	};
 	/**
 	 *
@@ -46378,6 +46479,17 @@ Builder = (function() {
 	/**
 	 *
 	 * @param {...buildProps} props
+	 * @param {string} props.content
+	 *
+	 * @returns {jQuery}
+	 */
+	Builder.prototype.text = function() {
+		
+		return tmpl('span', Array.prototype.slice.call(arguments).map(Builder.normalizeBuildProps));
+	};
+	/**
+	 *
+	 * @param {...buildProps} props
 	 * @param {string} props.title
 	 *
 	 * @returns {jQuery}
@@ -47579,7 +47691,7 @@ Builder = (function() {
 				divider: different_day ? tmpl('divider', {
 					title: m_event_date.calendar().capitalize()
 				}) : '',
-				action_buttons: new AddToFavoriteButton(event.id, {
+				action_buttons: new AddToFavoriteButton(event, {
 					is_add_avatar: true,
 					is_checked: event.is_favorite,
 					classes: [
@@ -47722,7 +47834,7 @@ Builder = (function() {
 					is_link: true,
 					entity: __C.ENTITIES.ORGANIZATION
 				}),
-				action_button: new AddToFavoriteButton(event.id, {
+				action_button: new AddToFavoriteButton(event, {
 					is_add_avatar: true,
 					is_checked: event.is_favorite,
 					classes: [

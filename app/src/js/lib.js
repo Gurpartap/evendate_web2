@@ -21,7 +21,9 @@ __C = {
 			BUTTON: 'button'
 		},
 		TEXT_COLORS: {
-			ACCENT: '-text_color_accent'
+			ACCENT: '-text_color_accent',
+			MUTED_80: '-text_color_primary_80',
+			MUTED_50: '-text_color_primary_50'
 		},
 		TEXT_WEIGHT: {
 			BOLD: '-font_weight_bold',
@@ -35,6 +37,7 @@ __C = {
 			DEFAULT: '-color_default',
 			NEUTRAL: '-color_neutral',
 			NEUTRAL_ACCENT: '-color_neutral_accent',
+			MUTED: '-color_muted',
 			MARGINAL: '-color_marginal',
 			MARGINAL_ACCENT: '-color_marginal_accent',
 			MARGINAL_PRIMARY: '-color_marginal_primary',
@@ -114,6 +117,7 @@ __C = {
 		ICONS: {
 			STAR: 'fa-star',
 			STAR_O: 'fa-star-o',
+			BELL: 'fa-bell',
 			BELL_O: 'fa-bell-o',
 			TIMES: 'fa-times',
 			TIMES_CIRCLE: 'fa-times-circle',
@@ -2281,16 +2285,6 @@ function bindTabs($parent, is_height_dynamic) {
 		
 		$this.data('instance', $this);
 	}).addClass('-Handled_Tabs');
-}
-
-function bindShareButtons($parent) {
-	$parent = $parent ? $parent : $('body');
-	$parent.find('.ShareButton').not('.-Handled_ShareButton').each(function(i, elem) {
-		var $this = $(elem);
-		$this.on('click', function() {
-			window.open($this.data('href'), $this.data('title'), 'width=600,height=440,resizable=yes,scrollbars=no,status=no');
-		});
-	}).addClass('-Handled_ShareButton');
 }
 
 function bindSelect2($parent) {

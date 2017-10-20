@@ -30,27 +30,40 @@
 
 .event_image_bottom .button + .button {margin-left: .88em}
 
-.event_main_action_button {width: 200px}
+.event_main_action_button {width: 225px}
 
-.event_content {padding: 36px 42px 60px}
+.event_content {padding: 24px 24px 46px}
+
+.event_content > hr {
+	margin: 48px 0;
+	border-color: #e2e4e8;
+}
 
 .event_title {
 	display: block;
 	font-size: 1.5em;
 	font-weight: 500;
-	margin: 0 0 1em;
+	margin: 0 0 15px;
 }
 .event_description {
-	font-size: 0.88em;
-	line-height: 1.3;
+	font-size: 1.125em;
+	line-height: 1.33;
 	white-space: pre-line;
 }
 
 .event_map {
-	height: 150px;
+	height: 363px;
+	margin-left: -24px;
+	margin-right: -24px;
 	background-size: 100% auto;
 	background-position: 50%;
 	cursor: pointer;
+	overflow: hidden;
+}
+.event_map > img {
+	position: absolute;
+	width: 100%;
+	transform: translateY(-25%);
 }
 
 .event_additional_content {
@@ -63,7 +76,7 @@
 	font-size: .88rem;
 	margin: .5em 0;
 }
-.event_additional_field:not(:first-child) {margin-top: 36px}
+.event_additional_field:not(:first-child) {margin-top: 48px}
 .event_additional_field > p {margin: .4em 0}
 .event_additional_field_split {font-size: 0}
 .event_additional_field_split > .event_additional_field {
@@ -74,10 +87,7 @@
 }
 
 .event_additional_field > .button {margin-right: 1em}
-.event_additional_field > .avatars_collection {
-	margin-left: 1em;
-	cursor: pointer;
-}
+.event_additional_field .avatars_collection {cursor: pointer}
 
 .event_additional_field > .external_link {
 	display: block;
@@ -87,12 +97,18 @@
 }
 
 .event_calendar {
-	width: 225px;
+	width: 280px;
 }
 
 .event_date {
 	display: block;
 	margin-bottom: 6px;
+}
+
+.event_favored_additional_text {
+	display: block;
+	font-weight: 500;
+	margin: 0 0 24px;
 }
 
 .event_additional_field_label {
@@ -141,6 +157,7 @@
 }
 
 @supports (--custom_properties: 1) {
+	.event_content > hr {border-color: var(--color_marginal)}
 	.event_additional_content {border-left-color: var(--color_primary_30)}
 	.event_additional_field_label {color: var(--color_primary_50)}
 	.event_vulcan_header {color: var(--color_primary)}

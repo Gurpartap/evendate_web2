@@ -63,17 +63,34 @@
 
 .calendar_cell.-active {
 	color: #fff;
-	background-color: #657184;
+	opacity: 1;
+	background-color: #3e4d66;
+	box-shadow: 0 3px 12px 0 rgba(62, 77, 102, 0.5);
 }
 .-weekday_selection .calendar_weekday {cursor: pointer}
 
 .calendar_day:not(.-disabled) {cursor: pointer}
-.calendar_day.not_this_month,
 .calendar_day.-disabled,
-.event_calendar_day.not_this_month,
-.event_calendar_day.-disabled {opacity: .5}
+.calendar_day:not(.-active).not_this_month,
+.event_calendar_day.-disabled,
+.event_calendar_day:not(.-active).not_this_month {opacity: .5}
+
+.event_calendar_day,
+.event_calendar_weekday {
+	font-size: .875rem;
+	font-weight: 500;
+}
+
+.event_calendar_weekday {
+	color: #c5c9d1;
+	text-transform: uppercase;
+}
+.event_calendar_wrapper > .calendar_header {color: #657184}
+
 
 @supports (--custom_properties: 1) {
 	.calendar_header {color: var(--color_accent)}
-	.calendar_cell.-active {background-color: var(--color_primary_80)}
+	.calendar_cell.-active {background-color: var(--color_primary)}
+	.event_calendar_weekday {color: var(--color_primary_30)}
+	.event_calendar_wrapper > .calendar_header {color: var(--color_primary_80)}
 }

@@ -88,6 +88,7 @@ Calendar = (function() {
 			if(this.options.weekday_selection === true || this.options.month_selection === true ) {
 				this.options.selection_type = Calendar.SELECTION_TYPES.MULTI;
 			}
+			this.raw_dates = [];
 			this.selected_days = [];
 			this.selected_weeks = {};
 			this.selected_months = [];
@@ -138,6 +139,7 @@ Calendar = (function() {
 		}
 		this.renderTable();
 		this.$calendar.trigger('change:month');
+		this.bindTime(this.raw_dates);
 		return this;
 	};
 	
@@ -442,7 +444,7 @@ Calendar = (function() {
 					}
 				}
 			}
-			self.$calendar.find('.Day_'+day).removeClass(__C.CLASSES.ACTIVE);
+			self.$calendar.find('.Day_'+day).removeClass(__C.CLASSES.ACTIVE).removeAttr('title');
 		}
 		
 		if(this.options.selection_type === Calendar.SELECTION_TYPES.MULTI){
@@ -461,6 +463,26 @@ Calendar = (function() {
 		
 		return this;
 	};
+	/**
+	 *
+	 * @param {(DateModelsCollection|Array<DateModel>|DateModel)} dates
+	 */
+	Calendar.prototype.bindTime = function(dates) {
+		var self = this;
+		
+		this.raw_dates = (dates instanceof Array ? dates : [dates]);
+		
+		this.raw_dates.forEach(function(date) {
+			var m = moment.unix(date.event_date);
+			
+			self.$calendar.find('.Day_'+m.format(__C.DATE_FORMAT)).attr('title', '{start_time} - {end_time}'.format({
+				start_time: trimSeconds(date.start_time),
+				end_time: trimSeconds(date.end_time)
+			}));
+		});
+		
+		return this;
+ 	};
 	
 	Calendar.prototype.selectWeek = function(week){ // 0..6
 		var self = this,

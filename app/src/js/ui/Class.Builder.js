@@ -72,6 +72,17 @@ Builder = (function() {
 	/**
 	 *
 	 * @param {...buildProps} props
+	 * @param {string} props.content
+	 *
+	 * @returns {jQuery}
+	 */
+	Builder.prototype.text = function() {
+		
+		return tmpl('span', Array.prototype.slice.call(arguments).map(Builder.normalizeBuildProps));
+	};
+	/**
+	 *
+	 * @param {...buildProps} props
 	 * @param {string} props.title
 	 *
 	 * @returns {jQuery}
@@ -1273,7 +1284,7 @@ Builder = (function() {
 				divider: different_day ? tmpl('divider', {
 					title: m_event_date.calendar().capitalize()
 				}) : '',
-				action_buttons: new AddToFavoriteButton(event.id, {
+				action_buttons: new AddToFavoriteButton(event, {
 					is_add_avatar: true,
 					is_checked: event.is_favorite,
 					classes: [
@@ -1416,7 +1427,7 @@ Builder = (function() {
 					is_link: true,
 					entity: __C.ENTITIES.ORGANIZATION
 				}),
-				action_button: new AddToFavoriteButton(event.id, {
+				action_button: new AddToFavoriteButton(event, {
 					is_add_avatar: true,
 					is_checked: event.is_favorite,
 					classes: [

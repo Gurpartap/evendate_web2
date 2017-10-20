@@ -80,7 +80,7 @@ a.button:hover {text-decoration: none}
 
 
 .button.-color_default,
-.button.-color_neutral_alt {background-color: transparent}
+.button.-color_muted {background-color: transparent}
 
 .button.-color_primary_alt {background-color: rgba(83,121,184,0.24)}
 .button.-color_accent_alt {background-color: #ffdeeb}
@@ -178,7 +178,7 @@ a.button:hover {text-decoration: none}
 .button.-color_primary > .ripple,
 .button.-color_accent > .ripple,
 .button.-color_default > .ripple,
-.button.-color_neutral_alt > .ripple {background-color: #fff}
+.button.-color_muted > .ripple {background-color: #fff}
 
 .button.-color_primary_alt > .ripple,
 .button.-color_accent_alt > .ripple,
@@ -208,7 +208,7 @@ a.button:hover {text-decoration: none}
 	.button.-text_color_default,
 	.button.-text_color_marginal {color: var(--color_text)}
 
-	.button.-color_neutral_alt {color: var(--color_primary_50)}
+	.button.-color_muted {color: var(--color_primary_50)}
 
 	.button.-color_primary_alt,
 	.button.-text_color_primary,
@@ -268,7 +268,7 @@ a.button:hover {text-decoration: none}
 	.button.-text_color_default,
 	.button.-text_color_marginal {color: #4a4a4a}
 
-	.button.-color_neutral_alt {color: #9fa6b3}
+	.button.-color_muted {color: #9fa6b3}
 
 	.button.-color_primary_alt,
 	.button.-text_color_primary,

@@ -220,6 +220,9 @@ OneEvent = extending(OneEntity, (function() {
 	}
 	
 	OneEvent.ENDPOINT = Object.freeze({
+		NOTIFICATION: '/events/{event_id}/notifications/{notification_uuid}',
+		NOTIFICATIONS: '/events/{event_id}/notifications',
+		FAVORITES: '/events/{event_id}/favorites',
 		ORDERS: '/events/{event_id}/orders'
 	});
 	
@@ -350,40 +353,55 @@ OneEvent = extending(OneEntity, (function() {
 	/**
 	 *
 	 * @param {(string|number)} event_id
-	 * @param {function} [success]
+	 *
 	 * @returns {jqPromise}
 	 */
-	OneEvent.addFavored = function(event_id, success) {
-		return __APP.SERVER.addData('/api/v1/events/' + event_id + '/favorites', {}, false, success);
+	OneEvent.addFavored = function(event_id) {
+		
+		return __APP.SERVER.addData(OneEvent.ENDPOINT.FAVORITES.format({
+			event_id: event_id
+		}), {}, false);
 	};
 	/**
 	 *
 	 * @param {(string|number)} event_id
-	 * @param {AJAXCallback} [success]
+	 *
 	 * @returns {jqPromise}
 	 */
-	OneEvent.deleteFavored = function(event_id, success) {
-		return __APP.SERVER.deleteData('/api/v1/events/' + event_id + '/favorites', {}, success);
+	OneEvent.deleteFavored = function(event_id) {
+		
+		return __APP.SERVER.deleteData(OneEvent.ENDPOINT.FAVORITES.format({
+			event_id: event_id
+		}));
 	};
 	/**
 	 *
 	 * @param {(string|number)} event_id
 	 * @param {string} notification_type
-	 * @param {function} [success]
+	 *
 	 * @returns {jqPromise}
 	 */
-	OneEvent.addEventNotification = function(event_id, notification_type, success) {
-		return __APP.SERVER.addData('/api/v1/events/' + event_id + '/notifications', {notification_type: notification_type}, false, success);
+	OneEvent.addEventNotification = function(event_id, notification_type) {
+		
+		return __APP.SERVER.addData(OneEvent.ENDPOINT.NOTIFICATIONS.format({
+			event_id: event_id
+		}), {
+			notification_type: notification_type
+		}, false);
 	};
 	/**
 	 *
 	 * @param {(string|number)} event_id
 	 * @param {string} notification_uuid
-	 * @param {AJAXCallback} [success]
+	 *
 	 * @returns {jqPromise}
 	 */
-	OneEvent.deleteEventNotification = function(event_id, notification_uuid, success) {
-		return __APP.SERVER.deleteData('/api/v1/events/' + event_id + '/notifications/' + notification_uuid, {}, success);
+	OneEvent.deleteEventNotification = function(event_id, notification_uuid) {
+		
+		return __APP.SERVER.deleteData(OneEvent.ENDPOINT.NOTIFICATION.format({
+			event_id: event_id,
+			notification_uuid: notification_uuid
+		}));
 	};
 	/**
 	 * @typedef {object} OrderRegistrationField
@@ -522,6 +540,32 @@ OneEvent = extending(OneEntity, (function() {
 	};
 	/**
 	 *
+	 * @return {jqPromise}
+	 */
+	OneEvent.prototype.favour = function() {
+		var self = this;
+		
+		return OneEvent.addFavored(this.id).then(function() {
+			self.favored.push(__APP.USER);
+			
+			return __APP.USER;
+		});
+	};
+	/**
+	 *
+	 * @return {jqPromise}
+	 */
+	OneEvent.prototype.unfavour = function() {
+		var self = this;
+		
+		return OneEvent.deleteFavored(this.id).then(function() {
+			self.favored.remove(__APP.USER.id);
+			
+			return self.favored;
+		});
+	};
+	/**
+	 *
 	 * @param {(OneEvent.STATUS|Array<OneEvent.STATUS>)} status
 	 * @param {AJAXCallback} [success]
 	 * @returns {jqPromise}
@@ -539,22 +583,41 @@ OneEvent = extending(OneEntity, (function() {
 	/**
 	 *
 	 * @param {string} notification_type
-	 * @param {function} [success]
+	 *
 	 * @returns {jqPromise}
 	 */
-	OneEvent.prototype.addNotification = function(notification_type, success) {
+	OneEvent.prototype.addNotification = function(notification_type) {
+		var self = this;
 		
-		return this.constructor.addEventNotification(this.id, notification_type, success);
+		return this.constructor.addEventNotification(this.id, notification_type).then(function(raw_notification) {
+			var notification = new OneNotification();
+			
+			notification.setData({
+				uuid: raw_notification.uuid,
+				notification_type: notification_type,
+				notification_time: raw_notification.notification_time,
+				done: false,
+				event_id: self.id,
+				created_at: (new Date()).valueOf()
+			});
+			
+			self.notifications.push(notification);
+			
+			return notification;
+		});
 	};
 	/**
 	 *
 	 * @param {string} notification_uuid
-	 * @param {AJAXCallback} [success]
+	 *
 	 * @returns {jqPromise}
 	 */
-	OneEvent.prototype.deleteNotification = function(notification_uuid, success) {
+	OneEvent.prototype.deleteNotification = function(notification_uuid) {
+		var self = this;
 		
-		return this.constructor.deleteEventNotification(this.id, notification_uuid, success);
+		return this.constructor.deleteEventNotification(this.id, notification_uuid).then(function() {
+			self.notifications.remove(notification_uuid);
+		});
 	};
 	/**
 	 *
