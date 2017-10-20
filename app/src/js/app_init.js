@@ -148,6 +148,7 @@ if (checkRedirect()) {
 					$('.DownloadAppBand').removeClass('-open_band');
 				});
 			}
+			__APP.LOADER = __APP.BUILD.overlayLoader();
 			
 			user_jqhxr = __APP.USER.fetchUser(new Fields(
 				'email',

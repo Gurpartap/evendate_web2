@@ -101,12 +101,57 @@ EditEventPage = extending(AbstractEditEventPage, (function() {
 			
 			this.render_vars.registration_predefined_fields = tmpl('edit-event-registration-predefined-field', registration_fields);
 		}
+		
+		this.render_vars.delete_event_button = __APP.BUILD.button({
+			title: 'Отменить событие',
+			classes: [
+				'RemoveEvent',
+				__C.CLASSES.COLORS.BUBBLEGUM,
+				__C.CLASSES.SIZES.WIDE,
+				__C.CLASSES.HOOKS.RIPPLE
+			]
+		});
+		
+		this.render_vars.return_event_button = __APP.BUILD.button({
+			title: 'Вернуть событие',
+			classes: [
+				'ReturnEvent',
+				__C.CLASSES.COLORS.FRANKLIN,
+				__C.CLASSES.SIZES.WIDE,
+				__C.CLASSES.HOOKS.RIPPLE
+			]
+		});
 	};
 	
 	EditEventPage.prototype.init = function() {
 		var self = this;
 		
 		AbstractEditEventPage.prototype.init.call(this);
+		
+		(function cancelButtonInit() {
+			var $cancel_wrapper = self.$wrapper.find('.RemoveEventWrapper'),
+				$restore_wrapper = self.$wrapper.find('.ReturnEventWrapper');
+			
+			if (self.event.canceled) {
+				$cancel_wrapper.addClass(__C.CLASSES.HIDDEN);
+			} else {
+				$restore_wrapper.addClass(__C.CLASSES.HIDDEN);
+			}
+			
+			self.$wrapper.find('.RemoveEvent').on('click.RemoveEvent', function() {
+				self.event.cancel().done(function() {
+					$restore_wrapper.removeClass(__C.CLASSES.HIDDEN);
+					$cancel_wrapper.addClass(__C.CLASSES.HIDDEN);
+				});
+			});
+			
+			self.$wrapper.find('.ReturnEvent').on('click.ReturnEvent', function() {
+				self.event.restore().done(function() {
+					$cancel_wrapper.removeClass(__C.CLASSES.HIDDEN);
+					$restore_wrapper.addClass(__C.CLASSES.HIDDEN);
+				});
+			});
+		}());
 		
 		(function selectDates($view, raw_dates, is_same_time) {
 			var MainCalendar = $view.find('.EventDatesCalendar').data('calendar'),

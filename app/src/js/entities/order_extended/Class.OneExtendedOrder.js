@@ -75,14 +75,13 @@ OneExtendedOrder = extending(OneOrder, (function() {
 	};
 	/**
 	 *
-	 * @param {(string|number)} event_id
 	 * @param {(string|number)} uuid
 	 * @param {(Fields|string)} [fields]
 	 * @param {AJAXCallback} [success]
 	 *
 	 * @return {jqPromise}
 	 */
-	OneExtendedOrder.fetchOrder = function(event_id, uuid, fields, success) {
+	OneExtendedOrder.fetchOrder = function(uuid, fields, success) {
 		fields = Fields.parseFields(fields);
 		
 		

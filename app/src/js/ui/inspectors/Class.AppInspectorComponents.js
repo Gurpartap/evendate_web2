@@ -41,20 +41,16 @@ AppInspectorComponents = (function() {
 	};
 	/**
 	 *
-	 * @param {(Array<OneTicket>|...OneTicket|TicketsCollection)} tickets
+	 * @param {(Array<OneTicket>|OneTicket|TicketsCollection)} tickets
+	 * @param [is_clickable=false]
 	 *
 	 * @return {jQuery}
 	 */
-	AppInspectorComponents.prototype.tickets = function(tickets) {
-		var _tickets;
+	AppInspectorComponents.prototype.tickets = function(tickets, is_clickable) {
+		var _tickets = tickets instanceof Array ? tickets : [tickets],
+			$tickets;
 		
-		if (arguments.length > 1) {
-			_tickets = [].slice.call(arguments)
-		} else {
-			_tickets = tickets instanceof Array ? tickets : [tickets]
-		}
-		
-		return tmpl('app-inspector-ticket', _tickets.map(function(ticket) {
+		$tickets = tmpl('app-inspector-ticket', _tickets.map(function(ticket) {
 			
 			return {
 				fields: tmpl('fields-wrapper', [
@@ -72,9 +68,29 @@ AppInspectorComponents = (function() {
 				]),
 				footer: !ticket.checkout ? '' : tmpl('app-inspector-ticket-footer')
 			};
-		})).each(function(i, el) {
-			$(el).data('ticket', _tickets[i]);
+		}));
+		
+		$tickets.each(function(i, el) {
+			$(el).data('ticket_uuid', _tickets[i].uuid).data('event_id', _tickets[i].event_id);
 		});
+		
+		if (is_clickable) {
+			$tickets.on('click.OpenTicket', function() {
+				var $this = $(this),
+					modal = $this.data('modal');
+				
+				if (!modal) {
+					modal = new TicketsModal({
+						uuid: $this.data('ticket_uuid'),
+						event_id: $this.data('event_id')
+					});
+					$this.data('modal', modal);
+				}
+				modal.show();
+			}).addClass(__C.CLASSES.UNIVERSAL_STATES.CLICKABLE);
+		}
+		
+		return $tickets;
 	};
 	/**
 	 *

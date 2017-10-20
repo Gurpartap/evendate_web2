@@ -27,5 +27,12 @@ AddEventPage = extending(AbstractEditEventPage, (function() {
 		this.render_vars.ticket_types = tmpl('edit-event-tickets-row-empty');
 	};
 	
+	AddEventPage.prototype.init = function() {
+		AbstractEditEventPage.prototype.init.call(this);
+		
+		this.$wrapper.find('.RemoveEventWrapper').addClass(__C.CLASSES.HIDDEN);
+		this.$wrapper.find('.ReturnEventWrapper').addClass(__C.CLASSES.HIDDEN);
+	};
+	
 	return AddEventPage;
 }()));

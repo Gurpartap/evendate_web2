@@ -301,7 +301,15 @@ $__modules['events'] = array(
 				array('length' => $__length, 'offset' => $__offset),
 				$__order_by ?? array('nearest_event_date', 'first_event_date'));
 		},
-		'tickets' => function () use ($__db, $__request, $__fields, $__user, $__order_by, $__offset, $__length) { /*MY EVENTS!*/
+		'tickets' => function ($uuid = null) use ($__db, $__request, $__fields, $__user, $__order_by, $__offset, $__length) { /*MY EVENTS!*/
+			if ($__user instanceof User == false) throw new PrivilegesException('NOT_AUTHORIZED', $__db);
+			if (isset( $uuid )) {
+				return TicketsCollection::oneByUUID($__db,
+					$__user,
+					$uuid,
+					$__fields ?? array()
+				)->getParams($__user, $__fields);
+			}
 			return TicketsCollection::filter(
 				$__db,
 				$__user,
@@ -349,7 +357,15 @@ $__modules['events'] = array(
 				$__order_by ?? array()
 			);
 		},
-		'orders' => function () use ($__db, $__request, $__fields, $__user, $__order_by, $__offset, $__length, $__pagination) {
+		'orders' => function ($uuid = null) use ($__db, $__request, $__fields, $__user, $__order_by, $__offset, $__length, $__pagination) {
+			if ($__user instanceof User == false) throw new PrivilegesException('NOT_AUTHORIZED', $__db);
+			if (isset( $uuid )) {
+				return OrdersCollection::oneByUUID($__db,
+					$__user,
+					$uuid,
+					$__fields ?? array()
+				)->getParams($__user, $__fields);
+			}
 			return OrdersCollection::filter($__db,
 				$__user,
 				array_merge($__request, array('user' => $__user)),

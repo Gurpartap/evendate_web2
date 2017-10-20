@@ -28,10 +28,13 @@ OneTicket = extending(OneEntity, (function() {
 	 * @property {?timestamp} created_at
 	 *
 	 * @property {OneTicketType} ticket_type
+	 * @property {OneEvent} event
 	 * @property {OneOrder} order
 	 * @property {OneUser} user
 	 */
 	function OneTicket(event_id, uuid) {
+		var self = this;
+		
 		this.uuid = setDefaultValue(uuid, 0);
 		this.event_id = setDefaultValue(event_id, 0);
 		this.user_id = null;
@@ -42,51 +45,84 @@ OneTicket = extending(OneEntity, (function() {
 		this.checkout = null;
 		this.price = null;
 		this.number = null;
+		this.event = new OneEvent();
 		this.ticket_type = new OneTicketType();
 		this.order = new OneOrder();
 		this.user = new OneUser();
 		
 		this.created_at = null;
+		
+		Object.defineProperties(this, {
+			status_name: {
+				get: function() {
+					
+					return localeFromNamespace(self.order.status_type_code, OneTicket.TICKET_STATUSES, __LOCALES.ru_RU.TEXTS.TICKET_STATUSES);
+				}
+			},
+			status_type_code: {
+				get: function() {
+					
+					return self.order.status_type_code;
+				}
+			}
+		});
 	}
 	OneTicket.prototype.ID_PROP_NAME = 'uuid';
+	
+	OneTicket.TICKET_STATUSES = Object.freeze(mergeObjects({
+		USED: 'used'
+	}, OneOrder.EXTENDED_ORDER_STATUSES));
+	
+	OneTicket.ENDPOINT = Object.freeze({
+		TICKET: '/events/tickets/{ticket_uuid}',
+		ADMIN_TICKET: '/statistics/events/{event_id}/tickets/{ticket_uuid}'
+	});
 	
 	/**
 	 *
 	 * @param {(string|number)} event_id
 	 * @param {(string|number)} uuid
 	 * @param {(Fields|string)} [fields]
-	 * @param {AJAXCallback} [success]
 	 *
 	 * @return {jqPromise}
 	 */
-	OneTicket.fetchTicket = function(event_id, uuid, fields, success) {
-		return __APP.SERVER.getData('/api/v1/events/' + event_id + '/tickets/' + uuid, {
+	OneTicket.fetchTicket = function(event_id, uuid, fields) {
+		
+		return __APP.SERVER.getData(OneTicket.ENDPOINT.TICKET.format({
+			ticket_uuid: uuid
+		}), {
 			fields: fields
-		}, success);
+		});
 	};
 	/**
 	 *
 	 * @param {(string|number)} event_id
 	 * @param {(string|number)} uuid
-	 * @param {AJAXCallback} [success]
+	 *
 	 * @return {jqPromise}
 	 */
-	OneTicket.check = function(event_id, uuid, success) {
-		return __APP.SERVER.updateData('/api/v1/statistics/events/' + event_id + '/tickets/' + uuid, {
+	OneTicket.check = function(event_id, uuid) {
+		
+		return __APP.SERVER.updateData(OneTicket.ENDPOINT.ADMIN_TICKET.format({
+			ticket_uuid: uuid
+		}), {
 			checkout: true
-		}, false, success);
+		}, false);
 	};
 	/**
 	 *
 	 * @param {(string|number)} event_id
 	 * @param {(string|number)} uuid
-	 * @param {AJAXCallback} [success]
+	 *
 	 * @return {jqPromise}
 	 */
-	OneTicket.uncheck = function(event_id, uuid, success) {
-		return __APP.SERVER.updateData('/api/v1/statistics/events/' + event_id + '/tickets/' + uuid, {
+	OneTicket.uncheck = function(event_id, uuid) {
+		
+		return __APP.SERVER.updateData(OneTicket.ENDPOINT.ADMIN_TICKET.format({
+			ticket_uuid: uuid
+		}), {
 			checkout: false
-		}, false, success);
+		}, false);
 	};
 	/**
 	 *
@@ -112,50 +148,42 @@ OneTicket = extending(OneEntity, (function() {
 	/**
 	 *
 	 * @param {(Fields|string)} [fields]
-	 * @param {AJAXCallback} [success]
 	 *
 	 * @return {jqPromise}
 	 */
-	OneTicket.prototype.fetchTicket = function(fields, success) {
+	OneTicket.prototype.fetch = function(fields) {
 		var self = this;
 		
-		return OneTicket.fetchTicket(this.event_id, this.uuid, fields, function(data) {
+		return OneTicket.fetchTicket(this.event_id, this.uuid, fields).then(function(data) {
 			self.setData(data);
-			if (success && typeof success === 'function') {
-				success.call(self, data);
-			}
+			
+			return data;
 		});
 	};
 	/**
 	 *
-	 * @param {AJAXCallback} [success]
-	 *
 	 * @return {jqPromise}
 	 */
-	OneTicket.prototype.check = function(success) {
+	OneTicket.prototype.check = function() {
 		var self = this;
 		
-		return OneTicket.check(this.event_id, this.uuid, function() {
+		return OneTicket.check(this.event_id, this.uuid).then(function() {
 			self.checkout = true;
-			if (success && typeof success === 'function') {
-				success.call(self, self);
-			}
+			
+			return self;
 		});
 	};
 	/**
 	 *
-	 * @param {AJAXCallback} [success]
-	 *
 	 * @return {jqPromise}
 	 */
-	OneTicket.prototype.uncheck = function(success) {
+	OneTicket.prototype.uncheck = function() {
 		var self = this;
 		
-		return OneTicket.uncheck(this.event_id, this.uuid, function() {
+		return OneTicket.uncheck(this.event_id, this.uuid).then(function() {
 			self.checkout = false;
-			if (success && typeof success === 'function') {
-				success.call(self, self);
-			}
+			
+			return self;
 		});
 	};
 	/**

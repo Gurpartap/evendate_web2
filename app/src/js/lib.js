@@ -33,6 +33,7 @@ __C = {
 		COLORS: {
 			ACCENT: '-color_accent',
 			FRANKLIN: '-color_franklin',
+			BUBBLEGUM: '-color_bubblegum',
 			PRIMARY: '-color_primary',
 			DEFAULT: '-color_default',
 			NEUTRAL: '-color_neutral',
@@ -52,6 +53,7 @@ __C = {
 			RIGHT: '-align_right'
 		},
 		UNIVERSAL_STATES: {
+			CLICKABLE: '-clickable',
 			EMPTY: '-empty',
 			SLIGHTLY_ROUNDED: '-slightly_rounded',
 			ROUNDED: '-rounded',
