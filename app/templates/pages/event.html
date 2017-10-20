@@ -9,6 +9,7 @@
 			<div class="event_content">
 				<h3 class="event_title" title="{title}">{title}</h3>
 				<div class="event_description">{description}</div>
+				{map}
 			</div>
 		</div>
 		<div class="event_additional_content">
@@ -18,20 +19,21 @@
 				{organization_avatar_block}
 			</div>
 			<div class="event_additional_field">
-				{event_additional_info}
 				<div class="form_unit">
 					{event_action}
 				</div>
-				<div class="form_unit">
-					{event_notifications_button}
-				</div>
-			</div>
-			<div class="event_additional_field AddAvatarWrapper">
-				{action_button}
-				{avatars_collection}
+				{event_additional_info}
 			</div>
 			<div class="event_additional_field">
 				<div class="event_calendar EventCalendar"></div>
+			</div>
+			<div class="event_additional_field AddAvatarWrapper">
+				<h6 class="event_additional_field_label">Добавили в избранное</h6>
+				<div class="form_unit AvatarsCollectionWrapper">
+					{avatars_collection}
+				</div><!--
+				<span class="event_favored_additional_text FavoredAdditionalText">{favored_additional_text}</span>-->
+				{action_button}
 			</div>
 			{event_additional_fields}
 		</div>
@@ -57,7 +59,11 @@
 </script>
 
 <script type="javascript/template" id="tmpl-event-map">
-	<div class="event_map CallModal EventMap" data-modal_type="map" style="background-image: url('https://maps.googleapis.com/maps/api/staticmap?markers={location_sanitized}&zoom=15&size=640x640&scale=2&format=png&maptype=roadmap&key=AIzaSyCKu_xeHhtme8b1awA_rHjpfV3wVg1fZDg')" data-modal_map_location="{location_sanitized}"></div>
+	<hr>
+	<p class="small_title -text_color_default -transform_uppercase">Место проведения</p>
+	<div class="event_map CallModal EventMap" data-modal_type="map" data-modal_map_location="{location_sanitized}">
+		<img src="https://maps.googleapis.com/maps/api/staticmap?markers={location_sanitized}&zoom=15&size=640x640&scale=2&format=png&maptype=roadmap&key=AIzaSyCKu_xeHhtme8b1awA_rHjpfV3wVg1fZDg">
+	</div>
 	<p class="-font_weight_bolder">{location}</p>
 </script>
 
@@ -66,17 +72,12 @@
 </script>
 
 <script type="javascript/template" id="tmpl-event-date-time">
-	<div class="event_additional_field Collapsing" data-collapsing_id="event_dates" data-default-height="80">
-		<div class="collapsing_wrapper CollapsingWrapper -fading" data-collapsing_id="event_dates">
-			<div class="collapsing_content CollapsingContent">
-				<div class="event_additional_field_split">
-					<div class="event_additional_field"><h6 class="event_additional_field_label">Дата</h6></div>
-					<div class="event_additional_field"><h6 class="event_additional_field_label">Время</h6></div>
-				</div>
-				{date_times}
-			</div>
+	<div class="event_additional_field">
+		<div class="event_additional_field_split">
+			<div class="event_additional_field"><h6 class="event_additional_field_label">Дата</h6></div>
+			<div class="event_additional_field"><h6 class="event_additional_field_label">Время</h6></div>
 		</div>
-		<button class="collapsing_button CollapsingTrigger fa_icon fa-chevron-down -empty" data-collapsing_id="event_dates" data-collapsing_trigger="click"></button>
+		{date_times}
 	</div>
 </script>
 
@@ -96,7 +97,7 @@
 
 <script type="javascript/template" id="tmpl-event-detail-link">
 	<div class="event_additional_field">
-		<h6 class="event_additional_field_label">Подробнее</h6>
+		<h6 class="event_additional_field_label">Страница события</h6>
 		<a class="external_link ExternalLink" href="{detail_info_url}" target="_blank">{detail_info_url}</a>
 	</div>
 </script>
@@ -105,14 +106,5 @@
 	<div class="event_vulcan">
 		<header class="event_vulcan_header">Похожие мероприятия</header>
 		{event_cards}
-	</div>
-</script>
-
-<script type="javascript/template" id="tmpl-dropdown-event-edit-notifications">
-	<div class="dropdown_box DropdownBox">
-		<header class="dropdown_header">Настройка напоминания</header>
-		<form class="dropdown_box_wrapper">
-			{notifications}
-		</form>
 	</div>
 </script>

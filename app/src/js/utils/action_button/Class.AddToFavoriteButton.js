@@ -11,10 +11,10 @@ AddToFavoriteButton = extending(ActionButton, (function() {
 	 *
 	 * @constructor
 	 * @constructs AddToFavoriteButton
-	 * @param {(number|string)} event_id
+	 * @param {OneEvent} event
 	 * @param {object} [options]
 	 */
-	function AddToFavoriteButton(event_id, options) {
+	function AddToFavoriteButton(event, options) {
 		this.options = {
 			labels: {
 				checked: __LOCALES.ru_RU.TEXTS.BUTTON.FAVORED,
@@ -35,7 +35,7 @@ AddToFavoriteButton = extending(ActionButton, (function() {
 				unchecked_hover: __C.CLASSES.ICONS.STAR_O
 			}
 		};
-		this.event_id = event_id;
+		this.event = event;
 		ActionButton.call(this, options);
 	}
 	
@@ -45,14 +45,14 @@ AddToFavoriteButton = extending(ActionButton, (function() {
 		var modal;
 		
 		if (!(modal = this.data('modal'))) {
-			modal = new AuthModal(location.origin + '/event/' + this.event_id, {
+			modal = new AuthModal(location.origin + '/event/' + this.event.id, {
 				note: 'Чтобы добавить событие в избранное, необходимо войти через социальную сеть'
 			});
 			this.data('modal', modal);
 		}
 		
 		cookies.setItem('auth_command', 'add_to_favorite');
-		cookies.setItem('auth_entity_id', this.event_id);
+		cookies.setItem('auth_entity_id', this.event.id);
 		
 		return modal.show();
 	};
@@ -61,11 +61,11 @@ AddToFavoriteButton = extending(ActionButton, (function() {
 		var self = this;
 		
 		if (this.is_checked) {
-			OneEvent.deleteFavored(this.event_id, function() {
+			this.event.unfavour().done(function() {
 				self.afterUncheck();
 			});
 		} else {
-			OneEvent.addFavored(this.event_id, function() {
+			this.event.favour().done(function() {
 				self.afterCheck();
 			});
 		}

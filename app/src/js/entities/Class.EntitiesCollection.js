@@ -83,6 +83,24 @@ EntitiesCollection = extending(Array, (function() {
 		
 		return this.length;
 	};
+	/**
+	 *
+	 * @param {(string|number)} id
+	 *
+	 * @returns {(OneEntity|null)}
+	 */
+	EntitiesCollection.prototype.pull = function(id) {
+		var entity;
+		
+		if (this.has(id)) {
+			entity = this.getByID(id);
+			this.remove(id);
+			
+			return entity;
+		}
+		
+		return null;
+	};
 	
 	EntitiesCollection.prototype.createAdditionalLookup = function() {};
 	/**
