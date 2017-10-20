@@ -223,7 +223,8 @@ OneEvent = extending(OneEntity, (function() {
 		NOTIFICATION: '/events/{event_id}/notifications/{notification_uuid}',
 		NOTIFICATIONS: '/events/{event_id}/notifications',
 		FAVORITES: '/events/{event_id}/favorites',
-		ORDERS: '/events/{event_id}/orders'
+		ORDERS: '/events/{event_id}/orders',
+		STATUS: '/events/{event_id}/status'
 	});
 	
 	/**
@@ -318,11 +319,12 @@ OneEvent = extending(OneEntity, (function() {
 	 *
 	 * @param {(string|number)} event_id
 	 * @param {(OneEvent.STATUS|Array<OneEvent.STATUS>)} status
-	 * @param {AJAXCallback} [success]
+	 *
 	 * @returns {jqPromise}
 	 */
-	OneEvent.changeEventStatus = function(event_id, status, success) {
+	OneEvent.changeEventStatus = function(event_id, status) {
 		var data = {};
+		
 		status = Array.isArray(status) ? status : [status];
 		status.forEach(function(el) {
 			switch (el) {
@@ -344,10 +346,12 @@ OneEvent = extending(OneEntity, (function() {
 				}
 			}
 		});
-		return __APP.SERVER.updateData('/api/v1/events/' + event_id + '/status', data, false, function() {
-			if (success && typeof success == 'function') {
-				success.call(self, data);
-			}
+		
+		return __APP.SERVER.updateData(OneEvent.ENDPOINT.STATUS.format({
+			event_id: event_id
+		}), data, false).then(function() {
+			
+			return data;
 		});
 	};
 	/**
@@ -566,18 +570,54 @@ OneEvent = extending(OneEntity, (function() {
 	};
 	/**
 	 *
-	 * @param {(OneEvent.STATUS|Array<OneEvent.STATUS>)} status
-	 * @param {AJAXCallback} [success]
-	 * @returns {jqPromise}
+	 * @return {jqPromise}
 	 */
-	OneEvent.prototype.changeEventStatus = function(status, success) {
+	OneEvent.prototype.cancel = function() {
 		var self = this;
 		
-		return this.constructor.changeEventStatus(self.id, status, function(data) {
-			self.setData(data);
-			if (isFunction(success)) {
-				success.call(self, data);
-			}
+		return OneEvent.changeEventStatus(this.id, OneEvent.STATUS.CANCEL).then(function() {
+			self.canceled = true;
+			
+			return self;
+		});
+	};
+	/**
+	 *
+	 * @return {jqPromise}
+	 */
+	OneEvent.prototype.restore = function() {
+		var self = this;
+		
+		return OneEvent.changeEventStatus(this.id, OneEvent.STATUS.BRING_BACK).then(function() {
+			self.canceled = false;
+			
+			return self;
+		});
+	};
+	/**
+	 *
+	 * @return {jqPromise}
+	 */
+	OneEvent.prototype.hide = function() {
+		var self = this;
+		
+		return OneEvent.changeEventStatus(this.id, OneEvent.STATUS.HIDE).then(function() {
+			self.hidden = true;
+			
+			return self;
+		});
+	};
+	/**
+	 *
+	 * @return {jqPromise}
+	 */
+	OneEvent.prototype.bringBach = function() {
+		var self = this;
+		
+		return OneEvent.changeEventStatus(this.id, OneEvent.STATUS.SHOW).then(function() {
+			self.hidden = false;
+			
+			return self;
 		});
 	};
 	/**

@@ -5899,7 +5899,7 @@ fieldset + .org_admin_settings_wrapper,
 	align-items: flex-start;
 	min-width: 750px;
 	max-width: 1044px;
-	margin: 24px 0;
+	margin: 24px 0 60px;
 	border-radius: 2px;
 }
 
@@ -5928,7 +5928,7 @@ fieldset + .org_admin_settings_wrapper,
 
 .event_main_action_button {width: 225px}
 
-.event_content {padding: 24px 24px 46px}
+.event_content {padding: 36px 60px 46px}
 
 .event_content > hr {
 	margin: 48px 0;
@@ -5942,15 +5942,15 @@ fieldset + .org_admin_settings_wrapper,
 	margin: 0 0 15px;
 }
 .event_description {
-	font-size: 1.125em;
+	font-size: 1em;
 	line-height: 1.33;
 	white-space: pre-line;
 }
 
 .event_map {
 	height: 363px;
-	margin-left: -24px;
-	margin-right: -24px;
+	margin-left: -60px;
+	margin-right: -60px;
 	background-size: 100% auto;
 	background-position: 50%;
 	cursor: pointer;

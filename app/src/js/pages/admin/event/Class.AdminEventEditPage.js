@@ -41,3 +41,4 @@ AdminEventEditPage = extending(EditEventPage, AdminEventPage, (function() {
 }()));
 
 AdminEventEditPage.prototype.renderHeaderTabs = AdminEventPage.prototype.renderHeaderTabs;
+AdminEventEditPage.prototype.init = EditEventPage.prototype.init;
