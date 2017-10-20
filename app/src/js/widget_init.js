@@ -84,6 +84,8 @@ $(document)
 			}
 		});
 		
+		__APP.LOADER = __APP.BUILD.overlayLoader();
+		
 		user_jqhxr = __APP.USER.fetchUser(new Fields('email'));
 		auth_urls_jqxhr = AsynchronousConnection.dealAjax(AsynchronousConnection.HTTP_METHODS.GET, '/auth.php', {
 			action: 'get_urls',

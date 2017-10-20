@@ -1551,7 +1551,7 @@ Builder = (function() {
 	
 	/**
 	 *
-	 * @param {(OneExtendedTicket|Array<OneExtendedTicket>|ExtendedTicketsCollection)} tickets
+	 * @param {(OneTicket|Array<OneTicket>|TicketsCollection)} tickets
 	 * @return Array
 	 */
 	Builder.normalizeTicketProps = function(tickets) {
@@ -1589,7 +1589,10 @@ Builder = (function() {
 			
 			if (ticket.event.is_same_time) {
 				event_date = ticket.event.dates[0];
-				props.formatted_dates = displayDateRange(event_date.event_date, ticket.event.dates[ticket.event.dates.length - 1].event_date) + ', ' + displayTimeRange(event_date.start_time, event_date.end_time);
+				props.formatted_dates = '{date}, {time}'.format({
+					date: displayDateRange(event_date.event_date, ticket.event.dates[ticket.event.dates.length - 1].event_date),
+					time: displayTimeRange(event_date.start_time, event_date.end_time)
+				});
 			} else {
 				event_date = ticket.event.nearest_event_date;
 				props.formatted_dates = displayDateRange(event_date, event_date);
@@ -1600,7 +1603,7 @@ Builder = (function() {
 	};
 	/**
 	 *
-	 * @param {(OneExtendedTicket|Array<OneExtendedTicket>|ExtendedTicketsCollection)} tickets
+	 * @param {(OneTicket|Array<OneTicket>|TicketsCollection)} tickets
 	 * @return {jQuery}
 	 */
 	Builder.prototype.ticketCards = function buildTicketCard(tickets) {

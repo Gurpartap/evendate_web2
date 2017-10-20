@@ -132,7 +132,7 @@ EventPage = extending(Page, (function() {
 		
 		
 		this.$wrapper.find('.CancelEvent').on('click.CancelEvent', function() {
-			PAGE.event.changeEventStatus(OneEvent.STATUS.CANCEL, function() {
+			PAGE.event.cancel().done(function() {
 				PAGE.$wrapper.find('.EventPage').append(PAGE.$overlay_cap);
 			});
 		});
@@ -224,7 +224,7 @@ EventPage = extending(Page, (function() {
 					__C.CLASSES.HOOKS.RIPPLE
 				]
 			}).on('click.CancelCancellation', function() {
-				self.event.changeEventStatus(OneEvent.STATUS.BRING_BACK, function() {
+				self.event.restore().done(function() {
 					self.$overlay_cap.detach();
 				});
 			})));
@@ -339,7 +339,7 @@ EventPage = extending(Page, (function() {
 		if (this.event.registration_required) {
 			this.render_vars.event_additional_info = this.render_vars.event_additional_info.add(
 				tmpl('event-additional-info', {
-					text: (this.event.registration_till ? 'Регистрация до ' + moment.unix(this.event.registration_till).calendar(null, __LOCALES.ru_RU.DATE.CALENDAR_DATE_TIME) : 'Регистрация обязательна')
+					text: (this.event.registration_till ? 'Регистрация до ' + moment.unix(this.event.registration_till).calendar(null, __LOCALES.ru_RU.DATE.CALENDAR_DATE_TIME).toLowerCase() : 'Регистрация обязательна')
 				})
 			);
 		}
