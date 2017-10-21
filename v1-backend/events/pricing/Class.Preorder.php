@@ -49,6 +49,16 @@ class Preorder
 		return $this->sum;
 	}
 
+	/**
+	 * @return Event
+	 */
+	public function getEvent(): Event
+	{
+		return $this->event;
+	}
+
+
+
 	public function getTicketsCount()
 	{
 		if (!$this->sum) {

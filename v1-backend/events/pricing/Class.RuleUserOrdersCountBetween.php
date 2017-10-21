@@ -30,7 +30,9 @@ final class RuleUserOrdersCountBetween extends AbstractPricingRule implements Pr
 	function isApplicable(Preorder $preorder): bool
 	{
 		$user = App::getCurrentUser();
-		if ($user->getOrdersCountInOrganization() > $this->data['min_count'] && $user->getOrdersCountInOrganization() < $this->data['max_count']) {
+		if ($user instanceof User == false) return false;
+		$orders = $user->getOrdersInOrganization($preorder->getEvent());
+		if (count($orders) > $this->data['min_count'] && count($orders) < $this->data['max_count']) {
 			return true;
 		}
 		return false;
