@@ -35985,6 +35985,7 @@ __C = {
 			BELL_O: 'fa-bell-o',
 			TIMES: 'fa-times',
 			TIMES_CIRCLE: 'fa-times-circle',
+			ENVELOPE: 'fa-envelope',
 			PLUS: 'fa-plus',
 			MINUS: 'fa-minus',
 			CHECK: 'fa-check',
@@ -36138,6 +36139,18 @@ function classEscalation(Class, methods) {
 			value: methods[method_name]
 		});
 	});
+}
+
+/**
+ *
+ * @param {object} instance
+ * @param {Function} Class
+ *
+ * @return {boolean}
+ */
+function isDirectInstance(instance, Class) {
+	
+	return instance.constructor === Class;
 }
 /**
  * Returns capitalized string
@@ -37133,6 +37146,30 @@ function tmpl(template_type, items, addTo, direction) {
 	}
 	return result;
 }
+
+/**
+ *
+ * @typedef {object} ParsedUrl
+ *
+ * @property {string} anchor
+ * @property {string} authority
+ * @property {string} directory
+ * @property {string} file
+ * @property {string} host
+ * @property {string} password
+ * @property {string} path
+ * @property {string} port
+ * @property {string} protocol
+ * @property {string} query
+ * @property {Object<string, string>} queryKey
+ * @property {string} relative
+ * @property {string} source
+ * @property {string} user
+ * @property {string} userInfo
+ * @property {string} wo_path
+ * @property {string} wo_query
+ *
+ */
 /**
  *
  * Parses URI and returns object like PHP parse_url function do
@@ -37140,24 +37177,7 @@ function tmpl(template_type, items, addTo, direction) {
  *
  * @param {string} str
  * @param {object} [options]
- * @return {{
- *    anchor: string
- *    authority: string
- *    directory: string
- *    file: string
- *    host: string
- *    password: string
- *    path: string
- *    port: string
- *    protocol: string
- *    query: string
- *    queryKey: Object
- *    relative: string
- *    source: string
- *    user: string
- *    userInfo: string
- *    wo_query: string
- * }}
+ * @return {ParsedUrl}
  */
 function parseUri(str, options) {
 	var o = {
@@ -37188,8 +37208,15 @@ function parseUri(str, options) {
 	});
 	
 	Object.defineProperties(uri, {
+		wo_path: {
+			get: function() {
+				
+				return uri[o.key[1]] + '://' + uri[o.key[6]];
+			}
+		},
 		wo_query: {
 			get: function() {
+				
 				return uri[o.key[1]] + '://' + uri[o.key[6]] + uri[o.key[9]];
 			}
 		}
@@ -48231,6 +48258,7 @@ Page = (function() {
 	 * @property {jQuery} $wrapper
 	 * @property {string} wrapper_tmpl
 	 * @property {boolean} with_header_tabs
+	 * @property {ParsedUrl} location
 	 *
 	 * @property {jqPromise} rendering_defer
 	 * @property {jqPromise} fetching_data_defer
@@ -48240,19 +48268,13 @@ Page = (function() {
 		this.state_name = this.name;
 		this.page_title = setDefaultValue(this.page_title, '');
 		this.page_title_obj = setDefaultValue(this.page_title_obj, '');
-		/**
-		 * @name Page#$view
-		 * @type jQuery
-		 */
 		this.$view = setDefaultValue(this.$view, $('.PageView'));
-		/**
-		 * @name Page#$wrapper
-		 * @type jQuery
-		 */
 		this.$wrapper = setDefaultValue(this.$wrapper, $());
 		this.$loader = $();
 		this.wrapper_tmpl = setDefaultValue(this.wrapper_tmpl, 'std');
 		this.with_header_tabs = setDefaultValue(this.with_header_tabs, false);
+		
+		this.location = parseUri(window.location);
 		
 		this.render_vars = setDefaultValue(this.render_vars, {});
 		
@@ -48657,7 +48679,7 @@ OrderPage = extending(Page, (function() {
 	
 	OrderPage.prototype.redirect = function() {
 		
-		return __APP.openPage(new NotAvailableOrderPage(this.event));
+		return __APP.openPage(new NotAvailableOrderPage(this.event.organization.id, this.event));
 	};
 	
 	OrderPage.prototype.init = function() {
@@ -49380,61 +49402,47 @@ LegalEntityPayment = extending(Page, (function() {
  */
 /**
  *
- * @class NotAvailableOrderPage
+ * @class AbstractFeedbackPage
  * @extends Page
  */
-NotAvailableOrderPage = extending(Page, (function() {
+AbstractFeedbackPage = extending(Page, (function() {
 	/**
 	 *
-	 * @param {OneEvent} event
+	 * @param {number} organization_id
 	 *
 	 * @constructor
-	 * @constructs NotAvailableOrderPage
+	 * @constructs AbstractFeedbackPage
 	 *
-	 * @property {OneEvent} event
+	 * @property {OneOrganization} organization
 	 */
-	function NotAvailableOrderPage(event) {
-		var self = this;
-		
+	function AbstractFeedbackPage(organization_id) {
 		Page.call(this);
 		
-		this.event = event;
+		this.organization = new OneOrganization(organization_id);
+		this.fields = new Fields();
 		
 		this.render_vars = {
+			header: null,
+			sub_header: null,
 			name_field: null,
 			email_field: null,
 			phone_field: null,
 			message_field: null,
 			submit_button: null
 		};
-		
-		Object.defineProperties(this, {
-			page_title: {
-				get: function() {
-					
-					return (self.event.ticketing_locally ? 'Заказ билетов на событие ' : 'Регистрация на событие ') + self.event.title;
-				}
-			}
-		});
 	}
-	
-	NotAvailableOrderPage.prototype.disablePage = function(message) {
-		this.$wrapper.find('.OrderForm').remove();
+	/**
+	 *
+	 * @return {jqPromise}
+	 */
+	AbstractFeedbackPage.prototype.fetchData = function() {
 		
-		this.$wrapper.find('.OrderFormWrapper').append(__APP.BUILD.cap(tmpl('order-overlay-cap-content', {
-			message: message,
-			return_button: __APP.BUILD.link({
-				page: '/event/' + this.event.id,
-				title: 'Вернуться на страницу события',
-				classes: [
-					__C.CLASSES.COMPONENT.BUTTON,
-					__C.CLASSES.COLORS.PRIMARY
-				]
-			})
-		})));
+		return this.fetching_data_defer = this.organization.fetchOrganization(this.fields);
 	};
 	
-	NotAvailableOrderPage.prototype.init = function() {
+	AbstractFeedbackPage.prototype.afterFormSend = function() {};
+	
+	AbstractFeedbackPage.prototype.init = function() {
 		var self = this,
 			$form = this.$wrapper.find('.FeedbackForm'),
 			$form_wrapper = this.$wrapper.find('.FeedbackFormWrapper'),
@@ -49445,24 +49453,18 @@ NotAvailableOrderPage = extending(Page, (function() {
 				$form_wrapper.addClass(__C.CLASSES.HIDDEN);
 				$loader = __APP.BUILD.loaderBlock();
 				$form_wrapper.after($loader);
-				self.event.organization.sendFeedback($form.serializeForm()).always(function() {
+				self.organization.sendFeedback($form.serializeForm()).always(function() {
 					$loader.remove();
 				}).done(function() {
 					showNotifier({text: 'Сообщение успешно отправлено', status: true});
-					$form_wrapper.html(__APP.BUILD.linkButton({
-						title: 'Вернуться к событию',
-						page: '/event/{event_id}'.format({event_id: self.event.id}),
-						classes: [
-							__C.CLASSES.COLORS.ACCENT
-						]
-					}));
+					self.afterFormSend();
 					$form_wrapper.removeClass(__C.CLASSES.HIDDEN);
 				});
 			}
 		});
 	};
 	
-	NotAvailableOrderPage.prototype.preRender = function() {
+	AbstractFeedbackPage.prototype.preRender = function() {
 		this.render_vars.name_field = __APP.BUILD.formUnit({
 			label: 'Ваше имя',
 			id: 'order_page_feedback_form_name',
@@ -49509,11 +49511,77 @@ NotAvailableOrderPage = extending(Page, (function() {
 		});
 	};
 	
-	NotAvailableOrderPage.prototype.render = function() {
+	AbstractFeedbackPage.prototype.render = function() {
 		
-		this.$wrapper.html(tmpl('order-page-disabled', this.render_vars));
+		this.$wrapper.html(tmpl('organization-feedback-page', this.render_vars));
 		
 		this.init();
+	};
+	
+	return AbstractFeedbackPage;
+}()));
+/**
+ * @requires ../organizations/Class.AbstractFeedbackPage.js
+ */
+/**
+ *
+ * @class NotAvailableOrderPage
+ * @extends AbstractFeedbackPage
+ */
+NotAvailableOrderPage = extending(AbstractFeedbackPage, (function() {
+	/**
+	 *
+	 * @param {number} organization_id
+	 * @param {OneEvent} event
+	 *
+	 * @constructor
+	 * @constructs NotAvailableOrderPage
+	 *
+	 * @property {OneEvent} event
+	 * @property {OneOrganization} organization
+	 */
+	function NotAvailableOrderPage(organization_id, event) {
+		var self = this;
+		
+		AbstractFeedbackPage.call(this, organization_id);
+		
+		this.event = event;
+		
+		Object.defineProperties(this, {
+			page_title: {
+				get: function() {
+					
+					return (self.event.ticketing_locally ? 'Заказ билетов на событие ' : 'Регистрация на событие ') + self.event.title;
+				}
+			}
+		});
+	}
+	/**
+	 *
+	 * @return {jqPromise}
+	 */
+	NotAvailableOrderPage.prototype.fetchData = Page.prototype.fetchData;
+	
+	NotAvailableOrderPage.prototype.afterFormSend = function() {
+		this.$wrapper.find('.FeedbackFormWrapper').html(__APP.BUILD.linkButton({
+			title: 'Вернуться к событию',
+			page: '/event/{event_id}'.format({event_id: this.event.id}),
+			classes: [
+				__C.CLASSES.COLORS.ACCENT
+			]
+		}));
+	};
+	
+	NotAvailableOrderPage.prototype.preRender = function() {
+		AbstractFeedbackPage.prototype.preRender.call(this);
+		
+		this.render_vars.header = tmpl('organization-feedback-header', {
+			header: 'Регистрация на событие окончена'
+		});
+		
+		this.render_vars.sub_header = tmpl('organization-feedback-sub-header', {
+			sub_header: 'Что-то пошло не так? Дайте знать нам и организаторам события.'
+		});
 	};
 	
 	return NotAvailableOrderPage;

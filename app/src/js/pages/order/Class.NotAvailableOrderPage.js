@@ -1,35 +1,29 @@
 /**
- * @requires ../Class.Page.js
+ * @requires ../organizations/Class.AbstractFeedbackPage.js
  */
 /**
  *
  * @class NotAvailableOrderPage
- * @extends Page
+ * @extends AbstractFeedbackPage
  */
-NotAvailableOrderPage = extending(Page, (function() {
+NotAvailableOrderPage = extending(AbstractFeedbackPage, (function() {
 	/**
 	 *
+	 * @param {number} organization_id
 	 * @param {OneEvent} event
 	 *
 	 * @constructor
 	 * @constructs NotAvailableOrderPage
 	 *
 	 * @property {OneEvent} event
+	 * @property {OneOrganization} organization
 	 */
-	function NotAvailableOrderPage(event) {
+	function NotAvailableOrderPage(organization_id, event) {
 		var self = this;
 		
-		Page.call(this);
+		AbstractFeedbackPage.call(this, organization_id);
 		
 		this.event = event;
-		
-		this.render_vars = {
-			name_field: null,
-			email_field: null,
-			phone_field: null,
-			message_field: null,
-			submit_button: null
-		};
 		
 		Object.defineProperties(this, {
 			page_title: {
@@ -40,103 +34,32 @@ NotAvailableOrderPage = extending(Page, (function() {
 			}
 		});
 	}
+	/**
+	 *
+	 * @return {jqPromise}
+	 */
+	NotAvailableOrderPage.prototype.fetchData = Page.prototype.fetchData;
 	
-	NotAvailableOrderPage.prototype.disablePage = function(message) {
-		this.$wrapper.find('.OrderForm').remove();
-		
-		this.$wrapper.find('.OrderFormWrapper').append(__APP.BUILD.cap(tmpl('order-overlay-cap-content', {
-			message: message,
-			return_button: __APP.BUILD.link({
-				page: '/event/' + this.event.id,
-				title: 'Вернуться на страницу события',
-				classes: [
-					__C.CLASSES.COMPONENT.BUTTON,
-					__C.CLASSES.COLORS.PRIMARY
-				]
-			})
-		})));
-	};
-	
-	NotAvailableOrderPage.prototype.init = function() {
-		var self = this,
-			$form = this.$wrapper.find('.FeedbackForm'),
-			$form_wrapper = this.$wrapper.find('.FeedbackFormWrapper'),
-			$loader;
-		
-		this.render_vars.submit_button.on('click.SendFeedback', function() {
-			if (isFormValid($form)) {
-				$form_wrapper.addClass(__C.CLASSES.HIDDEN);
-				$loader = __APP.BUILD.loaderBlock();
-				$form_wrapper.after($loader);
-				self.event.organization.sendFeedback($form.serializeForm()).always(function() {
-					$loader.remove();
-				}).done(function() {
-					showNotifier({text: 'Сообщение успешно отправлено', status: true});
-					$form_wrapper.html(__APP.BUILD.linkButton({
-						title: 'Вернуться к событию',
-						page: '/event/{event_id}'.format({event_id: self.event.id}),
-						classes: [
-							__C.CLASSES.COLORS.ACCENT
-						]
-					}));
-					$form_wrapper.removeClass(__C.CLASSES.HIDDEN);
-				});
-			}
-		});
+	NotAvailableOrderPage.prototype.afterFormSend = function() {
+		this.$wrapper.find('.FeedbackFormWrapper').html(__APP.BUILD.linkButton({
+			title: 'Вернуться к событию',
+			page: '/event/{event_id}'.format({event_id: this.event.id}),
+			classes: [
+				__C.CLASSES.COLORS.ACCENT
+			]
+		}));
 	};
 	
 	NotAvailableOrderPage.prototype.preRender = function() {
-		this.render_vars.name_field = __APP.BUILD.formUnit({
-			label: 'Ваше имя',
-			id: 'order_page_feedback_form_name',
-			name: 'name',
-			value: __APP.USER.full_name,
-			placeholder: 'Имя',
-			helptext: 'Чтобы мы знали как в вам обращаться',
-			required: true
+		AbstractFeedbackPage.prototype.preRender.call(this);
+		
+		this.render_vars.header = tmpl('organization-feedback-header', {
+			header: 'Регистрация на событие окончена'
 		});
 		
-		this.render_vars.email_field = __APP.BUILD.formUnit({
-			label: 'Ваш e-mail',
-			id: 'order_page_feedback_form_email',
-			name: 'email',
-			value: __APP.USER.email,
-			placeholder: 'E-mail',
-			helptext: 'Чтобы мы знали как с вами связаться',
-			required: true
+		this.render_vars.sub_header = tmpl('organization-feedback-sub-header', {
+			sub_header: 'Что-то пошло не так? Дайте знать нам и организаторам события.'
 		});
-		
-		this.render_vars.phone_field = __APP.BUILD.formUnit({
-			label: 'Ваш телефон',
-			id: 'order_page_feedback_form_phone',
-			name: 'phone',
-			placeholder: 'Номер телефона',
-			helptext: 'Будем звонить только в экстренных случаях!'
-		});
-		
-		this.render_vars.message_field = __APP.BUILD.formUnit({
-			label: 'Сообщение',
-			id: 'order_page_feedback_form_message',
-			name: 'message',
-			type: 'textarea',
-			placeholder: 'Сообщите нам, если что-то пошло не так, либо если у вас есть какие-то пожелания',
-			required: true
-		});
-		
-		this.render_vars.submit_button = __APP.BUILD.button({
-			title: 'Отправить',
-			classes: [
-				__C.CLASSES.COLORS.ACCENT,
-				'SendFeedbackButton'
-			]
-		});
-	};
-	
-	NotAvailableOrderPage.prototype.render = function() {
-		
-		this.$wrapper.html(tmpl('order-page-disabled', this.render_vars));
-		
-		this.init();
 	};
 	
 	return NotAvailableOrderPage;

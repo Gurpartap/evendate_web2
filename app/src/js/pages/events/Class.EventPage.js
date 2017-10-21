@@ -51,6 +51,13 @@ EventPage = extending(Page, (function() {
 		});
 		
 		this.$overlay_cap = $();
+		
+		Object.defineProperty(this, 'page_title', {
+			get: function() {
+				
+				return self.event.title;
+			}
+		});
 	}
 	
 	EventPage.fields = new Fields([
@@ -310,6 +317,19 @@ EventPage = extending(Page, (function() {
 			block_classes: [__C.CLASSES.SIZES.SMALL],
 			is_link: true,
 			entity: __C.ENTITIES.ORGANIZATION
+		});
+		
+		this.render_vars.org_contact_link = __APP.BUILD.linkButton({
+			title: 'Связаться с организатором',
+			page: '/organization/{org_id}/feedback'.format({
+				org_id: this.event.organization.id
+			}),
+			classes: [
+				__C.CLASSES.COLORS.DEFAULT,
+				__C.CLASSES.ICON_CLASS,
+				__C.CLASSES.ICONS.ENVELOPE,
+				__C.CLASSES.HOOKS.RIPPLE
+			]
 		});
 		
 		if (this.event.ticketing_locally || this.event.registration_locally) {
@@ -613,8 +633,6 @@ EventPage = extending(Page, (function() {
 	
 	EventPage.prototype.render = function() {
 		var m_nearest_date = this.event.nearest_event_date ? moment.unix(this.event.nearest_event_date) : moment.unix(this.event.first_event_date);
-		
-		__APP.changeTitle(this.event.title);
 		
 		this.$wrapper.html(tmpl('event-page', this.render_vars));
 		

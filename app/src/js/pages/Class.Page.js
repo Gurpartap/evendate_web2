@@ -17,6 +17,7 @@ Page = (function() {
 	 * @property {jQuery} $wrapper
 	 * @property {string} wrapper_tmpl
 	 * @property {boolean} with_header_tabs
+	 * @property {ParsedUrl} location
 	 *
 	 * @property {jqPromise} rendering_defer
 	 * @property {jqPromise} fetching_data_defer
@@ -26,19 +27,13 @@ Page = (function() {
 		this.state_name = this.name;
 		this.page_title = setDefaultValue(this.page_title, '');
 		this.page_title_obj = setDefaultValue(this.page_title_obj, '');
-		/**
-		 * @name Page#$view
-		 * @type jQuery
-		 */
 		this.$view = setDefaultValue(this.$view, $('.PageView'));
-		/**
-		 * @name Page#$wrapper
-		 * @type jQuery
-		 */
 		this.$wrapper = setDefaultValue(this.$wrapper, $());
 		this.$loader = $();
 		this.wrapper_tmpl = setDefaultValue(this.wrapper_tmpl, 'std');
 		this.with_header_tabs = setDefaultValue(this.with_header_tabs, false);
+		
+		this.location = parseUri(window.location);
 		
 		this.render_vars = setDefaultValue(this.render_vars, {});
 		

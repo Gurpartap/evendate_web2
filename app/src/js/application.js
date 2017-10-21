@@ -112,6 +112,7 @@ __APP = {
 		'organization': {
 			'add': AddOrganizationPage,
 			'^([0-9]+)': {
+				'feedback': OrganizationFeedbackPage,
 				'edit': EditOrganizationPage,
 				'': OrganizationPage
 			},
