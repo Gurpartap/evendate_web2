@@ -1,10 +1,10 @@
 <?php
 
-final class RuleTicketsCountBetween extends AbstractPricingRule implements PricingRuleInterface
+final class RuleUserOrdersCountBetween extends AbstractPricingRule implements PricingRuleInterface
 {
 
-	const TYPE = 'tickets_count_between';
-	const TYPE_ID = 1;
+	const TYPE = 'user_orders_count_between';
+	const TYPE_ID = 3;
 
 	protected $data;
 
@@ -29,7 +29,8 @@ final class RuleTicketsCountBetween extends AbstractPricingRule implements Prici
 
 	function isApplicable(Preorder $preorder): bool
 	{
-		if ($preorder->getTicketsCount() > $this->data['min_count'] && $preorder->getTicketsCount() < $this->data['max_count']) {
+		$user = App::getCurrentUser();
+		if ($user->getOrdersCountInOrganization() > $this->data['min_count'] && $user->getOrdersCountInOrganization() < $this->data['max_count']) {
 			return true;
 		}
 		return false;

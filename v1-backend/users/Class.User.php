@@ -369,4 +369,14 @@ class User extends AbstractUser
 		return $res->fetch();
 	}
 
+	public function getOrdersInOrganization(Event $event){
+		$q_get_count = App::queryFactory()->newSelect();
+		$q_get_count->from('view_tickets_orders')
+			->cols('final_sum')
+			->join('events', 'inner', 'events.id = view_tickets_orders.event_id')
+			->where('events.organization_id = ?', $event->getOrganizationId())
+			->where('ticket_order_status_type = \'green\'');
+
+	}
+
 }

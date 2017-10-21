@@ -144,10 +144,10 @@ class RegistrationForm
 	{
 		try {
 			$db->beginTransaction();
-
 			$order_info = Order::create($event, $user, $db, $tickets, $promocode);
+			$preorder = new Preorder($event, array('tickets' => $tickets, 'promocode' => $promocode));
 			$tickets = Ticket::createBatch($event, $order_info['id'], $db, $tickets);
-			Order::updateSum($order_info['id'], $db, $event);
+			Order::updateSum($order_info['id'], $db, $event, $preorder->getFinalSum()->getData());
 
 			$db->commit();
 

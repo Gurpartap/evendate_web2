@@ -426,6 +426,20 @@ $__modules['events'] = array(
 			$order = OrdersCollection::oneByUUID($__db, $__user, $uuid, $fields);
 			return $order->makeBitcoinPayment($fields, $event);
 		},
+		'{{/(id:[0-9]+)}/preorder}' => function ($id) use ($__db, $__request, $__pagination, $__user, $__fields) {
+			$event = EventsCollection::one(
+				$__db,
+				$__user,
+				intval($id),
+				array());
+
+			if ((!isset($__request['payload']) || !is_array($__request['payload'])) && isset($__request['post_data'])) {
+				$__request['payload'] = json_decode($__request['post_data'], true);
+			}
+
+			$preorder = new Preorder($event, $__request['payload'], $__request['payload']['promocode'] ?? null);
+			return $preorder->getFinalSum();
+		},
 		'{{/(id:[0-9]+)}/orders}' => function ($id) use ($__db, $__request, $__offset, $__length, $__user, $__fields) {
 			$event_fields = Fields::parseFields('accept_bitcoins');
 

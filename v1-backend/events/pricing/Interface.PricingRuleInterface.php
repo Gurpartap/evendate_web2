@@ -6,9 +6,8 @@ interface PricingRuleInterface
 
 	function verify();
 
-	function apply(Preorder $preorder);
+	function isApplicable(Preorder $preorder): bool;
 
-	function attempt();
-
+	function getRuleData();
 
 }

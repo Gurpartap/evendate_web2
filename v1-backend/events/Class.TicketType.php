@@ -9,7 +9,7 @@ class TicketType extends AbstractEntity
 	const PROMOCODE_EFFORT_FIELD_NAME = 'promocode_effort';
 	const SOLD_COUNT_FIELD_NAME = 'sold_count';
 
-	private $price;
+	protected $price;
 
 	protected static $DEFAULT_COLS = array(
 		'uuid',

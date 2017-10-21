@@ -6,7 +6,7 @@ final class RuleOrderSumBetween extends AbstractPricingRule implements PricingRu
 	CONST TYPE = 'order_sum_between';
 	CONST TYPE_ID = 2;
 
-	private $data;
+	protected $data;
 
 	/**
 	 * RuleInterfaceOrderSumBetween constructor.
@@ -21,18 +21,27 @@ final class RuleOrderSumBetween extends AbstractPricingRule implements PricingRu
 	function verify()
 	{
 		parent::verify();
-		if (!isset($this->data['sum']) || filter_var(($this->data['sum']), FILTER_VALIDATE_FLOAT, FILTER_NULL_ON_FAILURE) == null)
-			throw new InvalidArgumentException('BAD_PRICING_RULE_SUM');
+		if (!isset($this->data['min_sum']) || filter_var(($this->data['min_sum']), FILTER_VALIDATE_FLOAT, FILTER_NULL_ON_FAILURE) == null)
+			throw new InvalidArgumentException('BAD_PRICING_RULE_MIN_SUM');
+		if (!isset($this->data['max_sum']) || filter_var(($this->data['max_sum']), FILTER_VALIDATE_FLOAT, FILTER_NULL_ON_FAILURE) == null)
+			throw new InvalidArgumentException('BAD_PRICING_RULE_MIN_SUM');
 	}
 
-	function apply(Preorder $preorder)
+	function isApplicable(Preorder $preorder): bool
 	{
-		// TODO: Implement apply() method.
+		if ($preorder->getSum() > $this->data['min_sum'] && $preorder->getSum() < $this->data['max_sum']) {
+			return true;
+		}
+		return false;
 	}
 
-
-	function attempt()
+	function getRuleData()
 	{
-		// TODO: Implement attempt() method.
+		return array(
+			'min_sum' => $this->data['min_sum'],
+			'max_sum' => $this->data['max_sum']
+		);
 	}
+
+
 }
