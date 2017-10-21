@@ -156,6 +156,7 @@ class Event extends AbstractEntity
 		'registration_available',
 		'ticketing_available',
 		'accept_bitcoins',
+		'apply_promocodes_and_pricing_rules',
 		'booking_time',
 //		'registered_count',
 
@@ -718,6 +719,12 @@ class Event extends AbstractEntity
 			$data['is_free'] = 'true';
 		} else {
 			$data['is_free'] = filter_var($data['is_free'], FILTER_VALIDATE_BOOLEAN) ? 'true' : 'false';
+		}
+
+		if (!isset($data['apply_promocodes_and_pricing_rules'])) {
+			$data['apply_promocodes_and_pricing_rules'] = 'true';
+		} else {
+			$data['apply_promocodes_and_pricing_rules'] = filter_var($data['apply_promocodes_and_pricing_rules'], FILTER_VALIDATE_BOOLEAN) ? 'true' : 'false';
 		}
 
 		if (!isset($data['accept_bitcoins'])) {
@@ -2072,6 +2079,16 @@ class Event extends AbstractEntity
 		require_once $BACKEND_FULL_PATH . '/statistics/Class.EventFinance.php';
 		$finance = new EventFinance($this->db, $this, $user);
 		return $finance->getFields($fields);
+	}
+
+	public function getApplyPromocodesAndPricingRules()
+	{
+		$q_get_field = App::queryFactory()->newSelect();
+		$q_get_field
+			->cols(array('apply_promocodes_and_pricing_rules'))
+			->from('view_events')
+			->where('id = ?', $this->getId());
+		return $this->db->prepareExecute($q_get_field)->fetchColumn(0);
 	}
 
 

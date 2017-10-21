@@ -36,11 +36,13 @@ class Preorder
 	public function getSum()
 	{
 		if (!$this->sum) {
+			$this->tickets_count = 0;
+			$this->sum = 0;
 			foreach ($this->tickets as $ticket) {
 				$ticket_type = TicketTypesCollection::oneByUUID($this->db, $this->user, $ticket['uuid'], array());
 				if ($ticket_type->getPrice() > 0) {
-					$this->tickets_count = $ticket['count'];
-					$this->sum = intval($ticket['count']) * $ticket_type->getPrice();
+					$this->tickets_count += $ticket['count'];
+					$this->sum = $this->sum + intval($ticket['count']) * $ticket_type->getPrice();
 				}
 			}
 		}
@@ -99,7 +101,20 @@ class Preorder
 	{
 		$rule_instance = $this->applyPricingRules();
 		$promocode_discount = $this->getPromocodeDiscount($this->promocode);
-		$final_sum = ($this->getSum() - $rule_instance['discount'] - $promocode_discount);
+		if ($this->event->getApplyPromocodesAndPricingRules()) {
+			$final_sum = ($this->getSum() - $rule_instance['discount'] - $promocode_discount);
+		} else {
+			if ($promocode_discount != 0) {
+				$final_sum = $this->getSum() - $promocode_discount;
+				$rule_instance = array(
+					'pricing_rule' => null,
+					'rule_data' => null,
+					'discount' => 0,
+				);
+			} else {
+				$final_sum = $this->getSum() - $rule_instance['discount'];
+			}
+		}
 		$final_sum = $final_sum < 0 ? 0 : $final_sum;
 		return new Result(true, '', array(
 			'pricing_rule' => $rule_instance['rule_data'],
