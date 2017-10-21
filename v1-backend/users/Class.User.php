@@ -376,7 +376,7 @@ class User extends AbstractUser
 			->join('events', 'inner', 'events.id = view_tickets_orders.event_id')
 			->where('events.organization_id = ?', $event->getOrganizationId())
 			->where('ticket_order_status_type = \'green\'');
-
+		return $this->db->prepareExecute($q_get_count)->fetchAll();
 	}
 
 }
