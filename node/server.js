@@ -510,14 +510,6 @@ pg.connect(pg_conn_string, function (err, client, done) {
         } catch (ex) {
             logger.error(ex);
         }
-        try {
-            new CronJob('30 */1 * * *', function () {
-                let notifications = new Notifications(real_config, client, logger);
-                notifications.send();
-            }, null, true);
-        } catch (ex) {
-            logger.error(ex);
-        }
 //every monday at 8:30 am
         try {
             new CronJob('30 5 * * 1', function () {
