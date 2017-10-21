@@ -6251,6 +6251,11 @@ fieldset + .org_admin_settings_wrapper,
 	.feed_calendar_td.-active > .day_num:hover,
 	.feed_calendar_td.-active > .day_num:focus {background-color: var(--color_accent)}
 }
+.feedback_page {
+	max-width: 600px;
+	padding: 18px;
+	margin: 42px auto;
+}
 .legal_entity_payment_page {
 	max-width: 800px;
 	margin: 48px auto;

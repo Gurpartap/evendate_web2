@@ -266,7 +266,7 @@ OrderPage = extending(Page, (function() {
 	
 	OrderPage.prototype.redirect = function() {
 		
-		return __APP.openPage(new NotAvailableOrderPage(this.event));
+		return __APP.openPage(new NotAvailableOrderPage(this.event.organization.id, this.event));
 	};
 	
 	OrderPage.prototype.init = function() {
