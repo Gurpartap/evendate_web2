@@ -26,7 +26,9 @@ OrganizationPage = extending(Page, (function() {
 			last_date: '',
 			block_scroll: false,
 			is_upload_disabled: false
-		};
+		},
+			self = this;
+		
 		Page.call(this);
 		
 		this.fields = new Fields(
@@ -97,6 +99,13 @@ OrganizationPage = extending(Page, (function() {
 		this.delayed_events = new DelayedEventsCollection();
 		this.canceled_events = new CanceledEventsCollection();
 		this.organization = new OneOrganization(organization_id);
+		
+		Object.defineProperty(this, 'page_title', {
+			get: function() {
+				
+				return self.organization.short_name;
+			}
+		});
 	}
 	/**
 	 *
@@ -221,7 +230,6 @@ OrganizationPage = extending(Page, (function() {
 			organization = new OneOrganization(PAGE.organization.id);
 		
 		organization.setData(PAGE.organization);
-		__APP.changeTitle(organization.short_name);
 		__APP.SIDEBAR.$subscribed_orgs.find('[data-organization_id="' + organization.id + '"]').find('.OrganizationCounter').addClass(__C.CLASSES.HIDDEN);
 		PAGE.$wrapper.html(tmpl('organization-wrapper', $.extend(true, {
 			background_image: tmpl('organization-background-image', {
@@ -245,16 +253,27 @@ OrganizationPage = extending(Page, (function() {
 			}),
 			has_address: organization.default_address ? '' : __C.CLASSES.HIDDEN,
 			redact_org_button: (organization.role === OneUser.ROLE.ADMIN) ? __APP.BUILD.linkButton({
-					title: __LOCALES.ru_RU.TEXTS.BUTTON.EDIT,
-					classes: [
-						__C.CLASSES.SIZES.WIDE,
-						__C.CLASSES.COLORS.NEUTRAL,
-						__C.CLASSES.ICON_CLASS,
-						__C.CLASSES.ICONS.PENCIL,
-						__C.CLASSES.HOOKS.RIPPLE
-					],
-					page: '/admin/organization/' + organization.id + '/edit/'
-				}) : '',
+				title: __LOCALES.ru_RU.TEXTS.BUTTON.EDIT,
+				classes: [
+					__C.CLASSES.SIZES.WIDE,
+					__C.CLASSES.COLORS.NEUTRAL,
+					__C.CLASSES.ICON_CLASS,
+					__C.CLASSES.ICONS.PENCIL,
+					__C.CLASSES.HOOKS.RIPPLE
+				],
+				page: '/admin/organization/' + organization.id + '/edit/'
+			}) : __APP.BUILD.linkButton({
+				title: 'Связаться с организатором',
+				page: '/organization/{org_id}/feedback'.format({
+					org_id: this.organization.id
+				}),
+				classes: [
+					__C.CLASSES.COLORS.DEFAULT,
+					__C.CLASSES.ICON_CLASS,
+					__C.CLASSES.ICONS.ENVELOPE,
+					__C.CLASSES.HOOKS.RIPPLE
+				]
+			}),
 			hidden_for_users: PAGE.is_admin ? '' : __C.CLASSES.HIDDEN,
 			subscribed_blocks: __APP.BUILD.subscribers(organization.subscribed)
 		}, organization)));
