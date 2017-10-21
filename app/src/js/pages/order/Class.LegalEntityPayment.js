@@ -68,7 +68,7 @@ LegalEntityPayment = extending(Page, (function() {
 	
 	LegalEntityPayment.prototype.fetchData = function() {
 		
-		return this.fetching_data_defer = this.order.fetchOrder(this.order_fields);
+		return this.fetching_data_defer = this.order.fetch(this.order_fields);
 	};
 	
 	LegalEntityPayment.prototype.init = function() {

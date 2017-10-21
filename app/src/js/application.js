@@ -145,6 +145,7 @@ __APP = {
 	YA_METRIKA: window.yaCounter32442130 || null,
 	IS_WIDGET: false,
 	IS_REPAINTED: false,
+	LOADER: $(),
 	/**
 	 *
 	 * @param {object} colors

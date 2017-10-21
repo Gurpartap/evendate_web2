@@ -1449,7 +1449,7 @@ AbstractEditEventPage = extending(Page, (function() {
 		]);
 		
 		
-		this.render_vars.auto_price_change_help = __APP.BUILD.helpLink(HelpCenterConnection.ARTICLE.TICKETS, 'Как организовать автоматическое изменение цен');
+		this.render_vars.auto_price_change_help = __APP.BUILD.helpLink(HelpCenterConnection.ARTICLE.DYNAMIC_PRICING, 'Как организовать автоматическое изменение цен');
 		
 		this.render_vars.tickets_help = __APP.BUILD.helpLink(HelpCenterConnection.ARTICLE.TICKETS, 'Как выглядит электронный билет');
 		

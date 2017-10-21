@@ -14,7 +14,9 @@ RewriteCond %{HTTP_HOST} ^evendate\.io [NC]
 RewriteCond %{HTTPS} off
 RewriteRule (.*) https://%{HTTP_HOST}%{REQUEST_URI} [R=301,L]
 
-RewriteRule ^(.*)to-organization(.*)$ organization.php [END]
+RewriteRule ^(.*)about(.*)$ landing.php [END]
+RewriteRule ^(.*)to-organization(.*)$ organization.html [END]
+RewriteRule ^(.*)organization-details(.*)$ organization.php [END]
 RewriteRule ^ticket/(.*)$ ticket.php?uuid=$1 [NC,END]
 
 RewriteCond %{REQUEST_FILENAME} !-f

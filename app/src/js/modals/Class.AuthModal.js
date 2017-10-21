@@ -14,7 +14,8 @@ AuthModal = extending(AbstractModal, (function() {
 	 * @constructor
 	 * @constructs AuthModal
 	 *
-	 * @property {object} options
+	 * @property {object} [options]
+	 * @property {string} options.note
 	 * @property {string} redirect_to
 	 */
 	function AuthModal(redirect_to, options) {
@@ -65,6 +66,7 @@ AuthModal = extending(AbstractModal, (function() {
 		this.__init();
 		
 		bindRippleEffect(this.modal);
+		bindHelpLink(this.modal);
 		
 		return this;
 	};

@@ -62,7 +62,7 @@ FeedPage = extending(Page, (function() {
 			
 			$this.on('click', function() {
 				$event.addClass('-cancel');
-				OneEvent.changeEventStatus(event_id, OneEvent.STATUS.HIDE, function() {
+				OneEvent.changeEventStatus(event_id, OneEvent.STATUS.HIDE).done(function() {
 					$event.after(__APP.BUILD.button({
 						classes: [__C.CLASSES.COLORS.NEUTRAL, 'ReturnEvent'],
 						title: 'Вернуть событие',
@@ -72,7 +72,7 @@ FeedPage = extending(Page, (function() {
 					}));
 					$event.siblings('.ReturnEvent').not('.-Handled_ReturnEvent').on('click', function() {
 						var $remove_button = $(this);
-						OneEvent.changeEventStatus(event_id, OneEvent.STATUS.SHOW, function() {
+						OneEvent.changeEventStatus(event_id, OneEvent.STATUS.SHOW).done(function() {
 							$remove_button.remove();
 							$event.removeClass('-cancel');
 						});

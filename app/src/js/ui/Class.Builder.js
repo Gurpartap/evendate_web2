@@ -72,6 +72,17 @@ Builder = (function() {
 	/**
 	 *
 	 * @param {...buildProps} props
+	 * @param {string} props.content
+	 *
+	 * @returns {jQuery}
+	 */
+	Builder.prototype.text = function() {
+		
+		return tmpl('span', Array.prototype.slice.call(arguments).map(Builder.normalizeBuildProps));
+	};
+	/**
+	 *
+	 * @param {...buildProps} props
 	 * @param {string} props.title
 	 *
 	 * @returns {jQuery}
@@ -250,8 +261,11 @@ Builder = (function() {
 	Builder.prototype.link = function buildLink(props) {
 		
 		return bindPageLinks(tmpl('link', [].map.call(arguments, function(arg) {
+			var props = Builder.normalizeBuildProps(arg);
 			
-			return Builder.normalizeBuildProps(arg);
+			props.classes.push(__C.CLASSES.COMPONENT.LINK, __C.CLASSES.HOOKS.LINK);
+			
+			return props;
 		})));
 	};
 	/**
@@ -264,30 +278,31 @@ Builder = (function() {
 	 */
 	Builder.prototype.linkButton = function buildLinkButton(props) {
 		
-		return bindPageLinks(tmpl('link-button', [].map.call(arguments, function(arg) {
+		return bindPageLinks(tmpl('link', [].map.call(arguments, function(arg) {
+			var props = Builder.normalizeBuildProps(arg);
 			
-			return Builder.normalizeBuildProps(arg);
+			props.classes.push(__C.CLASSES.COMPONENT.BUTTON, __C.CLASSES.HOOKS.LINK);
+			
+			return props;
 		})));
 	};
 	/**
 	 *
-	 * @param {string} href
-	 * @param {string} title
-	 * @param {(string|Array<string>)} [classes]
-	 * @param {HTMLDataset} [dataset]
-	 * @param {HTMLAttributes} [attributes]
+	 * @param {...buildProps} props
+	 * @param {string} props.page
+	 * @param {string} props.title
 	 *
 	 * @returns {jQuery}
 	 */
-	Builder.prototype.actionLink = function buildActionLink(href, title, classes, dataset, attributes) {
+	Builder.prototype.actionLink = function buildActionLink(props) {
 		
-		return tmpl('action-link', Builder.normalizeBuildProps({
-			href: href,
-			title: title,
-			classes: classes,
-			dataset: dataset,
-			attributes: attributes
-		}));
+		return bindPageLinks(tmpl('link', [].map.call(arguments, function(arg) {
+			var props = Builder.normalizeBuildProps(arg);
+			
+			props.classes.push(__C.CLASSES.COMPONENT.ACTION, __C.CLASSES.HOOKS.LINK);
+			
+			return props;
+		})));
 	};
 	/**
 	 *
@@ -836,6 +851,37 @@ Builder = (function() {
 	};
 	/**
 	 *
+	 * @param {object} sharing_object
+	 * @param {string} sharing_object.title
+	 * @param {string} sharing_object.url
+	 * @param {string} [sharing_object.image_url]
+	 * @param {(__C.SOCIAL_NETWORKS|Array<__C.SOCIAL_NETWORKS>)} social_networks
+	 *
+	 * @return {jQuery}
+	 */
+	Builder.prototype.shareLinks = function(sharing_object, social_networks) {
+		social_networks = social_networks instanceof Array ? social_networks : [social_networks];
+		
+		return this.externalLink.apply(this, social_networks.map(function(network) {
+			var link = getByValue(network, __C.SOCIAL_NETWORKS, __C.SHARE_LINK);
+			
+			return {
+				page: link.format(sharing_object),
+				classes: [
+					'share_icon',
+					network
+				]
+			};
+		})).on('click', function(e) {
+			window.open(this.href, 'share', 'height=570,width=650,status=yes,toolbar=no,menubar=no');
+			
+			e.preventDefault();
+			
+			return false;
+		});
+	};
+	/**
+	 *
 	 * @param users
 	 * @param {buildProps} [props]
 	 * @param {(Array<string>|string)} [props.avatar_classes]
@@ -1238,7 +1284,7 @@ Builder = (function() {
 				divider: different_day ? tmpl('divider', {
 					title: m_event_date.calendar().capitalize()
 				}) : '',
-				action_buttons: new AddToFavoriteButton(event.id, {
+				action_buttons: new AddToFavoriteButton(event, {
 					is_add_avatar: true,
 					is_checked: event.is_favorite,
 					classes: [
@@ -1381,7 +1427,7 @@ Builder = (function() {
 					is_link: true,
 					entity: __C.ENTITIES.ORGANIZATION
 				}),
-				action_button: new AddToFavoriteButton(event.id, {
+				action_button: new AddToFavoriteButton(event, {
 					is_add_avatar: true,
 					is_checked: event.is_favorite,
 					classes: [
@@ -1505,7 +1551,7 @@ Builder = (function() {
 	
 	/**
 	 *
-	 * @param {(OneExtendedTicket|Array<OneExtendedTicket>|ExtendedTicketsCollection)} tickets
+	 * @param {(OneTicket|Array<OneTicket>|TicketsCollection)} tickets
 	 * @return Array
 	 */
 	Builder.normalizeTicketProps = function(tickets) {
@@ -1543,7 +1589,10 @@ Builder = (function() {
 			
 			if (ticket.event.is_same_time) {
 				event_date = ticket.event.dates[0];
-				props.formatted_dates = displayDateRange(event_date.event_date, ticket.event.dates[ticket.event.dates.length - 1].event_date) + ', ' + displayTimeRange(event_date.start_time, event_date.end_time);
+				props.formatted_dates = '{date}, {time}'.format({
+					date: displayDateRange(event_date.event_date, ticket.event.dates[ticket.event.dates.length - 1].event_date),
+					time: displayTimeRange(event_date.start_time, event_date.end_time)
+				});
 			} else {
 				event_date = ticket.event.nearest_event_date;
 				props.formatted_dates = displayDateRange(event_date, event_date);
@@ -1554,7 +1603,7 @@ Builder = (function() {
 	};
 	/**
 	 *
-	 * @param {(OneExtendedTicket|Array<OneExtendedTicket>|ExtendedTicketsCollection)} tickets
+	 * @param {(OneTicket|Array<OneTicket>|TicketsCollection)} tickets
 	 * @return {jQuery}
 	 */
 	Builder.prototype.ticketCards = function buildTicketCard(tickets) {
@@ -1605,7 +1654,7 @@ Builder = (function() {
 			vars.modal_header = tmpl('modal-header', {
 				title: normalized_props.title,
 				close_button: tmpl('button', {
-					classes: ['modal_destroy_button', __C.CLASSES.HOOKS.CLOSE_MODAL, __C.CLASSES.HOOKS.RIPPLE].join(' '),
+					classes: ['modal_destroy_button', __C.CLASSES.HOOKS.CLOSE_MODAL].join(' '),
 					title: '×'
 				})
 			});

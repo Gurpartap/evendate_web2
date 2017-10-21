@@ -79,7 +79,7 @@ AbstractTopBar = (function () {
 		
 		this.$tabs_wrapper.html(tmpl('tabs-header', {
 			color: 'default',
-			tabs: tmpl('link', tabs.map(function(tab) {
+			tabs: __APP.BUILD.link.apply(__APP.BUILD, tabs.map(function(tab) {
 				var _tab = Builder.normalizeBuildProps(tab);
 				
 				_tab.classes.push('tab', 'Tab');

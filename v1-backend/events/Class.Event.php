@@ -135,6 +135,7 @@ class Event extends AbstractEntity
 		'organization_logo_large_url',
 		'organization_logo_medium_url',
 		'organization_logo_small_url',
+		'organization_is_private',
 		'is_same_time',
 		'created_at',
 		'updated_at',

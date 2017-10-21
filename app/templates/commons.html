@@ -1,3 +1,7 @@
+<script type="javascript/template" id="tmpl-span">
+	<span class="{classes}" {attributes} {dataset}>{content}</span>
+</script>
+
 <script type="javascript/template" id="tmpl-input">
 	<input class="{classes}" {attributes} {dataset}>
 </script>
@@ -78,15 +82,7 @@
 </script>
 
 <script type="javascript/template" id="tmpl-link">
-	<a href="{page}" class="link {classes} Link" {dataset} {attributes}>{title}</a>
-</script>
-
-<script type="javascript/template" id="tmpl-link-button">
-	<a href="{page}" class="button {classes} Link" {dataset} {attributes}>{title}</a>
-</script>
-
-<script type="javascript/template" id="tmpl-action-link">
-	<a href="{href}" class="action {classes}" {dataset} {attributes}>{title}</a>
+	<a href="{page}" class="{classes}" {dataset} {attributes}>{title}</a>
 </script>
 
 <script type="javascript/template" id="tmpl-tag">
@@ -229,27 +225,6 @@
 	<div class="loader_block {classes}">{loader}</div>
 </script>
 
-<script type="javascript/template" id="tmpl-vk-share-button">
-	<button class="ShareButton share_icon {classes}" data-title="VK" data-href="http://vk.com/share.php?url=http://evendate.ru/event/{id}?title={title}&description={description}&image={image_horizontal_url}&noparse=false"></button>
-</script>
-
-<script type="javascript/template" id="tmpl-facebook-share-button">
-	<button class="ShareButton share_icon {classes}" data-title="Facebook" data-href="http://www.facebook.com/dialog/share?app_id=1692270867652630&display=popup&title={title}&quote={description}&href=http://evendate.ru/event/{id}&redirect_uri=http://evendate.ru/event/{id}image[0][url]={image_horizontal_large_url}&image[0][user_generated]=true"></button>
-</script>
-
-<script type="javascript/template" id="tmpl-twitter-share-button">
-	<button class="ShareButton share_icon twitter {classes}" data-title="Twitter" data-href="https://twitter.com/share?url=http://evendate.ru/event/{id}?text={title}&via=evendate.ru&hashtags=#evendate"></button>
-</script>
-<!--
-<script type="javascript/template" id="tmpl-event-card">
-	<div class="event_card">
-		<div class="event_card_img" style="background-image: url('{image_horizontal_small_url}')"></div>
-		<div class="event_card_description">
-			<span>{title}</span>
-		</div>
-	</div>
-</script>-->
-
 <script type="javascript/template" id="tmpl-event-card">
 	<div class="page feed_event FeedEvent">
 		<a href="/event/{id}" class="feed_event_img_side img_holder link Link">
@@ -342,7 +317,7 @@
 
 <script type="javascript/template" id="tmpl-overlay-cap">
 	<div class="overlay_cap -unselectable -centering OverlayCap {classes}" {dataset} {attributes}>
-		<div class="overlay_cap_wrapper">{content}</div>
+		<div class="overlay_cap_wrapper CapWrapper">{content}</div>
 	</div>
 </script>
 
@@ -359,19 +334,6 @@
 
 <script type="javascript/template" id="tmpl-required-star">
 	<span class="-text_color_accent"> * </span>
-</script>
-
-<script type="javascript/template" id="tmpl-dropdown-export-formats">
-	<div class="dropdown_box">
-		<div class="dropdown_list DropDownList">
-			<div class="dropdown_li">
-				<a class="dropdown_button -size_wide -color_neutral RippleEffect" href="{xlsx_href}" target="_blank">Excel</a>
-			</div>
-			<div class="dropdown_li">
-				<a class="dropdown_button -size_wide -color_neutral RippleEffect" href="{html_href}" target="_blank">HTML</a>
-			</div>
-		</div>
-	</div>
 </script>
 
 <script type="javascript/template" id="tmpl-payment-form">

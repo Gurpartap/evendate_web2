@@ -35,23 +35,7 @@ OneExtendedTicket = extending(OneTicket, (function() {
 	 * @property {OneEvent} event
 	 */
 	function OneExtendedTicket(event_id, uuid) {
-		var self = this;
 		OneTicket.call(this, event_id, uuid);
-		
-		this.event = new OneEvent(event_id);
-		
-		Object.defineProperties(this, {
-			status_name: {
-				get: function() {
-					return localeFromNamespace(self.order.status_type_code, OneExtendedTicket.TICKET_STATUSES, __LOCALES.ru_RU.TEXTS.TICKET_STATUSES);
-				}
-			},
-			status_type_code: {
-				get: function() {
-					return self.order.status_type_code;
-				}
-			}
-		});
 	}
 	
 	OneExtendedTicket.prototype.ID_PROP_NAME = 'uuid';
@@ -127,11 +111,10 @@ OneExtendedTicket = extending(OneTicket, (function() {
 	 * @param {(string|number)} event_id
 	 * @param {(string|number)} uuid
 	 * @param {(Fields|string)} [fields]
-	 * @param {AJAXCallback} [success]
 	 *
 	 * @return {jqPromise}
 	 */
-	OneExtendedTicket.fetchTicket = function(event_id, uuid, fields, success) {
+	OneExtendedTicket.fetchTicket = function(event_id, uuid, fields) {
 		var event_ajax_data;
 		
 		fields = Fields.parseFields(fields);
@@ -145,26 +128,27 @@ OneExtendedTicket = extending(OneTicket, (function() {
 			})
 		});
 		
-		return __APP.SERVER.getData('/api/v1/events/' + event_id, event_ajax_data, success);
+		return __APP.SERVER.getData(OneEvent.ENDPOINT.EVENT.format({
+			event_id: event_id
+		}), event_ajax_data);
 	};
 	
 	OneExtendedTicket.exportTicket = OneTicket.exportTicket;
 	/**
 	 *
 	 * @param {(Fields|string)} [fields]
-	 * @param {AJAXCallback} [success]
 	 *
 	 * @return {jqPromise}
 	 */
-	OneExtendedTicket.prototype.fetchTicket = function(fields, success) {
+	OneExtendedTicket.prototype.fetch = function(fields) {
 		var self = this;
 		
-		return OneExtendedTicket.fetchTicket(this.event_id, this.uuid, fields, function(data) {
+		return OneExtendedTicket.fetchTicket(this.event_id, this.uuid, fields).then(function(data) {
 			var ticket_data = OneExtendedTicket.extractTicketFromData(data);
+			
 			self.setData(ticket_data);
-			if (isFunction(success)) {
-				success.call(self, ticket_data);
-			}
+			
+			return ticket_data;
 		});
 	};
 	

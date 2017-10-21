@@ -164,7 +164,7 @@ button.-font_weight_bold {font-weight: 600}
 	small.-text_color_default,
 	small.-text_color_neutral,
 	label.-text_color_default,
-	label.-text_color_neutral {color: var(--color_page)}
+	label.-text_color_neutral {color: var(--color_text)}
 
 	a.-text_color_dark_primary,
 	b.-text_color_dark_primary,
@@ -266,7 +266,7 @@ button.-font_weight_bold {font-weight: 600}
 	small.-text_color_default,
 	small.-text_color_neutral,
 	label.-text_color_default,
-	label.-text_color_neutral {color: #fff}
+	label.-text_color_neutral {color: #4a4a4a}
 
 	a.-text_color_dark_primary,
 	b.-text_color_dark_primary,

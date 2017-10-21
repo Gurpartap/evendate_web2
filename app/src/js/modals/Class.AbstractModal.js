@@ -42,6 +42,11 @@ AbstractModal = (function() {
 		 *
 		 * @protected
 		 */
+		this.is_fetched = false;
+		/**
+		 *
+		 * @protected
+		 */
 		this.is_rendered = false;
 		/**
 		 *
@@ -191,6 +196,10 @@ AbstractModal = (function() {
 		}, props));
 		this.content_wrapper = this.modal.find('.ModalContent');
 		
+		if (!this.is_hidable) {
+			this.modal.find('.'+__C.CLASSES.HOOKS.CLOSE_MODAL).addClass(__C.CLASSES.HIDDEN);
+		}
+		
 		this.is_rendered = true;
 		
 		if (!this.content) {
@@ -269,31 +278,53 @@ AbstractModal = (function() {
 	 * @return {AbstractModal}
 	 */
 	AbstractModal.prototype.__show = function() {
-		var self = this;
+		var self = this,
+			$loader;
 		
-		if (!this.is_rendered)
-			return this.render().show();
-		
-		AbstractModal.hideCurrent();
-		$('body').addClass('-open_modal');
-		__APP.MODALS.active_modal = this;
-		
-		this.modal_wrapper.append(this.modal.addClass('-faded').removeClass(__C.CLASSES.HIDDEN));
-		this.adjustDestroyerHeight();
-		
-		this.modal.trigger('modal:show');
-		setTimeout(function() {
-			self.modal.removeClass('-faded');
-			self.modal_wrapper.scrollTop(self.scrollTop);
-			self.modal.trigger('modal:appear');
-			self.is_shown = true;
-		}, 200);
-		
-		if (!this.is_inited) {
-			this.init();
+		function show() {
+			if (!self.is_rendered)
+				return self.render().show();
+			
+			self.modal_wrapper.append(self.modal.addClass('-faded').removeClass(__C.CLASSES.HIDDEN));
+			
+			self.adjustDestroyerHeight();
+			
+			self.modal.trigger('modal:show');
+			setTimeout(function() {
+				self.modal.removeClass('-faded');
+				self.modal_wrapper.scrollTop(self.scrollTop);
+				self.modal.trigger('modal:appear');
+				self.is_shown = true;
+			}, 200);
+			
+			if (!self.is_inited) {
+				self.init();
+			}
+			
+			return self;
 		}
 		
-		return this;
+		if (__APP.MODALS.active_modal !== self) {
+			AbstractModal.hideCurrent();
+			__APP.MODALS.active_modal = self;
+			$('body').addClass('-open_modal');
+			
+			if (!this.is_fetched) {
+				$loader = __APP.BUILD.overlayLoader(this.modal_wrapper);
+				this.adjustDestroyerHeight();
+				this.modal.trigger('modal:fetch/start');
+				this.fetchData().done(function() {
+					$loader.remove();
+					self.is_fetched = true;
+					self.modal.trigger('modal:fetch/done');
+					show();
+				});
+				
+				return this;
+			}
+		}
+		
+		return show();
 	};
 	/**
 	 *
@@ -361,6 +392,14 @@ AbstractModal = (function() {
 		return this.__render($.extend({
 			classes: [__C.CLASSES.FLOATING_MATERIAL]
 		}, props));
+	};
+	/**
+	 *
+	 * @return {jqPromise}
+	 */
+	AbstractModal.prototype.fetchData = function() {
+		
+		return $.Deferred().resolve().promise();
 	};
 	/**
 	 * @return {AbstractModal}

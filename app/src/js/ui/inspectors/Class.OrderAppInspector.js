@@ -27,12 +27,13 @@ OrderAppInspector = extending(AbstractAppInspector, (function() {
 		this.title = 'Заказ ' + formatTicketNumber(this.order.number);
 		this.$content = tmpl('order-app-inspector', {
 			orderer: AbstractAppInspector.build.avatarBlock(this.order.user),
-			payment_info: (function(){
+			payment_info: (function() {
 				var pairs = [];
 				
 				switch (self.order.status_type_code) {
 					case OneOrder.ORDER_STATUSES.PAYED:
 					case OneOrder.ORDER_STATUSES.PAYED_LEGAL_ENTITY: {
+						
 						pairs.push({
 							key: 'Сумма заказа',
 							value: formatCurrency(self.order.sum, ' ', '.', '', '₽')
@@ -59,13 +60,34 @@ OrderAppInspector = extending(AbstractAppInspector, (function() {
 							value: formatCurrency(self.order.final_sum - self.order.shop_sum_amount, ' ', '.', '', '₽')
 						});
 						
-						return __APP.BUILD.pairList(pairs);
+						return AbstractAppInspector.build.title('Оплата').add(__APP.BUILD.pairList(pairs));
 					}
 					default: {
 						
 						return '';
 					}
 				}
+			})(),
+			sources: (function() {
+				var pairs = [];
+				
+				if (!empty(self.order.utm)) {
+					for (var key in self.order.utm) {
+						if (self.order.utm.hasOwnProperty(key)) {
+							pairs.push({
+								key: key,
+								value: self.order.utm[key]
+							});
+						}
+					}
+				}
+				
+				if (pairs.length) {
+					
+					return AbstractAppInspector.build.title('Источники').add(__APP.BUILD.pairList(pairs));
+				}
+				
+				return '';
 			})(),
 			status_block: __APP.BUILD.orderStatusBlock(this.order.status_type_code),
 			tickets_title: AbstractAppInspector.build.title('Билеты'),

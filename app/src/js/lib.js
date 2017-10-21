@@ -16,11 +16,14 @@ __C = {
 		FLOATING_MATERIAL: 'material -floating_material',
 		IMG_HOLDER: 'img_holder',
 		COMPONENT: {
+			LINK: 'link',
 			ACTION: 'action',
 			BUTTON: 'button'
 		},
 		TEXT_COLORS: {
-			ACCENT: '-text_color_accent'
+			ACCENT: '-text_color_accent',
+			MUTED_80: '-text_color_primary_80',
+			MUTED_50: '-text_color_primary_50'
 		},
 		TEXT_WEIGHT: {
 			BOLD: '-font_weight_bold',
@@ -30,10 +33,12 @@ __C = {
 		COLORS: {
 			ACCENT: '-color_accent',
 			FRANKLIN: '-color_franklin',
+			BUBBLEGUM: '-color_bubblegum',
 			PRIMARY: '-color_primary',
 			DEFAULT: '-color_default',
 			NEUTRAL: '-color_neutral',
 			NEUTRAL_ACCENT: '-color_neutral_accent',
+			MUTED: '-color_muted',
 			MARGINAL: '-color_marginal',
 			MARGINAL_ACCENT: '-color_marginal_accent',
 			MARGINAL_PRIMARY: '-color_marginal_primary',
@@ -48,6 +53,7 @@ __C = {
 			RIGHT: '-align_right'
 		},
 		UNIVERSAL_STATES: {
+			CLICKABLE: '-clickable',
 			EMPTY: '-empty',
 			SLIGHTLY_ROUNDED: '-slightly_rounded',
 			ROUNDED: '-rounded',
@@ -90,6 +96,7 @@ __C = {
 			ADD_STAFF: 'AddStaff',
 			ADD_TO_FAVORITES: 'AddToFavorites',
 			TEXT: 'Text',
+			LINK: 'Link',
 			CALL_MODAL: 'CallModal',
 			CLOSE_MODAL: 'CloseModal',
 			DROPDOWN_BUTTON: 'DropdownButton',
@@ -112,8 +119,10 @@ __C = {
 		ICONS: {
 			STAR: 'fa-star',
 			STAR_O: 'fa-star-o',
+			BELL: 'fa-bell',
 			BELL_O: 'fa-bell-o',
 			TIMES: 'fa-times',
+			TIMES_CIRCLE: 'fa-times-circle',
 			PLUS: 'fa-plus',
 			MINUS: 'fa-minus',
 			CHECK: 'fa-check',
@@ -121,7 +130,8 @@ __C = {
 			EYE: 'fa-eye',
 			EYE_CLOSE: 'fa-eye-slash',
 			TICKET: 'fa-ticket',
-			DOWNLOAD: 'fa-download'
+			DOWNLOAD: 'fa-download',
+			USER_PLUS: 'fa-user-plus'
 		},
 		ICON_CLASS: 'fa_icon'
 	},
@@ -170,8 +180,16 @@ __C = {
 	 */
 	SOCIAL_NETWORKS: {
 		VK: 'vk',
+		TWITTER: 'twitter',
 		GOOGLE: 'google',
 		FACEBOOK: 'facebook'
+	},
+	
+	SHARE_LINK: {
+		VK: 'https://vk.com/share.php?url={url}&title={title}&image={image_url}&noparse=false',
+		TWITTER: 'https://twitter.com/intent/tweet?url={url}&text={title}&via=evendate&hashtags=evendate',
+		GOOGLE: 'https://plus.google.com/share?url={url}&hl=ru',
+		FACEBOOK: 'https://www.facebook.com/dialog/share?app_id=1692270867652630&display=popup&title={title}&href={url}&redirect_uri={url}image[0][url]={image_url}&image[0][user_generated]=true'
 	},
 	/**
 	 * @enum {string}
@@ -179,7 +197,8 @@ __C = {
 	ENTITIES: {
 		USER: 'user',
 		EVENT: 'event',
-		ORGANIZATION: 'organization'
+		ORGANIZATION: 'organization',
+		ACTIVITY: 'activity'
 	},
 	/**
 	 * @enum {string}
@@ -1327,6 +1346,25 @@ function storeStat(entity_id, entity_type, event_type) {
 }
 
 /**
+ *
+ * @param {string} [uri]
+ *
+ * @returns {Object<string, string>}
+ */
+function gatherUTMTags(uri) {
+	var	parsed_uri = parseUri(uri || window.location),
+		utm = {};
+	
+	for (var key in parsed_uri.queryKey) {
+		if (key.indexOf('utm_') === 0) {
+			utm[key] = parsed_uri.queryKey[key];
+		}
+	}
+	
+	return utm;
+}
+
+/**
  * Возвращает единицу измерения с правильным окончанием
  *
  * @param {Number} num      Число
@@ -2251,16 +2289,6 @@ function bindTabs($parent, is_height_dynamic) {
 	}).addClass('-Handled_Tabs');
 }
 
-function bindShareButtons($parent) {
-	$parent = $parent ? $parent : $('body');
-	$parent.find('.ShareButton').not('.-Handled_ShareButton').each(function(i, elem) {
-		var $this = $(elem);
-		$this.on('click', function() {
-			window.open($this.data('href'), $this.data('title'), 'width=600,height=440,resizable=yes,scrollbars=no,status=no');
-		});
-	}).addClass('-Handled_ShareButton');
-}
-
 function bindSelect2($parent) {
 	$parent = $parent ? $parent : $('body');
 	var $selects = $parent.is('.ToSelect2') ? $parent : $parent.find('.ToSelect2');
@@ -2323,7 +2351,10 @@ function bindDropdown($parent) {
 		var $button = $(this),
 			instance = $button.resolveInstance(),
 			data = $button.data(),
-			$dropbox = $('.DropdownBox').filter('[data-dropdown_id="' + data.dropdown + '"]'),
+			$dropbox = $('.DropdownBox').filter(function(i, el) {
+				
+				return $(el).data('dropdown_id') === data.dropdown;
+			}),
 			button_pos;
 		
 		if (instance.initiate) {

@@ -70,6 +70,7 @@ OneEvent = extending(OneEntity, (function() {
 	 * @property {?string} image_horizontal_medium_url
 	 * @property {?string} image_horizontal_small_url
 	 *
+	 * @property {?boolean} has_landing
 	 * @property {?boolean} is_free
 	 * @property {?number} min_price
 	 *
@@ -113,7 +114,8 @@ OneEvent = extending(OneEntity, (function() {
 				'organization_short_name',
 				'organization_logo_large_url',
 				'organization_logo_medium_url',
-				'organization_logo_small_url'
+				'organization_logo_small_url',
+				'organization_is_private'
 			];
 		
 		this.id = event_id ? event_id : 0;
@@ -156,6 +158,7 @@ OneEvent = extending(OneEntity, (function() {
 		this.image_horizontal_medium_url = null;
 		this.image_horizontal_small_url = null;
 		
+		this.has_landing = null;
 		this.is_free = null;
 		this.min_price = null;
 		
@@ -216,6 +219,15 @@ OneEvent = extending(OneEntity, (function() {
 		}
 	}
 	
+	OneEvent.ENDPOINT = Object.freeze({
+		EVENT: '/events/{event_id}',
+		STATUS: '/events/{event_id}/status',
+		ORDERS: '/events/{event_id}/orders',
+		FAVORITES: '/events/{event_id}/favorites',
+		NOTIFICATIONS: '/events/{event_id}/notifications',
+		NOTIFICATION: '/events/{event_id}/notifications/{notification_uuid}'
+	});
+	
 	/**
 	 * @const
 	 * @enum {string}
@@ -234,7 +246,13 @@ OneEvent = extending(OneEntity, (function() {
 	 * @returns {jqPromise}
 	 */
 	OneEvent.fetchEvent = function(event_id, fields, success) {
-		return __APP.SERVER.getData('/api/v1/events/' + event_id, {fields: new Fields(fields)}, success);
+		var send_data = {
+			fields: new Fields(fields)
+		};
+		
+		send_data.utm = JSON.stringify(gatherUTMTags(window.location));
+		
+		return __APP.SERVER.getData('/api/v1/events/' + event_id, send_data, success);
 	};
 	/**
 	 * @typedef {function({
@@ -302,11 +320,12 @@ OneEvent = extending(OneEntity, (function() {
 	 *
 	 * @param {(string|number)} event_id
 	 * @param {(OneEvent.STATUS|Array<OneEvent.STATUS>)} status
-	 * @param {AJAXCallback} [success]
+	 *
 	 * @returns {jqPromise}
 	 */
-	OneEvent.changeEventStatus = function(event_id, status, success) {
+	OneEvent.changeEventStatus = function(event_id, status) {
 		var data = {};
+		
 		status = Array.isArray(status) ? status : [status];
 		status.forEach(function(el) {
 			switch (el) {
@@ -328,49 +347,66 @@ OneEvent = extending(OneEntity, (function() {
 				}
 			}
 		});
-		return __APP.SERVER.updateData('/api/v1/events/' + event_id + '/status', data, false, function() {
-			if (success && typeof success == 'function') {
-				success.call(self, data);
-			}
+		
+		return __APP.SERVER.updateData(OneEvent.ENDPOINT.STATUS.format({
+			event_id: event_id
+		}), data, false).then(function() {
+			
+			return data;
 		});
 	};
 	/**
 	 *
 	 * @param {(string|number)} event_id
-	 * @param {function} [success]
+	 *
 	 * @returns {jqPromise}
 	 */
-	OneEvent.addFavored = function(event_id, success) {
-		return __APP.SERVER.addData('/api/v1/events/' + event_id + '/favorites', {}, false, success);
+	OneEvent.addFavored = function(event_id) {
+		
+		return __APP.SERVER.addData(OneEvent.ENDPOINT.FAVORITES.format({
+			event_id: event_id
+		}), {}, false);
 	};
 	/**
 	 *
 	 * @param {(string|number)} event_id
-	 * @param {AJAXCallback} [success]
+	 *
 	 * @returns {jqPromise}
 	 */
-	OneEvent.deleteFavored = function(event_id, success) {
-		return __APP.SERVER.deleteData('/api/v1/events/' + event_id + '/favorites', {}, success);
+	OneEvent.deleteFavored = function(event_id) {
+		
+		return __APP.SERVER.deleteData(OneEvent.ENDPOINT.FAVORITES.format({
+			event_id: event_id
+		}));
 	};
 	/**
 	 *
 	 * @param {(string|number)} event_id
 	 * @param {string} notification_type
-	 * @param {function} [success]
+	 *
 	 * @returns {jqPromise}
 	 */
-	OneEvent.addEventNotification = function(event_id, notification_type, success) {
-		return __APP.SERVER.addData('/api/v1/events/' + event_id + '/notifications', {notification_type: notification_type}, false, success);
+	OneEvent.addEventNotification = function(event_id, notification_type) {
+		
+		return __APP.SERVER.addData(OneEvent.ENDPOINT.NOTIFICATIONS.format({
+			event_id: event_id
+		}), {
+			notification_type: notification_type
+		}, false);
 	};
 	/**
 	 *
 	 * @param {(string|number)} event_id
 	 * @param {string} notification_uuid
-	 * @param {AJAXCallback} [success]
+	 *
 	 * @returns {jqPromise}
 	 */
-	OneEvent.deleteEventNotification = function(event_id, notification_uuid, success) {
-		return __APP.SERVER.deleteData('/api/v1/events/' + event_id + '/notifications/' + notification_uuid, {}, success);
+	OneEvent.deleteEventNotification = function(event_id, notification_uuid) {
+		
+		return __APP.SERVER.deleteData(OneEvent.ENDPOINT.NOTIFICATION.format({
+			event_id: event_id,
+			notification_uuid: notification_uuid
+		}));
 	};
 	/**
 	 * @typedef {object} OrderRegistrationField
@@ -381,18 +417,20 @@ OneEvent = extending(OneEntity, (function() {
 	 *
 	 * @param {(string|number)} event_id
 	 * @param {Array<OrderRegistrationField>} registration_fields
+	 * @param {Object<string, string>} [utm]
 	 * @param {AJAXCallback} [success]
 	 *
 	 * @return {jqPromise}
 	 */
-	OneEvent.registerToEvent = function(event_id, registration_fields, success) {
+	OneEvent.registerToEvent = function(event_id, registration_fields, utm, success) {
 		
-		return __APP.SERVER.addData('/api/v1/events/' + event_id + '/orders', {
+		return __APP.SERVER.addData(OneEvent.ENDPOINT.ORDERS.format({event_id: event_id}), {
 			registration_fields: registration_fields,
 			tickets: [{
 				uuid: null,
 				count: 1
-			}]
+			}],
+			utm: utm || null
 		}, true, success);
 	};
 	/**
@@ -405,42 +443,51 @@ OneEvent = extending(OneEntity, (function() {
 	 * @param {(string|number)} event_id
 	 * @param {Array<OrderTicketType>} tickets
 	 * @param {string} [promocode]
+	 * @param {Object<string, string>} [utm]
 	 * @param {AJAXCallback} [success]
 	 *
 	 * @return {jqPromise}
 	 */
-	OneEvent.buyTickets = function(event_id, tickets, promocode, success) {
+	OneEvent.buyTickets = function(event_id, tickets, promocode, utm, success) {
 		
-		return __APP.SERVER.addData('/api/v1/events/' + event_id + '/orders', {
+		return __APP.SERVER.addData(OneEvent.ENDPOINT.ORDERS.format({event_id: event_id}), {
 			tickets: tickets,
-			promocode: promocode || null
+			promocode: promocode || null,
+			utm: utm || null
 		}, true, success);
 	};
 	/**
+	 * @typedef {object} OrderCreateData
+	 *
+	 * @property {Array<OrderTicketType>} [tickets]
+	 * @property {Array<OrderRegistrationField>} [registration_fields]
+	 * @property {string} [promocode]
+	 * @property {Object<string, string>} [utm]
+	 */
+	/**
 	 *
 	 * @param {(string|number)} event_id
-	 * @param {Array<OrderTicketType>} [tickets]
-	 * @param {Array<OrderRegistrationField>} [registration_fields]
-	 * @param {string} [promocode]
+	 * @param {OrderCreateData} order_data
 	 * @param {AJAXCallback} [success]
 	 *
 	 * @return {jqPromise}
 	 */
-	OneEvent.makeOrder = function(event_id, tickets, registration_fields, promocode, success) {
-		if (empty(tickets)) {
+	OneEvent.makeOrder = function(event_id, order_data, success) {
+		if (empty(order_data.tickets)) {
 			
-			return OneEvent.registerToEvent(event_id, registration_fields, success);
+			return OneEvent.registerToEvent(event_id, order_data.registration_fields, order_data.utm, success);
 		}
 		
-		if (empty(registration_fields)) {
+		if (empty(order_data.registration_fields)) {
 			
-			return OneEvent.buyTickets(event_id, tickets, promocode, success);
+			return OneEvent.buyTickets(event_id, order_data.tickets, order_data.promocode, order_data.utm, success);
 		}
 		
-		return __APP.SERVER.addData('/api/v1/events/' + event_id + '/orders', {
-			registration_fields: registration_fields,
-			tickets: tickets,
-			promocode: promocode || null
+		return __APP.SERVER.addData(OneEvent.ENDPOINT.ORDERS.format({event_id: event_id}), {
+			registration_fields: order_data.registration_fields,
+			tickets: order_data.tickets,
+			promocode: order_data.promocode || null,
+			utm: order_data.utm || null
 		}, true, success);
 	};
 	/**
@@ -498,51 +545,133 @@ OneEvent = extending(OneEntity, (function() {
 	};
 	/**
 	 *
-	 * @param {(OneEvent.STATUS|Array<OneEvent.STATUS>)} status
-	 * @param {AJAXCallback} [success]
-	 * @returns {jqPromise}
+	 * @return {jqPromise}
 	 */
-	OneEvent.prototype.changeEventStatus = function(status, success) {
+	OneEvent.prototype.favour = function() {
 		var self = this;
 		
-		return this.constructor.changeEventStatus(self.id, status, function(data) {
-			self.setData(data);
-			if (isFunction(success)) {
-				success.call(self, data);
-			}
+		return OneEvent.addFavored(this.id).then(function() {
+			self.favored.push(__APP.USER);
+			
+			return __APP.USER;
+		});
+	};
+	/**
+	 *
+	 * @return {jqPromise}
+	 */
+	OneEvent.prototype.unfavour = function() {
+		var self = this;
+		
+		return OneEvent.deleteFavored(this.id).then(function() {
+			self.favored.remove(__APP.USER.id);
+			
+			return self.favored;
+		});
+	};
+	/**
+	 *
+	 * @return {jqPromise}
+	 */
+	OneEvent.prototype.cancel = function() {
+		var self = this;
+		
+		return OneEvent.changeEventStatus(this.id, OneEvent.STATUS.CANCEL).then(function() {
+			self.canceled = true;
+			
+			return self;
+		});
+	};
+	/**
+	 *
+	 * @return {jqPromise}
+	 */
+	OneEvent.prototype.restore = function() {
+		var self = this;
+		
+		return OneEvent.changeEventStatus(this.id, OneEvent.STATUS.BRING_BACK).then(function() {
+			self.canceled = false;
+			
+			return self;
+		});
+	};
+	/**
+	 *
+	 * @return {jqPromise}
+	 */
+	OneEvent.prototype.hide = function() {
+		var self = this;
+		
+		return OneEvent.changeEventStatus(this.id, OneEvent.STATUS.HIDE).then(function() {
+			self.hidden = true;
+			
+			return self;
+		});
+	};
+	/**
+	 *
+	 * @return {jqPromise}
+	 */
+	OneEvent.prototype.bringBach = function() {
+		var self = this;
+		
+		return OneEvent.changeEventStatus(this.id, OneEvent.STATUS.SHOW).then(function() {
+			self.hidden = false;
+			
+			return self;
 		});
 	};
 	/**
 	 *
 	 * @param {string} notification_type
-	 * @param {function} [success]
+	 *
 	 * @returns {jqPromise}
 	 */
-	OneEvent.prototype.addNotification = function(notification_type, success) {
+	OneEvent.prototype.addNotification = function(notification_type) {
+		var self = this;
 		
-		return this.constructor.addEventNotification(this.id, notification_type, success);
+		return this.constructor.addEventNotification(this.id, notification_type).then(function(raw_notification) {
+			var notification = new OneNotification();
+			
+			notification.setData({
+				uuid: raw_notification.uuid,
+				notification_type: notification_type,
+				notification_time: raw_notification.notification_time,
+				done: false,
+				event_id: self.id,
+				created_at: (new Date()).valueOf()
+			});
+			
+			self.notifications.push(notification);
+			
+			return notification;
+		});
 	};
 	/**
 	 *
 	 * @param {string} notification_uuid
-	 * @param {AJAXCallback} [success]
+	 *
 	 * @returns {jqPromise}
 	 */
-	OneEvent.prototype.deleteNotification = function(notification_uuid, success) {
+	OneEvent.prototype.deleteNotification = function(notification_uuid) {
+		var self = this;
 		
-		return this.constructor.deleteEventNotification(this.id, notification_uuid, success);
+		return this.constructor.deleteEventNotification(this.id, notification_uuid).then(function() {
+			self.notifications.remove(notification_uuid);
+		});
 	};
 	/**
 	 *
 	 * @param {Array<OrderRegistrationField>} registration_fields
+	 * @param {Object<string, string>} [utm]
 	 * @param {AJAXCallback} [success]
 	 *
 	 * @return {jqPromise}
 	 */
-	OneEvent.prototype.registerToEvent = function(registration_fields, success) {
+	OneEvent.prototype.registerToEvent = function(registration_fields, utm, success) {
 		var self = this;
 		
-		return this.constructor.registerToEvent(this.id, registration_fields, function(data) {
+		return this.constructor.registerToEvent(this.id, registration_fields, utm, function(data) {
 			self.is_registered = true;
 			
 			if (isFunction(success)) {
@@ -554,28 +683,27 @@ OneEvent = extending(OneEntity, (function() {
 	 *
 	 * @param {Array<OrderTicketType>} tickets
 	 * @param {string} [promocode]
+	 * @param {Object<string, string>} [utm]
 	 * @param {AJAXCallback} [success]
 	 *
 	 * @return {jqPromise}
 	 */
-	OneEvent.prototype.buyTickets = function(tickets, promocode, success) {
+	OneEvent.prototype.buyTickets = function(tickets, promocode, utm, success) {
 		
-		return this.constructor.buyTickets(this.id, tickets, promocode, success);
+		return this.constructor.buyTickets(this.id, tickets, promocode, utm, success);
 	};
 	/**
 	 *
-	 * @param {Array<OrderTicketType>} tickets
-	 * @param {Array<OrderRegistrationField>} registration_fields
-	 * @param {string} [promocode]
+	 * @param {OrderCreateData} order_data
 	 * @param {AJAXCallback} [success]
 	 *
 	 * @return {jqPromise}
 	 */
-	OneEvent.prototype.makeOrder = function(tickets, registration_fields, promocode, success) {
+	OneEvent.prototype.makeOrder = function(order_data, success) {
 		var self = this;
 		
-		return this.constructor.makeOrder(this.id, tickets, registration_fields, promocode, success).then(function(data) {
-			var order = new OneOrder(self.id);
+		return this.constructor.makeOrder(this.id, order_data, success).then(function(data) {
+			var order = new OneOrder();
 			
 			order.setData($.extend({
 				registration_fields: data.registration_fields,

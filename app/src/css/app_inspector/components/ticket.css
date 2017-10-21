@@ -23,7 +23,11 @@
 	text-transform: uppercase;
 }
 
+.app_inspector_ticket.-clickable {cursor: pointer}
+.app_inspector_ticket.-clickable:hover {background-color: #f6f6f6}
+
 @supports (--custom_properties: 1) {
 	.app_inspector_ticket {background-color: var(--color_background_gray)}
 	.app_inspector_ticket_footer > span {color: var(--color_primary_50)}
+	.app_inspector_ticket.-clickable:hover {background-color: var(--color_gray_material)}
 }

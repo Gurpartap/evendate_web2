@@ -11,6 +11,7 @@ var gulp = require('gulp'),
 	rename = require('gulp-rename'),
 	clean = require('gulp-clean'),
 	runSequence = require('run-sequence').use(gulp),
+	console = require('console'),
 	
 	js_path = '../app/src/js/',
 	css_path = '../app/src/css/',
@@ -106,7 +107,9 @@ gulp.task('tmpl', function() {
 gulp.task('minify_js', ['js'], function() {
 	
 	return gulp.src(dest_path + '{app,vendor}.js')
-		.pipe(uglify())
+		.pipe(uglify().on('error', function(e){
+			console.log(e);
+		}))
 		.pipe(rename({extname: '.min.js'}))
 		.pipe(gulp.dest(dest_path));
 });
@@ -149,5 +152,5 @@ gulp.task('watch', function() {
 
 gulp.task('build', function(cb) {
 	
-	return runSequence(['minify_css', 'minify_js'], 'rev', cb);
+	return runSequence(['minify_css', 'minify_js', 'tmpl'], 'rev', cb);
 });

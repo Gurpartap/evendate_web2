@@ -56,6 +56,14 @@ ActionButton = extendingJQuery((function() {
 		this.data('instance', this);
 		this.initiate();
 	}
+	
+	/**
+	 *
+	 * @event ActionButton:change
+	 * @type function
+	 * @param {string} state
+	 * @param {ActionButton} button
+	 */
 	/**
 	 *
 	 * @enum {string}
@@ -106,7 +114,9 @@ ActionButton = extendingJQuery((function() {
 	ActionButton.prototype.icon_class = __C.CLASSES.ICON_CLASS;
 	
 	ActionButton.prototype.onClick = function() {};
-	
+	/**
+	 * @fires ActionButton:change
+	 */
 	ActionButton.prototype.afterCheck = function() {
 		var is_hovered = this.is(':hover');
 		
@@ -114,9 +124,15 @@ ActionButton = extendingJQuery((function() {
 		this
 			.removeClass(''.concat(this.classes[ActionButton.STATES.UNCHECKED_HOVER], ' ', this.classes[ActionButton.STATES.UNCHECKED]))
 			.addClass(''.concat(this.classes[is_hovered ? ActionButton.STATES.CHECKED_HOVER : ActionButton.STATES.CHECKED], ' ', this.checked_state_class))
-			.children('.'+__C.CLASSES.HOOKS.TEXT).text(this.options.labels[is_hovered ? ActionButton.STATES.CHECKED_HOVER : ActionButton.STATES.CHECKED]);
+			.children('.'+__C.CLASSES.HOOKS.TEXT).text(this.options.labels[is_hovered ? ActionButton.STATES.CHECKED_HOVER : ActionButton.STATES.CHECKED])
+			.trigger('ActionButton:change', [
+				'checked',
+				this
+			]);
 	};
-	
+	/**
+	 * @fires ActionButton:change
+	 */
 	ActionButton.prototype.afterUncheck = function() {
 		var is_hovered = this.is(':hover');
 		
@@ -124,7 +140,11 @@ ActionButton = extendingJQuery((function() {
 		this
 			.removeClass(''.concat(this.classes[ActionButton.STATES.CHECKED_HOVER], ' ', this.classes[ActionButton.STATES.CHECKED], ' ', this.checked_state_class))
 			.addClass(''.concat(this.classes[is_hovered ? ActionButton.STATES.UNCHECKED_HOVER : ActionButton.STATES.UNCHECKED]))
-			.children('.'+__C.CLASSES.HOOKS.TEXT).text(this.options.labels[is_hovered ? ActionButton.STATES.UNCHECKED_HOVER : ActionButton.STATES.UNCHECKED]);
+			.children('.'+__C.CLASSES.HOOKS.TEXT).text(this.options.labels[is_hovered ? ActionButton.STATES.UNCHECKED_HOVER : ActionButton.STATES.UNCHECKED])
+			.trigger('ActionButton:change', [
+				'unchecked',
+				this
+			]);
 	};
 	/**
 	 * @abstract

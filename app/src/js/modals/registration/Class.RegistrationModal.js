@@ -2,6 +2,7 @@
  * @requires Class.PreviewRegistrationModal.js
  */
 /**
+ * @deprecated
  * @class RegistrationModal
  * @extends PreviewRegistrationModal
  */
