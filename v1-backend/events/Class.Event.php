@@ -9,6 +9,7 @@ require_once $BACKEND_FULL_PATH . '/events/Class.RegistrationFieldsCollection.ph
 require_once $BACKEND_FULL_PATH . '/events/Class.TicketType.php';
 require_once $BACKEND_FULL_PATH . '/events/Class.TicketTypesCollection.php';
 require_once $BACKEND_FULL_PATH . '/events/Class.PromocodesCollection.php';
+require_once $BACKEND_FULL_PATH . '/events/Class.PricingRuleFactory.php';
 
 class Event extends AbstractEntity
 {
@@ -51,6 +52,7 @@ class Event extends AbstractEntity
 	const ORDERS_COUNT_FIELD_NAME = 'orders_count';
 	const EMAIL_TEXTS_FIELD_NAME = 'email_texts';
 	const PROMOCODES_FIELD_NAME = 'promocodes';
+	const PRICING_RULES_FIELD_NAME = 'pricing_rules';
 	/*ONLY FOR ADMINS*/
 
 	const REGISTRATION_FIELDS_FIELD_NAME = 'registration_fields';
@@ -154,6 +156,7 @@ class Event extends AbstractEntity
 		'registration_available',
 		'ticketing_available',
 		'accept_bitcoins',
+		'apply_promocodes_and_pricing_rules',
 		'booking_time',
 //		'registered_count',
 
@@ -718,6 +721,12 @@ class Event extends AbstractEntity
 			$data['is_free'] = filter_var($data['is_free'], FILTER_VALIDATE_BOOLEAN) ? 'true' : 'false';
 		}
 
+		if (!isset($data['apply_promocodes_and_pricing_rules'])) {
+			$data['apply_promocodes_and_pricing_rules'] = 'true';
+		} else {
+			$data['apply_promocodes_and_pricing_rules'] = filter_var($data['apply_promocodes_and_pricing_rules'], FILTER_VALIDATE_BOOLEAN) ? 'true' : 'false';
+		}
+
 		if (!isset($data['accept_bitcoins'])) {
 			$data['accept_bitcoins'] = 'false';
 		} else {
@@ -778,6 +787,7 @@ class Event extends AbstractEntity
 					'is_free' => $data['is_free'],
 					'is_online' => $data['is_online'],
 					'min_price' => $data['min_price'],
+					'apply_promocodes_and_pricing_rules' => $data['apply_promocodes_and_pricing_rules'] ?? true,
 					'status' => $data['public_at'] instanceof DateTime ? 'false' : 'true',
 				))->returning(array('id'));
 
@@ -794,6 +804,7 @@ class Event extends AbstractEntity
 			self::saveTicketingInfo($db, $event_id, $data);
 			self::saveEmailTexts($db, $event_id, $data);
 			self::savePromocodes($db, $event_id, $data);
+			self::savePricingRules($db, $event_id, $data);
 
 
 			$data['vk']['event_id'] = $event_id;
@@ -882,6 +893,20 @@ class Event extends AbstractEntity
 			))
 			->where('id = ?', $data['vk_post_id']);
 		$db->prepareExecute($q_upd_vk_post);
+	}
+
+	private static function savePricingRules(ExtendedPDO $db, $event_id, array $data)
+	{
+		if (!isset($data['pricing_rules']) || !is_array($data['pricing_rules'])) return;
+		$q_upd_rules = App::queryFactory()->newUpdate();
+		$q_upd_rules->table('tickets_pricing_rules')
+			->cols(array('enabled' => 'false'))
+			->where('event_id = ?', $event_id);
+		$db->prepareExecute($q_upd_rules, 'CANT_UPDATE_PRICING_RULES');
+
+		foreach ($data['pricing_rules'] as $rule) {
+			PricingRuleFactory::create($rule)->save($event_id);
+		}
 	}
 
 	private static function saveEventTags(ExtendedPDO $db, $event_id, array $tags)
@@ -1293,6 +1318,7 @@ class Event extends AbstractEntity
 				),
 				Fields::parseOrderBy($fields[self::TAGS_FIELD_NAME]['order_by'] ?? ''))->getData();
 		}
+
 		if (isset($fields[self::ORDERS_FIELD_NAME]) && $user instanceof User) {
 			$orders_fields = Fields::parseFields($fields[self::ORDERS_FIELD_NAME]['fields'] ?? '');
 			$orders_filters = Fields::parseFilters($fields[self::ORDERS_FIELD_NAME]['filters'] ?? '');
@@ -1351,7 +1377,6 @@ class Event extends AbstractEntity
 			}
 		}
 
-
 		if (isset($fields[self::PROMOCODES_FIELD_NAME])) {
 			if ($user instanceof User &&
 				$user->hasRights($this->getOrganization(), array(Roles::ROLE_MODERATOR, Roles::ROLE_ADMIN))
@@ -1376,7 +1401,6 @@ class Event extends AbstractEntity
 				$result_data[self::PROMOCODES_FIELD_NAME] = null;
 			}
 		}
-
 
 		if (isset($fields[self::REGISTERED_USERS_FIELD_NAME])) {
 			if ($user instanceof User) {
@@ -1434,6 +1458,9 @@ class Event extends AbstractEntity
 			)->getData();
 		}
 
+		if (isset($fields[self::PRICING_RULES_FIELD_NAME])) {
+			$result_data[self::PRICING_RULES_FIELD_NAME] = $this->getPricingRules()->getData();
+		}
 
 		return new Result(true, '', $result_data);
 	}
@@ -1508,6 +1535,7 @@ class Event extends AbstractEntity
 					'is_free' => $data['is_free'],
 					'is_online' => $data['is_online'],
 					'min_price' => $data['min_price'],
+					'apply_promocodes_and_pricing_rules' => $data['apply_promocodes_and_pricing_rules'] ?? true,
 					'status' => $data['public_at'] instanceof DateTime ? 'false' : 'true',
 				))
 				->where('id = ?', $this->getId());
@@ -1563,6 +1591,7 @@ class Event extends AbstractEntity
 			self::saveNotifications($this->generateNotifications($data), $this->db);
 			self::saveEmailTexts($this->db, $this->getId(), $data);
 			self::savePromocodes($this->db, $this->getId(), $data);
+			self::savePricingRules($this->db, $this->getId(), $data);
 
 			$this->db->commit();
 
@@ -1948,6 +1977,40 @@ class Event extends AbstractEntity
 	}
 
 
+	public function getPricingRules()
+	{
+		$q_get_rules = App::queryFactory()->newSelect();
+		$q_get_rules->cols(array(
+				'id',
+				'uuid',
+				'name',
+				'event_id',
+				'tickets_pricing_rule_type_id',
+				'type_code',
+				'effort',
+				'is_percentage',
+				'is_fixed',
+				'rule',
+				'enabled',
+				'created_at',
+				'updated_at'
+			))
+			->from('view_tickets_pricing_rules')
+			->where('event_id = ?', $this->getId());
+
+		$user = App::getCurrentUser();
+		if ($user instanceof User && $user->hasRights($this->getOrganization(), array('admin', 'moderator'))) {
+			// admin, can get all rules
+		} else {
+			$q_get_rules->where('enabled = true');
+		}
+		$result = App::DB()->prepareExecute($q_get_rules, 'CANT_GET_PRICING_RULES')->fetchAll();
+		foreach ($result as &$item) {
+			$item = array_merge($item, json_decode($item['rule'], true));
+		}
+		return new Result(true, '', $result);
+	}
+
 	public function checkLandingAlias(string $alias)
 	{
 		$reserved_names = array(
@@ -2017,5 +2080,16 @@ class Event extends AbstractEntity
 		$finance = new EventFinance($this->db, $this, $user);
 		return $finance->getFields($fields);
 	}
+
+	public function getApplyPromocodesAndPricingRules()
+	{
+		$q_get_field = App::queryFactory()->newSelect();
+		$q_get_field
+			->cols(array('apply_promocodes_and_pricing_rules'))
+			->from('view_events')
+			->where('id = ?', $this->getId());
+		return $this->db->prepareExecute($q_get_field)->fetchColumn(0);
+	}
+
 
 }

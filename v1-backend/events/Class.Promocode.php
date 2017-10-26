@@ -6,6 +6,15 @@ class Promocode extends AbstractEntity
 	const USE_COUNT = 'use_count';
 	const TOTAL_EFFORT = 'total_effort';
 
+	protected $uuid;
+	protected $code;
+	protected $is_fixed;
+	protected $is_percentage;
+	protected $effort;
+	protected $start_date;
+	protected $end_date;
+	protected $enabled;
+
 	protected static $DEFAULT_COLS = array(
 		'uuid',
 		'code',
@@ -97,6 +106,40 @@ class Promocode extends AbstractEntity
 		return $data;
 
 	}
+
+	/**
+	 * @return mixed
+	 */
+	public function getCode()
+	{
+		return $this->code;
+	}
+
+	/**
+	 * @return mixed
+	 */
+	public function getIsFixed()
+	{
+		return $this->is_fixed;
+	}
+
+	/**
+	 * @return mixed
+	 */
+	public function getIsPercentage()
+	{
+		return $this->is_percentage;
+	}
+
+	/**
+	 * @return mixed
+	 */
+	public function getEffort()
+	{
+		return $this->effort;
+	}
+
+
 
 
 
