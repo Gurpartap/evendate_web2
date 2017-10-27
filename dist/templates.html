@@ -1090,8 +1090,9 @@
 								<p class="text">Задавайте условия для изменения цены при покупке билета. Например: Если стоимость заказа больше 5000 ₽, тогда скидка 30 %.</p>
 
 								<div class="event_edit_dynamic_pricing_row">
-									<div class="event_edit_dynamic_pricing_condition_text">
-										<span class="-text_color_primary_80">При покупке билетов от <span class="-text_color_accent">5 ед.</span> до <span class="-text_color_accent">100 ед.</span>, скидка <span class="-text_color_accent">30%</span></span>
+									<div class="event_edit_dynamic_pricing_condition">
+										<p class="event_edit_dynamic_pricing_condition_name">Правило 1</p>
+										<p class="event_edit_dynamic_pricing_condition_text">При покупке билетов от <span class="-text_color_accent">5 ед.</span> до <span class="-text_color_accent">100 ед.</span>, скидка <span class="-text_color_accent">30%</span></p>
 									</div>
 									<div class="event_edit_dynamic_pricing_buttons">
 										<button class="event_edit_dynamic_pricing_options action -color_marginal fa_icon fa-sliders" type="button"></button>
@@ -1099,43 +1100,21 @@
 									</div>
 								</div>
 								<div class="event_edit_dynamic_pricing_row">
-									<div class="event_edit_dynamic_pricing_condition_text">
-										<span class="-text_color_primary_80">При сумме заказа от <span class="-text_color_accent">15000 ₽</span>, скидка <span class="-text_color_accent">2000 ₽</span></span>
+									<div class="event_edit_dynamic_pricing_condition">
+										<p class="event_edit_dynamic_pricing_condition_name">Правило 2</p>
+										<p class="event_edit_dynamic_pricing_condition_text">При сумме заказа от <span class="-text_color_accent">15000 ₽</span>, скидка <span class="-text_color_accent">2000 ₽</span></p>
 									</div>
 									<div class="event_edit_dynamic_pricing_buttons">
 										<button class="event_edit_dynamic_pricing_options action -color_marginal fa_icon fa-sliders" type="button"></button>
 										<button class="event_edit_row_delete_button action -color_marginal" type="button">×</button>
 									</div>
 								</div>
+								{pricing_rules}
 								<div class="form_unit -align_center">
-									<button class="button -color_accent" type="button">Добавить поле</button>
+									<button class="button -color_accent RippleEffect" type="button">Добавить поле</button>
 								</div>
 
-								<fieldset class="event_edit_dynamic_pricing_add_row">
-									<div class="form_unit">
-										<label class="form_label" for="event_edit_dynamic_pricing_add_row_type">Выберите тип условия</label>
-										<select id="event_edit_dynamic_pricing_add_row_type" class="form_select" name="dynamic_pricing_type">
-											<option>Количество билетов</option>
-											<option>Сумма заказа</option>
-										</select>
-									</div>
-									<div>
-										<span>При покупке от </span>
-										<span class="form_unit"><input class="form_input" size="3"></span>
-										<span> до </span>
-										<span class="form_unit"><input class="form_input" size="3"></span>
-										<span> билетов, скидка </span>
-										<span class="form_unit"><input class="form_input" size="4"></span>
-										<select class="form_select" name="dynamic_pricing_measure">
-											<option>%</option>
-											<option>₽</option>
-										</select>
-									</div>
-									<div class="form_unit">
-										<button class="button -color_accent" type="button">Добавить</button>
-										<button class="button -color_default" type="button">Отменить</button>
-									</div>
-								</fieldset>
+								<div class="PricingRuleHolder"></div>
 
 
 								<h3 class="help_link HelpLink" data-article_id="51">Промокоды</h3>
@@ -1294,6 +1273,56 @@
 
 	</div>
 
+</script>
+
+<script type="javascript/template" id="tmpl-pricing-rule-row">
+	<fieldset class="event_edit_dynamic_pricing_row PricingRuleRow" data-pricing_rule_row="{i}">
+		<input type="hidden" name="pricing_rules" value="{i}">
+		<input type="hidden" name="pricing_rule_{i}_uuid" value="{uuid}">
+		<input type="hidden" name="pricing_rule_{i}_name" value="{name}">
+		<input type="hidden" name="pricing_rule_{i}_type_code" value="{type_code}">
+		<input type="hidden" name="pricing_rule_{i}_effort" value="{effort}">
+		<input type="hidden" name="pricing_rule_{i}_min_count" value="{min_count}">
+		<input type="hidden" name="pricing_rule_{i}_max_count" value="{max_count}">
+		<input type="hidden" name="pricing_rule_{i}_is_fixed" value="{is_fixed}">
+		<div class="event_edit_dynamic_pricing_condition">
+			<p class="event_edit_dynamic_pricing_condition_name">{name}</p>
+			<p class="event_edit_dynamic_pricing_condition_text">{condition}</p>
+		</div>
+		<div class="event_edit_dynamic_pricing_buttons">
+			<button class="event_edit_dynamic_pricing_options action -color_marginal fa_icon fa-sliders ChangePricingRule" type="button"></button>
+			<button class="event_edit_row_delete_button action -color_marginal RemovePricingRule" type="button">×</button>
+		</div>
+	</fieldset>
+</script>
+
+<script type="javascript/template" id="tmpl-pricing-rule">
+	<fieldset class="event_edit_dynamic_pricing_add_row">
+		<input type="hidden" name="uuid" value="{uuid}">
+		{name_input_form_field}
+		{type_select_form_field}
+		<div class="pricing_rule_text_row">
+			<span>{rule_start_text} от </span>
+			<span class="form_unit form_input_group">
+				<input class="form_input" name="min_count" value="{min_count}" placeholder="0" size="3" required>
+				<span class="form_input_group_after -text_color_marginal">{count_measure}</span>
+			</span>
+			<span> до </span>
+			<span class="form_unit form_input_group">
+				<input class="form_input" name="max_count" value="{max_count}" placeholder="10 000" size="3" required>
+				<span class="form_input_group_after -text_color_marginal">{count_measure}</span>
+			</span>
+			<span>{rule_end_text}, скидка </span>
+			<span class="form_unit form_input_group">
+				<input class="form_input" name="effort" value="{effort}" placeholder="15" size="4" required>
+				{measure_select}
+			</span>
+		</div>
+		<div class="form_unit">
+			<button class="button -color_accent SavePricingRule" type="button">Сохранить</button>
+			<button class="button -color_default CancelPricingRule" type="button">Отменить</button>
+		</div>
+	</fieldset>
 </script>
 
 <script type="javascript/template" id="tmpl-selected-table-day">

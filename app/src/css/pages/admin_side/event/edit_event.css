@@ -248,12 +248,21 @@
 	display: flex;
 	justify-content: space-between;
 	align-items: center;
-	height: 54px;
+	height: 64px;
 	border-bottom: 1px solid #c5c9d1;
 }
 
-.event_edit_dynamic_pricing_condition_text {
+.event_edit_dynamic_pricing_condition_name {
 	font-weight: 500;
+	margin-bottom: 3px;
+}
+
+.event_edit_dynamic_pricing_condition_text {
+	margin: 0;
+	padding-left: 16px;
+	font-size: .875em;
+	font-weight: 500;
+	color: #657184;
 }
 
 .event_edit_dynamic_pricing_buttons {
@@ -263,8 +272,8 @@
 
 .event_edit_dynamic_pricing_options {
 	flex: none;
-	width: 32px;
-	height: 32px;
+	width: 50px;
+	height: 50px;
 }
 
 .event_edit_dynamic_pricing_add_row {
@@ -279,4 +288,5 @@
 	.edit_event_registration_custom_field_remove_button {color: var(--color_primary_30)}
 	.edit_event_registration_custom_field_remove_button:hover {color: var(--color_primary_50)}
 	.event_edit_dynamic_pricing_add_row {background-color: var(--color_background_gray)}
+	.event_edit_dynamic_pricing_condition_text {color: var(--color_primary_80)}
 }

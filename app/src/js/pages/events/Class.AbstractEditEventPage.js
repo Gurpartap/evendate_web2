@@ -133,6 +133,7 @@ AbstractEditEventPage = extending(Page, (function() {
 	AbstractEditEventPage.lastRegistrationFieldId = 0;
 	AbstractEditEventPage.lastTicketTypeRowId = 0;
 	AbstractEditEventPage.lastPromocodeRowId = 0;
+	AbstractEditEventPage.lastPricingRuleRowId = 0;
 	/**
 	 *
 	 * @param {RegistrationFieldModel|Array<RegistrationFieldModel>|RegistrationFieldModelsCollection} [registration_data]
@@ -543,6 +544,139 @@ AbstractEditEventPage = extending(Page, (function() {
 		});
 	
 		return $rows;
+	};
+	/**
+	 *
+	 * @param {(PricingRuleModelsCollection|Array<PricingRuleModel>|PricingRuleModel)} rules
+	 *
+	 * @return {jQuery}
+	 */
+	AbstractEditEventPage.pricingRuleRowBuilder = function(rules) {
+		var $rules;
+		
+		$rules = tmpl('pricing-rule-row', (rules instanceof Array ? rules : [rules]).map(function(rule) {
+			var row_id = ++AbstractEditEventPage.lastPricingRuleRowId;
+			
+			return {
+				i: row_id,
+				uuid: rule.uuid,
+				name: rule.name,
+				type_code: rule.type_code,
+				effort: rule.effort,
+				min_count: rule.min_count,
+				max_count: rule.max_count,
+				is_fixed: rule.is_fixed,
+				condition: (function(rule){
+					
+					return '';
+				}(rule))
+			};
+		}));
+		
+		$rules.find('.RemovePricingRule').on('click.RemovePricingRule', function() {
+			$(this).closest('.PricingRuleRow').remove();
+		});
+		
+		$rules.find('.ChangePricingRule').on('click.ChangePricingRule', function() {
+			var $pricing_rule_row = $(this).closest('.PricingRuleRow'),
+				model = new PricingRuleModel(),
+				data = $pricing_rule_row.serializeForm(),
+				$change_block;
+			
+			model.setData({
+				uuid: data.uuid || null,
+				name: data.name,
+				type_code: data.type_code,
+				effort: data.effort,
+				min_count: data.min_count,
+				max_count: data.max_count,
+				is_fixed: !!data.is_fixed,
+				is_percentage: !data.is_fixed
+			});
+			
+			$change_block = AbstractEditEventPage.pricingRuleBuilder(model);
+			
+			$change_block.find('.CancelPricingRule').on('click.CancelPricingRule', function() {
+				$change_block.remove();
+			});
+			
+			$change_block.find('.SavePricingRule').on('click.SavePricingRule', function() {
+				data = $(this).closest('.PricingRuleRow').serializeForm();
+				
+				model.setData({
+					uuid: data.uuid || null,
+					name: data.name,
+					type_code: data.type_code,
+					effort: data.effort,
+					min_count: data.min_count,
+					max_count: data.max_count,
+					is_fixed: !!data.is_fixed,
+					is_percentage: !data.is_fixed
+				});
+				$pricing_rule_row.after(AbstractEditEventPage.pricingRuleRowBuilder(model));
+				$pricing_rule_row.remove();
+				$change_block.remove();
+			});
+		});
+		
+		return $rules;
+	};
+	/**
+	 *
+	 * @param {PricingRuleModel} rule
+	 *
+	 * @return {jQuery}
+	 */
+	AbstractEditEventPage.pricingRuleBuilder = function(rule) {
+		var rule_start_text,
+			rule_end_text,
+			count_measure;
+		
+		switch (rule.type_code) {
+			case PricingRuleModel.TYPE.TICKETS_COUNT_BETWEEN: {
+				rule_start_text = 'При покупке';
+				rule_end_text = ' билетов';
+				count_measure = 'ед.';
+				
+				break;
+			}
+			case PricingRuleModel.TYPE.ORDER_SUM_BETWEEN: {
+				rule_start_text = 'При покупке на сумму';
+				rule_end_text = '';
+				count_measure = '₽';
+				
+				break;
+			}
+		}
+		
+		return tmpl('pricing-rule', {
+			name_input_form_field: __APP.BUILD.formUnit({
+				id: 'event_edit_dynamic_pricing_add_row_type',
+				label: 'Название',
+				value: rule.name || 'Правило ' + AbstractEditEventPage.lastPricingRuleRowId + 1,
+				name: 'name'
+			}),
+			type_select_form_field: __APP.BUILD.formUnit({
+				id: 'event_edit_dynamic_pricing_add_row_type',
+				label: 'Выберите тип условия',
+				type: 'select',
+				value: rule.type_code,
+				name: 'type_code',
+				values: [
+					{id: PricingRuleModel.TYPE.TICKETS_COUNT_BETWEEN, display_name: 'Количество билетов'},
+					{id: PricingRuleModel.TYPE.ORDER_SUM_BETWEEN, display_name: 'Сумма заказа'},
+					{id: PricingRuleModel.TYPE.USER_ORDER_COUNT_BETWEEN, display_name: 'Количество всех заказов пользователя'},
+					{id: PricingRuleModel.TYPE.USER_ORDER_SUM_BETWEEN, display_name: 'Сумма всех заказов пользователя'}
+				]
+			}),
+			rule_start_text: rule_start_text,
+			rule_end_text: rule_end_text,
+			count_measure: count_measure,
+			measure_select: __APP.BUILD.select([
+				{val: 'is_percentage', display_name: '%'},
+				{val: 'is_fixed', display_name: '₽'}
+			], {name: 'dynamic_pricing_measure'}, ['form_input_group_after'], {}, rule.is_fixed ? 'is_fixed' : 'is_percentage')
+		});
 	};
 	/**
 	 *

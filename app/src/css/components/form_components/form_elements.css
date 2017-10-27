@@ -186,7 +186,51 @@ span.form_unit {display: inline-block}
 	font-family: FontAwesome;
 }
 
-/* Form DatePicker */
+.form_input_group {
+	display: flex;
+}
+
+span.form_input_group {display: inline-flex}
+
+.form_input_group > .form_input {order: 2}
+.form_input_group > .form_input:only-child {border-radius: 2px}
+.form_input_group > .form_input:not(:first-child) {
+	border-top-left-radius: 0;
+	border-bottom-left-radius: 0;
+	border-left: 0;
+	padding-left: 0;
+}
+.form_input_group > .form_input:not(:last-child) {
+	border-top-right-radius: 0;
+	border-bottom-right-radius: 0;
+	border-right: 0;
+	padding-right: 0;
+}
+
+.form_input_group_after,
+.form_input_group_before {
+	display: flex;
+	align-items: center;
+	padding: 0 4px;
+	font-size: 1em;
+	background-color: #fff;
+	border: 1px solid #4a4a4a;
+	transition: background_color .2s ease, border .2s ease, box-shadow .2s ease, height .2s ease;
+}
+.form_input_group_after {border-left: 0}
+.form_input_group_before {border-right: 0}
+.form_input_group_before:first-child {border-radius: 2px 0 0 2px}
+.form_input_group_after:last-child {border-radius: 0 2px 2px 0}
+
+:not(.form_input_group_before) + .form_input_group_before {order: 0}
+.form_input_group_before + .form_input_group_before {order: 1}
+:not(.form_input_group_after) + .form_input_group_after {order: 3}
+.form_input_group_after + .form_input_group_after {order: 4}
+
+:not(.-status_disabled) .form_input:not(:disabled):not(.-status_disabled):focus + .form_input_group_after {border-color: #00dc88}
+
+
+	/* Form DatePicker */
 
 
 .form_datepicker {

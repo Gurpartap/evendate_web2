@@ -342,6 +342,17 @@ String.prototype.toUnderscore = function() {
 	return (this.charAt(0).toLowerCase() + this.slice(1)).replace(/([A-Z])/g, function($1) {return "_" + $1.toLowerCase();});
 };
 /**
+ *
+ * @param {string} current_separator
+ * @param {string} new_separator
+ *
+ * @return {string}
+ */
+String.prototype.replaceSeparator = function(current_separator, new_separator) {
+	
+	return this.replace(current_separator, new_separator);
+};
+/**
  * Returns formatted string for fields AJAX data
  * @param {AJAXData} data
  * @return {string}

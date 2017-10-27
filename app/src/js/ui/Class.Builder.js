@@ -645,6 +645,16 @@ Builder = (function() {
 										props.inputmask
 									);
 								}
+								case 'select': {
+									
+									return self.select(
+										props.values,
+										mergeObjects({}, props.attributes, defined_attributes, true, true),
+										classes.concat('form_select'),
+										props.dataset,
+										props.value
+									);
+								}
 								default: {
 									
 									return self.input(

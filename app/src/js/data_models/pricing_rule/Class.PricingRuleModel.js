@@ -34,7 +34,7 @@ PricingRuleModel = extending(AbstractDataModel, (function() {
 		this.is_fixed = null;
 	}
 	
-	PricingRuleModel.ID_PROP_NAME = 'uuid';
+	PricingRuleModel.prototype.ID_PROP_NAME = 'uuid';
 	/**
 	 *
 	 * @enum {string}
