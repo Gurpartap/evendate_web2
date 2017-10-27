@@ -195,7 +195,7 @@ OneUser = extending(OneEntity, (function() {
 		return OneUser.fetchFavored(self.id, data).done(function(favored) {
 			self.favored.setData(favored);
 			if (success && typeof success == 'function') {
-				success.call(self, self.favored.last_pushed);
+				success.call(self, self.favored.__last_pushed);
 			}
 		}).promise();
 	};
@@ -211,7 +211,7 @@ OneUser = extending(OneEntity, (function() {
 		return OneUser.fetchSubscriptions(self.id, data).done(function(subscriptions) {
 			self.subscriptions.setData(subscriptions);
 			if (success && typeof success == 'function') {
-				success.call(self, self.subscriptions.last_pushed);
+				success.call(self, self.subscriptions.__last_pushed);
 			}
 		}).promise();
 	};

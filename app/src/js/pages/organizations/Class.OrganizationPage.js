@@ -193,14 +193,14 @@ OrganizationPage = extending(Page, (function() {
 			}
 		});
 		
-		if (PAGE.organization.subscribed.last_pushed.length) {
+		if (PAGE.organization.subscribed.__last_pushed.length) {
 			$subscribers_scroll.scrollbar({
 				onScroll: function(y) {
 					var $loader,
 						last_is_friend = false;
 					
-					if (PAGE.organization.subscribed.last_pushed.length) {
-						last_is_friend = PAGE.organization.subscribed.last_pushed[PAGE.organization.subscribed.last_pushed.length - 1].is_friend
+					if (PAGE.organization.subscribed.__last_pushed.length) {
+						last_is_friend = PAGE.organization.subscribed.__last_pushed[PAGE.organization.subscribed.__last_pushed.length - 1].is_friend
 					}
 					
 					if (y.scroll + 200 >= y.maxScroll && !$subscribers_scroll.block_scroll) {

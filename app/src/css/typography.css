@@ -125,28 +125,28 @@ b.-transform_uppercase,
 p.-transform_uppercase,
 span.-transform_uppercase,
 small.-transform_uppercase,
-label.-transform_uppercase {text-transform: uppercase}
+label.-transform_uppercase {text-transform: uppercase !important}
 
 a.-font_weight_lighter,
 p.-font_weight_lighter,
 span.-font_weight_lighter,
 small.-font_weight_lighter,
 label.-font_weight_lighter,
-button.-font_weight_lighter {font-weight: 400}
+button.-font_weight_lighter {font-weight: 400 !important}
 
 a.-font_weight_bolder,
 p.-font_weight_bolder,
 span.-font_weight_bolder,
 small.-font_weight_bolder,
 label.-font_weight_bolder,
-button.-font_weight_bolder {font-weight: 500}
+button.-font_weight_bolder {font-weight: 500 !important}
 
 a.-font_weight_bold,
 p.-font_weight_bold,
 span.-font_weight_bold,
 small.-font_weight_bold,
 label.-font_weight_bold,
-button.-font_weight_bold {font-weight: 600}
+button.-font_weight_bold {font-weight: 600 !important}
 
 
 @supports (--custom_properties: 1) {

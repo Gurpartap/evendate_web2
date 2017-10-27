@@ -228,6 +228,7 @@
 .event_edit_ticket_type_expand_button {}
 
 .event_edit_row_delete_button {
+	top: -2px;
 	font-size: 2em;
 	line-height: 1;
 	font-weight: 100;
@@ -243,10 +244,39 @@
 	margin-top: 36px;
 }
 
+.event_edit_dynamic_pricing_row {
+	display: flex;
+	justify-content: space-between;
+	align-items: center;
+	height: 54px;
+	border-bottom: 1px solid #c5c9d1;
+}
+
+.event_edit_dynamic_pricing_condition_text {
+	font-weight: 500;
+}
+
+.event_edit_dynamic_pricing_buttons {
+	display: flex;
+	align-items: center;
+}
+
+.event_edit_dynamic_pricing_options {
+	flex: none;
+	width: 32px;
+	height: 32px;
+}
+
+.event_edit_dynamic_pricing_add_row {
+	padding: 24px;
+	background-color: #f9f9fa;
+}
+
 @supports (--custom_properties: 1) {
 	.event_edit_navigation_item.-active {background-color: var(--color_accent)}
 	.event_datepicker_calendar .calendar_wrapper:after {border-right-color: 1px solid var(--color_primary_30)}
 	.edit_event_registration_field_draggable {color: var(--color_primary_50)}
 	.edit_event_registration_custom_field_remove_button {color: var(--color_primary_30)}
 	.edit_event_registration_custom_field_remove_button:hover {color: var(--color_primary_50)}
+	.event_edit_dynamic_pricing_add_row {background-color: var(--color_background_gray)}
 }

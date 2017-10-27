@@ -44,6 +44,8 @@ OneEvent = extending(OneEntity, (function() {
 	 * @property {AbstractEventTicketsCollection} tickets
 	 * @property {TicketTypesCollection} ticket_types
 	 * @property {?number} booking_time
+	 * @property {?boolean} apply_promocodes_and_pricing_rules
+	 * @property {PricingRuleModelsCollection} pricing_rules
 	 *
 	 * @property {?boolean} registration_locally
 	 * @property {?boolean} registration_available
@@ -137,6 +139,8 @@ OneEvent = extending(OneEntity, (function() {
 		this.tickets = new AbstractEventTicketsCollection(event_id);
 		this.ticket_types = new TicketTypesCollection(event_id);
 		this.booking_time = null;
+		this.apply_promocodes_and_pricing_rules = null;
+		this.pricing_rules = new PricingRuleModelsCollection();
 		
 		this.registration_locally = null;
 		this.registration_available = null;

@@ -100,8 +100,8 @@ a.-odd:focus {text-decoration: none}
 .action,
 .button,
 .counter,
-.form_radio + .form_label,
-.form_checkbox + .form_label,
+.form_radio_wrapper > .form_label,
+.form_checkbox_wrapper > .form_label,
 form:disabled,
 fieldset:disabled,
 .-unselectable {

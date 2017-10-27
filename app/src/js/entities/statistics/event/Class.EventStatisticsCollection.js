@@ -64,7 +64,7 @@ EventStatisticsCollection = extending(StatisticsCollection, (function() {
 			self.setData(data[self.field]);
 			
 			if (isFunction(success)) {
-				success.call(self, self.last_pushed);
+				success.call(self, self.__last_pushed);
 			}
 		});
 	};

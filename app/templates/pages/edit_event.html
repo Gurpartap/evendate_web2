@@ -48,7 +48,7 @@
 													{end_time}
 												</div>
 											</fieldset>
-											<div class="form_unit">
+											<div class="form_unit form_checkbox_wrapper">
 												<input id="edit_event_different_time" class="form_checkbox CollapsingTrigger Switch" type="checkbox" name="different_time" tabindex="-1" data-collapsing_id="event_edit_date_picker" data-switch_id="different_time">
 												<label class="form_label" for="edit_event_different_time"><span>Разное время</span></label>
 											</div>
@@ -80,9 +80,9 @@
 												<tbody class="SelectedDaysRows">
 												</tbody>
 											</table>
-											<div>
+											<div class="-align_center">
 												<input id="new_date" type="hidden">
-												<button class="button form_datepicker -color_default event_selected_days_add_date AddDayToTable DatePicker RippleEffect" type="button" data-min_date="{current_date}" tabindex="-1">
+												<button class="form_datepicker -uppercase -color_default event_selected_days_add_date AddDayToTable DatePicker" type="button" data-min_date="{current_date}" tabindex="-1">
 													<span>Добавить день</span>
 												</button>
 											</div>
@@ -100,7 +100,7 @@
 									</div>
 								</div>
 								<div class="form_group -align_center">
-									<div class="form_unit">
+									<div class="form_unit form_checkbox_wrapper">
 										<input id="edit_event_is_online" class="form_checkbox EditEventIsOnline" type="checkbox" name="is_online">
 										<label class="form_label" for="edit_event_is_online"><span>Online - событие</span></label>
 									</div>
@@ -108,12 +108,9 @@
 
 								<h2>Цена <span class="required_star">*</span></h2>
 								<div class="form_group -parts_1_3">
-									<div class="form_unit -inline">
-										<label class="form_label" for="edit_event_free"><span>Бесплатно</span></label>
-										<div class="form_unit">
-											<input id="edit_event_free" class="form_checkbox Switch IsFreeSwitch OnChangeCrossPost" type="checkbox" checked name="is_free" data-switch_id="is_free">
-											<label class="form_label" for="edit_event_free"></label>
-										</div>
+									<div class="form_unit form_checkbox_wrapper -reverse">
+										<input id="edit_event_free" class="form_checkbox Switch IsFreeSwitch OnChangeCrossPost" type="checkbox" checked name="is_free" data-switch_id="is_free">
+										<label class="form_label" for="edit_event_free"><span class="-font_weight_bolder">Бесплатно</span></label>
 									</div>
 									<fieldset class="form_unit Switching" data-switch_id="is_free" disabled>
 										{min_price_input}
@@ -187,7 +184,7 @@
 								<h2>Настройка регистрации на событие</h2>
 								<p class="form_text">Если на ваше событие требуется регистрация, вы можете настроить её параметры здесь. Вы можете задать крайний срок регистрации, максимальное количество мест, </p>
 								{registration_help}
-								<div class="form_unit form_accent_block">
+								<div class="form_unit form_checkbox_wrapper form_accent_block">
 									<input id="edit_event_registration_required" class="form_checkbox Switch OnChangeCrossPost" type="checkbox" name="registration_required" data-switch_id="registration">
 									<label class="form_label" for="edit_event_registration_required"><span>Обязательная регистрация на событие</span></label>
 								</div>
@@ -196,19 +193,19 @@
 
 									<p class="form_text">Форма регистрации может храниться как в Evendate, так и на внешнем сайте</p>
 
-									<div class="form_unit">
+									<div class="form_unit form_checkbox_wrapper">
 										<input id="edit_event_registration_side" class="form_checkbox" type="checkbox">
 										<label class="form_label" for="edit_event_registration_side"><span>Регистрация на внешнем сайте</span></label>
 									</div>
 
-									<div class="form_unit">
+									<div class="form_unit form_checkbox_wrapper">
 										<input id="edit_event_registration_locally" class="form_checkbox RegistrationLocallySwitch Switch" name="registration_locally" type="checkbox" data-switch_id="registration_locally">
 										<label class="form_label" for="edit_event_registration_locally"><span>Регистрация через Evendate</span></label>
 									</div>
 
 									<h3>Ограничение регистраций</h3>
 
-									<div class="form_unit form_accent_block">
+									<div class="form_unit form_checkbox_wrapper form_accent_block">
 										<input id="edit_event_registration_limit_by_date" class="form_checkbox Switch" type="checkbox" name="registration_limit_by_date" data-switch_id="registration_limit_by_date">
 										<label class="form_label" for="edit_event_registration_limit_by_date"><span>По крайней дате регистрации</span></label>
 									</div>
@@ -222,7 +219,7 @@
 
 
 
-									<div class="form_unit form_accent_block">
+									<div class="form_unit form_checkbox_wrapper form_accent_block">
 										<input id="edit_event_registration_limit_by_quantity" class="form_checkbox Switch" type="checkbox" name="registration_limit_by_quantity" data-switch_id="registration_limit_by_quantity">
 										<label class="form_label" for="edit_event_registration_limit_by_quantity"><span>По максимальному количеству регистраций</span></label>
 									</div>
@@ -253,7 +250,7 @@
 
 										<h3 class="help_link HelpLink" data-article_id="127">Подтверждение анкеты</h3>
 										<p class="form_text">Подписчик будет зарегистрирован только после подтверждения заявки модератором или администратором</p>
-										<div class="form_unit">
+										<div class="form_unit form_checkbox_wrapper">
 											<input id="edit_event_registration_approvement_required" class="form_checkbox" type="checkbox" name="registration_approvement_required">
 											<label class="form_label" for="edit_event_registration_approvement_required"><span>Подтверждать анкету вручную</span></label>
 										</div>
@@ -287,11 +284,64 @@
 									{tickets_help}
 								</div>
 
-								<div class="form_unit form_accent_block">
+								<div class="form_unit form_checkbox_wrapper">
 									<input id="edit_event_accept_bitcoins" class="form_checkbox AcceptBitcoinsCheckbox" type="checkbox" name="accept_bitcoins">
 									<label class="form_label" for="edit_event_accept_bitcoins"><span>Принимать биткоины</span></label>
 								</div>
 								{booking_time_input}
+
+								<h3>Динамическое ценообразование</h3>
+								<p class="text">Задавайте условия для изменения цены при покупке билета. Например: Если стоимость заказа больше 5000 ₽, тогда скидка 30 %.</p>
+
+								<div class="event_edit_dynamic_pricing_row">
+									<div class="event_edit_dynamic_pricing_condition_text">
+										<span class="-text_color_primary_80">При покупке билетов от <span class="-text_color_accent">5 ед.</span> до <span class="-text_color_accent">100 ед.</span>, скидка <span class="-text_color_accent">30%</span></span>
+									</div>
+									<div class="event_edit_dynamic_pricing_buttons">
+										<button class="event_edit_dynamic_pricing_options action -color_marginal fa_icon fa-sliders" type="button"></button>
+										<button class="event_edit_row_delete_button action -color_marginal" type="button">×</button>
+									</div>
+								</div>
+								<div class="event_edit_dynamic_pricing_row">
+									<div class="event_edit_dynamic_pricing_condition_text">
+										<span class="-text_color_primary_80">При сумме заказа от <span class="-text_color_accent">15000 ₽</span>, скидка <span class="-text_color_accent">2000 ₽</span></span>
+									</div>
+									<div class="event_edit_dynamic_pricing_buttons">
+										<button class="event_edit_dynamic_pricing_options action -color_marginal fa_icon fa-sliders" type="button"></button>
+										<button class="event_edit_row_delete_button action -color_marginal" type="button">×</button>
+									</div>
+								</div>
+								<div class="form_unit -align_center">
+									<button class="button -color_accent" type="button">Добавить поле</button>
+								</div>
+
+								<fieldset class="event_edit_dynamic_pricing_add_row">
+									<div class="form_unit">
+										<label class="form_label" for="event_edit_dynamic_pricing_add_row_type">Выберите тип условия</label>
+										<select id="event_edit_dynamic_pricing_add_row_type" class="form_select" name="dynamic_pricing_type">
+											<option>Количество билетов</option>
+											<option>Сумма заказа</option>
+										</select>
+									</div>
+									<div>
+										<span>При покупке от </span>
+										<span class="form_unit"><input class="form_input" size="3"></span>
+										<span> до </span>
+										<span class="form_unit"><input class="form_input" size="3"></span>
+										<span> билетов, скидка </span>
+										<span class="form_unit"><input class="form_input" size="4"></span>
+										<select class="form_select" name="dynamic_pricing_measure">
+											<option>%</option>
+											<option>₽</option>
+										</select>
+									</div>
+									<div class="form_unit">
+										<button class="button -color_accent" type="button">Добавить</button>
+										<button class="button -color_default" type="button">Отменить</button>
+									</div>
+								</fieldset>
+
+
 								<h3 class="help_link HelpLink" data-article_id="51">Промокоды</h3>
 								<table class="event_edit_table table -simple_table -full_page_width Promocodes Collapsing">
 									<thead>
@@ -330,7 +380,7 @@
 
 								<h2>Публикация</h2>
 
-								<div class="form_unit form_accent_block">
+								<div class="form_unit form_checkbox_wrapper form_accent_block">
 									<input id="edit_event_delayed_publication" class="form_checkbox Switch DelayedPublicationSwitch" type="checkbox" name="delayed_publication" data-switch_id="delayed_publication">
 									<label class="form_label" for="edit_event_delayed_publication"><span>Отложенная публикация</span></label>
 								</div>
@@ -344,7 +394,7 @@
 
 
 								<div class="form_group -parts_e_2 -valign_baseline">
-									<div class="form_unit form_accent_block AdditionalNotificationSwitchParent -status_disabled">
+									<div class="form_unit form_checkbox_wrapper form_accent_block AdditionalNotificationSwitchParent -status_disabled">
 										<input id="edit_event_additional_notification" class="form_checkbox Switch AdditionalNotificationSwitch" type="checkbox" name="additional_notification" data-switch_id="additional_notification" disabled>
 										<label class="form_label" for="edit_event_additional_notification"><span>Дополнительное уведомление</span></label>
 									</div>
@@ -367,7 +417,7 @@
 
 
 								<fieldset class="Collapsing VkPostFieldset">
-									<div class="form_unit form_accent_block">
+									<div class="form_unit form_checkbox_wrapper form_accent_block">
 										<input id="edit_event_to_public_vk" class="form_checkbox CollapsingTrigger VkPostTrigger Switch" type="checkbox" name="vk_post" tabindex="-1" data-collapsing_id="public_vk" data-switch_id="public_vk">
 										<label class="form_label" for="edit_event_to_public_vk"><span>Опубликовать Вконтакте</span></label>
 									</div>
@@ -456,7 +506,8 @@
 		<td><button class="remove_date RemoveRow" type="button" tabindex="-1">&times;</button></td>
 		<td>
 			<div class="form_unit">
-				<input class="form_input form_datepicker DatePicker" name="event_date" value="{formatted_date}" data-selected_day="{date}" data-min_date="{today}">
+				<span class="-font_weight_bolder">{formatted_date}</span>
+				<input type="hidden" name="event_date" value="{date}">
 			</div>
 		</td>
 		<td></td>
@@ -470,7 +521,7 @@
 		<div class="edit_event_registration_field_draggable DragHandle">
 			<span class="fa_icon fa-reorder"></span>
 		</div>
-		<div class="form_unit form_accent_block">
+		<div class="form_unit form_checkbox_wrapper form_accent_block">
 			<input id="edit_event_registration_{type}_field_enable" class="form_checkbox Switch PredefinedFieldSwitch" type="checkbox" name="registration_fields" value="{id}" data-switch_id="registration_{type}_field">
 			<label class="form_label" for="edit_event_registration_{type}_field_enable"><span>{name}</span></label>
 		</div>
@@ -479,7 +530,7 @@
 		<fieldset class="Switching" data-switch_id="registration_{type}_field" disabled>
 			<input class="RegistrationFieldOrderNumber" type="hidden" name="registration_{id}_field_order_number" value="{order_number}">
 			<input type="hidden" name="registration_{id}_field_type" value="{type}">
-			<div class="form_unit">
+			<div class="form_unit form_checkbox_wrapper">
 				<input id="edit_event_registration_{type}_field_required" class="form_checkbox" type="checkbox" name="registration_{id}_field_required">
 				<label class="form_label" for="edit_event_registration_{type}_field_required"><span>Обязательное поле</span></label>
 			</div>
@@ -515,7 +566,7 @@
 
 		<div class="edit_event_registration_custom_field_values RegistrationCustomFieldValues">{registration_custom_field_values}</div>
 
-		<div class="form_unit">
+		<div class="form_unit form_checkbox_wrapper">
 			<input id="edit_event_registration_{id}_custom_field_required" class="form_checkbox" type="checkbox" name="registration_{id}_field_required">
 			<label class="form_label" for="edit_event_registration_{id}_custom_field_required"><span>Обязательное поле</span></label>
 		</div>

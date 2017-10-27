@@ -28,6 +28,7 @@ OrderPage = extending(Page, (function() {
 		this.event = new OneEvent(event_id);
 		this.event_fields = new Fields(
 			'accept_bitcoins',
+			'apply_promocodes_and_pricing_rules',
 			'ticketing_locally',
 			'ticketing_available',
 			'registration_locally',

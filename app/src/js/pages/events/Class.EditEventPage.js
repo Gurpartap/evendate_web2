@@ -24,6 +24,7 @@ EditEventPage = extending(AbstractEditEventPage, (function() {
 		'accept_bitcoins',
 		'email_texts',
 		'booking_time',
+		'pricing_rules',
 		'vk_post_link', {
 			promocodes: {
 				fields: new Fields('use_limit')

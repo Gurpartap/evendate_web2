@@ -26,10 +26,10 @@ RegistrationFieldModelsCollection = extending(EntitiesCollection, (function() {
 		var self = this,
 			entities = Array.prototype.slice.call(arguments);
 		
-		this.last_pushed.splice(0);
+		this.__last_pushed.splice(0);
 		
 		entities.forEach(function(entity) {
-			self.last_pushed.push(self[self.length++] = (entity instanceof self.collection_of) ? entity : (new self.collection_of()).setData(entity));
+			self.__last_pushed.push(self[self.length++] = (entity instanceof self.collection_of) ? entity : (new self.collection_of()).setData(entity));
 		});
 		//this.sortByType();
 		

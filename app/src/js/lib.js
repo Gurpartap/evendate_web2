@@ -218,6 +218,9 @@ __C = {
 	},
 	
 	MOMENTJS_CALENDAR: {
+		DAY: 'D',
+		MONTH: 'MMMM',
+		YEAR: 'YYYY',
 		DATE_AND_MONTH: 'D MMMM',
 		HOURS_AND_MINUTES: 'HH:mm'
 	}
@@ -235,7 +238,11 @@ function extending(/**...parents, children*/){
 		parents = Array.prototype.slice.call(arguments);
 	
 	parents.forEach(function(parent) {
-		children.prototype = $.extend(Object.create(parent.prototype), children.prototype);
+		children.prototype = $.extend(Object.create(parent.prototype), children.prototype, Object.getOwnPropertyNames(children.prototype).reduce(function(child_prototype, name) {
+			child_prototype[name] = children.prototype[name];
+			
+			return child_prototype;
+		}, {}));
 	});
 	children.prototype.constructor = children;
 	
@@ -274,7 +281,8 @@ function classEscalation(Class, methods) {
 	
 	return Object.keys(methods).forEach(function(method_name) {
 		Object.defineProperty(Class.prototype, method_name, {
-			value: methods[method_name]
+			value: methods[method_name],
+			configurable: true
 		});
 	});
 }

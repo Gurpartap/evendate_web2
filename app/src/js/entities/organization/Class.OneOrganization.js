@@ -471,7 +471,7 @@ OneOrganization = extending(OneEntity, (function() {
 			self.finance.withdraws.setData(data);
 			
 			if (isFunction(success)) {
-				success.call(self, self.finance.withdraws.last_pushed);
+				success.call(self, self.finance.withdraws.__last_pushed);
 			}
 		});
 	};

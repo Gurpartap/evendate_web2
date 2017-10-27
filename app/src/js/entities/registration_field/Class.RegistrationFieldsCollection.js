@@ -27,11 +27,7 @@ RegistrationFieldsCollection = extending(EntitiesCollection, (function() {
 			}
 		});
 		
-		for ( var type_name in RegistrationFieldModel.TYPES ) {
-			if (RegistrationFieldModel.TYPES.hasOwnProperty(type_name)) {
-				this.__types[RegistrationFieldModel.TYPES[type_name]] = [];
-			}
-		}
+		this.emptyAdditionalLookup();
 		Object.freeze(this.__types);
 	}
 	RegistrationFieldsCollection.prototype.collection_of = RegistrationField;
@@ -43,6 +39,16 @@ RegistrationFieldsCollection = extending(EntitiesCollection, (function() {
 		if (entity instanceof RegistrationField) {
 			this.__types[entity.type].push(entity);
 		}
+	};
+	
+	RegistrationFieldsCollection.prototype.emptyAdditionalLookup = function() {
+		for ( var type_name in RegistrationFieldModel.TYPES ) {
+			if (RegistrationFieldModel.TYPES.hasOwnProperty(type_name)) {
+				this.__types[RegistrationFieldModel.TYPES[type_name]] = [];
+			}
+		}
+		
+		return this;
 	};
 	
 	return RegistrationFieldsCollection;

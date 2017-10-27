@@ -317,7 +317,13 @@ AbstractEditEventPage = extending(Page, (function() {
 					tickets_sell_start_date_select: __APP.BUILD.formUnit({
 						type: 'date',
 						name: 'ticket_type_' + row_id + '_sell_start_date',
-						value: ticket_type.sell_start_date ? unixTimestampToISO(ticket_type.sell_start_date) : undefined
+						value: ticket_type.sell_start_date ? unixTimestampToISO(ticket_type.sell_start_date) : undefined,
+						dataset: {
+							format: function(date) {
+								
+								return date.calendar(null, __LOCALE.DATE.CALENDAR_DATE_WITH_YEAR);
+							}
+						}
 					}),
 					tickets_sell_start_after_checkbox: __APP.BUILD.formUnit({
 						id: 'event_edit_ticket_type_' + row_id + '_start_after',
@@ -338,7 +344,13 @@ AbstractEditEventPage = extending(Page, (function() {
 						type: 'date',
 						name: 'ticket_type_' + row_id + '_sell_end_date',
 						value: ticket_type.sell_end_date ? unixTimestampToISO(ticket_type.sell_end_date) : undefined,
-						unit_classes: ['-inline']
+						unit_classes: ['-inline'],
+						dataset: {
+							format: function(date) {
+								
+								return date.calendar(null, __LOCALE.DATE.CALENDAR_DATE_WITH_YEAR);
+							}
+						}
 					}),
 					tickets_by_order_min_amount_input: __APP.BUILD.formUnit({
 						id: 'event_edit_ticket_type_' + row_id + '_min_count_per_user',
@@ -473,12 +485,24 @@ AbstractEditEventPage = extending(Page, (function() {
 				promocode_start_date_select: __APP.BUILD.formUnit({
 					type: 'date',
 					name: 'promocode_' + row_id + '_start_date',
-					value: promocode.start_date ? unixTimestampToISO(promocode.start_date) : undefined
+					value: promocode.start_date ? unixTimestampToISO(promocode.start_date) : undefined,
+					dataset: {
+						format: function(date) {
+							
+							return date.calendar(null, __LOCALE.DATE.CALENDAR_DATE_WITH_YEAR);
+						}
+					}
 				}),
 				promocode_end_date_select: __APP.BUILD.formUnit({
 					type: 'date',
 					name: 'promocode_' + row_id + '_end_date',
-					value: promocode.end_date ? unixTimestampToISO(promocode.end_date) : undefined
+					value: promocode.end_date ? unixTimestampToISO(promocode.end_date) : undefined,
+					dataset: {
+						format: function(date) {
+							
+							return date.calendar(null, __LOCALE.DATE.CALENDAR_DATE_WITH_YEAR);
+						}
+					}
 				})
 			};
 		}));
@@ -567,6 +591,7 @@ AbstractEditEventPage = extending(Page, (function() {
 	};
 	
 	AbstractEditEventPage.prototype.fetchData = function() {
+		
 		return this.fetching_data_defer = this.my_organizations.fetchMyOrganizations(['admin', 'moderator'], this.my_organizations_fields);
 	};
 	/**
@@ -1044,7 +1069,7 @@ AbstractEditEventPage = extending(Page, (function() {
 			PAGE.MainCalendar = new Calendar('.EventDatesCalendar', {
 				weekday_selection: true,
 				month_selection: true,
-				min_date: moment().format(__C.DATE_FORMAT)
+				min_date: moment().format(__C.DATE_FORMAT),
 			});
 			PAGE.MainCalendar.init();
 			
@@ -1103,14 +1128,12 @@ AbstractEditEventPage = extending(Page, (function() {
 				 */
 				function buildTableRow(days) {
 					days = days instanceof Array ? days : [days];
-					var today = moment().format(__C.DATE_FORMAT);
 					
 					return tmpl('selected-table-day', days.map(function(day, i) {
 						
 						return {
 							date: day,
-							formatted_date: day.split('-').reverse().join('.'),
-							today: today,
+							formatted_date: moment(day).calendar(null, __LOCALE.DATE.CALENDAR_DATE_WITH_YEAR),
 							start_time: __APP.BUILD.formUnit({
 								name: 'start_time',
 								type: 'time',
@@ -1126,17 +1149,9 @@ AbstractEditEventPage = extending(Page, (function() {
 				}
 				
 				$output = buildTableRow(selected_days);
-				bindDatePickers($output);
 				bindRemoveRow($output);
 				
 				$fucking_table = $fucking_table.add($output);
-				$output.find('.DatePicker').each(function() {
-					var DP = $(this).data('datepicker');
-					DP.$datepicker.on('date-picked', function() {
-						PAGE.MainCalendar.deselectDays(DP.prev_selected_day).selectDays(DP.selected_day);
-						doTheFuckingSort($fucking_table, $selected_days_table_rows)
-					});
-				});
 				doTheFuckingSort($fucking_table, $selected_days_table_rows);
 			}
 			
@@ -1388,6 +1403,10 @@ AbstractEditEventPage = extending(Page, (function() {
 				class: 'OnChangeCrossPost'
 			},
 			dataset: {
+				format: function(date) {
+					
+					return date.calendar(null, __LOCALE.DATE.CALENDAR_DATE_WITH_YEAR);
+				},
 				selected_day: this.event.registration_till ? m_registration_till.format(__C.DATE_FORMAT) : '',
 				min_date: moment().add(1, 'd').format(__C.DATE_FORMAT)
 			}
@@ -1560,6 +1579,10 @@ AbstractEditEventPage = extending(Page, (function() {
 			required: true,
 			unit_classes: ['-inline'],
 			dataset: {
+				format: function(date) {
+					
+					return date.calendar(null, __LOCALE.DATE.CALENDAR_DATE_WITH_YEAR);
+				},
 				min_date: moment().format(__C.DATE_FORMAT)
 			}
 		});
@@ -1582,6 +1605,10 @@ AbstractEditEventPage = extending(Page, (function() {
 			required: true,
 			unit_classes: ['-inline'],
 			dataset: {
+				format: function(date) {
+					
+					return date.calendar(null, __LOCALE.DATE.CALENDAR_DATE_WITH_YEAR);
+				},
 				min_date: moment().format(__C.DATE_FORMAT)
 			}
 		});
