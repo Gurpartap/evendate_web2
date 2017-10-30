@@ -171,7 +171,10 @@ Builder = (function() {
 	Builder.prototype.select = function buildSelect(values, attributes, classes, dataset, default_value) {
 		var $select;
 		
-		values.unshift({id: '-1'});
+		values.unshift({
+			id: '-1',
+			attributes: ['hidden']
+		});
 		
 		$select =  tmpl('select', Builder.normalizeBuildProps({
 			options: __APP.BUILD.option(values),

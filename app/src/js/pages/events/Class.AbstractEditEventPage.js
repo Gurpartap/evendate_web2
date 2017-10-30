@@ -546,6 +546,52 @@ AbstractEditEventPage = extending(Page, (function() {
 		return $rows;
 	};
 	/**
+	 * @param {PricingRuleModel.TYPE} type
+	 *
+	 * @returns {{
+	 *  rule_start_text: string,
+	 *  rule_end_text: string,
+	 *  count_measure: string
+	 * }}
+	 */
+	AbstractEditEventPage.pricingRuleTexts = function(type) {
+		switch (type) {
+			default:
+			case PricingRuleModel.TYPE.TICKETS_COUNT_BETWEEN: {
+				
+				return {
+					rule_start_text: 'При покупке',
+					rule_end_text: ' билетов',
+					count_measure: 'ед.'
+				};
+			}
+			case PricingRuleModel.TYPE.ORDER_SUM_BETWEEN: {
+				
+				return {
+					rule_start_text: 'При покупке на сумму',
+					rule_end_text: '',
+					count_measure: '₽'
+				};
+			}
+			case PricingRuleModel.TYPE.USER_ORDER_COUNT_BETWEEN: {
+				
+				return {
+					rule_start_text: 'При количестве заказов у клиента',
+					rule_end_text: '',
+					count_measure: 'ед.'
+				};
+			}
+			case PricingRuleModel.TYPE.USER_ORDER_SUM_BETWEEN: {
+				
+				return {
+					rule_start_text: 'При общей всех сумме заказов клиента',
+					rule_end_text: '',
+					count_measure: '₽'
+				};
+			}
+		}
+	};
+	/**
 	 *
 	 * @param {(PricingRuleModelsCollection|Array<PricingRuleModel>|PricingRuleModel)} rules
 	 *
@@ -565,10 +611,38 @@ AbstractEditEventPage = extending(Page, (function() {
 				effort: rule.effort,
 				min_count: rule.min_count,
 				max_count: rule.max_count,
-				is_fixed: rule.is_fixed,
-				condition: (function(rule){
+				is_fixed: rule.is_fixed ? rule.is_fixed : '',
+				condition: (function(rule) {
+					var $cond = $(),
+						text_vars = AbstractEditEventPage.pricingRuleTexts(rule.type_code),
+						effort_measure = rule.is_fixed ? '₽' : '%';
 					
-					return '';
+					function addText($text, content, is_accent) {
+						
+						return $text.add(__APP.BUILD.text({
+							content: content,
+							classes: is_accent ? [__C.CLASSES.TEXT_COLORS.ACCENT] : []
+						}))
+					}
+					
+					$cond = addText($cond, text_vars.rule_start_text);
+					
+					if (rule.min_count && +rule.min_count !== 0) {
+						$cond = addText(addText($cond, ' от'), ' {min_count}'.format({
+							min_count: formatCurrency(rule.min_count, ' ', '.', '', text_vars.count_measure)
+						}), true);
+					}
+					if (rule.max_count && +rule.max_count !== Number.MAX_SAFE_INTEGER) {
+						$cond = addText(addText($cond, ' до'), ' {max_count}'.format({
+							max_count: formatCurrency(rule.max_count, ' ', '.', '', text_vars.count_measure)
+						}), true);
+					}
+					
+					$cond = addText(addText($cond, text_vars.rule_end_text + ', скидка'), ' {effort}'.format({
+						effort: formatCurrency(rule.effort, ' ', '.', '', effort_measure)
+					}), true);
+					
+					return $cond;
 				}(rule))
 			};
 		}));
@@ -581,42 +655,27 @@ AbstractEditEventPage = extending(Page, (function() {
 			var $pricing_rule_row = $(this).closest('.PricingRuleRow'),
 				model = new PricingRuleModel(),
 				data = $pricing_rule_row.serializeForm(),
+				name_prefix = 'pricing_rule_{id}_'.format({id: data.pricing_rules}),
 				$change_block;
 			
 			model.setData({
-				uuid: data.uuid || null,
-				name: data.name,
-				type_code: data.type_code,
-				effort: data.effort,
-				min_count: data.min_count,
-				max_count: data.max_count,
-				is_fixed: !!data.is_fixed,
-				is_percentage: !data.is_fixed
+				uuid: data[name_prefix + 'uuid'],
+				name: data[name_prefix + 'name'],
+				type_code: data[name_prefix + 'type_code'],
+				effort: data[name_prefix + 'effort'],
+				min_count: +data[name_prefix + 'min_count'] === 0 ? null : data[name_prefix + 'min_count'],
+				max_count: +data[name_prefix + 'max_count'] === Number.MAX_SAFE_INTEGER ? null : data[name_prefix + 'max_count'],
+				is_fixed: !!data[name_prefix + 'is_fixed'],
+				is_percentage: !data[name_prefix + 'is_fixed']
 			});
 			
-			$change_block = AbstractEditEventPage.pricingRuleBuilder(model);
+			$change_block = __APP.CURRENT_PAGE.addPricingRuleEditBlock(model);
 			
-			$change_block.find('.CancelPricingRule').on('click.CancelPricingRule', function() {
-				$change_block.remove();
-			});
-			
-			$change_block.find('.SavePricingRule').on('click.SavePricingRule', function() {
-				data = $(this).closest('.PricingRuleRow').serializeForm();
-				
-				model.setData({
-					uuid: data.uuid || null,
-					name: data.name,
-					type_code: data.type_code,
-					effort: data.effort,
-					min_count: data.min_count,
-					max_count: data.max_count,
-					is_fixed: !!data.is_fixed,
-					is_percentage: !data.is_fixed
-				});
-				$pricing_rule_row.after(AbstractEditEventPage.pricingRuleRowBuilder(model));
+			$change_block.on('save:rule', function(e, rule) {
+				$pricing_rule_row.after(AbstractEditEventPage.pricingRuleRowBuilder(rule));
 				$pricing_rule_row.remove();
-				$change_block.remove();
 			});
+			
 		});
 		
 		return $rules;
@@ -627,51 +686,16 @@ AbstractEditEventPage = extending(Page, (function() {
 	 *
 	 * @return {jQuery}
 	 */
-	AbstractEditEventPage.pricingRuleBuilder = function(rule) {
-		var rule_start_text,
-			rule_end_text,
-			count_measure;
+	AbstractEditEventPage.pricingRuleTextRowBuilder = function(rule) {
+		var text_vars = AbstractEditEventPage.pricingRuleTexts(rule.type_code);
 		
-		switch (rule.type_code) {
-			case PricingRuleModel.TYPE.TICKETS_COUNT_BETWEEN: {
-				rule_start_text = 'При покупке';
-				rule_end_text = ' билетов';
-				count_measure = 'ед.';
-				
-				break;
-			}
-			case PricingRuleModel.TYPE.ORDER_SUM_BETWEEN: {
-				rule_start_text = 'При покупке на сумму';
-				rule_end_text = '';
-				count_measure = '₽';
-				
-				break;
-			}
-		}
-		
-		return tmpl('pricing-rule', {
-			name_input_form_field: __APP.BUILD.formUnit({
-				id: 'event_edit_dynamic_pricing_add_row_type',
-				label: 'Название',
-				value: rule.name || 'Правило ' + AbstractEditEventPage.lastPricingRuleRowId + 1,
-				name: 'name'
-			}),
-			type_select_form_field: __APP.BUILD.formUnit({
-				id: 'event_edit_dynamic_pricing_add_row_type',
-				label: 'Выберите тип условия',
-				type: 'select',
-				value: rule.type_code,
-				name: 'type_code',
-				values: [
-					{id: PricingRuleModel.TYPE.TICKETS_COUNT_BETWEEN, display_name: 'Количество билетов'},
-					{id: PricingRuleModel.TYPE.ORDER_SUM_BETWEEN, display_name: 'Сумма заказа'},
-					{id: PricingRuleModel.TYPE.USER_ORDER_COUNT_BETWEEN, display_name: 'Количество всех заказов пользователя'},
-					{id: PricingRuleModel.TYPE.USER_ORDER_SUM_BETWEEN, display_name: 'Сумма всех заказов пользователя'}
-				]
-			}),
-			rule_start_text: rule_start_text,
-			rule_end_text: rule_end_text,
-			count_measure: count_measure,
+		return tmpl('pricing-rule-text-row', {
+			min_count: +rule.min_count === 0 ? '' : rule.min_count,
+			max_count: +rule.max_count === Number.MAX_SAFE_INTEGER ? '' : rule.max_count,
+			effort: rule.effort,
+			rule_start_text: text_vars.rule_start_text,
+			rule_end_text: text_vars.rule_end_text,
+			count_measure: text_vars.count_measure,
 			measure_select: __APP.BUILD.select([
 				{val: 'is_percentage', display_name: '%'},
 				{val: 'is_fixed', display_name: '₽'}
@@ -862,6 +886,23 @@ AbstractEditEventPage = extending(Page, (function() {
 			send_data.accept_bitcoins = form_data.accept_bitcoins;
 		}
 		
+		if (form_data.pricing_rules) {
+			send_data.pricing_rules = (form_data.pricing_rules instanceof Array ? form_data.pricing_rules : [form_data.pricing_rules]).map(function(id) {
+				var prefix = 'pricing_rule_{id}_'.format({id: id});
+				
+				return {
+					uuid: form_data[prefix + 'uuid'],
+					name: form_data[prefix + 'name'],
+					type_code: form_data[prefix + 'type_code'],
+					effort: form_data[prefix + 'effort'] || 0,
+					min_count: form_data[prefix + 'min_count'] ? form_data[prefix + 'min_count'] : 0,
+					max_count: form_data[prefix + 'max_count'] ? form_data[prefix + 'max_count'] : Number.MAX_SAFE_INTEGER,
+					is_fixed: !!form_data[prefix + 'is_fixed'],
+					is_percentage: !form_data[prefix + 'is_fixed']
+				};
+			});
+		}
+		
 		if (form_data.promocodes) {
 			send_data.promocodes = (form_data.promocodes instanceof Array ? form_data.promocodes : [form_data.promocodes]).map(function(id) {
 				
@@ -927,6 +968,85 @@ AbstractEditEventPage = extending(Page, (function() {
 			$available_event_publications_wrapper.addClass(__C.CLASSES.HIDDEN);
 		}
 		$form_overall_fields.attr('disabled', (organization.tariff.events_publication_left <= 0 && !self.is_edit));
+	};
+	/**
+	 *
+	 * @param {PricingRuleModel} [rule]
+	 *
+	 * @return {jQuery}
+	 */
+	AbstractEditEventPage.prototype.addPricingRuleEditBlock = function(rule) {
+		var $change_rule;
+		
+		rule = rule ? rule : new PricingRuleModel();
+		
+		/**
+		 *
+		 * @param {jQuery} $wrapper
+		 *
+		 * @return {PricingRuleModel}
+		 */
+		function gatherRuleModel($wrapper) {
+			var rule = new PricingRuleModel(),
+				data = $wrapper.serializeForm();
+			
+			rule.setData({
+				uuid: data.uuid || null,
+				name: data.name,
+				type_code: data.type_code,
+				effort: data.effort,
+				min_count: data.min_count,
+				max_count: data.max_count,
+				is_fixed: data.dynamic_pricing_measure === 'is_fixed',
+				is_percentage: data.dynamic_pricing_measure === 'is_percentage'
+			});
+			
+			return rule;
+		}
+		
+		$change_rule = tmpl('pricing-rule-edit', {
+			name_input_form_field: __APP.BUILD.formUnit({
+				id: 'event_edit_dynamic_pricing_add_row_type',
+				label: 'Название',
+				value: rule.name || 'Условие №' + (AbstractEditEventPage.lastPricingRuleRowId + 1),
+				name: 'name'
+			}),
+			type_select_form_field: __APP.BUILD.formUnit({
+				id: 'event_edit_dynamic_pricing_add_row_type',
+				label: 'Выберите тип условия',
+				type: 'select',
+				classes: ['PricingRuleTypeSelect'],
+				value: rule.type_code || PricingRuleModel.TYPE.TICKETS_COUNT_BETWEEN,
+				name: 'type_code',
+				values: [
+					{val: PricingRuleModel.TYPE.TICKETS_COUNT_BETWEEN, display_name: 'Количество билетов'},
+					{val: PricingRuleModel.TYPE.ORDER_SUM_BETWEEN, display_name: 'Сумма заказа'},
+					{val: PricingRuleModel.TYPE.USER_ORDER_COUNT_BETWEEN, display_name: 'Количество всех заказов пользователя'},
+					{val: PricingRuleModel.TYPE.USER_ORDER_SUM_BETWEEN, display_name: 'Сумма всех заказов пользователя'}
+				]
+			}),
+			text_row: AbstractEditEventPage.pricingRuleTextRowBuilder(rule)
+		});
+		
+		$change_rule.find('.PricingRuleTypeSelect').on('change.PricingRuleTypeSelect', function() {
+			var $row = $change_rule.find('.PricingRuleTextRow');
+			
+			$row.after(AbstractEditEventPage.pricingRuleTextRowBuilder(gatherRuleModel($change_rule)));
+			$row.remove();
+		});
+		
+		$change_rule.find('.CancelPricingRule').on('click.CancelPricingRule', function() {
+			$change_rule.remove();
+		});
+		
+		$change_rule.find('.SavePricingRule').on('click.SavePricingRule', function() {
+			$change_rule.trigger('save:rule', [gatherRuleModel($change_rule)]);
+			$change_rule.remove();
+		});
+		
+		this.$wrapper.find('.PricingRuleHolder').html($change_rule);
+		
+		return $change_rule;
 	};
 	
 	AbstractEditEventPage.prototype.initCrossPosting = function() {
@@ -1445,6 +1565,18 @@ AbstractEditEventPage = extending(Page, (function() {
 		});
 		
 		AbstractEditEventPage.checkTicketTypeSellAfter(PAGE.$wrapper.find('.TicketTypes'));
+		
+		PAGE.$wrapper.find('.AddPricingRule').on('click.AddPricingRule', function() {
+			var $change_block;
+			
+			if (!PAGE.$wrapper.find('.PricingRuleHolder').children().length) {
+				$change_block = PAGE.addPricingRuleEditBlock();
+				
+				$change_block.on('save:rule', function(e, rule) {
+					PAGE.$wrapper.find('.PricingRules').append(AbstractEditEventPage.pricingRuleRowBuilder(rule));
+				});
+			}
+		});
 		
 		$main_tabs.on('tabs:change', function() {
 			if($main_tabs.currentTabsIndex === 0){

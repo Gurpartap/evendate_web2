@@ -217,6 +217,9 @@ span.form_input_group {display: inline-flex}
 	border: 1px solid #4a4a4a;
 	transition: background_color .2s ease, border .2s ease, box-shadow .2s ease, height .2s ease;
 }
+
+select.form_input_group_after,
+select.form_input_group_before {cursor: pointer}
 .form_input_group_after {border-left: 0}
 .form_input_group_before {border-right: 0}
 .form_input_group_before:first-child {border-radius: 2px 0 0 2px}

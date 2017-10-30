@@ -74,7 +74,7 @@ EditEventPage = extending(AbstractEditEventPage, (function() {
 		                                AbstractEditEventPage.ticketTypeRowsBuilder(ticket_types) :
 		                                tmpl('edit-event-tickets-row-empty');
 		
-		this.render_vars.pricing_rules = this.event.pricing_rules.length ?  AbstractEditEventPage : '';
+		this.render_vars.pricing_rules = this.event.pricing_rules.enabled_rules.length ?  AbstractEditEventPage.pricingRuleRowBuilder(this.event.pricing_rules.enabled_rules) : '';
 		
 		this.render_vars.promocodes = this.event.promocodes.length ?
 		                              AbstractEditEventPage.promocodeRowsBuilder(this.event.promocodes) :
