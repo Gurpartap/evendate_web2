@@ -29,8 +29,8 @@ final class RuleTicketsCountBetween extends AbstractPricingRule implements Prici
 
 	function isApplicable(Preorder $preorder): bool
 	{
-		if ($preorder->getTicketsCount() > $this->data['min_count']
-			&& $preorder->getTicketsCount() < $this->data['max_count']) {
+		if ($preorder->getTicketsCount() >= $this->data['min_count']
+			&& $preorder->getTicketsCount() <= $this->data['max_count']) {
 			return true;
 		}
 		return false;

@@ -29,7 +29,7 @@ final class RuleOrderSumBetween extends AbstractPricingRule implements PricingRu
 
 	function isApplicable(Preorder $preorder): bool
 	{
-		if ($preorder->getSum() > $this->data['min_count'] && $preorder->getSum() < $this->data['max_count']) {
+		if ($preorder->getSum() >= $this->data['min_count'] && $preorder->getSum() <= $this->data['max_count']) {
 			return true;
 		}
 		return false;

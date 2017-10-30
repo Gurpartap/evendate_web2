@@ -160,6 +160,13 @@ span.-transform_uppercase,
 small.-transform_uppercase,
 label.-transform_uppercase {text-transform: uppercase !important}
 
+a.-line_through,
+b.-line_through,
+p.-line_through,
+span.-line_through,
+small.-line_through,
+label.-line_through {text-decoration: line-through !important}
+
 a.-font_weight_lighter,
 p.-font_weight_lighter,
 span.-font_weight_lighter,
@@ -692,8 +699,8 @@ table {
 
 .-unite > *:not(:last-child) {border-right: 0}
 .-unite > *:not(:first-child):not(:last-child) {border-radius: 0}
-.-unite > :first-child {border-radius: 3px 0 0 3px}
-.-unite > :last-child {border-radius: 0 3px 3px 0}
+.-unite > :first-child {border-radius: 2px 0 0 2px}
+.-unite > :last-child {border-radius: 0 2px 2px 0}
 
 .-unite > .button {
 	padding: 0;

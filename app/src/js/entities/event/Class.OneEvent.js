@@ -227,6 +227,7 @@ OneEvent = extending(OneEntity, (function() {
 		EVENT: '/events/{event_id}',
 		STATUS: '/events/{event_id}/status',
 		ORDERS: '/events/{event_id}/orders',
+		PREORDER: '/events/{event_id}/preorder',
 		FAVORITES: '/events/{event_id}/favorites',
 		NOTIFICATIONS: '/events/{event_id}/notifications',
 		NOTIFICATION: '/events/{event_id}/notifications/{notification_uuid}'
@@ -496,6 +497,22 @@ OneEvent = extending(OneEntity, (function() {
 	};
 	/**
 	 *
+	 * @param {(string|number)} event_id
+	 * @param {OrderCreateData} order_data
+	 *
+	 * @return {jqPromise}
+	 */
+	OneEvent.preOrder = function(event_id, order_data) {
+		
+		return __APP.SERVER.addData(OneEvent.ENDPOINT.PREORDER.format({event_id: event_id}), {
+			registration_fields: order_data.registration_fields,
+			tickets: order_data.tickets,
+			promocode: order_data.promocode || null,
+			utm: order_data.utm || null
+		}, true);
+	};
+	/**
+	 *
 	 * @param {(Fields|string|Array)} [fields]
 	 * @param {AJAXCallback} [success]
 	 * @returns {jqPromise}
@@ -724,6 +741,16 @@ OneEvent = extending(OneEntity, (function() {
 				send_data: data
 			};
 		});
+	};
+	/**
+	 *
+	 * @param {OrderCreateData} order_data
+	 *
+	 * @return {jqPromise}
+	 */
+	OneEvent.prototype.preOrder = function(order_data) {
+		
+		return this.constructor.preOrder(this.id, order_data);
 	};
 	
 	return OneEvent;

@@ -36,7 +36,7 @@ final class RuleUserOrdersSumBetween extends AbstractPricingRule implements Pric
 		foreach($orders as $order){
 			$sum += $order['final_sum'];
 		}
-		if ($sum > $this->data['min_count'] && $sum < $this->data['max_count']) {
+		if ($sum >= $this->data['min_count'] && $sum <= $this->data['max_count']) {
 			return true;
 		}
 		return false;

@@ -35922,7 +35922,8 @@ __C = {
 			SHADOWED: '-shadowed',
 			BORDERED: '-bordered',
 			UPPERCASE: '-transform_uppercase',
-			NO_UPPERCASE: '-no_uppercase'
+			NO_UPPERCASE: '-no_uppercase',
+			LINE_THROUGH: '-line_through'
 		},
 		STATUS: {
 			SUCCESS: '-status_success',
@@ -36080,6 +36081,9 @@ __C = {
 	},
 	
 	MOMENTJS_CALENDAR: {
+		DAY: 'D',
+		MONTH: 'MMMM',
+		YEAR: 'YYYY',
 		DATE_AND_MONTH: 'D MMMM',
 		HOURS_AND_MINUTES: 'HH:mm'
 	}
@@ -36097,7 +36101,11 @@ function extending(/**...parents, children*/){
 		parents = Array.prototype.slice.call(arguments);
 	
 	parents.forEach(function(parent) {
-		children.prototype = $.extend(Object.create(parent.prototype), children.prototype);
+		children.prototype = $.extend(Object.create(parent.prototype), children.prototype, Object.getOwnPropertyNames(children.prototype).reduce(function(child_prototype, name) {
+			child_prototype[name] = children.prototype[name];
+			
+			return child_prototype;
+		}, {}));
 	});
 	children.prototype.constructor = children;
 	
@@ -36136,7 +36144,8 @@ function classEscalation(Class, methods) {
 	
 	return Object.keys(methods).forEach(function(method_name) {
 		Object.defineProperty(Class.prototype, method_name, {
-			value: methods[method_name]
+			value: methods[method_name],
+			configurable: true
 		});
 	});
 }
@@ -36194,6 +36203,17 @@ String.prototype.toCamelCase = function(delimiter) {
  */
 String.prototype.toUnderscore = function() {
 	return (this.charAt(0).toLowerCase() + this.slice(1)).replace(/([A-Z])/g, function($1) {return "_" + $1.toLowerCase();});
+};
+/**
+ *
+ * @param {string} current_separator
+ * @param {string} new_separator
+ *
+ * @return {string}
+ */
+String.prototype.replaceSeparator = function(current_separator, new_separator) {
+	
+	return this.replace(current_separator, new_separator);
 };
 /**
  * Returns formatted string for fields AJAX data
@@ -36603,6 +36623,9 @@ $.fn.extend({
 							break;
 						}
 						default: {
+							if (c === null) {
+								break;
+							}
 							std = c.replace(xb, "\r\n");
 						}
 					}
@@ -39576,35 +39599,244 @@ socket.on('image.getFromURLDone', function (response) {
 });
 
 /**
- * @typedef {object} AJAXData
- * @property {(Fields|Array|string|undefined)} [fields]
- * @property {(string|undefined)} [format=json] Sets the response format. Can be xml or json. Default: json
- * @property {(boolean|undefined)} [download=false] If flag is TRUE server will set additional headers to make response downloadble in browser. Default: false
- * @property {(boolean|undefined)} [nude_data=false] If nude_data is TRUE server response with only data, without status code and description. Default: false
- * @property {(number|undefined)} [offset] Use offset to set how many elements you want to skip. Default: 0
- * @property {(number|undefined)} [length] Sets the items count server will return in response. Default: 100
- * @property {(string|undefined)} [order_by]
+ *
+ * @class DataSet
+ * @extends Array
  */
-/**
- * @typedef {function((object|Array<object>))} AJAXCallback
- */
-/**
- * @interface
- */
-EntityInterface = (function() {
+DataSet = extending(Array, (function() {
 	/**
 	 *
-	 * @interface
+	 * @constructor
+	 * @constructs DataSet
+	 *
+	 * @property {Object<(string|number), Data>} __lookup
+	 * @property {Array<Data>} __last_pushed
 	 */
-	function EntityInterface() {}
+	function DataSet() {
+		Object.defineProperties(this, {
+			__lookup: {
+				value: {},
+				writable: true,
+				enumerable: false,
+				configurable: false
+			},
+			__last_pushed: {
+				value: []
+			}
+		});
+	}
+	
+	classEscalation(DataSet,
+		/**
+		 * @lends DataSet.prototype
+		 */
+		{
+			collection_of: Data,
+			/**
+			 *
+			 * @param {(Array|object)} data
+			 *
+			 * @returns {DataSet}
+			 */
+			setData: function(data) {
+				data = data instanceof Array ? data : [data];
+				this.push.apply(this, data);
+				
+				return this;
+			},
+			/**
+			 *
+			 * @param {(string|number)} id
+			 *
+			 * @returns {(Data|null)}
+			 */
+			getByID: function(id) {
+				
+				return this.__lookup.hasOwnProperty(id) ? this.__lookup[id] : null;
+			},
+			/**
+			 *
+			 * @param {(string|number)} id
+			 *
+			 * @returns {boolean}
+			 */
+			has: function(id) {
+				
+				return this.getByID(id) instanceof Data;
+			},
+			/**
+			 *
+			 * @param {...object} element
+			 *
+			 * @returns {number}
+			 */
+			push: function(element) {
+				var item,
+					ID_PROP_NAME = this.collection_of.prototype.ID_PROP_NAME,
+					entities = arguments;
+				
+				this.__last_pushed.splice(0);
+				
+				for (var i = 0, entity = entities[i]; i < entities.length; entity = entities[++i]) {
+					if (empty(entity[ID_PROP_NAME]) || (!empty(entity[ID_PROP_NAME]) && !this.has(entity[ID_PROP_NAME]))) {
+						item = (entity instanceof this.collection_of) ? entity : (new this.collection_of()).setData(entity);
+						this.__last_pushed.push(item);
+						this[this.length++] = item;
+						if (!empty(item[ID_PROP_NAME])) {
+							this.__lookup[item[ID_PROP_NAME]] = item;
+						}
+						this.createAdditionalLookup(item);
+					}
+				}
+				
+				return this.length;
+			},
+			/**
+			 *
+			 * @param {(string|number)} id
+			 *
+			 * @returns {(OneEntity|null)}
+			 */
+			pull: function(id) {
+				var entity;
+				
+				if (this.has(id)) {
+					entity = this.getByID(id);
+					this.remove(id);
+					
+					return entity;
+				}
+				
+				return null;
+			},
+			createAdditionalLookup: function() {},
+			emptyAdditionalLookup: function() {},
+			/**
+			 *
+			 * @return {Array}
+			 */
+			getArrayCopy: function() {
+				
+				return this.map(function(el) {
+					return el;
+				})
+			},
+			/**
+			 *
+			 * @param {(string|number)} id
+			 *
+			 * @returns {Array<Data>}
+			 */
+			remove: function(id) {
+				if (this.has(id)) {
+					delete this.__lookup[id];
+					
+					return this.splice(this.indexOf(this.getByID(id)), 1);
+				}
+				
+				return [];
+			},
+			/**
+			 *
+			 * @return {DataSet}
+			 */
+			empty: function() {
+				this.__last_pushed.splice(0, this.__last_pushed.length);
+				this.__lookup = {};
+				this.emptyAdditionalLookup();
+				this.splice(0, this.length);
+				
+				return this;
+			},
+			/**
+			 *
+			 * @param {string} key
+			 * @param {boolean} [ascending=false]
+			 *
+			 * @return {DataSet}
+			 */
+			sortBy: function(key, ascending) {
+				var key_spliced = key.split('.');
+				
+				this.sort(function(a, b) {
+					var cur_a = mergeObjects({}, a),
+						cur_b = mergeObjects({}, b);
+					
+					key_spliced.forEach(function(key) {
+						cur_a = typeof cur_a[key] === 'object' ? mergeObjects({}, cur_a[key]) : cur_a[key];
+						cur_b = typeof cur_b[key] === 'object' ? mergeObjects({}, cur_b[key]) : cur_b[key];
+					});
+					
+					if (isFinite(cur_a) && isFinite(cur_b)) {
+						
+						return ascending ? cur_a - cur_b : cur_b - cur_a;
+					} else {
+						if (cur_a.name > cur_b.name) {
+							
+							return ascending ? 1 : -1;
+						}
+						if (cur_a.name < cur_b.name) {
+							
+							return ascending ? -1 : 1;
+						}
+						
+						return 0;
+					}
+				});
+				
+				return this;
+			},
+			/**
+			 *
+			 * @return {string}
+			 */
+			toString: function() {
+				
+				return JSON.stringify(this);
+			}
+		}
+	);
+	
+	return DataSet;
+}()));
+/**
+ *
+ * @class Data
+ */
+Data = (function() {
+	/**
+	 *
+	 * @constructor
+	 * @constructs Data
+	 */
+	function Data() {}
+	
+	Data.prototype.ID_PROP_NAME = 'id';
 	/**
 	 *
 	 * @param {(Array|object)} data
-	 * @returns {EntityInterface}
+	 * @returns {Data}
 	 */
-	EntityInterface.prototype.setData = function(data) {};
+	Data.prototype.setData = function(data) {
+		var field;
+		
+		if (data instanceof Array) {
+			data = data[0];
+		}
+		for (field in data) {
+			if (data.hasOwnProperty(field) && this.hasOwnProperty(field)) {
+				if ((this[field] instanceof Data || this[field] instanceof DataSet) && !empty(data[field])) {
+					this[field].setData(data[field]);
+				} else {
+					this[field] = data[field];
+				}
+			}
+		}
+		
+		return this;
+	};
 	
-	return EntityInterface;
+	return Data;
 }());
 /**
  * @class Fields
@@ -39876,16 +40108,17 @@ Fields = (function() {
 	return Fields;
 }());
 /**
- * @requires EntityInterface.js
+ * @requires Class.Data.js
  * @requires Class.Fields.js
  */
 /**
  *
  * @abstract
  * @class
+ * @extends Data
  * @implements EntityInterface
  */
-OneEntity = extending(EntityInterface, (function() {
+OneEntity = extending(Data, (function() {
 	/**
 	 *
 	 * @constructor
@@ -39894,209 +40127,34 @@ OneEntity = extending(EntityInterface, (function() {
 	function OneEntity() {}
 	
 	OneEntity.prototype.ID_PROP_NAME = 'id';
-	/**
-	 *
-	 * @param {(Array|object)} data
-	 * @returns {OneEntity}
-	 */
-	OneEntity.prototype.setData = function(data) {
-		var field;
-		
-		if (Array.isArray(data)) {
-			data = data[0];
-		}
-		for (field in data) {
-			if (data.hasOwnProperty(field) && this.hasOwnProperty(field)) {
-				if ((this[field] instanceof EntitiesCollection || this[field] instanceof OneEntity) && data[field] != null) {
-					this[field].setData(data[field]);
-				} else {
-					this[field] = data[field];
-				}
-			}
-		}
-		
-		return this;
-	};
 	
 	return OneEntity;
 }()));
 
 /**
+ * @requires Class.DataSet.js
  * @requires Class.OneEntity.js
  */
 /**
  *
  * @abstract
  * @class EntitiesCollection
- * @extends Array
+ * @extends DataSet
  * @implements EntityInterface
  */
-EntitiesCollection = extending(Array, (function() {
+EntitiesCollection = extending(DataSet, (function() {
 	/**
 	 *
 	 * @constructor
 	 * @constructs EntitiesCollection
 	 *
 	 * @property {Object<(string|number), OneEntity>} __lookup
-	 * @property {Array<OneEntity>} last_pushed
+	 * @property {Array<OneEntity>} __last_pushed
 	 */
 	function EntitiesCollection() {
-		Object.defineProperties(this, {
-			__lookup: {
-				value: {},
-				writable: true,
-				enumerable: false,
-				configurable: false
-			},
-			'last_pushed': {
-				value: []
-			}
-		});
+		DataSet.call(this);
 	}
 	EntitiesCollection.prototype.collection_of = OneEntity;
-	/**
-	 *
-	 * @param {(Array|object)} data
-	 * @returns {EntitiesCollection}
-	 */
-	EntitiesCollection.prototype.setData = function(data) {
-		data = data instanceof Array ? data : [data];
-		this.push.apply(this, data);
-		return this;
-	};
-	/**
-	 *
-	 * @param {(string|number)} id
-	 * @returns {(OneEntity|null)}
-	 */
-	EntitiesCollection.prototype.getByID = function(id) {
-		return this.__lookup.hasOwnProperty(id) ? this.__lookup[id] : null;
-	};
-	/**
-	 *
-	 * @param {(string|number)} id
-	 * @returns {boolean}
-	 */
-	EntitiesCollection.prototype.has = function(id) {
-		return this.getByID(id) instanceof OneEntity;
-	};
-	/**
-	 *
-	 * @param {...object} element
-	 * @returns {number}
-	 */
-	EntitiesCollection.prototype.push = function(element) {
-		var item,
-			ID_PROP_NAME = this.collection_of.prototype.ID_PROP_NAME,
-			entities = arguments;
-		
-		this.last_pushed.splice(0);
-		
-		for (var i = 0, entity = entities[i]; i < entities.length; entity = entities[++i]) {
-			if (empty(entity[ID_PROP_NAME]) || (!empty(entity[ID_PROP_NAME]) && !this.has(entity[ID_PROP_NAME]))) {
-				item = (entity instanceof this.collection_of) ? entity : (new this.collection_of()).setData(entity);
-				this.last_pushed.push(item);
-				this[this.length++] = item;
-				if (!empty(item[ID_PROP_NAME])) {
-					this.__lookup[item[ID_PROP_NAME]] = item;
-				}
-				this.createAdditionalLookup(item);
-			}
-		}
-		
-		return this.length;
-	};
-	/**
-	 *
-	 * @param {(string|number)} id
-	 *
-	 * @returns {(OneEntity|null)}
-	 */
-	EntitiesCollection.prototype.pull = function(id) {
-		var entity;
-		
-		if (this.has(id)) {
-			entity = this.getByID(id);
-			this.remove(id);
-			
-			return entity;
-		}
-		
-		return null;
-	};
-	
-	EntitiesCollection.prototype.createAdditionalLookup = function() {};
-	/**
-	 *
-	 * @return {Array}
-	 */
-	EntitiesCollection.prototype.getArrayCopy = function() {
-		return this.map(function(el) {
-			return el;
-		})
-	};
-	/**
-	 *
-	 * @param {(string|number)} id
-	 * @returns {Array<OneEntity>}
-	 */
-	EntitiesCollection.prototype.remove = function(id) {
-		if (this.has(id)) {
-			delete this.__lookup[id];
-			return this.splice(this.indexOf(this.getByID(id)), 1);
-		}
-		return [];
-	};
-	/**
-	 *
-	 * @return {EntitiesCollection}
-	 */
-	EntitiesCollection.prototype.empty = function() {
-		this.last_pushed.splice(0, this.last_pushed.length);
-		this.__lookup = {};
-		this.splice(0, this.length);
-		
-		return this;
-	};
-	/**
-	 *
-	 * @param {string} key
-	 * @param {boolean} [ascending=false]
-	 *
-	 * @return {EntitiesCollection}
-	 */
-	EntitiesCollection.prototype.sortBy = function(key, ascending) {
-		var key_spliced = key.split('.');
-		
-		this.sort(function(a, b) {
-			var cur_a = Object.assign({}, a),
-				cur_b = Object.assign({}, b);
-			
-			key_spliced.forEach(function(key) {
-				cur_a = typeof cur_a[key] === 'object' ? Object.assign({}, cur_a[key]) : cur_a[key];
-				cur_b = typeof cur_b[key] === 'object' ? Object.assign({}, cur_b[key]) : cur_b[key];
-			});
-			
-			if (isFinite(cur_a) && isFinite(cur_b)) {
-				
-				return ascending ? cur_a - cur_b : cur_b - cur_a;
-			} else {
-				
-				if (cur_a.name > cur_b.name) {
-					
-					return ascending ? 1 : -1;
-				}
-				if (cur_a.name < cur_b.name) {
-					
-					return ascending ? -1 : 1;
-				}
-				
-				return 0;
-			}
-		});
-		
-		return this;
-	};
 	
 	return EntitiesCollection;
 }()));
@@ -40202,7 +40260,7 @@ CitiesCollection = extending(EntitiesCollection, (function() {
 		}, function(data) {
 			self.setData(data);
 			if (success && typeof success == 'function') {
-				success.call(self, self.last_pushed);
+				success.call(self, self.__last_pushed);
 			}
 		});
 	};
@@ -40723,11 +40781,7 @@ RegistrationFieldsCollection = extending(EntitiesCollection, (function() {
 			}
 		});
 		
-		for ( var type_name in RegistrationFieldModel.TYPES ) {
-			if (RegistrationFieldModel.TYPES.hasOwnProperty(type_name)) {
-				this.__types[RegistrationFieldModel.TYPES[type_name]] = [];
-			}
-		}
+		this.emptyAdditionalLookup();
 		Object.freeze(this.__types);
 	}
 	RegistrationFieldsCollection.prototype.collection_of = RegistrationField;
@@ -40739,6 +40793,16 @@ RegistrationFieldsCollection = extending(EntitiesCollection, (function() {
 		if (entity instanceof RegistrationField) {
 			this.__types[entity.type].push(entity);
 		}
+	};
+	
+	RegistrationFieldsCollection.prototype.emptyAdditionalLookup = function() {
+		for ( var type_name in RegistrationFieldModel.TYPES ) {
+			if (RegistrationFieldModel.TYPES.hasOwnProperty(type_name)) {
+				this.__types[RegistrationFieldModel.TYPES[type_name]] = [];
+			}
+		}
+		
+		return this;
 	};
 	
 	return RegistrationFieldsCollection;
@@ -40980,10 +41044,10 @@ RegistrationFieldModelsCollection = extending(EntitiesCollection, (function() {
 		var self = this,
 			entities = Array.prototype.slice.call(arguments);
 		
-		this.last_pushed.splice(0);
+		this.__last_pushed.splice(0);
 		
 		entities.forEach(function(entity) {
-			self.last_pushed.push(self[self.length++] = (entity instanceof self.collection_of) ? entity : (new self.collection_of()).setData(entity));
+			self.__last_pushed.push(self[self.length++] = (entity instanceof self.collection_of) ? entity : (new self.collection_of()).setData(entity));
 		});
 		//this.sortByType();
 		
@@ -41559,7 +41623,7 @@ AbstractEventOrdersCollection = extending(OrdersCollection, (function() {
 		}, function(data) {
 			self.setData(data);
 			if (isFunction(success)) {
-				success.call(self, self.last_pushed);
+				success.call(self, self.__last_pushed);
 			}
 		});
 	};
@@ -41584,11 +41648,11 @@ AbstractEventOrdersCollection = extending(OrdersCollection, (function() {
 		}, function(data) {
 			self.setData(data);
 			if (isFunction(success)) {
-				success.call(self, self.last_pushed);
+				success.call(self, self.__last_pushed);
 			}
 		}).then(function() {
 			
-			return self.last_pushed;
+			return self.__last_pushed;
 		});
 	};
 	
@@ -41886,7 +41950,7 @@ AbstractEventTicketsCollection = extending(TicketsCollection, (function() {
 		}, function(data) {
 			self.setData(data);
 			if (isFunction(success)) {
-				success.call(self, self.last_pushed);
+				success.call(self, self.__last_pushed);
 			}
 		});
 	};
@@ -41912,11 +41976,11 @@ AbstractEventTicketsCollection = extending(TicketsCollection, (function() {
 		}, filters), function(data) {
 			self.setData(data);
 			if (isFunction(success)) {
-				success.call(self, self.last_pushed);
+				success.call(self, self.__last_pushed);
 			}
 		}).then(function() {
 			
-			return self.last_pushed;
+			return self.__last_pushed;
 		});
 	};
 	
@@ -42100,7 +42164,7 @@ TicketTypesCollection = extending(EntitiesCollection, (function() {
 		}, function(data) {
 			self.setData(data);
 			if (success && typeof success == 'function') {
-				success.call(self, self.last_pushed);
+				success.call(self, self.__last_pushed);
 			}
 		});
 	};
@@ -42537,7 +42601,7 @@ WithdrawModelsCollection = extending(EntitiesCollection, (function() {
 			self.setData(data['withdraws']);
 			
 			if (isFunction(success)) {
-				success.call(self, self.last_pushed);
+				success.call(self, self.__last_pushed);
 			}
 		});
 	};
@@ -42765,7 +42829,7 @@ OrganizationStatisticsCollection = extending(StatisticsCollection, (function() {
 			self.setData(data[self.field]);
 			
 			if (isFunction(success)) {
-				success.call(self, self.last_pushed);
+				success.call(self, self.__last_pushed);
 			}
 		});
 	};
@@ -43321,7 +43385,7 @@ OneOrganization = extending(OneEntity, (function() {
 			self.finance.withdraws.setData(data);
 			
 			if (isFunction(success)) {
-				success.call(self, self.finance.withdraws.last_pushed);
+				success.call(self, self.finance.withdraws.__last_pushed);
 			}
 		});
 	};
@@ -43434,7 +43498,7 @@ OrganizationsCollection = extending(EntitiesCollection, (function() {
 		return OrganizationsCollection.fetchMyOrganizations(roles, ajax_data, function(data) {
 			self.setData(data);
 			if (isFunction(success)) {
-				success.call(self, self.last_pushed);
+				success.call(self, self.__last_pushed);
 			}
 		});
 	};
@@ -43689,7 +43753,7 @@ OneUser = extending(OneEntity, (function() {
 		return OneUser.fetchFavored(self.id, data).done(function(favored) {
 			self.favored.setData(favored);
 			if (success && typeof success == 'function') {
-				success.call(self, self.favored.last_pushed);
+				success.call(self, self.favored.__last_pushed);
 			}
 		}).promise();
 	};
@@ -43705,7 +43769,7 @@ OneUser = extending(OneEntity, (function() {
 		return OneUser.fetchSubscriptions(self.id, data).done(function(subscriptions) {
 			self.subscriptions.setData(subscriptions);
 			if (success && typeof success == 'function') {
-				success.call(self, self.subscriptions.last_pushed);
+				success.call(self, self.subscriptions.__last_pushed);
 			}
 		}).promise();
 	};
@@ -44073,7 +44137,7 @@ EventStatisticsCollection = extending(StatisticsCollection, (function() {
 			self.setData(data[self.field]);
 			
 			if (isFunction(success)) {
-				success.call(self, self.last_pushed);
+				success.call(self, self.__last_pushed);
 			}
 		});
 	};
@@ -44257,6 +44321,8 @@ OneEvent = extending(OneEntity, (function() {
 	 * @property {AbstractEventTicketsCollection} tickets
 	 * @property {TicketTypesCollection} ticket_types
 	 * @property {?number} booking_time
+	 * @property {?boolean} apply_promocodes_and_pricing_rules
+	 * @property {PricingRuleModelsCollection} pricing_rules
 	 *
 	 * @property {?boolean} registration_locally
 	 * @property {?boolean} registration_available
@@ -44350,6 +44416,8 @@ OneEvent = extending(OneEntity, (function() {
 		this.tickets = new AbstractEventTicketsCollection(event_id);
 		this.ticket_types = new TicketTypesCollection(event_id);
 		this.booking_time = null;
+		this.apply_promocodes_and_pricing_rules = null;
+		this.pricing_rules = new PricingRuleModelsCollection();
 		
 		this.registration_locally = null;
 		this.registration_available = null;
@@ -44436,6 +44504,7 @@ OneEvent = extending(OneEntity, (function() {
 		EVENT: '/events/{event_id}',
 		STATUS: '/events/{event_id}/status',
 		ORDERS: '/events/{event_id}/orders',
+		PREORDER: '/events/{event_id}/preorder',
 		FAVORITES: '/events/{event_id}/favorites',
 		NOTIFICATIONS: '/events/{event_id}/notifications',
 		NOTIFICATION: '/events/{event_id}/notifications/{notification_uuid}'
@@ -44705,6 +44774,22 @@ OneEvent = extending(OneEntity, (function() {
 	};
 	/**
 	 *
+	 * @param {(string|number)} event_id
+	 * @param {OrderCreateData} order_data
+	 *
+	 * @return {jqPromise}
+	 */
+	OneEvent.preOrder = function(event_id, order_data) {
+		
+		return __APP.SERVER.addData(OneEvent.ENDPOINT.PREORDER.format({event_id: event_id}), {
+			registration_fields: order_data.registration_fields,
+			tickets: order_data.tickets,
+			promocode: order_data.promocode || null,
+			utm: order_data.utm || null
+		}, true);
+	};
+	/**
+	 *
 	 * @param {(Fields|string|Array)} [fields]
 	 * @param {AJAXCallback} [success]
 	 * @returns {jqPromise}
@@ -44934,6 +45019,16 @@ OneEvent = extending(OneEntity, (function() {
 			};
 		});
 	};
+	/**
+	 *
+	 * @param {OrderCreateData} order_data
+	 *
+	 * @return {jqPromise}
+	 */
+	OneEvent.prototype.preOrder = function(order_data) {
+		
+		return this.constructor.preOrder(this.id, order_data);
+	};
 	
 	return OneEvent;
 }()));
@@ -45071,7 +45166,7 @@ EventsCollection = extending(EntitiesCollection, (function() {
 		return this.constructor[method_name](ajax_data, function(data) {
 			self.setData(data);
 			if (isFunction(success)) {
-				success.call(self, self.last_pushed);
+				success.call(self, self.__last_pushed);
 			}
 		});
 	};
@@ -45094,7 +45189,7 @@ EventsCollection = extending(EntitiesCollection, (function() {
 		return this.constructor.fetchEvents(ajax_data, function(data) {
 			self.setData(data);
 			if (isFunction(success)) {
-				success.call(self, self.last_pushed);
+				success.call(self, self.__last_pushed);
 			}
 		});
 	};
@@ -45115,7 +45210,7 @@ EventsCollection = extending(EntitiesCollection, (function() {
 		return this.constructor.fetchOrganizationsEvents(organization_id, ajax_data, function(data) {
 			self.setData(data);
 			if (success && typeof success === 'function') {
-				success.call(self, self.last_pushed);
+				success.call(self, self.__last_pushed);
 			}
 		});
 	};
@@ -45137,7 +45232,7 @@ EventsCollection = extending(EntitiesCollection, (function() {
 		return this.constructor.fetchOrganizationsEvents(organization_id, ajax_data, function(data) {
 			self.setData(data);
 			if (success && typeof success === 'function') {
-				success.call(self, self.last_pushed);
+				success.call(self, self.__last_pushed);
 			}
 		});
 	};
@@ -45301,7 +45396,7 @@ CurrentUser = extending(OneUser, (function() {
 		return CurrentUser.fetchFriends(ajax_data, function(data) {
 			self.friends.setData(data);
 			if (success && typeof success == 'function') {
-				success.call(self, self.friends.last_pushed);
+				success.call(self, self.friends.__last_pushed);
 			}
 		});
 	};
@@ -45458,11 +45553,11 @@ OrganizationSubscribersCollection = extending(UsersCollection, (function() {
 			
 			self.setData(subscribed);
 			if (isFunction(success)) {
-				success.call(self, self.last_pushed);
+				success.call(self, self.__last_pushed);
 			}
 		}).then(function() {
 			
-			return self.last_pushed;
+			return self.__last_pushed;
 		});
 	};
 	/**
@@ -45485,11 +45580,11 @@ OrganizationSubscribersCollection = extending(UsersCollection, (function() {
 			
 			self.setData(subscribed);
 			if (isFunction(success)) {
-				success.call(self, self.last_pushed);
+				success.call(self, self.__last_pushed);
 			}
 		}).then(function() {
 			
-			return self.last_pushed;
+			return self.__last_pushed;
 		});
 	};
 	/**
@@ -46730,7 +46825,10 @@ Builder = (function() {
 	Builder.prototype.select = function buildSelect(values, attributes, classes, dataset, default_value) {
 		var $select;
 		
-		values.unshift({id: '-1'});
+		values.unshift({
+			id: '-1',
+			attributes: ['hidden']
+		});
 		
 		$select =  tmpl('select', Builder.normalizeBuildProps({
 			options: __APP.BUILD.option(values),
@@ -46981,10 +47079,15 @@ Builder = (function() {
 	Builder.prototype.radioCheckbox = function buildRadioCheckbox(type, props) {
 		if (type === 'checkbox' || type === 'radio') {
 			props = Builder.normalizeBuildProps(props, ['unit_classes'], ['unit_dataset']);
-			if (props.classes.indexOf('form_checkbox') === -1 && props.classes.indexOf('form_radio') === -1) {
+			if (!props.classes.contains('form_' + type)) {
 				props.classes.unshift('form_' + type);
 			}
-			props.unit_classes.unshift('form_unit');
+			if (!props.unit_classes.contains('form_' + type + '_wrapper')) {
+				props.unit_classes.unshift('form_' + type + '_wrapper');
+			}
+			if (!props.unit_classes.contains('form_unit')) {
+				props.unit_classes.unshift('form_unit');
+			}
 			if(!props.attributes.checked) {
 				delete props.attributes.checked;
 			}
@@ -47111,11 +47214,16 @@ Builder = (function() {
 		
 		return $.makeSet(Array.prototype.map.call(arguments, function(props) {
 			switch (props.type) {
-				case 'radio':
+				case 'radio': {
+					
 					return self.radio(props);
-				case 'checkbox':
+				}
+				case 'checkbox': {
+					
 					return self.checkbox(props);
-				default:
+				}
+				default: {
+					
 					return tmpl('form-unit', Builder.normalizeBuildProps({
 						unit_classes: props.unit_classes || [],
 						label: props.label ? tmpl('label', Builder.normalizeBuildProps({
@@ -47194,6 +47302,16 @@ Builder = (function() {
 										props.inputmask
 									);
 								}
+								case 'select': {
+									
+									return self.select(
+										props.values,
+										mergeObjects({}, props.attributes, defined_attributes, true, true),
+										classes.concat('form_select'),
+										props.dataset,
+										props.value
+									);
+								}
 								default: {
 									
 									return self.input(
@@ -47208,6 +47326,7 @@ Builder = (function() {
 							}
 						})(props)
 					}, ['unit_classes']));
+				}
 			}
 		}));
 	};
@@ -48441,6 +48560,7 @@ OrderPage = extending(Page, (function() {
 		this.event = new OneEvent(event_id);
 		this.event_fields = new Fields(
 			'accept_bitcoins',
+			'apply_promocodes_and_pricing_rules',
 			'ticketing_locally',
 			'ticketing_available',
 			'registration_locally',
@@ -48462,6 +48582,7 @@ OrderPage = extending(Page, (function() {
 		this.is_promocode_active = false;
 		
 		this.overall_sum = 0;
+		this.total_sum = 0;
 		
 		this.render_vars = {
 			event_id: event_id,
@@ -48481,23 +48602,6 @@ OrderPage = extending(Page, (function() {
 				get: function() {
 					
 					return (self.event.ticketing_locally ? 'Заказ билетов на событие ' : 'Регистрация на событие ') + self.event.title;
-				}
-			},
-			total_sum: {
-				get: function() {
-					var total_sum = 0;
-					
-					if (self.is_promocode_active) {
-						if (self.promocode.is_fixed) {
-							total_sum = self.overall_sum - self.promocode.effort;
-						} else {
-							total_sum = self.overall_sum - (self.overall_sum * self.promocode.effort / 100);
-						}
-						
-						return total_sum <= 0 ? 0 : total_sum;
-					}
-					
-					return self.overall_sum;
 				}
 			}
 		});
@@ -48641,7 +48745,7 @@ OrderPage = extending(Page, (function() {
 	 *
 	 * @returns {jqPromise}
 	 */
-	OrderPage.prototype.makeOrder = function(send_request) {
+	OrderPage.prototype.commitOrder = function(send_request) {
 		var self = this,
 			$form = this.$wrapper.find('.OrderForm'),
 			send_data;
@@ -48692,7 +48796,9 @@ OrderPage = extending(Page, (function() {
 			$footer = this.$wrapper.find('.OrderFormFooter'),
 			ticket_selected = parsed_uri.queryKey['ticket_selected'],
 			$payload,
-			$selected_type;
+			$selected_type,
+			is_timeout_enabled = false,
+			timeout;
 		
 		this.$main_action_buttton = this.render_vars.register_button;
 		
@@ -48737,25 +48843,42 @@ OrderPage = extending(Page, (function() {
 			} else {
 				$footer.attr('disabled', true);
 			}
-			
-			if (self.is_promocode_active) {
-				self.$wrapper.find('.TicketsTotalSum').text(formatCurrency(self.total_sum));
-			}
-			
-			if (self.total_sum === 0) {
-				if ($.contains(self.$wrapper[0], self.render_vars.pay_button[0])) {
-					self.render_vars.pay_button.after(self.render_vars.register_button);
-					self.render_vars.pay_button.detach();
-					self.$main_action_buttton = self.render_vars.register_button;
-					$pay_buttons.addClass(__C.CLASSES.HIDDEN);
-				}
-			} else {
-				if ($.contains(self.$wrapper[0], self.render_vars.register_button[0])) {
-					self.render_vars.register_button.after(self.render_vars.pay_button);
-					self.render_vars.register_button.detach();
-					self.$main_action_buttton = self.render_vars.pay_button;
-					$pay_buttons.removeClass(__C.CLASSES.HIDDEN);
-				}
+		}
+		
+		function preOrder() {
+			if (!is_timeout_enabled) {
+				is_timeout_enabled = true;
+				timeout = window.setTimeout(function() {
+					is_timeout_enabled = false;
+					self.event.preOrder(self.gatherSendData()).done(function(data) {
+						self.total_sum = data.price.final_sum;
+						
+						if (data.pricing_rule || data.promocode) {
+							self.$wrapper.find('.TicketsOverallSum').addClass(__C.CLASSES.UNIVERSAL_STATES.LINE_THROUGH);
+							self.$wrapper.find('.TicketsDiscountedWrapper').removeClass(__C.CLASSES.HIDDEN);
+							self.$wrapper.find('.TicketsTotalSum').text(formatCurrency(self.total_sum));
+						} else {
+							self.$wrapper.find('.TicketsOverallSum').removeClass(__C.CLASSES.UNIVERSAL_STATES.LINE_THROUGH);
+							self.$wrapper.find('.TicketsDiscountedWrapper').addClass(__C.CLASSES.HIDDEN);
+						}
+						
+						if (self.total_sum === 0) {
+							if ($.contains(self.$wrapper[0], self.render_vars.pay_button[0])) {
+								self.render_vars.pay_button.after(self.render_vars.register_button);
+								self.render_vars.pay_button.detach();
+								self.$main_action_buttton = self.render_vars.register_button;
+								$pay_buttons.addClass(__C.CLASSES.HIDDEN);
+							}
+						} else {
+							if ($.contains(self.$wrapper[0], self.render_vars.register_button[0])) {
+								self.render_vars.register_button.after(self.render_vars.pay_button);
+								self.render_vars.register_button.detach();
+								self.$main_action_buttton = self.render_vars.pay_button;
+								$pay_buttons.removeClass(__C.CLASSES.HIDDEN);
+							}
+						}
+					});
+				}, 500);
 			}
 		}
 		
@@ -48782,13 +48905,15 @@ OrderPage = extending(Page, (function() {
 					
 					$wrapper.removeAttr('disabled');
 					
-					$promocode_wrapper.after(tmpl('order-tickets-selling-promocode', {
-						effort: self.promocode.effort + (self.promocode.is_fixed ? ' ₽' : '%')
+					$promocode_wrapper.after(__APP.BUILD.text({
+						classes: [__C.CLASSES.TEXT_COLORS.MUTED_80, __C.CLASSES.TEXT_WEIGHT.BOLDER],
+						content: 'Промокод активирован'
 					}));
 					$promocode_wrapper.addClass(__C.CLASSES.HIDDEN);
 					
 					self.is_promocode_active = true;
 					countTotalSum();
+					preOrder();
 				}, function() {
 					showNotifier({
 						status: false,
@@ -48827,6 +48952,12 @@ OrderPage = extending(Page, (function() {
 			$quantity_inputs.on('QuantityInput::change', function() {
 				countTicketTypeSum($(this).closest('.TicketType'));
 				countTotalSum();
+				if (isTicketTypeSelected()) {
+					preOrder();
+				} else {
+					self.$wrapper.find('.TicketsOverallSum').removeClass(__C.CLASSES.UNIVERSAL_STATES.LINE_THROUGH);
+					self.$wrapper.find('.TicketsDiscountedWrapper').addClass(__C.CLASSES.HIDDEN);
+				}
 			});
 			
 			this.$wrapper.find('.TicketType').each(function() {
@@ -48836,7 +48967,7 @@ OrderPage = extending(Page, (function() {
 			countTotalSum();
 			
 			this.render_vars.legal_entity_payment_button.on('click.LegalEntityPayment', function() {
-				self.makeOrder().done(function(data) {
+				self.commitOrder().done(function(data) {
 					var parsed_uri = parseUri(location);
 					
 					__APP.changeState(parsed_uri.path + '/' + data.order.uuid + '/from_legal_entity');
@@ -48855,7 +48986,7 @@ OrderPage = extending(Page, (function() {
 			
 			if (is_type_selected) {
 				if (__APP.IS_WIDGET) {
-					self.makeOrder(false).done(function(send_data) {
+					self.commitOrder(false).done(function(send_data) {
 						$payload = self.$wrapper.find('.OrderFormPayload');
 						$payload.val(JSON.stringify(mergeObjects({
 							redirect_to_payment: true,
@@ -48865,7 +48996,7 @@ OrderPage = extending(Page, (function() {
 						self.$wrapper.find('.OrderForm').submit();
 					});
 				} else {
-					self.makeOrder().done(function(data) {
+					self.commitOrder().done(function(data) {
 						
 						Payment.doPayment('order-' + data.order.uuid, data.order.final_sum, callback_url);
 					})
@@ -48879,7 +49010,7 @@ OrderPage = extending(Page, (function() {
 		});
 		
 		this.render_vars.register_button.on('click.Register', function() {
-			self.makeOrder().done(function(data) {
+			self.commitOrder().done(function(data) {
 				var callback_url,
 					parsed_callback;
 				
@@ -48911,7 +49042,7 @@ OrderPage = extending(Page, (function() {
 					modal;
 				
 				if (!$this.data('modal')) {
-					self.makeOrder().done(function(data) {
+					self.commitOrder().done(function(data) {
 						modal = new BitcoinModal(self.event, data.order.uuid);
 						$this.data('modal', modal);
 						
@@ -49815,7 +49946,6 @@ __LOCALES = {
 				
 				APPROVED: 'Подтверждено',
 				PAYED: 'Оплачено',
-				PAYED_LEGAL_ENTITY: 'Оплачено юрлицом',
 				WITHOUT_PAYMENT: 'Без оплаты',
 				
 				TICKETS_ARE_OVER: 'Билеты закончились',
@@ -49832,12 +49962,19 @@ __LOCALES = {
 			DATE_TIME_FORMAT: 'DD.MM.YYYY, HH:mm',
 			MONTH_SHORT_NAMES: ['Янв', 'Фев', 'Мар', 'Апр', 'Май', 'Июн', 'Июл', 'Авг', 'Сен', 'Окт', 'Ноя', 'Дек'],
 			MONTH_NAMES: ['Январь', 'Февраль', 'Март', 'Апрель', 'Май', 'Июнь', 'Июль', 'Август', 'Сентябрь', 'Октябрь', 'Ноябрь', 'Декабрь'],
+			CALENDAR_DATE_WITH_YEAR: {
+				sameDay: '[Сегодня]',
+				lastDay: '[Вчера]',
+				nextWeek: __C.MOMENTJS_CALENDAR.DATE_AND_MONTH + ' ' + __C.MOMENTJS_CALENDAR.YEAR,
+				lastWeek: __C.MOMENTJS_CALENDAR.DATE_AND_MONTH + ' ' + __C.MOMENTJS_CALENDAR.YEAR,
+				sameElse: __C.MOMENTJS_CALENDAR.DATE_AND_MONTH + ' ' + __C.MOMENTJS_CALENDAR.YEAR
+			},
 			CALENDAR_DATE_TIME: {
-				sameDay: '[Сегодня в] HH:mm',
-				lastDay: '[Вчера в] HH:mm',
-				nextWeek: 'D MMMM [в] HH:mm',
-				lastWeek: 'D MMMM [в] HH:mm',
-				sameElse: 'D MMMM [в] HH:mm'
+				sameDay: '[Сегодня в] ' + __C.MOMENTJS_CALENDAR.HOURS_AND_MINUTES,
+				lastDay: '[Вчера в] ' + __C.MOMENTJS_CALENDAR.HOURS_AND_MINUTES,
+				nextWeek: __C.MOMENTJS_CALENDAR.DATE_AND_MONTH + ' [в] ' + __C.MOMENTJS_CALENDAR.HOURS_AND_MINUTES,
+				lastWeek: __C.MOMENTJS_CALENDAR.DATE_AND_MONTH + ' [в] ' + __C.MOMENTJS_CALENDAR.HOURS_AND_MINUTES,
+				sameElse: __C.MOMENTJS_CALENDAR.DATE_AND_MONTH + ' [в] ' + __C.MOMENTJS_CALENDAR.HOURS_AND_MINUTES
 			}
 		},
 		DATATABLES_URL: '//cdn.datatables.net/plug-ins/1.10.15/i18n/Russian.json'
