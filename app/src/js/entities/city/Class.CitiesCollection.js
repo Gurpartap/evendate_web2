@@ -67,7 +67,7 @@ CitiesCollection = extending(EntitiesCollection, (function() {
 		}, function(data) {
 			self.setData(data);
 			if (success && typeof success == 'function') {
-				success.call(self, self.last_pushed);
+				success.call(self, self.__last_pushed);
 			}
 		});
 	};

@@ -120,6 +120,8 @@ class Order extends AbstractEntity
 		'updated_at',
 		'shop_sum_amount',
 		'payment_type',
+		'ticket_pricing_rule_id',
+		'ticket_pricing_rule_discount',
 		'status_id',
 		self::BITCOIN_ADDRESS_FIELD_NAME => '(SELECT address FROM bitcoin_addresses WHERE ticket_order_id = view_tickets_orders.id ORDER BY id DESC LIMIT 1) AS ' . self::BITCOIN_ADDRESS_FIELD_NAME,
 		self::BITCOIN_AMOUNT_FIELD_NAME => '(SELECT waiting_amount FROM bitcoin_addresses WHERE ticket_order_id = view_tickets_orders.id ORDER BY id DESC LIMIT 1) AS ' . self::BITCOIN_AMOUNT_FIELD_NAME,
@@ -156,31 +158,26 @@ class Order extends AbstractEntity
 		return array('id' => $res['id'], 'uuid' => $res['uuid']);
 	}
 
-	public static function updateSum($id, ExtendedPDO $db, Event $event)
+	public static function updateSum($id, ExtendedPDO $db, Event $event, array $pricing_info)
 	{
 		$q_upd = 'UPDATE ticket_orders SET sum = subquery.sum,
-			final_sum = subquery.final_sum
+			final_sum = :final_sum,
+			 ticket_pricing_rule_id = :ticket_pricing_rule_id, 
+			 ticket_pricing_rule_discount = :pricing_rule_discount
 			FROM (
 				SELECT 
-				COALESCE(view_tickets_orders.sum, 0) AS sum,
-				promocodes.effort,
-				promocodes.is_fixed, 
-				promocodes.is_percentage,
-				CASE 
-			WHEN promocodes.enabled = FALSE THEN COALESCE(view_tickets_orders.sum, 0) 
-			WHEN promocodes.enabled = TRUE AND promocodes.is_fixed = TRUE 
-				THEN (COALESCE(view_tickets_orders.sum, 0) - promocodes.effort)
-			WHEN promocodes.enabled = TRUE AND promocodes.is_percentage = TRUE 
-				THEN (COALESCE(view_tickets_orders.sum, 0) - (promocodes.effort / 100 * COALESCE(view_tickets_orders.sum, 0)))
-				END AS final_sum,
-				promocodes.enabled
+				COALESCE(view_tickets_orders.sum, 0) AS sum
 				FROM view_tickets_orders
-				LEFT JOIN promocodes ON promocodes.id = view_tickets_orders.promocode_id
 				WHERE view_tickets_orders.id = :order_id) AS subquery
 				WHERE ticket_orders.id = :order_id
 				RETURNING *';
 
-		$upd = $db->prepareExecuteRaw($q_upd, array(':order_id' => $id), 'CANT_INSERT_ORDER_SUM')->fetch();
+		$upd = $db->prepareExecuteRaw($q_upd, array(
+			':order_id' => $id,
+			':final_sum' => $pricing_info['price']['final_sum'],
+			':pricing_rule_discount' => $pricing_info['price']['discount'] ?? 0,
+			':ticket_pricing_rule_id' => $pricing_info['pricing_rule']['id'] ?? null
+		), 'CANT_INSERT_ORDER_SUM')->fetch();
 
 		$q_get_event_info = 'SELECT 
 			view_tickets_orders.final_sum,

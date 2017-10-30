@@ -58,9 +58,9 @@ MyTicketsCollection = extending(ExtendedTicketsCollection, (function() {
 			}, []));
 			
 			if (isFunction(success)) {
-				success.call(self, self.last_pushed);
+				success.call(self, self.__last_pushed);
 			}
-			return self.last_pushed;
+			return self.__last_pushed;
 		});
 	};
 	

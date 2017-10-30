@@ -56,6 +56,8 @@
 }
 .button.-no_uppercase {text-transform: none}
 
+.button:not(.-size_wide) + .button:not(.-size_wide) {margin-left: 1em}
+
 a.button {line-height: 30px}
 a.button.-size_low {line-height: 1.88rem}
 a.button.-size_huge {line-height: 3rem}

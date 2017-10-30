@@ -52,10 +52,10 @@ EventsExtendedTicketsCollection = extending(ExtendedTicketsCollection, (function
 		return EventsExtendedTicketsCollection.fetchTickets(this.event_id, fields).then(function(data) {
 			self.setData(ExtendedTicketsCollection.extractTicketsFromEvent(data));
 			if (isFunction(success)) {
-				success.call(self, self.last_pushed);
+				success.call(self, self.__last_pushed);
 			}
 			
-			return self.last_pushed;
+			return self.__last_pushed;
 		});
 	};
 	

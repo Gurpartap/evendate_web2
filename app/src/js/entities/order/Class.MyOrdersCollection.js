@@ -45,7 +45,7 @@ MyOrdersCollection = extending(OrdersCollection, (function() {
 		}).then(function(orders) {
 			self.setData(orders);
 			
-			return self.last_pushed;
+			return self.__last_pushed;
 		});
 	};
 	/**
@@ -66,7 +66,7 @@ MyOrdersCollection = extending(OrdersCollection, (function() {
 		}).then(function(orders) {
 			self.setData(orders);
 			
-			return self.last_pushed;
+			return self.__last_pushed;
 		});
 	};
 	

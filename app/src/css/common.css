@@ -100,8 +100,8 @@ a.-odd:focus {text-decoration: none}
 .action,
 .button,
 .counter,
-.form_radio + .form_label,
-.form_checkbox + .form_label,
+.form_radio_wrapper > .form_label,
+.form_checkbox_wrapper > .form_label,
 form:disabled,
 fieldset:disabled,
 .-unselectable {
@@ -292,8 +292,8 @@ table {
 
 .-unite > *:not(:last-child) {border-right: 0}
 .-unite > *:not(:first-child):not(:last-child) {border-radius: 0}
-.-unite > :first-child {border-radius: 3px 0 0 3px}
-.-unite > :last-child {border-radius: 0 3px 3px 0}
+.-unite > :first-child {border-radius: 2px 0 0 2px}
+.-unite > :last-child {border-radius: 0 2px 2px 0}
 
 .-unite > .button {
 	padding: 0;

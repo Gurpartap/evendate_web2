@@ -9,6 +9,8 @@ class TicketType extends AbstractEntity
 	const PROMOCODE_EFFORT_FIELD_NAME = 'promocode_effort';
 	const SOLD_COUNT_FIELD_NAME = 'sold_count';
 
+	protected $price;
+
 	protected static $DEFAULT_COLS = array(
 		'uuid',
 		'event_id',
@@ -184,5 +186,14 @@ class TicketType extends AbstractEntity
 
 		return new Result(true, '', $result);
 	}
+
+	/**
+	 * @return mixed
+	 */
+	public function getPrice()
+	{
+		return $this->price;
+	}
+
 
 }

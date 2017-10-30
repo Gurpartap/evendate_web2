@@ -24,6 +24,7 @@ EditEventPage = extending(AbstractEditEventPage, (function() {
 		'accept_bitcoins',
 		'email_texts',
 		'booking_time',
+		'pricing_rules',
 		'vk_post_link', {
 			promocodes: {
 				fields: new Fields('use_limit')
@@ -72,6 +73,8 @@ EditEventPage = extending(AbstractEditEventPage, (function() {
 		this.render_vars.ticket_types = ticket_types.length ?
 		                                AbstractEditEventPage.ticketTypeRowsBuilder(ticket_types) :
 		                                tmpl('edit-event-tickets-row-empty');
+		
+		this.render_vars.pricing_rules = this.event.pricing_rules.enabled_rules.length ?  AbstractEditEventPage.pricingRuleRowBuilder(this.event.pricing_rules.enabled_rules) : '';
 		
 		this.render_vars.promocodes = this.event.promocodes.length ?
 		                              AbstractEditEventPage.promocodeRowsBuilder(this.event.promocodes) :

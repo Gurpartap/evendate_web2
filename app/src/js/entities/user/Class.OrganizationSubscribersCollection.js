@@ -64,11 +64,11 @@ OrganizationSubscribersCollection = extending(UsersCollection, (function() {
 			
 			self.setData(subscribed);
 			if (isFunction(success)) {
-				success.call(self, self.last_pushed);
+				success.call(self, self.__last_pushed);
 			}
 		}).then(function() {
 			
-			return self.last_pushed;
+			return self.__last_pushed;
 		});
 	};
 	/**
@@ -91,11 +91,11 @@ OrganizationSubscribersCollection = extending(UsersCollection, (function() {
 			
 			self.setData(subscribed);
 			if (isFunction(success)) {
-				success.call(self, self.last_pushed);
+				success.call(self, self.__last_pushed);
 			}
 		}).then(function() {
 			
-			return self.last_pushed;
+			return self.__last_pushed;
 		});
 	};
 	/**

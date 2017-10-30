@@ -60,7 +60,8 @@ __C = {
 			SHADOWED: '-shadowed',
 			BORDERED: '-bordered',
 			UPPERCASE: '-transform_uppercase',
-			NO_UPPERCASE: '-no_uppercase'
+			NO_UPPERCASE: '-no_uppercase',
+			LINE_THROUGH: '-line_through'
 		},
 		STATUS: {
 			SUCCESS: '-status_success',
@@ -218,6 +219,9 @@ __C = {
 	},
 	
 	MOMENTJS_CALENDAR: {
+		DAY: 'D',
+		MONTH: 'MMMM',
+		YEAR: 'YYYY',
 		DATE_AND_MONTH: 'D MMMM',
 		HOURS_AND_MINUTES: 'HH:mm'
 	}
@@ -235,7 +239,11 @@ function extending(/**...parents, children*/){
 		parents = Array.prototype.slice.call(arguments);
 	
 	parents.forEach(function(parent) {
-		children.prototype = $.extend(Object.create(parent.prototype), children.prototype);
+		children.prototype = $.extend(Object.create(parent.prototype), children.prototype, Object.getOwnPropertyNames(children.prototype).reduce(function(child_prototype, name) {
+			child_prototype[name] = children.prototype[name];
+			
+			return child_prototype;
+		}, {}));
 	});
 	children.prototype.constructor = children;
 	
@@ -274,7 +282,8 @@ function classEscalation(Class, methods) {
 	
 	return Object.keys(methods).forEach(function(method_name) {
 		Object.defineProperty(Class.prototype, method_name, {
-			value: methods[method_name]
+			value: methods[method_name],
+			configurable: true
 		});
 	});
 }
@@ -332,6 +341,17 @@ String.prototype.toCamelCase = function(delimiter) {
  */
 String.prototype.toUnderscore = function() {
 	return (this.charAt(0).toLowerCase() + this.slice(1)).replace(/([A-Z])/g, function($1) {return "_" + $1.toLowerCase();});
+};
+/**
+ *
+ * @param {string} current_separator
+ * @param {string} new_separator
+ *
+ * @return {string}
+ */
+String.prototype.replaceSeparator = function(current_separator, new_separator) {
+	
+	return this.replace(current_separator, new_separator);
 };
 /**
  * Returns formatted string for fields AJAX data
@@ -741,6 +761,9 @@ $.fn.extend({
 							break;
 						}
 						default: {
+							if (c === null) {
+								break;
+							}
 							std = c.replace(xb, "\r\n");
 						}
 					}

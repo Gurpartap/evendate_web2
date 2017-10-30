@@ -171,7 +171,10 @@ Builder = (function() {
 	Builder.prototype.select = function buildSelect(values, attributes, classes, dataset, default_value) {
 		var $select;
 		
-		values.unshift({id: '-1'});
+		values.unshift({
+			id: '-1',
+			attributes: ['hidden']
+		});
 		
 		$select =  tmpl('select', Builder.normalizeBuildProps({
 			options: __APP.BUILD.option(values),
@@ -422,10 +425,15 @@ Builder = (function() {
 	Builder.prototype.radioCheckbox = function buildRadioCheckbox(type, props) {
 		if (type === 'checkbox' || type === 'radio') {
 			props = Builder.normalizeBuildProps(props, ['unit_classes'], ['unit_dataset']);
-			if (props.classes.indexOf('form_checkbox') === -1 && props.classes.indexOf('form_radio') === -1) {
+			if (!props.classes.contains('form_' + type)) {
 				props.classes.unshift('form_' + type);
 			}
-			props.unit_classes.unshift('form_unit');
+			if (!props.unit_classes.contains('form_' + type + '_wrapper')) {
+				props.unit_classes.unshift('form_' + type + '_wrapper');
+			}
+			if (!props.unit_classes.contains('form_unit')) {
+				props.unit_classes.unshift('form_unit');
+			}
 			if(!props.attributes.checked) {
 				delete props.attributes.checked;
 			}
@@ -552,11 +560,16 @@ Builder = (function() {
 		
 		return $.makeSet(Array.prototype.map.call(arguments, function(props) {
 			switch (props.type) {
-				case 'radio':
+				case 'radio': {
+					
 					return self.radio(props);
-				case 'checkbox':
+				}
+				case 'checkbox': {
+					
 					return self.checkbox(props);
-				default:
+				}
+				default: {
+					
 					return tmpl('form-unit', Builder.normalizeBuildProps({
 						unit_classes: props.unit_classes || [],
 						label: props.label ? tmpl('label', Builder.normalizeBuildProps({
@@ -635,6 +648,16 @@ Builder = (function() {
 										props.inputmask
 									);
 								}
+								case 'select': {
+									
+									return self.select(
+										props.values,
+										mergeObjects({}, props.attributes, defined_attributes, true, true),
+										classes.concat('form_select'),
+										props.dataset,
+										props.value
+									);
+								}
 								default: {
 									
 									return self.input(
@@ -649,6 +672,7 @@ Builder = (function() {
 							}
 						})(props)
 					}, ['unit_classes']));
+				}
 			}
 		}));
 	};
