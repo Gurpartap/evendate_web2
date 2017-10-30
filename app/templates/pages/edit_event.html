@@ -293,31 +293,11 @@
 								<h3>Динамическое ценообразование</h3>
 								<p class="text">Задавайте условия для изменения цены при покупке билета. Например: Если стоимость заказа больше 5000 ₽, тогда скидка 30 %.</p>
 
-								<fieldset class="PricingRules"><!--
-									<div class="event_edit_dynamic_pricing_row">
-										<div class="event_edit_dynamic_pricing_condition">
-											<p class="event_edit_dynamic_pricing_condition_name">Правило 1</p>
-											<p class="event_edit_dynamic_pricing_condition_text">При покупке билетов от <span class="-text_color_accent">5 ед.</span> до <span class="-text_color_accent">100 ед.</span>, скидка <span class="-text_color_accent">30%</span></p>
-										</div>
-										<div class="event_edit_dynamic_pricing_buttons">
-											<button class="event_edit_dynamic_pricing_options action -color_marginal fa_icon fa-sliders" type="button"></button>
-											<button class="event_edit_row_delete_button action -color_marginal" type="button">×</button>
-										</div>
-									</div>
-									<div class="event_edit_dynamic_pricing_row">
-										<div class="event_edit_dynamic_pricing_condition">
-											<p class="event_edit_dynamic_pricing_condition_name">Правило 2</p>
-											<p class="event_edit_dynamic_pricing_condition_text">При сумме заказа от <span class="-text_color_accent">15000 ₽</span>, скидка <span class="-text_color_accent">2000 ₽</span></p>
-										</div>
-										<div class="event_edit_dynamic_pricing_buttons">
-											<button class="event_edit_dynamic_pricing_options action -color_marginal fa_icon fa-sliders" type="button"></button>
-											<button class="event_edit_row_delete_button action -color_marginal" type="button">×</button>
-										</div>
-									</div>-->
+								<fieldset class="PricingRules">
 									{pricing_rules}
 								</fieldset>
 								<div class="form_unit -align_center">
-									<button class="button -color_accent RippleEffect AddPricingRule" type="button">Добавить поле</button>
+									<button class="button -color_accent RippleEffect AddPricingRule" type="button">Добавить условие</button>
 								</div>
 
 								<div class="PricingRuleHolder"></div>

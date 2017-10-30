@@ -77,35 +77,27 @@ AdminOrganizationFinancesPage = extending(AdminOrganizationPage, (function() {
 	 *
 	 * @param {(WithdrawModelsCollection|Array<WithdrawModel>|WithdrawModel)} withdraws
 	 *
-	 * @return {jQuery}
+	 * @return {DataTable.Api}
 	 */
-	AdminOrganizationFinancesPage.transactionRowBuilder = function(withdraws) {
-	
-		return tmpl('admin-organization-finances-transaction-row', (withdraws instanceof Array ? withdraws : [withdraws]).map(function(withdraw) {
+	AdminOrganizationFinancesPage.prototype.appendWithdraw = function(withdraws) {
+		
+		return this.transactionsTable.rows.add((withdraws instanceof Array ? withdraws : [withdraws]).map(function(withdraw) {
 			
 			return {
-				date_timestamp: withdraw.created_at,
-				date: moment.unix(withdraw.created_at).format(__LOCALE.DATE.DATE_FORMAT),
+				date: {
+					display: moment.unix(withdraw.created_at).format(__LOCALE.DATE.DATE_FORMAT),
+					timestamp: withdraw.created_at
+				},
 				staff_block: __APP.BUILD.avatarBlocks(withdraw.user, {
 					entity: __C.ENTITIES.USER,
 					avatar_classes: [__C.CLASSES.SIZES.X30, __C.CLASSES.UNIVERSAL_STATES.ROUNDED]
-				}),
+				}).outerHTML(),
 				status: withdraw.status_description,
 				comment: withdraw.comment,
 				response: withdraw.response,
 				sum: formatCurrency(withdraw.sum, ' ', '.', '', '₽')
 			};
-		}));
-	};
-	/**
-	 *
-	 * @param {(WithdrawModelsCollection|Array<WithdrawModel>|WithdrawModel)} withdraws
-	 *
-	 * @return {DataTable.Api}
-	 */
-	AdminOrganizationFinancesPage.prototype.appendWithdraw = function(withdraws) {
-		
-		return this.transactionsTable.rows.add(AdminOrganizationFinancesPage.transactionRowBuilder(withdraws)).draw();
+		})).draw();
 	};
 	
 	AdminOrganizationFinancesPage.prototype.init = function() {
@@ -165,7 +157,32 @@ AdminOrganizationFinancesPage = extending(AdminOrganizationPage, (function() {
 		$chars = this.$wrapper.find('.AreaChart');
 		$chars.append(__APP.BUILD.loaderBlock());
 		
-		this.transactionsTable = this.$wrapper.find('.TransactionStoryTable').eq(0).DataTable(data_tables_opts);
+		this.transactionsTable = this.$wrapper.find('.TransactionStoryTable').eq(0).DataTable(mergeObjects(data_tables_opts, {
+			columns: [
+				{
+					data: {
+						_: 'date.display',
+						sort: 'date.timestamp'
+					}
+				},
+				{
+					data: 'staff_block'
+				},
+				{data: 'status'},
+				{
+					data: 'comment',
+					className: '-preformatted_text'
+				},
+				{
+					data: 'response',
+					className: '-preformatted_text'
+				},
+				{
+					data: 'sum',
+					className: '-align_right'
+				},
+			]
+		}));
 		
 		this.eventsTable = this.$wrapper.find('.EventsFinancesTable').eq(0).DataTable(data_tables_opts);
 		
