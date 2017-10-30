@@ -77,7 +77,7 @@ MyTicketsPage = extending(Page, (function() {
 			return null;
 		}
 		
-		green_tickets = ExtendedTicketsCollection.getGreenTickets(this.tickets.last_pushed);
+		green_tickets = ExtendedTicketsCollection.getGreenTickets(this.tickets.__last_pushed);
 		
 		if (!green_tickets.length) {
 			this.fetchAndAppendTickets();

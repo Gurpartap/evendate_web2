@@ -86,8 +86,7 @@ class RegistrationForm
 		$q_upd_fields = App::queryFactory()->newUpdate();
 		$q_upd_fields->table('registration_form_fields')
 			->cols(array('status' => 'false'))
-			->where('event_id = ?', $event_id)
-			->where('(SELECT COUNT(id) FROM registration_field_values WHERE registration_form_field_id = registration_form_fields.id) < 1');
+			->where('event_id = ?', $event_id);
 
 		$db->prepareExecute($q_upd_fields, 'CANT_UPDATE_FIELDS');
 
@@ -144,10 +143,10 @@ class RegistrationForm
 	{
 		try {
 			$db->beginTransaction();
-
 			$order_info = Order::create($event, $user, $db, $tickets, $promocode);
+			$preorder = new Preorder($event, array('tickets' => $tickets, 'promocode' => $promocode));
 			$tickets = Ticket::createBatch($event, $order_info['id'], $db, $tickets);
-			Order::updateSum($order_info['id'], $db, $event);
+			Order::updateSum($order_info['id'], $db, $event, $preorder->getFinalSum()->getData());
 
 			$db->commit();
 

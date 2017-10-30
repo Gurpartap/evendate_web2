@@ -501,7 +501,7 @@
 				{registration}
 				<input class="OrderFormPayload" type="hidden" name="post_data">
 				<fieldset class="order_page_footer OrderFormFooter -align_center">
-					<div class="form_unit">
+					<div class="form_unit form_checkbox_wrapper">
 						<input id="order_agreement" class="form_checkbox Switch" type="checkbox" data-switch_id="order_agreement" required>
 						<label class="form_label" for="order_agreement">
 							<span>Я согласен c условиями Пользовательского соглашения и Договором оказания услуг по организации мероприятия</span>
@@ -545,21 +545,19 @@
 			<b class="-text_color_primary_80">Общая стоимость: </b>
 			<b class="-text_color_dark_primary"><span class="TicketsOverallSum">{overall_price}</span> ₽</b>
 		</p>
-		<div class="form_group -align_right -parts_2_1 PromocodeWrapper">
+		<div class="form_group -align_right -parts_3_1 PromocodeWrapper">
 			<div class="form_unit -unite -parts_e_3">
 				<input class="form_input PromocodeInput" placeholder="Промокод" name="promocode">
 				<button class="button -color_accent ActivatePromocode RippleEffect" type="button">Применить</button>
 			</div>
 		</div>
+		<div class="TicketsDiscountedWrapper -hidden">
+			<p class="-text_size_big">
+				<b class="-text_color_primary_80">Итоговая стоимость: </b>
+				<b class="-text_color_dark_primary"><span class="TicketsTotalSum">{total_sum}</span> ₽</b>
+			</p>
+		</div>
 	</footer>
-</script>
-
-<script type="javascript/template" id="tmpl-order-tickets-selling-promocode">
-	<b>Скидка с промокода: {effort}</b>
-	<p class="-text_size_big">
-		<b class="-text_color_primary_80">Итоговая стоимость: </b>
-		<b class="-text_color_dark_primary"><span class="TicketsTotalSum">{total_sum}</span> ₽</b>
-	</p>
 </script>
 
 <script type="javascript/template" id="tmpl-order-ticket-type">

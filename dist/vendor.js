@@ -69569,6 +69569,8 @@ if (typeof JSON !== 'object') {
 !function(a){function b(d,e){return this instanceof b?(a.isPlainObject(d)?e=d:(e=e||{},e.alias=d),this.el=void 0,this.opts=a.extend(!0,{},this.defaults,e),this.maskset=void 0,this.noMasksCache=e&&void 0!==e.definitions,this.userOptions=e||{},this.events={},this.dataAttribute="data-inputmask",this.isRTL=this.opts.numericInput,void c(this.opts.alias,e,this.opts)):new b(d,e)}function c(b,d,e){var f=e.aliases[b];return f?(f.alias&&c(f.alias,void 0,e),a.extend(!0,e,f),a.extend(!0,e,d),!0):(null===e.mask&&(e.mask=b),!1)}function d(c,d){function e(c,e,f){if(null!==c&&""!==c){if(1===c.length&&f.greedy===!1&&0!==f.repeat&&(f.placeholder=""),f.repeat>0||"*"===f.repeat||"+"===f.repeat){var g="*"===f.repeat?0:"+"===f.repeat?1:f.repeat;c=f.groupmarker.start+c+f.groupmarker.end+f.quantifiermarker.start+g+","+f.repeat+f.quantifiermarker.end}var h;return void 0===b.prototype.masksCache[c]||d===!0?(h={mask:c,maskToken:b.prototype.analyseMask(c,f),validPositions:{},_buffer:void 0,buffer:void 0,tests:{},metadata:e,maskLength:void 0},d!==!0&&(b.prototype.masksCache[f.numericInput?c.split("").reverse().join(""):c]=h,h=a.extend(!0,{},b.prototype.masksCache[f.numericInput?c.split("").reverse().join(""):c]))):h=a.extend(!0,{},b.prototype.masksCache[f.numericInput?c.split("").reverse().join(""):c]),h}}var f;if(a.isFunction(c.mask)&&(c.mask=c.mask(c)),a.isArray(c.mask)){if(c.mask.length>1){c.keepStatic=null===c.keepStatic||c.keepStatic;var g=c.groupmarker.start;return a.each(c.numericInput?c.mask.reverse():c.mask,function(b,d){g.length>1&&(g+=c.groupmarker.end+c.alternatormarker+c.groupmarker.start),g+=void 0===d.mask||a.isFunction(d.mask)?d:d.mask}),g+=c.groupmarker.end,e(g,c.mask,c)}c.mask=c.mask.pop()}return c.mask&&(f=void 0===c.mask.mask||a.isFunction(c.mask.mask)?e(c.mask,c.mask,c):e(c.mask.mask,c.mask,c)),f}function e(c,d,f){function k(a,b,c){b=b||0;var d,e,g,h=[],i=0,j=n();S=void 0!==V?V.maxLength:void 0,S===-1&&(S=void 0);do a===!0&&l().validPositions[i]?(g=l().validPositions[i],e=g.match,d=g.locator.slice(),h.push(c===!0?g.input:c===!1?e.nativeDef:F(i,e))):(g=q(i,d,i-1),e=g.match,d=g.locator.slice(),(f.jitMasking===!1||i<j||"number"==typeof f.jitMasking&&isFinite(f.jitMasking)&&f.jitMasking>i)&&h.push(c===!1?e.nativeDef:F(i,e))),i++;while((void 0===S||i<S)&&(null!==e.fn||""!==e.def)||b>i);return""===h[h.length-1]&&h.pop(),l().maskLength=i+1,h}function l(){return d}function m(a){var b=l();b.buffer=void 0,a!==!0&&(b._buffer=void 0,b.validPositions={},b.p=0)}function n(a,b,c){var d=-1,e=-1,f=c||l().validPositions;void 0===a&&(a=-1);for(var g in f){var h=parseInt(g);f[h]&&(b||null!==f[h].match.fn)&&(h<=a&&(d=h),h>=a&&(e=h))}return d!==-1&&a-d>1||e<a?d:e}function o(b,c,d,e){function g(a){var b=l().validPositions[a];if(void 0!==b&&null===b.match.fn){var c=l().validPositions[a-1],d=l().validPositions[a+1];return void 0!==c&&void 0!==d}return!1}var h,i=b,j=a.extend(!0,{},l().validPositions),k=!1;for(l().p=b,h=c-1;h>=i;h--)void 0!==l().validPositions[h]&&(d!==!0&&(!l().validPositions[h].match.optionality&&g(h)||f.canClearPosition(l(),h,n(),e,f)===!1)||delete l().validPositions[h]);for(m(!0),h=i+1;h<=n();){for(;void 0!==l().validPositions[i];)i++;if(h<i&&(h=i+1),void 0===l().validPositions[h]&&A(h))h++;else{var o=q(h);k===!1&&j[i]&&j[i].match.def===o.match.def?(l().validPositions[i]=a.extend(!0,{},j[i]),l().validPositions[i].input=o.input,delete l().validPositions[h],h++):s(i,o.match.def)?z(i,o.input||F(h),!0)!==!1&&(delete l().validPositions[h],h++,k=!0):A(h)||(h++,i--),i++}}m(!0)}function p(a,b){for(var c,d=a,e=n(),g=l().validPositions[e]||t(0)[0],h=void 0!==g.alternation?g.locator[g.alternation].toString().split(","):[],i=0;i<d.length&&(c=d[i],!(c.match&&(f.greedy&&c.match.optionalQuantifier!==!0||(c.match.optionality===!1||c.match.newBlockMarker===!1)&&c.match.optionalQuantifier!==!0)&&(void 0===g.alternation||g.alternation!==c.alternation||void 0!==c.locator[g.alternation]&&y(c.locator[g.alternation].toString().split(","),h)))||b===!0&&(null!==c.match.fn||/[0-9a-bA-Z]/.test(c.match.def)));i++);return c}function q(a,b,c){return l().validPositions[a]||p(t(a,b?b.slice():b,c))}function r(a){return l().validPositions[a]?l().validPositions[a]:t(a)[0]}function s(a,b){for(var c=!1,d=t(a),e=0;e<d.length;e++)if(d[e].match&&d[e].match.def===b){c=!0;break}return c}function t(b,c,d){function e(c,d,g,h){function j(g,h,m){function p(b,c){var d=0===a.inArray(b,c.matches);return d||a.each(c.matches,function(a,e){if(e.isQuantifier===!0&&(d=p(b,c.matches[a-1])))return!1}),d}function r(b,c,d){var e,f;return(l().tests[b]||l().validPositions[b])&&a.each(l().tests[b]||[l().validPositions[b]],function(a,b){var g=void 0!==d?d:b.alternation,h=void 0!==b.locator[g]?b.locator[g].toString().indexOf(c):-1;(void 0===f||h<f)&&h!==-1&&(e=b,f=h)}),e?e.locator.slice((void 0!==d?d:e.alternation)+1):void 0!==d?r(b,c):void 0}function s(a,c){return null===a.match.fn&&null!==c.match.fn&&c.match.fn.test(a.match.def,l(),b,!1,f,!1)}if(k>1e4)throw"Inputmask: There is probably an error in your mask definition or in the code. Create an issue on github with an example of the mask you are using. "+l().mask;if(k===b&&void 0===g.matches)return n.push({match:g,locator:h.reverse(),cd:q}),!0;if(void 0!==g.matches){if(g.isGroup&&m!==g){if(g=j(c.matches[a.inArray(g,c.matches)+1],h))return!0}else if(g.isOptional){var t=g;if(g=e(g,d,h,m)){if(i=n[n.length-1].match,!p(i,t))return!0;o=!0,k=b}}else if(g.isAlternator){var u,v=g,w=[],x=n.slice(),y=h.length,z=d.length>0?d.shift():-1;if(z===-1||"string"==typeof z){var A,B=k,C=d.slice(),D=[];if("string"==typeof z)D=z.split(",");else for(A=0;A<v.matches.length;A++)D.push(A);for(var E=0;E<D.length;E++){if(A=parseInt(D[E]),n=[],d=r(k,A,y)||C.slice(),g=j(v.matches[A]||c.matches[A],[A].concat(h),m)||g,g!==!0&&void 0!==g&&D[D.length-1]<v.matches.length){var F=a.inArray(g,c.matches)+1;c.matches.length>F&&(g=j(c.matches[F],[F].concat(h.slice(1,h.length)),m),g&&(D.push(F.toString()),a.each(n,function(a,b){b.alternation=h.length-1})))}u=n.slice(),k=B,n=[];for(var G=0;G<u.length;G++){var H=u[G],I=!1;H.alternation=H.alternation||y;for(var J=0;J<w.length;J++){var K=w[J];if(("string"!=typeof z||a.inArray(H.locator[H.alternation].toString(),D)!==-1)&&(H.match.def===K.match.def||s(H,K))){I=H.match.nativeDef===K.match.nativeDef,H.alternation==K.alternation&&K.locator[K.alternation].toString().indexOf(H.locator[H.alternation])===-1&&(K.locator[K.alternation]=K.locator[K.alternation]+","+H.locator[H.alternation],K.alternation=H.alternation,null==H.match.fn&&(K.na=K.na||H.locator[H.alternation].toString(),K.na.indexOf(H.locator[H.alternation])===-1&&(K.na=K.na+","+H.locator[H.alternation])));break}}I||w.push(H)}}"string"==typeof z&&(w=a.map(w,function(b,c){if(isFinite(c)){var d,e=b.alternation,f=b.locator[e].toString().split(",");b.locator[e]=void 0,b.alternation=void 0;for(var g=0;g<f.length;g++)d=a.inArray(f[g],D)!==-1,d&&(void 0!==b.locator[e]?(b.locator[e]+=",",b.locator[e]+=f[g]):b.locator[e]=parseInt(f[g]),b.alternation=e);if(void 0!==b.locator[e])return b}})),n=x.concat(w),k=b,o=n.length>0,d=C.slice()}else g=j(v.matches[z]||c.matches[z],[z].concat(h),m);if(g)return!0}else if(g.isQuantifier&&m!==c.matches[a.inArray(g,c.matches)-1])for(var L=g,M=d.length>0?d.shift():0;M<(isNaN(L.quantifier.max)?M+1:L.quantifier.max)&&k<=b;M++){var N=c.matches[a.inArray(L,c.matches)-1];if(g=j(N,[M].concat(h),N)){if(i=n[n.length-1].match,i.optionalQuantifier=M>L.quantifier.min-1,p(i,N)){if(M>L.quantifier.min-1){o=!0,k=b;break}return!0}return!0}}else if(g=e(g,d,h,m))return!0}else k++}for(var m=d.length>0?d.shift():0;m<c.matches.length;m++)if(c.matches[m].isQuantifier!==!0){var p=j(c.matches[m],[m].concat(g),h);if(p&&k===b)return p;if(k>b)break}}function g(b){var c=[];return a.isArray(b)||(b=[b]),b.length>0&&(void 0===b[0].alternation?(c=p(b.slice()).locator.slice(),0===c.length&&(c=b[0].locator.slice())):a.each(b,function(a,b){if(""!==b.def)if(0===c.length)c=b.locator.slice();else for(var d=0;d<c.length;d++)b.locator[d]&&c[d].toString().indexOf(b.locator[d])===-1&&(c[d]+=","+b.locator[d])})),c}function h(a){return f.keepStatic&&b>0&&a.length>1+(""===a[a.length-1].match.def?1:0)&&a[0].match.optionality!==!0&&a[0].match.optionalQuantifier!==!0&&null===a[0].match.fn&&!/[0-9a-bA-Z]/.test(a[0].match.def)?[p(a)]:a}var i,j=l().maskToken,k=c?d:0,m=c?c.slice():[0],n=[],o=!1,q=c?c.join(""):"";if(b>-1){if(void 0===c){for(var r,s=b-1;void 0===(r=l().validPositions[s]||l().tests[s])&&s>-1;)s--;void 0!==r&&s>-1&&(m=g(r),q=m.join(""),k=s)}if(l().tests[b]&&l().tests[b][0].cd===q)return h(l().tests[b]);for(var t=m.shift();t<j.length;t++){var u=e(j[t],m,[t]);if(u&&k===b||k>b)break}}return(0===n.length||o)&&n.push({match:{fn:null,cardinality:0,optionality:!0,casing:null,def:"",placeholder:""},locator:[],cd:q}),void 0!==c&&l().tests[b]?h(a.extend(!0,[],n)):(l().tests[b]=a.extend(!0,[],n),h(l().tests[b]))}function u(){return void 0===l()._buffer&&(l()._buffer=k(!1,1),void 0===l().buffer&&l()._buffer.slice()),l()._buffer}function v(a){return void 0!==l().buffer&&a!==!0||(l().buffer=k(!0,n(),!0)),l().buffer}function w(a,b,c){var d;if(a===!0)m(),a=0,b=c.length;else for(d=a;d<b;d++)delete l().validPositions[d];for(d=a;d<b;d++)m(!0),c[d]!==f.skipOptionalPartCharacter&&z(d,c[d],!0,!0)}function x(a,c,d){switch(f.casing||c.casing){case"upper":a=a.toUpperCase();break;case"lower":a=a.toLowerCase();break;case"title":var e=l().validPositions[d-1];a=0===d||e&&e.input===String.fromCharCode(b.keyCode.SPACE)?a.toUpperCase():a.toLowerCase()}return a}function y(b,c){for(var d=f.greedy?c:c.slice(0,1),e=!1,g=0;g<b.length;g++)if(a.inArray(b[g],d)!==-1){e=!0;break}return e}function z(c,d,e,g,h){function i(a){var b=W?a.begin-a.end>1||a.begin-a.end===1&&f.insertMode:a.end-a.begin>1||a.end-a.begin===1&&f.insertMode;return b&&0===a.begin&&a.end===l().maskLength?"full":b}function j(b,d,e){var h=!1;return a.each(t(b),function(j,k){for(var p=k.match,q=d?1:0,r="",s=p.cardinality;s>q;s--)r+=D(b-(s-1));if(d&&(r+=d),v(!0),h=null!=p.fn?p.fn.test(r,l(),b,e,f,i(c)):(d===p.def||d===f.skipOptionalPartCharacter)&&""!==p.def&&{c:p.placeholder||p.def,pos:b},h!==!1){var t=void 0!==h.c?h.c:d;t=t===f.skipOptionalPartCharacter&&null===p.fn?p.placeholder||p.def:t;var y=b,A=v();if(void 0!==h.remove&&(a.isArray(h.remove)||(h.remove=[h.remove]),a.each(h.remove.sort(function(a,b){return b-a}),function(a,b){o(b,b+1,!0)})),void 0!==h.insert&&(a.isArray(h.insert)||(h.insert=[h.insert]),a.each(h.insert.sort(function(a,b){return a-b}),function(a,b){z(b.pos,b.c,!0,g)})),h.refreshFromBuffer){var B=h.refreshFromBuffer;if(e=!0,w(B===!0?B:B.start,B.end,A),void 0===h.pos&&void 0===h.c)return h.pos=n(),!1;if(y=void 0!==h.pos?h.pos:b,y!==b)return h=a.extend(h,z(y,t,!0,g)),!1}else if(h!==!0&&void 0!==h.pos&&h.pos!==b&&(y=h.pos,w(b,y,v().slice()),y!==b))return h=a.extend(h,z(y,t,!0)),!1;return(h===!0||void 0!==h.pos||void 0!==h.c)&&(j>0&&m(!0),u(y,a.extend({},k,{input:x(t,p,y)}),g,i(c))||(h=!1),!1)}}),h}function k(b,c,d){var e,h,i,j,k,o,p,q,r=a.extend(!0,{},l().validPositions),s=!1,u=n();for(j=l().validPositions[u];u>=0;u--)if(i=l().validPositions[u],i&&void 0!==i.alternation){if(e=u,h=l().validPositions[e].alternation,j.locator[i.alternation]!==i.locator[i.alternation])break;j=i}if(void 0!==h){q=parseInt(e);var v=void 0!==j.locator[j.alternation||h]?j.locator[j.alternation||h]:p[0];v.length>0&&(v=v.split(",")[0]);var w=l().validPositions[q],x=l().validPositions[q-1];a.each(t(q,x?x.locator:void 0,q-1),function(e,i){p=i.locator[h]?i.locator[h].toString().split(","):[];for(var j=0;j<p.length;j++){var t=[],u=0,x=0,y=!1;if(v<p[j]&&(void 0===i.na||a.inArray(p[j],i.na.split(","))===-1)){l().validPositions[q]=a.extend(!0,{},i);var A=l().validPositions[q].locator;for(l().validPositions[q].locator[h]=parseInt(p[j]),null==i.match.fn?(w.input!==i.match.def&&(y=!0,w.generatedInput!==!0&&t.push(w.input)),x++,l().validPositions[q].generatedInput=!/[0-9a-bA-Z]/.test(i.match.def),l().validPositions[q].input=i.match.def):l().validPositions[q].input=w.input,k=q+1;k<n(void 0,!0)+1;k++)o=l().validPositions[k],o&&o.generatedInput!==!0&&/[0-9a-bA-Z]/.test(o.input)?t.push(o.input):k<b&&u++,delete l().validPositions[k];for(y&&t[0]===i.match.def&&t.shift(),m(!0),s=!0;t.length>0;){var B=t.shift();if(B!==f.skipOptionalPartCharacter&&!(s=z(n(void 0,!0)+1,B,!1,g,!0)))break}if(s){l().validPositions[q].locator=A;var C=n(b)+1;for(k=q+1;k<n()+1;k++)o=l().validPositions[k],(void 0===o||null==o.match.fn)&&k<b+(x-u)&&x++;b+=x-u,s=z(b>C?C:b,c,d,g,!0)}if(s)return!1;m(),l().validPositions=a.extend(!0,{},r)}}})}return s}function r(b,c){var d=l().validPositions[c];if(d)for(var e=d.locator,f=e.length,g=b;g<c;g++)if(void 0===l().validPositions[g]&&!A(g,!0)){var h=t(g),i=h[0],j=-1;a.each(h,function(a,b){for(var c=0;c<f&&(void 0!==b.locator[c]&&y(b.locator[c].toString().split(","),e[c].toString().split(",")));c++)j<c&&(j=c,i=b)}),u(g,a.extend({},i,{input:i.match.placeholder||i.match.def}),!0)}}function u(b,c,d,e){if(e||f.insertMode&&void 0!==l().validPositions[b]&&void 0===d){var g,h=a.extend(!0,{},l().validPositions),i=n(void 0,!0);for(g=b;g<=i;g++)delete l().validPositions[g];l().validPositions[b]=a.extend(!0,{},c);var j,k=!0,o=l().validPositions,p=!1,q=l().maskLength;for(g=j=b;g<=i;g++){var r=h[g];if(void 0!==r)for(var t=j;t<l().maskLength&&(null===r.match.fn&&o[g]&&(o[g].match.optionalQuantifier===!0||o[g].match.optionality===!0)||null!=r.match.fn);){if(t++,p===!1&&h[t]&&h[t].match.def===r.match.def)l().validPositions[t]=a.extend(!0,{},h[t]),l().validPositions[t].input=r.input,C(t),j=t,k=!0;else if(s(t,r.match.def)){var u=z(t,r.input,!0,!0);k=u!==!1,j=u.caret||u.insert?n():t,p=!0}else k=r.generatedInput===!0;if(l().maskLength<q&&(l().maskLength=q),k)break}if(!k)break}if(!k)return l().validPositions=a.extend(!0,{},h),m(!0),!1}else l().validPositions[b]=a.extend(!0,{},c);return m(!0),!0}function C(b){for(var c=b-1;c>-1&&!l().validPositions[c];c--);var d,e;for(c++;c<b;c++)void 0===l().validPositions[c]&&(f.jitMasking===!1||f.jitMasking>c)&&(e=t(c,q(c-1).locator,c-1).slice(),""===e[e.length-1].match.def&&e.pop(),d=p(e),d&&(d.match.def===f.radixPointDefinitionSymbol||!A(c,!0)||a.inArray(f.radixPoint,v())<c&&d.match.fn&&d.match.fn.test(F(c),l(),c,!1,f))&&(G=j(c,d.match.placeholder||(null==d.match.fn?d.match.def:""!==F(c)?F(c):v()[c]),!0),G!==!1&&(l().validPositions[G.pos||c].generatedInput=!0)))}e=e===!0;var E=c;void 0!==c.begin&&(E=W&&!i(c)?c.end:c.begin);var G=!1,H=a.extend(!0,{},l().validPositions);if(C(E),i(c)&&(M(void 0,b.keyCode.DELETE,c),E=l().p),E<l().maskLength&&(G=j(E,d,e),(!e||g===!0)&&G===!1)){var I=l().validPositions[E];if(!I||null!==I.match.fn||I.match.def!==d&&d!==f.skipOptionalPartCharacter){if((f.insertMode||void 0===l().validPositions[B(E)])&&!A(E,!0)){var J=t(E).slice();""===J[J.length-1].match.def&&J.pop();var K=p(J,!0);K&&null===K.match.fn&&(K=K.match.placeholder||K.match.def,j(E,K,e),l().validPositions[E].generatedInput=!0);for(var L=E+1,N=B(E);L<=N;L++)if(G=j(L,d,e),G!==!1){r(E,void 0!==G.pos?G.pos:L),E=L;break}}}else G={caret:B(E)}}return G===!1&&f.keepStatic&&!e&&h!==!0&&(G=k(E,d,e)),G===!0&&(G={pos:E}),a.isFunction(f.postValidation)&&G!==!1&&!e&&g!==!0&&(G=!!f.postValidation(v(!0),G,f)&&G),void 0===G.pos&&(G.pos=E),G===!1&&(m(!0),l().validPositions=a.extend(!0,{},H)),G}function A(a,b){var c;if(b?(c=q(a).match,""===c.def&&(c=r(a).match)):c=r(a).match,null!=c.fn)return c.fn;if(b!==!0&&a>-1){var d=t(a);return d.length>1+(""===d[d.length-1].match.def?1:0)}return!1}function B(a,b){var c=l().maskLength;if(a>=c)return c;for(var d=a;++d<c&&(b===!0&&(r(d).match.newBlockMarker!==!0||!A(d))||b!==!0&&!A(d)););return d}function C(a,b){var c,d=a;if(d<=0)return 0;for(;--d>0&&(b===!0&&r(d).match.newBlockMarker!==!0||b!==!0&&!A(d)&&(c=t(d),c.length<2||2===c.length&&""===c[1].match.def)););return d}function D(a){return void 0===l().validPositions[a]?F(a):l().validPositions[a].input}function E(b,c,d,e,g){if(e&&a.isFunction(f.onBeforeWrite)){var h=f.onBeforeWrite(e,c,d,f);if(h){if(h.refreshFromBuffer){var i=h.refreshFromBuffer;w(i===!0?i:i.start,i.end,h.buffer||c),c=v(!0)}void 0!==d&&(d=void 0!==h.caret?h.caret:d)}}b.inputmask._valueSet(c.join("")),void 0===d||void 0!==e&&"blur"===e.type?O(b,c,d):I(b,d),g===!0&&(Y=!0,a(b).trigger("input"))}function F(a,b){if(b=b||r(a).match,void 0!==b.placeholder)return b.placeholder;if(null===b.fn){if(a>-1&&void 0===l().validPositions[a]){var c,d=t(a),e=[];if(d.length>1+(""===d[d.length-1].match.def?1:0))for(var g=0;g<d.length;g++)if(d[g].match.optionality!==!0&&d[g].match.optionalQuantifier!==!0&&(null===d[g].match.fn||void 0===c||d[g].match.fn.test(c.match.def,l(),a,!0,f)!==!1)&&(e.push(d[g]),null===d[g].match.fn&&(c=d[g]),e.length>1&&/[0-9a-bA-Z]/.test(e[0].match.def)))return f.placeholder.charAt(a%f.placeholder.length)}return b.def}return f.placeholder.charAt(a%f.placeholder.length)}function G(c,d,e,g,h,i){function j(){var a=!1,b=u().slice(p,B(p)).join("").indexOf(o);if(b!==-1&&!A(p)){a=!0;for(var c=u().slice(p,p+b),d=0;d<c.length;d++)if(" "!==c[d]){a=!1;break}}return a}var k=g.slice(),o="",p=0,r=void 0;if(m(),l().p=B(-1),!e)if(f.autoUnmask!==!0){var s=u().slice(0,B(-1)).join(""),t=k.join("").match(new RegExp("^"+b.escapeRegex(s),"g"));t&&t.length>0&&(k.splice(0,t.length*s.length),p=B(p))}else p=B(p);if(a.each(k,function(b,d){if(void 0!==d){var g=new a.Event("keypress");g.which=d.charCodeAt(0),o+=d;var h=n(void 0,!0),i=l().validPositions[h],k=q(h+1,i?i.locator.slice():void 0,h);if(!j()||e||f.autoUnmask){var s=e?b:null==k.match.fn&&k.match.optionality&&h+1<l().p?h+1:l().p;r=aa.keypressEvent.call(c,g,!0,!1,e,s),p=s+1,o=""}else r=aa.keypressEvent.call(c,g,!0,!1,!0,h+1);if(!e&&a.isFunction(f.onBeforeWrite)&&(r=f.onBeforeWrite(g,v(),r.forwardPosition,f),r&&r.refreshFromBuffer)){var t=r.refreshFromBuffer;w(t===!0?t:t.start,t.end,r.buffer),m(!0),r.caret&&(l().p=r.caret)}}}),d){var x=void 0,y=n();document.activeElement===c&&(h||r)&&(x=I(c).begin,h&&r===!1&&(x=B(n(x))),r&&i!==!0&&(x<y+1||y===-1)&&(x=f.numericInput&&void 0===r.caret?C(r.forwardPosition):r.forwardPosition)),E(c,v(),x,h||new a.Event("checkval"))}}function H(b){if(b&&void 0===b.inputmask)return b.value;var c=[],d=l().validPositions;for(var e in d)d[e].match&&null!=d[e].match.fn&&c.push(d[e].input);var g=0===c.length?"":(W?c.reverse():c).join("");if(a.isFunction(f.onUnMask)){var h=(W?v().slice().reverse():v()).join("");g=f.onUnMask(h,g,f)||g}return g}function I(a,b,c,d){function e(a){if(d!==!0&&W&&"number"==typeof a&&(!f.greedy||""!==f.placeholder)){var b=v().join("").length;a=b-a}return a}var h;if("number"!=typeof b)return a.setSelectionRange?(b=a.selectionStart,c=a.selectionEnd):window.getSelection?(h=window.getSelection().getRangeAt(0),h.commonAncestorContainer.parentNode!==a&&h.commonAncestorContainer!==a||(b=h.startOffset,c=h.endOffset)):document.selection&&document.selection.createRange&&(h=document.selection.createRange(),b=0-h.duplicate().moveStart("character",-a.inputmask._valueGet().length),c=b+h.text.length),{begin:e(b),end:e(c)};b=e(b),c=e(c),c="number"==typeof c?c:b;var i=parseInt(((a.ownerDocument.defaultView||window).getComputedStyle?(a.ownerDocument.defaultView||window).getComputedStyle(a,null):a.currentStyle).fontSize)*c;if(a.scrollLeft=i>a.scrollWidth?i:0,g||f.insertMode!==!1||b!==c||c++,a.setSelectionRange)a.selectionStart=b,a.selectionEnd=c;else if(window.getSelection){if(h=document.createRange(),void 0===a.firstChild||null===a.firstChild){var j=document.createTextNode("");a.appendChild(j)}h.setStart(a.firstChild,b<a.inputmask._valueGet().length?b:a.inputmask._valueGet().length),h.setEnd(a.firstChild,c<a.inputmask._valueGet().length?c:a.inputmask._valueGet().length),h.collapse(!0);var k=window.getSelection();k.removeAllRanges(),k.addRange(h)}else a.createTextRange&&(h=a.createTextRange(),h.collapse(!0),h.moveEnd("character",c),h.moveStart("character",b),h.select());O(a,void 0,{begin:b,end:c})}function J(b){var c,d,e=v(),f=e.length,g=n(),h={},i=l().validPositions[g],j=void 0!==i?i.locator.slice():void 0;for(c=g+1;c<e.length;c++)d=q(c,j,c-1),j=d.locator.slice(),h[c]=a.extend(!0,{},d);var k=i&&void 0!==i.alternation?i.locator[i.alternation]:void 0;for(c=f-1;c>g&&(d=h[c],(d.match.optionality||d.match.optionalQuantifier||k&&(k!==h[c].locator[i.alternation]&&null!=d.match.fn||null===d.match.fn&&d.locator[i.alternation]&&y(d.locator[i.alternation].toString().split(","),k.toString().split(","))&&""!==t(c)[0].def))&&e[c]===F(c,d.match));c--)f--;return b?{l:f,def:h[f]?h[f].match:void 0}:f}function K(a){for(var b=J(),c=a.length-1;c>b&&!A(c);c--);return a.splice(b,c+1-b),a}function L(b){if(a.isFunction(f.isComplete))return f.isComplete(b,f);if("*"!==f.repeat){var c=!1,d=J(!0),e=C(d.l);if(void 0===d.def||d.def.newBlockMarker||d.def.optionality||d.def.optionalQuantifier){c=!0;for(var g=0;g<=e;g++){var h=q(g).match;if(null!==h.fn&&void 0===l().validPositions[g]&&h.optionality!==!0&&h.optionalQuantifier!==!0||null===h.fn&&b[g]!==F(g,h)){c=!1;break}}}return c}}function M(c,d,e,g){function h(){if(f.keepStatic){for(var b=[],d=n(-1,!0),e=a.extend(!0,{},l().validPositions),g=l().validPositions[d];d>=0;d--){var h=l().validPositions[d];if(h){if(h.generatedInput!==!0&&/[0-9a-bA-Z]/.test(h.input)&&b.push(h.input),delete l().validPositions[d],void 0!==h.alternation&&h.locator[h.alternation]!==g.locator[h.alternation])break;g=h}}if(d>-1)for(l().p=B(n(-1,!0));b.length>0;){var i=new a.Event("keypress");i.which=b.pop().charCodeAt(0),aa.keypressEvent.call(c,i,!0,!1,!1,l().p)}else l().validPositions=a.extend(!0,{},e)}}if((f.numericInput||W)&&(d===b.keyCode.BACKSPACE?d=b.keyCode.DELETE:d===b.keyCode.DELETE&&(d=b.keyCode.BACKSPACE),W)){var i=e.end;e.end=e.begin,e.begin=i}d===b.keyCode.BACKSPACE&&(e.end-e.begin<1||f.insertMode===!1)?(e.begin=C(e.begin),void 0===l().validPositions[e.begin]||l().validPositions[e.begin].input!==f.groupSeparator&&l().validPositions[e.begin].input!==f.radixPoint||e.begin--):d===b.keyCode.DELETE&&e.begin===e.end&&(e.end=A(e.end,!0)?e.end+1:B(e.end)+1,void 0===l().validPositions[e.begin]||l().validPositions[e.begin].input!==f.groupSeparator&&l().validPositions[e.begin].input!==f.radixPoint||e.end++),o(e.begin,e.end,!1,g),g!==!0&&h();var j=n(e.begin,!0);j<e.begin?l().p=B(j):g!==!0&&(l().p=e.begin)}function N(b){function c(a){var c,d=document.createElement("span");for(var e in g)isNaN(e)&&e.indexOf("font")!==-1&&(d.style[e]=g[e]);d.style.textTransform=g.textTransform,d.style.letterSpacing=g.letterSpacing,d.style.position="absolute",d.style.height="auto",d.style.width="auto",d.style.visibility="hidden",d.style.whiteSpace="nowrap",document.body.appendChild(d);var f,h=b.inputmask._valueGet(),i=0;for(c=0,f=h.length;c<=f;c++){if(d.innerHTML+=h.charAt(c)||"_",d.offsetWidth>=a){var j=a-i,k=d.offsetWidth-a;d.innerHTML=h.charAt(c),j-=d.offsetWidth/3,c=j<k?c-1:c;break}i=d.offsetWidth}return document.body.removeChild(d),c}function d(){T.style.position="absolute",T.style.top=e.top+"px",T.style.left=e.left+"px",T.style.width=parseInt(b.offsetWidth)-parseInt(g.paddingLeft)-parseInt(g.paddingRight)-parseInt(g.borderLeftWidth)-parseInt(g.borderRightWidth)+"px",T.style.height=parseInt(b.offsetHeight)-parseInt(g.paddingTop)-parseInt(g.paddingBottom)-parseInt(g.borderTopWidth)-parseInt(g.borderBottomWidth)+"px",T.style.lineHeight=T.style.height,T.style.zIndex=isNaN(g.zIndex)?-1:g.zIndex-1,T.style.webkitAppearance="textfield",T.style.mozAppearance="textfield",T.style.Appearance="textfield"}var e=a(b).position(),g=(b.ownerDocument.defaultView||window).getComputedStyle(b,null);b.parentNode;T=document.createElement("div"),document.body.appendChild(T);for(var h in g)isNaN(h)&&"cssText"!==h&&h.indexOf("webkit")==-1&&(T.style[h]=g[h]);b.style.backgroundColor="transparent",b.style.color="transparent",b.style.webkitAppearance="caret",b.style.mozAppearance="caret",b.style.Appearance="caret",d(),a(window).on("resize",function(c){e=a(b).position(),g=(b.ownerDocument.defaultView||window).getComputedStyle(b,null),d()}),a(b).on("click",function(a){return I(b,c(a.clientX)),aa.clickEvent.call(this,[a])}),a(b).on("keydown",function(a){a.shiftKey||f.insertMode===!1||setTimeout(function(){O(b)},0)})}function O(a,b,c){function d(){g||null!==i.fn&&void 0!==j.input?g&&null!==i.fn&&void 0!==j.input&&(g=!1,e+="</span>"):(g=!0,e+="<span class='im-static''>")}if(void 0!==T){b=b||v(),void 0===c?c=I(a):void 0===c.begin&&(c={begin:c,end:c});var e="",g=!1;if(""!=b){var h,i,j,k=0,m=n();do k===c.begin&&document.activeElement===a&&(e+="<span class='im-caret' style='border-right-width: 1px;border-right-style: solid;'></span>"),l().validPositions[k]?(j=l().validPositions[k],i=j.match,h=j.locator.slice(),d(),e+=j.input):(j=q(k,h,k-1),i=j.match,h=j.locator.slice(),(f.jitMasking===!1||k<m||"number"==typeof f.jitMasking&&isFinite(f.jitMasking)&&f.jitMasking>k)&&(d(),e+=F(k,i))),k++;while((void 0===S||k<S)&&(null!==i.fn||""!==i.def)||m>k)}T.innerHTML=e}}function P(b){function c(b,c){function d(b){function d(b){if(a.valHooks&&(void 0===a.valHooks[b]||a.valHooks[b].inputmaskpatch!==!0)){var d=a.valHooks[b]&&a.valHooks[b].get?a.valHooks[b].get:function(a){return a.value},e=a.valHooks[b]&&a.valHooks[b].set?a.valHooks[b].set:function(a,b){return a.value=b,a};a.valHooks[b]={get:function(a){if(a.inputmask){if(a.inputmask.opts.autoUnmask)return a.inputmask.unmaskedvalue();var b=d(a);return n(void 0,void 0,a.inputmask.maskset.validPositions)!==-1||c.nullable!==!0?b:""}return d(a)},set:function(b,c){var d,f=a(b);return d=e(b,c),b.inputmask&&f.trigger("setvalue"),d},inputmaskpatch:!0}}}function e(){return this.inputmask?this.inputmask.opts.autoUnmask?this.inputmask.unmaskedvalue():n()!==-1||c.nullable!==!0?document.activeElement===this&&c.clearMaskOnLostFocus?(W?K(v().slice()).reverse():K(v().slice())).join(""):h.call(this):"":h.call(this)}function f(b){i.call(this,b),this.inputmask&&a(this).trigger("setvalue")}function g(b){_.on(b,"mouseenter",function(b){var c=a(this),d=this,e=d.inputmask._valueGet();e!==v().join("")&&c.trigger("setvalue")})}var h,i;if(!b.inputmask.__valueGet){if(c.noValuePatching!==!0){if(Object.getOwnPropertyDescriptor){"function"!=typeof Object.getPrototypeOf&&(Object.getPrototypeOf="object"==typeof"test".__proto__?function(a){return a.__proto__}:function(a){return a.constructor.prototype});var j=Object.getPrototypeOf?Object.getOwnPropertyDescriptor(Object.getPrototypeOf(b),"value"):void 0;j&&j.get&&j.set?(h=j.get,i=j.set,Object.defineProperty(b,"value",{get:e,set:f,configurable:!0})):"INPUT"!==b.tagName&&(h=function(){return this.textContent},i=function(a){this.textContent=a},Object.defineProperty(b,"value",{get:e,set:f,configurable:!0}))}else document.__lookupGetter__&&b.__lookupGetter__("value")&&(h=b.__lookupGetter__("value"),i=b.__lookupSetter__("value"),b.__defineGetter__("value",e),b.__defineSetter__("value",f));b.inputmask.__valueGet=h,b.inputmask.__valueSet=i}b.inputmask._valueGet=function(a){return W&&a!==!0?h.call(this.el).split("").reverse().join(""):h.call(this.el)},b.inputmask._valueSet=function(a,b){i.call(this.el,null===a||void 0===a?"":b!==!0&&W?a.split("").reverse().join(""):a)},void 0===h&&(h=function(){return this.value},i=function(a){this.value=a},d(b.type),g(b))}}var e=b.getAttribute("type"),f="INPUT"===b.tagName&&a.inArray(e,c.supportsInputType)!==-1||b.isContentEditable||"TEXTAREA"===b.tagName;if(!f)if("INPUT"===b.tagName){var g=document.createElement("input");g.setAttribute("type",e),f="text"===g.type,g=null}else f="partial";return f!==!1&&d(b),f}var d=c(b,f);if(d!==!1&&(V=b,R=a(V),("rtl"===V.dir||f.rightAlign)&&(V.style.textAlign="right"),("rtl"===V.dir||f.numericInput)&&(V.dir="ltr",V.removeAttribute("dir"),V.inputmask.isRTL=!0,W=!0),f.colorMask===!0&&N(V),j&&(V.hasOwnProperty("inputmode")&&(V.inputmode=f.inputmode,V.setAttribute("inputmode",f.inputmode)),"rtfm"===f.androidHack&&(f.colorMask!==!0&&N(V),V.type="password")),_.off(V),d===!0&&(_.on(V,"submit",aa.submitEvent),_.on(V,"reset",aa.resetEvent),_.on(V,"mouseenter",aa.mouseenterEvent),_.on(V,"blur",aa.blurEvent),_.on(V,"focus",aa.focusEvent),_.on(V,"mouseleave",aa.mouseleaveEvent),f.colorMask!==!0&&_.on(V,"click",aa.clickEvent),_.on(V,"dblclick",aa.dblclickEvent),_.on(V,"paste",aa.pasteEvent),_.on(V,"dragdrop",aa.pasteEvent),_.on(V,"drop",aa.pasteEvent),_.on(V,"cut",aa.cutEvent),_.on(V,"complete",f.oncomplete),_.on(V,"incomplete",f.onincomplete),_.on(V,"cleared",f.oncleared),f.inputEventOnly!==!0&&(_.on(V,"keydown",aa.keydownEvent),_.on(V,"keypress",aa.keypressEvent)),_.on(V,"compositionstart",a.noop),_.on(V,"compositionupdate",a.noop),_.on(V,"compositionend",a.noop),_.on(V,"keyup",a.noop),_.on(V,"input",aa.inputFallBackEvent)),_.on(V,"setvalue",aa.setValueEvent),u(),""!==V.inputmask._valueGet()||f.clearMaskOnLostFocus===!1||document.activeElement===V)){var e=a.isFunction(f.onBeforeMask)?f.onBeforeMask(V.inputmask._valueGet(),f)||V.inputmask._valueGet():V.inputmask._valueGet();G(V,!0,!1,e.split(""));var g=v().slice();Q=g.join(""),L(g)===!1&&f.clearIncomplete&&m(),f.clearMaskOnLostFocus&&document.activeElement!==V&&(n()===-1?g=[]:K(g)),E(V,g),document.activeElement===V&&I(V,B(n()))}}d=d||this.maskset,f=f||this.opts;var Q,R,S,T,U,V=this.el,W=this.isRTL,X=!1,Y=!1,Z=!1,$=!1,_={on:function(c,d,e){var g=function(c){if(void 0===this.inputmask&&"FORM"!==this.nodeName){var d=a.data(this,"_inputmask_opts");d?new b(d).mask(this):_.off(this)}else{if("setvalue"===c.type||!(this.disabled||this.readOnly&&!("keydown"===c.type&&c.ctrlKey&&67===c.keyCode||f.tabThrough===!1&&c.keyCode===b.keyCode.TAB))){switch(c.type){case"input":if(Y===!0)return Y=!1,c.preventDefault();break;case"keydown":X=!1,Y=!1;break;case"keypress":if(X===!0)return c.preventDefault();X=!0;break;case"click":if(h||i){var g=this,j=arguments;return setTimeout(function(){e.apply(g,j)},0),!1}}var k=e.apply(this,arguments);return k===!1&&(c.preventDefault(),c.stopPropagation()),k}c.preventDefault()}};c.inputmask.events[d]=c.inputmask.events[d]||[],c.inputmask.events[d].push(g),a.inArray(d,["submit","reset"])!==-1?null!=c.form&&a(c.form).on(d,g):a(c).on(d,g)},off:function(b,c){if(b.inputmask&&b.inputmask.events){var d;c?(d=[],d[c]=b.inputmask.events[c]):d=b.inputmask.events,a.each(d,function(c,d){for(;d.length>0;){var e=d.pop();a.inArray(c,["submit","reset"])!==-1?null!=b.form&&a(b.form).off(c,e):a(b).off(c,e)}delete b.inputmask.events[c]})}}},aa={keydownEvent:function(c){function d(a){var b=document.createElement("input"),c="on"+a,d=c in b;return d||(b.setAttribute(c,"return;"),d="function"==typeof b[c]),b=null,d}var e=this,g=a(e),h=c.keyCode,j=I(e);if(h===b.keyCode.BACKSPACE||h===b.keyCode.DELETE||i&&h===b.keyCode.BACKSPACE_SAFARI||c.ctrlKey&&h===b.keyCode.X&&!d("cut"))c.preventDefault(),M(e,h,j),E(e,v(!0),l().p,c,e.inputmask._valueGet()!==v().join("")),e.inputmask._valueGet()===u().join("")?g.trigger("cleared"):L(v())===!0&&g.trigger("complete");else if(h===b.keyCode.END||h===b.keyCode.PAGE_DOWN){c.preventDefault();var k=B(n());f.insertMode||k!==l().maskLength||c.shiftKey||k--,I(e,c.shiftKey?j.begin:k,k,!0)}else h===b.keyCode.HOME&&!c.shiftKey||h===b.keyCode.PAGE_UP?(c.preventDefault(),I(e,0,c.shiftKey?j.begin:0,!0)):(f.undoOnEscape&&h===b.keyCode.ESCAPE||90===h&&c.ctrlKey)&&c.altKey!==!0?(G(e,!0,!1,Q.split("")),g.trigger("click")):h!==b.keyCode.INSERT||c.shiftKey||c.ctrlKey?f.tabThrough===!0&&h===b.keyCode.TAB?(c.shiftKey===!0?(null===r(j.begin).match.fn&&(j.begin=B(j.begin)),j.end=C(j.begin,!0),j.begin=C(j.end,!0)):(j.begin=B(j.begin,!0),j.end=B(j.begin,!0),j.end<l().maskLength&&j.end--),j.begin<l().maskLength&&(c.preventDefault(),I(e,j.begin,j.end))):c.shiftKey||f.insertMode===!1&&(h===b.keyCode.RIGHT?setTimeout(function(){var a=I(e);I(e,a.begin)},0):h===b.keyCode.LEFT&&setTimeout(function(){var a=I(e);I(e,W?a.begin+1:a.begin-1)},0)):(f.insertMode=!f.insertMode,I(e,f.insertMode||j.begin!==l().maskLength?j.begin:j.begin-1));f.onKeyDown.call(this,c,v(),I(e).begin,f),Z=a.inArray(h,f.ignorables)!==-1},keypressEvent:function(c,d,e,g,h){var i=this,j=a(i),k=c.which||c.charCode||c.keyCode;if(!(d===!0||c.ctrlKey&&c.altKey)&&(c.ctrlKey||c.metaKey||Z))return k===b.keyCode.ENTER&&Q!==v().join("")&&(Q=v().join(""),
 setTimeout(function(){j.trigger("change")},0)),!0;if(k){46===k&&c.shiftKey===!1&&","===f.radixPoint&&(k=44);var n,o=d?{begin:h,end:h}:I(i),p=String.fromCharCode(k);l().writeOutBuffer=!0;var q=z(o,p,g);if(q!==!1&&(m(!0),n=void 0!==q.caret?q.caret:d?q.pos+1:B(q.pos),l().p=n),e!==!1){var r=this;if(setTimeout(function(){f.onKeyValidation.call(r,k,q,f)},0),l().writeOutBuffer&&q!==!1){var s=v();E(i,s,f.numericInput&&void 0===q.caret?C(n):n,c,d!==!0),d!==!0&&setTimeout(function(){L(s)===!0&&j.trigger("complete")},0)}}if(c.preventDefault(),d)return q.forwardPosition=n,q}},pasteEvent:function(b){var c,d=this,e=b.originalEvent||b,g=a(d),h=d.inputmask._valueGet(!0),i=I(d);W&&(c=i.end,i.end=i.begin,i.begin=c);var j=h.substr(0,i.begin),k=h.substr(i.end,h.length);if(j===(W?u().reverse():u()).slice(0,i.begin).join("")&&(j=""),k===(W?u().reverse():u()).slice(i.end).join("")&&(k=""),W&&(c=j,j=k,k=c),window.clipboardData&&window.clipboardData.getData)h=j+window.clipboardData.getData("Text")+k;else{if(!e.clipboardData||!e.clipboardData.getData)return!0;h=j+e.clipboardData.getData("text/plain")+k}var l=h;if(a.isFunction(f.onBeforePaste)){if(l=f.onBeforePaste(h,f),l===!1)return b.preventDefault();l||(l=h)}return G(d,!1,!1,W?l.split("").reverse():l.toString().split("")),E(d,v(),B(n()),b,Q!==v().join("")),L(v())===!0&&g.trigger("complete"),b.preventDefault()},inputFallBackEvent:function(c){var d=this,e=d.inputmask._valueGet();if(v().join("")!==e){var f=I(d);if(e=e.replace(new RegExp("("+b.escapeRegex(u().join(""))+")*"),""),h){var g=e.replace(v().join(""),"");if(1===g.length){var i=new a.Event("keypress");return i.which=g.charCodeAt(0),aa.keypressEvent.call(d,i,!0,!0,!1,l().validPositions[f.begin-1]?f.begin:f.begin-1),!1}}if(f.begin>e.length&&(I(d,e.length),f=I(d)),v().length-e.length!==1||e.charAt(f.begin)===v()[f.begin]||e.charAt(f.begin+1)===v()[f.begin]||A(f.begin)){for(var j=n()+1,k=u().join("");null===e.match(b.escapeRegex(k)+"$");)k=k.slice(1);e=e.replace(k,""),e=e.split(""),G(d,!0,!1,e,c,f.begin<j),L(v())===!0&&a(d).trigger("complete")}else c.keyCode=b.keyCode.BACKSPACE,aa.keydownEvent.call(d,c);c.preventDefault()}},setValueEvent:function(b){var c=this,d=c.inputmask._valueGet();G(c,!0,!1,(a.isFunction(f.onBeforeMask)?f.onBeforeMask(d,f)||d:d).split("")),Q=v().join(""),(f.clearMaskOnLostFocus||f.clearIncomplete)&&c.inputmask._valueGet()===u().join("")&&c.inputmask._valueSet("")},focusEvent:function(a){var b=this,c=b.inputmask._valueGet();f.showMaskOnFocus&&(!f.showMaskOnHover||f.showMaskOnHover&&""===c)&&(b.inputmask._valueGet()!==v().join("")?E(b,v(),B(n())):$===!1&&I(b,B(n()))),f.positionCaretOnTab===!0&&aa.clickEvent.apply(b,[a,!0]),Q=v().join("")},mouseleaveEvent:function(a){var b=this;if($=!1,f.clearMaskOnLostFocus&&document.activeElement!==b){var c=v().slice(),d=b.inputmask._valueGet();d!==b.getAttribute("placeholder")&&""!==d&&(n()===-1&&d===u().join("")?c=[]:K(c),E(b,c))}},clickEvent:function(b,c){function d(b){if(""!==f.radixPoint){var c=l().validPositions;if(void 0===c[b]||c[b].input===F(b)){if(b<B(-1))return!0;var d=a.inArray(f.radixPoint,v());if(d!==-1){for(var e in c)if(d<e&&c[e].input!==F(e))return!1;return!0}}}return!1}var e=this;setTimeout(function(){if(document.activeElement===e){var b=I(e);if(c&&(b.begin=b.end),b.begin===b.end)switch(f.positionCaretOnClick){case"none":break;case"radixFocus":if(d(b.begin)){var g=a.inArray(f.radixPoint,v().join(""));I(e,f.numericInput?B(g):g);break}default:var h=b.begin,i=n(h,!0),j=B(i);if(h<j)I(e,A(h)||A(h-1)?h:B(h));else{var k=F(j);(""!==k&&v()[j]!==k&&r(j).match.optionalQuantifier!==!0||!A(j)&&r(j).match.def===k)&&(j=B(j)),I(e,j)}}}},0)},dblclickEvent:function(a){var b=this;setTimeout(function(){I(b,0,B(n()))},0)},cutEvent:function(c){var d=this,e=a(d),f=I(d),g=c.originalEvent||c,h=window.clipboardData||g.clipboardData,i=W?v().slice(f.end,f.begin):v().slice(f.begin,f.end);h.setData("text",W?i.reverse().join(""):i.join("")),document.execCommand&&document.execCommand("copy"),M(d,b.keyCode.DELETE,f),E(d,v(),l().p,c,Q!==v().join("")),d.inputmask._valueGet()===u().join("")&&e.trigger("cleared")},blurEvent:function(b){var c=a(this),d=this;if(d.inputmask){var e=d.inputmask._valueGet(),g=v().slice();Q!==g.join("")&&setTimeout(function(){c.trigger("change"),Q=g.join("")},0),""!==e&&(f.clearMaskOnLostFocus&&(n()===-1&&e===u().join("")?g=[]:K(g)),L(g)===!1&&(setTimeout(function(){c.trigger("incomplete")},0),f.clearIncomplete&&(m(),g=f.clearMaskOnLostFocus?[]:u().slice())),E(d,g,void 0,b))}},mouseenterEvent:function(a){var b=this;$=!0,document.activeElement!==b&&f.showMaskOnHover&&b.inputmask._valueGet()!==v().join("")&&E(b,v())},submitEvent:function(a){Q!==v().join("")&&R.trigger("change"),f.clearMaskOnLostFocus&&n()===-1&&V.inputmask._valueGet&&V.inputmask._valueGet()===u().join("")&&V.inputmask._valueSet(""),f.removeMaskOnSubmit&&(V.inputmask._valueSet(V.inputmask.unmaskedvalue(),!0),setTimeout(function(){E(V,v())},0))},resetEvent:function(a){setTimeout(function(){R.trigger("setvalue")},0)}};if(void 0!==c)switch(c.action){case"isComplete":return V=c.el,L(v());case"unmaskedvalue":return void 0!==V&&void 0===c.value||(U=c.value,U=(a.isFunction(f.onBeforeMask)?f.onBeforeMask(U,f)||U:U).split(""),G(void 0,!1,!1,W?U.reverse():U),a.isFunction(f.onBeforeWrite)&&f.onBeforeWrite(void 0,v(),0,f)),H(V);case"mask":P(V);break;case"format":return U=(a.isFunction(f.onBeforeMask)?f.onBeforeMask(c.value,f)||c.value:c.value).split(""),G(void 0,!1,!1,W?U.reverse():U),a.isFunction(f.onBeforeWrite)&&f.onBeforeWrite(void 0,v(),0,f),c.metadata?{value:W?v().slice().reverse().join(""):v().join(""),metadata:e.call(this,{action:"getmetadata"},d,f)}:W?v().slice().reverse().join(""):v().join("");case"isValid":c.value?(U=c.value.split(""),G(void 0,!1,!0,W?U.reverse():U)):c.value=v().join("");for(var ba=v(),ca=J(),da=ba.length-1;da>ca&&!A(da);da--);return ba.splice(ca,da+1-ca),L(ba)&&c.value===v().join("");case"getemptymask":return u().join("");case"remove":if(V){R=a(V),V.inputmask._valueSet(H(V)),_.off(V);var ea;Object.getOwnPropertyDescriptor&&Object.getPrototypeOf?(ea=Object.getOwnPropertyDescriptor(Object.getPrototypeOf(V),"value"),ea&&V.inputmask.__valueGet&&Object.defineProperty(V,"value",{get:V.inputmask.__valueGet,set:V.inputmask.__valueSet,configurable:!0})):document.__lookupGetter__&&V.__lookupGetter__("value")&&V.inputmask.__valueGet&&(V.__defineGetter__("value",V.inputmask.__valueGet),V.__defineSetter__("value",V.inputmask.__valueSet)),V.inputmask=void 0}return V;case"getmetadata":if(a.isArray(d.metadata)){var fa=k(!0,0,!1).join("");return a.each(d.metadata,function(a,b){if(b.mask===fa)return fa=b,!1}),fa}return d.metadata}}var f=navigator.userAgent,g=/mobile/i.test(f),h=/iemobile/i.test(f),i=/iphone/i.test(f)&&!h,j=/android/i.test(f)&&!h;return b.prototype={defaults:{placeholder:"_",optionalmarker:{start:"[",end:"]"},quantifiermarker:{start:"{",end:"}"},groupmarker:{start:"(",end:")"},alternatormarker:"|",escapeChar:"\\",mask:null,oncomplete:a.noop,onincomplete:a.noop,oncleared:a.noop,repeat:0,greedy:!0,autoUnmask:!1,removeMaskOnSubmit:!1,clearMaskOnLostFocus:!0,insertMode:!0,clearIncomplete:!1,aliases:{},alias:null,onKeyDown:a.noop,onBeforeMask:null,onBeforePaste:function(b,c){return a.isFunction(c.onBeforeMask)?c.onBeforeMask(b,c):b},onBeforeWrite:null,onUnMask:null,showMaskOnFocus:!0,showMaskOnHover:!0,onKeyValidation:a.noop,skipOptionalPartCharacter:" ",numericInput:!1,rightAlign:!1,undoOnEscape:!0,radixPoint:"",radixPointDefinitionSymbol:void 0,groupSeparator:"",keepStatic:null,positionCaretOnTab:!0,tabThrough:!1,supportsInputType:["text","tel","password"],definitions:{9:{validator:"[0-9]",cardinality:1,definitionSymbol:"*"},a:{validator:"[A-Za-z\u0410-\u044f\u0401\u0451\xc0-\xff\xb5]",cardinality:1,definitionSymbol:"*"},"*":{validator:"[0-9A-Za-z\u0410-\u044f\u0401\u0451\xc0-\xff\xb5]",cardinality:1}},ignorables:[8,9,13,19,27,33,34,35,36,37,38,39,40,45,46,93,112,113,114,115,116,117,118,119,120,121,122,123],isComplete:null,canClearPosition:a.noop,postValidation:null,staticDefinitionSymbol:void 0,jitMasking:!1,nullable:!0,inputEventOnly:!1,noValuePatching:!1,positionCaretOnClick:"lvp",casing:null,inputmode:"verbatim",colorMask:!1,androidHack:!1},masksCache:{},mask:function(f){function g(b,d,e,f){function g(a,c){c=void 0!==c?c:b.getAttribute(f+"-"+a),null!==c&&("string"==typeof c&&(0===a.indexOf("on")?c=window[c]:"false"===c?c=!1:"true"===c&&(c=!0)),e[a]=c)}var h,i,j,k,l=b.getAttribute(f);if(l&&""!==l&&(l=l.replace(new RegExp("'","g"),'"'),i=JSON.parse("{"+l+"}")),i){j=void 0;for(k in i)if("alias"===k.toLowerCase()){j=i[k];break}}g("alias",j),e.alias&&c(e.alias,e,d);for(h in d){if(i){j=void 0;for(k in i)if(k.toLowerCase()===h.toLowerCase()){j=i[k];break}}g(h,j)}return a.extend(!0,d,e),d}var h=this;return"string"==typeof f&&(f=document.getElementById(f)||document.querySelectorAll(f)),f=f.nodeName?[f]:f,a.each(f,function(c,f){var i=a.extend(!0,{},h.opts);g(f,i,a.extend(!0,{},h.userOptions),h.dataAttribute);var j=d(i,h.noMasksCache);void 0!==j&&(void 0!==f.inputmask&&f.inputmask.remove(),f.inputmask=new b,f.inputmask.opts=i,f.inputmask.noMasksCache=h.noMasksCache,f.inputmask.userOptions=a.extend(!0,{},h.userOptions),f.inputmask.el=f,f.inputmask.maskset=j,a.data(f,"_inputmask_opts",i),e.call(f.inputmask,{action:"mask"}))}),f&&f[0]?f[0].inputmask||this:this},option:function(b,c){return"string"==typeof b?this.opts[b]:"object"==typeof b?(a.extend(this.userOptions,b),this.el&&c!==!0&&this.mask(this.el),this):void 0},unmaskedvalue:function(a){return this.maskset=this.maskset||d(this.opts,this.noMasksCache),e.call(this,{action:"unmaskedvalue",value:a})},remove:function(){return e.call(this,{action:"remove"})},getemptymask:function(){return this.maskset=this.maskset||d(this.opts,this.noMasksCache),e.call(this,{action:"getemptymask"})},hasMaskedValue:function(){return!this.opts.autoUnmask},isComplete:function(){return this.maskset=this.maskset||d(this.opts,this.noMasksCache),e.call(this,{action:"isComplete"})},getmetadata:function(){return this.maskset=this.maskset||d(this.opts,this.noMasksCache),e.call(this,{action:"getmetadata"})},isValid:function(a){return this.maskset=this.maskset||d(this.opts,this.noMasksCache),e.call(this,{action:"isValid",value:a})},format:function(a,b){return this.maskset=this.maskset||d(this.opts,this.noMasksCache),e.call(this,{action:"format",value:a,metadata:b})},analyseMask:function(b,c){function d(a,b,c,d){this.matches=[],this.openGroup=a||!1,this.isGroup=a||!1,this.isOptional=b||!1,this.isQuantifier=c||!1,this.isAlternator=d||!1,this.quantifier={min:1,max:1}}function e(b,d,e){var f=c.definitions[d];e=void 0!==e?e:b.matches.length;var g=b.matches[e-1];if(f&&!q){f.placeholder=a.isFunction(f.placeholder)?f.placeholder(c):f.placeholder;for(var h=f.prevalidator,i=h?h.length:0,j=1;j<f.cardinality;j++){var k=i>=j?h[j-1]:[],l=k.validator,m=k.cardinality;b.matches.splice(e++,0,{fn:l?"string"==typeof l?new RegExp(l):new function(){this.test=l}:new RegExp("."),cardinality:m?m:1,optionality:b.isOptional,newBlockMarker:void 0===g||g.def!==(f.definitionSymbol||d),casing:f.casing,def:f.definitionSymbol||d,placeholder:f.placeholder,nativeDef:d}),g=b.matches[e-1]}b.matches.splice(e++,0,{fn:f.validator?"string"==typeof f.validator?new RegExp(f.validator):new function(){this.test=f.validator}:new RegExp("."),cardinality:f.cardinality,optionality:b.isOptional,newBlockMarker:void 0===g||g.def!==(f.definitionSymbol||d),casing:f.casing,def:f.definitionSymbol||d,placeholder:f.placeholder,nativeDef:d})}else b.matches.splice(e++,0,{fn:null,cardinality:0,optionality:b.isOptional,newBlockMarker:void 0===g||g.def!==d,casing:null,def:c.staticDefinitionSymbol||d,placeholder:void 0!==c.staticDefinitionSymbol?d:void 0,nativeDef:d}),q=!1}function f(b){b&&b.matches&&a.each(b.matches,function(a,d){var g=b.matches[a+1];(void 0===g||void 0===g.matches||g.isQuantifier===!1)&&d&&d.isGroup&&(d.isGroup=!1,e(d,c.groupmarker.start,0),d.openGroup!==!0&&e(d,c.groupmarker.end)),f(d)})}function g(){if(s.length>0){if(l=s[s.length-1],e(l,j),l.isAlternator){m=s.pop();for(var a=0;a<m.matches.length;a++)m.matches[a].isGroup=!1;s.length>0?(l=s[s.length-1],l.matches.push(m)):r.matches.push(m)}}else e(r,j)}function h(a){function b(a){return a===c.optionalmarker.start?a=c.optionalmarker.end:a===c.optionalmarker.end?a=c.optionalmarker.start:a===c.groupmarker.start?a=c.groupmarker.end:a===c.groupmarker.end&&(a=c.groupmarker.start),a}a.matches=a.matches.reverse();for(var d in a.matches){var e=parseInt(d);if(a.matches[d].isQuantifier&&a.matches[e+1]&&a.matches[e+1].isGroup){var f=a.matches[d];a.matches.splice(d,1),a.matches.splice(e+1,0,f)}void 0!==a.matches[d].matches?a.matches[d]=h(a.matches[d]):a.matches[d]=b(a.matches[d])}return a}for(var i,j,k,l,m,n,o,p=/(?:[?*+]|\{[0-9\+\*]+(?:,[0-9\+\*]*)?\})|[^.?*+^${[]()|\\]+|./g,q=!1,r=new d,s=[],t=[];i=p.exec(b);)if(j=i[0],q)g();else switch(j.charAt(0)){case c.escapeChar:q=!0;break;case c.optionalmarker.end:case c.groupmarker.end:if(k=s.pop(),k.openGroup=!1,void 0!==k)if(s.length>0){if(l=s[s.length-1],l.matches.push(k),l.isAlternator){m=s.pop();for(var u=0;u<m.matches.length;u++)m.matches[u].isGroup=!1;s.length>0?(l=s[s.length-1],l.matches.push(m)):r.matches.push(m)}}else r.matches.push(k);else g();break;case c.optionalmarker.start:s.push(new d((!1),(!0)));break;case c.groupmarker.start:s.push(new d((!0)));break;case c.quantifiermarker.start:var v=new d((!1),(!1),(!0));j=j.replace(/[{}]/g,"");var w=j.split(","),x=isNaN(w[0])?w[0]:parseInt(w[0]),y=1===w.length?x:isNaN(w[1])?w[1]:parseInt(w[1]);if("*"!==y&&"+"!==y||(x="*"===y?0:1),v.quantifier={min:x,max:y},s.length>0){var z=s[s.length-1].matches;i=z.pop(),i.isGroup||(o=new d((!0)),o.matches.push(i),i=o),z.push(i),z.push(v)}else i=r.matches.pop(),i.isGroup||(o=new d((!0)),o.matches.push(i),i=o),r.matches.push(i),r.matches.push(v);break;case c.alternatormarker:s.length>0?(l=s[s.length-1],n=l.matches.pop()):n=r.matches.pop(),n.isAlternator?s.push(n):(m=new d((!1),(!1),(!1),(!0)),m.matches.push(n),s.push(m));break;default:g()}for(;s.length>0;)k=s.pop(),r.matches.push(k);return r.matches.length>0&&(f(r),t.push(r)),c.numericInput&&h(t[0]),t}},b.extendDefaults=function(c){a.extend(!0,b.prototype.defaults,c)},b.extendDefinitions=function(c){a.extend(!0,b.prototype.defaults.definitions,c)},b.extendAliases=function(c){a.extend(!0,b.prototype.defaults.aliases,c)},b.format=function(a,c,d){return b(c).format(a,d)},b.unmask=function(a,c){return b(c).unmaskedvalue(a)},b.isValid=function(a,c){return b(c).isValid(a)},b.remove=function(b){a.each(b,function(a,b){b.inputmask&&b.inputmask.remove()})},b.escapeRegex=function(a){var b=["/",".","*","+","?","|","(",")","[","]","{","}","\\","$","^"];return a.replace(new RegExp("(\\"+b.join("|\\")+")","gim"),"\\$1")},b.keyCode={ALT:18,BACKSPACE:8,BACKSPACE_SAFARI:127,CAPS_LOCK:20,COMMA:188,COMMAND:91,COMMAND_LEFT:91,COMMAND_RIGHT:93,CONTROL:17,DELETE:46,DOWN:40,END:35,ENTER:13,ESCAPE:27,HOME:36,INSERT:45,LEFT:37,MENU:93,NUMPAD_ADD:107,NUMPAD_DECIMAL:110,NUMPAD_DIVIDE:111,NUMPAD_ENTER:108,NUMPAD_MULTIPLY:106,NUMPAD_SUBTRACT:109,PAGE_DOWN:34,PAGE_UP:33,PERIOD:190,RIGHT:39,SHIFT:16,SPACE:32,TAB:9,UP:38,WINDOWS:91,X:88},window.Inputmask=b,b}(jQuery),function(a,b){return void 0===a.fn.inputmask&&(a.fn.inputmask=function(c,d){var e,f=this[0];if(void 0===d&&(d={}),"string"==typeof c)switch(c){case"unmaskedvalue":return f&&f.inputmask?f.inputmask.unmaskedvalue():a(f).val();case"remove":return this.each(function(){this.inputmask&&this.inputmask.remove()});case"getemptymask":return f&&f.inputmask?f.inputmask.getemptymask():"";case"hasMaskedValue":return!(!f||!f.inputmask)&&f.inputmask.hasMaskedValue();case"isComplete":return!f||!f.inputmask||f.inputmask.isComplete();case"getmetadata":return f&&f.inputmask?f.inputmask.getmetadata():void 0;case"setvalue":a(f).val(d),f&&void 0===f.inputmask&&a(f).triggerHandler("setvalue");break;case"option":if("string"!=typeof d)return this.each(function(){if(void 0!==this.inputmask)return this.inputmask.option(d)});if(f&&void 0!==f.inputmask)return f.inputmask.option(d);break;default:return d.alias=c,e=new b(d),this.each(function(){e.mask(this)})}else{if("object"==typeof c)return e=new b(c),void 0===c.mask&&void 0===c.alias?this.each(function(){return void 0!==this.inputmask?this.inputmask.option(c):void e.mask(this)}):this.each(function(){e.mask(this)});if(void 0===c)return this.each(function(){e=new b(d),e.mask(this)})}}),a.fn.inputmask}(jQuery,Inputmask),function(a,b){}(jQuery,Inputmask),function(a,b){function c(a){return isNaN(a)||29===new Date(a,2,0).getDate()}return b.extendAliases({"dd/mm/yyyy":{mask:"1/2/y",placeholder:"dd/mm/yyyy",regex:{val1pre:new RegExp("[0-3]"),val1:new RegExp("0[1-9]|[12][0-9]|3[01]"),val2pre:function(a){var c=b.escapeRegex.call(this,a);return new RegExp("((0[1-9]|[12][0-9]|3[01])"+c+"[01])")},val2:function(a){var c=b.escapeRegex.call(this,a);return new RegExp("((0[1-9]|[12][0-9])"+c+"(0[1-9]|1[012]))|(30"+c+"(0[13-9]|1[012]))|(31"+c+"(0[13578]|1[02]))")}},leapday:"29/02/",separator:"/",yearrange:{minyear:1900,maxyear:2099},isInYearRange:function(a,b,c){if(isNaN(a))return!1;var d=parseInt(a.concat(b.toString().slice(a.length))),e=parseInt(a.concat(c.toString().slice(a.length)));return!isNaN(d)&&(b<=d&&d<=c)||!isNaN(e)&&(b<=e&&e<=c)},determinebaseyear:function(a,b,c){var d=(new Date).getFullYear();if(a>d)return a;if(b<d){for(var e=b.toString().slice(0,2),f=b.toString().slice(2,4);b<e+c;)e--;var g=e+f;return a>g?a:g}if(a<=d&&d<=b){for(var h=d.toString().slice(0,2);b<h+c;)h--;var i=h+c;return i<a?a:i}return d},onKeyDown:function(c,d,e,f){var g=a(this);if(c.ctrlKey&&c.keyCode===b.keyCode.RIGHT){var h=new Date;g.val(h.getDate().toString()+(h.getMonth()+1).toString()+h.getFullYear().toString()),g.trigger("setvalue")}},getFrontValue:function(a,b,c){for(var d=0,e=0,f=0;f<a.length&&"2"!==a.charAt(f);f++){var g=c.definitions[a.charAt(f)];g?(d+=e,e=g.cardinality):e++}return b.join("").substr(d,e)},postValidation:function(a,b,d){var e,f,g=a.join("");return 0===d.mask.indexOf("y")?(f=g.substr(0,4),e=g.substr(4,11)):(f=g.substr(6,11),e=g.substr(0,6)),b&&(e!==d.leapday||c(f))},definitions:{1:{validator:function(a,b,c,d,e){var f=e.regex.val1.test(a);return d||f||a.charAt(1)!==e.separator&&"-./".indexOf(a.charAt(1))===-1||!(f=e.regex.val1.test("0"+a.charAt(0)))?f:(b.buffer[c-1]="0",{refreshFromBuffer:{start:c-1,end:c},pos:c,c:a.charAt(0)})},cardinality:2,prevalidator:[{validator:function(a,b,c,d,e){var f=a;isNaN(b.buffer[c+1])||(f+=b.buffer[c+1]);var g=1===f.length?e.regex.val1pre.test(f):e.regex.val1.test(f);if(!d&&!g){if(g=e.regex.val1.test(a+"0"))return b.buffer[c]=a,b.buffer[++c]="0",{pos:c,c:"0"};if(g=e.regex.val1.test("0"+a))return b.buffer[c]="0",c++,{pos:c}}return g},cardinality:1}]},2:{validator:function(a,b,c,d,e){var f=e.getFrontValue(b.mask,b.buffer,e);f.indexOf(e.placeholder[0])!==-1&&(f="01"+e.separator);var g=e.regex.val2(e.separator).test(f+a);return d||g||a.charAt(1)!==e.separator&&"-./".indexOf(a.charAt(1))===-1||!(g=e.regex.val2(e.separator).test(f+"0"+a.charAt(0)))?g:(b.buffer[c-1]="0",{refreshFromBuffer:{start:c-1,end:c},pos:c,c:a.charAt(0)})},cardinality:2,prevalidator:[{validator:function(a,b,c,d,e){isNaN(b.buffer[c+1])||(a+=b.buffer[c+1]);var f=e.getFrontValue(b.mask,b.buffer,e);f.indexOf(e.placeholder[0])!==-1&&(f="01"+e.separator);var g=1===a.length?e.regex.val2pre(e.separator).test(f+a):e.regex.val2(e.separator).test(f+a);return d||g||!(g=e.regex.val2(e.separator).test(f+"0"+a))?g:(b.buffer[c]="0",c++,{pos:c})},cardinality:1}]},y:{validator:function(a,b,c,d,e){return e.isInYearRange(a,e.yearrange.minyear,e.yearrange.maxyear)},cardinality:4,prevalidator:[{validator:function(a,b,c,d,e){var f=e.isInYearRange(a,e.yearrange.minyear,e.yearrange.maxyear);if(!d&&!f){var g=e.determinebaseyear(e.yearrange.minyear,e.yearrange.maxyear,a+"0").toString().slice(0,1);if(f=e.isInYearRange(g+a,e.yearrange.minyear,e.yearrange.maxyear))return b.buffer[c++]=g.charAt(0),{pos:c};if(g=e.determinebaseyear(e.yearrange.minyear,e.yearrange.maxyear,a+"0").toString().slice(0,2),f=e.isInYearRange(g+a,e.yearrange.minyear,e.yearrange.maxyear))return b.buffer[c++]=g.charAt(0),b.buffer[c++]=g.charAt(1),{pos:c}}return f},cardinality:1},{validator:function(a,b,c,d,e){var f=e.isInYearRange(a,e.yearrange.minyear,e.yearrange.maxyear);if(!d&&!f){var g=e.determinebaseyear(e.yearrange.minyear,e.yearrange.maxyear,a).toString().slice(0,2);if(f=e.isInYearRange(a[0]+g[1]+a[1],e.yearrange.minyear,e.yearrange.maxyear))return b.buffer[c++]=g.charAt(1),{pos:c};if(g=e.determinebaseyear(e.yearrange.minyear,e.yearrange.maxyear,a).toString().slice(0,2),f=e.isInYearRange(g+a,e.yearrange.minyear,e.yearrange.maxyear))return b.buffer[c-1]=g.charAt(0),b.buffer[c++]=g.charAt(1),b.buffer[c++]=a.charAt(0),{refreshFromBuffer:{start:c-3,end:c},pos:c}}return f},cardinality:2},{validator:function(a,b,c,d,e){return e.isInYearRange(a,e.yearrange.minyear,e.yearrange.maxyear)},cardinality:3}]}},insertMode:!1,autoUnmask:!1},"mm/dd/yyyy":{placeholder:"mm/dd/yyyy",alias:"dd/mm/yyyy",regex:{val2pre:function(a){var c=b.escapeRegex.call(this,a);return new RegExp("((0[13-9]|1[012])"+c+"[0-3])|(02"+c+"[0-2])")},val2:function(a){var c=b.escapeRegex.call(this,a);return new RegExp("((0[1-9]|1[012])"+c+"(0[1-9]|[12][0-9]))|((0[13-9]|1[012])"+c+"30)|((0[13578]|1[02])"+c+"31)")},val1pre:new RegExp("[01]"),val1:new RegExp("0[1-9]|1[012]")},leapday:"02/29/",onKeyDown:function(c,d,e,f){var g=a(this);if(c.ctrlKey&&c.keyCode===b.keyCode.RIGHT){var h=new Date;g.val((h.getMonth()+1).toString()+h.getDate().toString()+h.getFullYear().toString()),g.trigger("setvalue")}}},"yyyy/mm/dd":{mask:"y/1/2",placeholder:"yyyy/mm/dd",alias:"mm/dd/yyyy",leapday:"/02/29",onKeyDown:function(c,d,e,f){var g=a(this);if(c.ctrlKey&&c.keyCode===b.keyCode.RIGHT){var h=new Date;g.val(h.getFullYear().toString()+(h.getMonth()+1).toString()+h.getDate().toString()),g.trigger("setvalue")}}},"dd.mm.yyyy":{mask:"1.2.y",placeholder:"dd.mm.yyyy",leapday:"29.02.",separator:".",alias:"dd/mm/yyyy"},"dd-mm-yyyy":{mask:"1-2-y",placeholder:"dd-mm-yyyy",leapday:"29-02-",separator:"-",alias:"dd/mm/yyyy"},"mm.dd.yyyy":{mask:"1.2.y",placeholder:"mm.dd.yyyy",leapday:"02.29.",separator:".",alias:"mm/dd/yyyy"},"mm-dd-yyyy":{mask:"1-2-y",placeholder:"mm-dd-yyyy",leapday:"02-29-",separator:"-",alias:"mm/dd/yyyy"},"yyyy.mm.dd":{mask:"y.1.2",placeholder:"yyyy.mm.dd",leapday:".02.29",separator:".",alias:"yyyy/mm/dd"},"yyyy-mm-dd":{mask:"y-1-2",placeholder:"yyyy-mm-dd",leapday:"-02-29",separator:"-",alias:"yyyy/mm/dd"},datetime:{mask:"1/2/y h:s",placeholder:"dd/mm/yyyy hh:mm",alias:"dd/mm/yyyy",regex:{hrspre:new RegExp("[012]"),hrs24:new RegExp("2[0-4]|1[3-9]"),hrs:new RegExp("[01][0-9]|2[0-4]"),ampm:new RegExp("^[a|p|A|P][m|M]"),mspre:new RegExp("[0-5]"),ms:new RegExp("[0-5][0-9]")},timeseparator:":",hourFormat:"24",definitions:{h:{validator:function(a,b,c,d,e){if("24"===e.hourFormat&&24===parseInt(a,10))return b.buffer[c-1]="0",b.buffer[c]="0",{refreshFromBuffer:{start:c-1,end:c},c:"0"};var f=e.regex.hrs.test(a);if(!d&&!f&&(a.charAt(1)===e.timeseparator||"-.:".indexOf(a.charAt(1))!==-1)&&(f=e.regex.hrs.test("0"+a.charAt(0))))return b.buffer[c-1]="0",b.buffer[c]=a.charAt(0),c++,{refreshFromBuffer:{start:c-2,end:c},pos:c,c:e.timeseparator};if(f&&"24"!==e.hourFormat&&e.regex.hrs24.test(a)){var g=parseInt(a,10);return 24===g?(b.buffer[c+5]="a",b.buffer[c+6]="m"):(b.buffer[c+5]="p",b.buffer[c+6]="m"),g-=12,g<10?(b.buffer[c]=g.toString(),b.buffer[c-1]="0"):(b.buffer[c]=g.toString().charAt(1),b.buffer[c-1]=g.toString().charAt(0)),{refreshFromBuffer:{start:c-1,end:c+6},c:b.buffer[c]}}return f},cardinality:2,prevalidator:[{validator:function(a,b,c,d,e){var f=e.regex.hrspre.test(a);return d||f||!(f=e.regex.hrs.test("0"+a))?f:(b.buffer[c]="0",c++,{pos:c})},cardinality:1}]},s:{validator:"[0-5][0-9]",cardinality:2,prevalidator:[{validator:function(a,b,c,d,e){var f=e.regex.mspre.test(a);return d||f||!(f=e.regex.ms.test("0"+a))?f:(b.buffer[c]="0",c++,{pos:c})},cardinality:1}]},t:{validator:function(a,b,c,d,e){return e.regex.ampm.test(a+"m")},casing:"lower",cardinality:1}},insertMode:!1,autoUnmask:!1},datetime12:{mask:"1/2/y h:s t\\m",placeholder:"dd/mm/yyyy hh:mm xm",alias:"datetime",hourFormat:"12"},"mm/dd/yyyy hh:mm xm":{mask:"1/2/y h:s t\\m",placeholder:"mm/dd/yyyy hh:mm xm",alias:"datetime12",regex:{val2pre:function(a){var c=b.escapeRegex.call(this,a);return new RegExp("((0[13-9]|1[012])"+c+"[0-3])|(02"+c+"[0-2])")},val2:function(a){var c=b.escapeRegex.call(this,a);return new RegExp("((0[1-9]|1[012])"+c+"(0[1-9]|[12][0-9]))|((0[13-9]|1[012])"+c+"30)|((0[13578]|1[02])"+c+"31)")},val1pre:new RegExp("[01]"),val1:new RegExp("0[1-9]|1[012]")},leapday:"02/29/",onKeyDown:function(c,d,e,f){var g=a(this);if(c.ctrlKey&&c.keyCode===b.keyCode.RIGHT){var h=new Date;g.val((h.getMonth()+1).toString()+h.getDate().toString()+h.getFullYear().toString()),g.trigger("setvalue")}}},"hh:mm t":{mask:"h:s t\\m",placeholder:"hh:mm xm",alias:"datetime",hourFormat:"12"},"h:s t":{mask:"h:s t\\m",placeholder:"hh:mm xm",alias:"datetime",hourFormat:"12"},"hh:mm:ss":{mask:"h:s:s",placeholder:"hh:mm:ss",alias:"datetime",autoUnmask:!1},"hh:mm":{mask:"h:s",placeholder:"hh:mm",alias:"datetime",autoUnmask:!1},date:{alias:"dd/mm/yyyy"},"mm/yyyy":{mask:"1/y",placeholder:"mm/yyyy",leapday:"donotuse",separator:"/",alias:"mm/dd/yyyy"},shamsi:{regex:{val2pre:function(a){var c=b.escapeRegex.call(this,a);return new RegExp("((0[1-9]|1[012])"+c+"[0-3])")},val2:function(a){var c=b.escapeRegex.call(this,a);return new RegExp("((0[1-9]|1[012])"+c+"(0[1-9]|[12][0-9]))|((0[1-9]|1[012])"+c+"30)|((0[1-6])"+c+"31)")},val1pre:new RegExp("[01]"),val1:new RegExp("0[1-9]|1[012]")},yearrange:{minyear:1300,maxyear:1499},mask:"y/1/2",leapday:"/12/30",placeholder:"yyyy/mm/dd",alias:"mm/dd/yyyy",clearIncomplete:!0}}),b}(jQuery,Inputmask),function(a,b){return b.extendDefinitions({A:{validator:"[A-Za-z\u0410-\u044f\u0401\u0451\xc0-\xff\xb5]",cardinality:1,casing:"upper"},"&":{validator:"[0-9A-Za-z\u0410-\u044f\u0401\u0451\xc0-\xff\xb5]",cardinality:1,casing:"upper"},"#":{validator:"[0-9A-Fa-f]",cardinality:1,casing:"upper"}}),b.extendAliases({url:{definitions:{i:{validator:".",cardinality:1}},mask:"(\\http://)|(\\http\\s://)|(ftp://)|(ftp\\s://)i{+}",insertMode:!1,autoUnmask:!1,inputmode:"url"},ip:{mask:"i[i[i]].i[i[i]].i[i[i]].i[i[i]]",definitions:{i:{validator:function(a,b,c,d,e){return c-1>-1&&"."!==b.buffer[c-1]?(a=b.buffer[c-1]+a,a=c-2>-1&&"."!==b.buffer[c-2]?b.buffer[c-2]+a:"0"+a):a="00"+a,new RegExp("25[0-5]|2[0-4][0-9]|[01][0-9][0-9]").test(a)},cardinality:1}},onUnMask:function(a,b,c){return a},inputmode:"numeric"},email:{mask:"*{1,64}[.*{1,64}][.*{1,64}][.*{1,63}]@-{1,63}.-{1,63}[.-{1,63}][.-{1,63}]",greedy:!1,onBeforePaste:function(a,b){return a=a.toLowerCase(),a.replace("mailto:","")},definitions:{"*":{validator:"[0-9A-Za-z!#$%&'*+/=?^_`{|}~-]",cardinality:1,casing:"lower"},"-":{validator:"[0-9A-Za-z-]",cardinality:1,casing:"lower"}},onUnMask:function(a,b,c){return a},inputmode:"email"},mac:{mask:"##:##:##:##:##:##"},vin:{mask:"V{13}9{4}",definitions:{V:{validator:"[A-HJ-NPR-Za-hj-npr-z\\d]",cardinality:1,casing:"upper"}},clearIncomplete:!0,autoUnmask:!0}}),b}(jQuery,Inputmask),function(a,b){return b.extendAliases({numeric:{mask:function(a){function c(b){for(var c="",d=0;d<b.length;d++)c+=a.definitions[b.charAt(d)]||a.optionalmarker.start===b.charAt(d)||a.optionalmarker.end===b.charAt(d)||a.quantifiermarker.start===b.charAt(d)||a.quantifiermarker.end===b.charAt(d)||a.groupmarker.start===b.charAt(d)||a.groupmarker.end===b.charAt(d)||a.alternatormarker===b.charAt(d)?"\\"+b.charAt(d):b.charAt(d);return c}if(0!==a.repeat&&isNaN(a.integerDigits)&&(a.integerDigits=a.repeat),a.repeat=0,a.groupSeparator===a.radixPoint&&("."===a.radixPoint?a.groupSeparator=",":","===a.radixPoint?a.groupSeparator=".":a.groupSeparator="")," "===a.groupSeparator&&(a.skipOptionalPartCharacter=void 0),a.autoGroup=a.autoGroup&&""!==a.groupSeparator,a.autoGroup&&("string"==typeof a.groupSize&&isFinite(a.groupSize)&&(a.groupSize=parseInt(a.groupSize)),isFinite(a.integerDigits))){var d=Math.floor(a.integerDigits/a.groupSize),e=a.integerDigits%a.groupSize;a.integerDigits=parseInt(a.integerDigits)+(0===e?d-1:d),a.integerDigits<1&&(a.integerDigits="*")}a.placeholder.length>1&&(a.placeholder=a.placeholder.charAt(0)),"radixFocus"===a.positionCaretOnClick&&""===a.placeholder&&a.integerOptional===!1&&(a.positionCaretOnClick="lvp"),a.definitions[";"]=a.definitions["~"],a.definitions[";"].definitionSymbol="~",a.numericInput===!0&&(a.positionCaretOnClick="radixFocus"===a.positionCaretOnClick?"lvp":a.positionCaretOnClick,a.digitsOptional=!1,isNaN(a.digits)&&(a.digits=2),a.decimalProtect=!1);var f="[+]";if(f+=c(a.prefix),f+=a.integerOptional===!0?"~{1,"+a.integerDigits+"}":"~{"+a.integerDigits+"}",void 0!==a.digits){a.decimalProtect&&(a.radixPointDefinitionSymbol=":");var g=a.digits.toString().split(",");isFinite(g[0]&&g[1]&&isFinite(g[1]))?f+=(a.decimalProtect?":":a.radixPoint)+";{"+a.digits+"}":(isNaN(a.digits)||parseInt(a.digits)>0)&&(f+=a.digitsOptional?"["+(a.decimalProtect?":":a.radixPoint)+";{1,"+a.digits+"}]":(a.decimalProtect?":":a.radixPoint)+";{"+a.digits+"}")}return f+=c(a.suffix),f+="[-]",a.greedy=!1,null!==a.min&&(a.min=a.min.toString().replace(new RegExp(b.escapeRegex(a.groupSeparator),"g"),""),","===a.radixPoint&&(a.min=a.min.replace(a.radixPoint,"."))),null!==a.max&&(a.max=a.max.toString().replace(new RegExp(b.escapeRegex(a.groupSeparator),"g"),""),","===a.radixPoint&&(a.max=a.max.replace(a.radixPoint,"."))),f},placeholder:"",greedy:!1,digits:"*",digitsOptional:!0,radixPoint:".",positionCaretOnClick:"radixFocus",groupSize:3,groupSeparator:"",autoGroup:!1,allowPlus:!0,allowMinus:!0,negationSymbol:{front:"-",back:""},integerDigits:"+",integerOptional:!0,prefix:"",suffix:"",rightAlign:!0,decimalProtect:!0,min:null,max:null,step:1,insertMode:!0,autoUnmask:!1,unmaskAsNumber:!1,inputmode:"numeric",postFormat:function(c,d,e){e.numericInput===!0&&(c=c.reverse(),isFinite(d)&&(d=c.join("").length-d-1));var f,g;d=d>=c.length?c.length-1:d<0?0:d;var h=c[d],i=c.slice();h===e.groupSeparator&&(i.splice(d--,1),h=i[d]);var j=i.join("").match(new RegExp("^"+b.escapeRegex(e.negationSymbol.front)));j=null!==j&&1===j.length,d>(j?e.negationSymbol.front.length:0)+e.prefix.length&&d<i.length-e.suffix.length&&(i[d]="!");var k=i.join(""),l=i.join();if(j&&(k=k.replace(new RegExp("^"+b.escapeRegex(e.negationSymbol.front)),""),k=k.replace(new RegExp(b.escapeRegex(e.negationSymbol.back)+"$"),"")),k=k.replace(new RegExp(b.escapeRegex(e.suffix)+"$"),""),k=k.replace(new RegExp("^"+b.escapeRegex(e.prefix)),""),k.length>0&&e.autoGroup||k.indexOf(e.groupSeparator)!==-1){var m=b.escapeRegex(e.groupSeparator);k=k.replace(new RegExp(m,"g"),"");var n=k.split(h===e.radixPoint?"!":e.radixPoint);if(k=""===e.radixPoint?k:n[0],h!==e.negationSymbol.front&&(k=k.replace("!","?")),k.length>e.groupSize)for(var o=new RegExp("([-+]?[\\d?]+)([\\d?]{"+e.groupSize+"})");o.test(k)&&""!==e.groupSeparator;)k=k.replace(o,"$1"+e.groupSeparator+"$2"),k=k.replace(e.groupSeparator+e.groupSeparator,e.groupSeparator);k=k.replace("?","!"),""!==e.radixPoint&&n.length>1&&(k+=(h===e.radixPoint?"!":e.radixPoint)+n[1])}k=e.prefix+k+e.suffix,j&&(k=e.negationSymbol.front+k+e.negationSymbol.back);var p=l!==k.split("").join(),q=a.inArray("!",k);if(q===-1&&(q=d),p){for(c.length=k.length,f=0,g=k.length;f<g;f++)c[f]=k.charAt(f);c[q]=h}return q=e.numericInput&&isFinite(d)?c.join("").length-q-1:q,e.numericInput&&(c=c.reverse(),a.inArray(e.radixPoint,c)<q&&c.join("").length-e.suffix.length!==q&&(q-=1)),{pos:q,refreshFromBuffer:p,buffer:c,isNegative:j}},onBeforeWrite:function(c,d,e,f){var g;if(c&&("blur"===c.type||"checkval"===c.type||"keydown"===c.type)){var h=f.numericInput?d.slice().reverse().join(""):d.join(""),i=h.replace(f.prefix,"");i=i.replace(f.suffix,""),i=i.replace(new RegExp(b.escapeRegex(f.groupSeparator),"g"),""),","===f.radixPoint&&(i=i.replace(f.radixPoint,"."));
 var j=i.match(new RegExp("[-"+b.escapeRegex(f.negationSymbol.front)+"]","g"));if(j=null!==j&&1===j.length,i=i.replace(new RegExp("[-"+b.escapeRegex(f.negationSymbol.front)+"]","g"),""),i=i.replace(new RegExp(b.escapeRegex(f.negationSymbol.back)+"$"),""),isNaN(f.placeholder)&&(i=i.replace(new RegExp(b.escapeRegex(f.placeholder),"g"),"")),i=i===f.negationSymbol.front?i+"0":i,""!==i&&isFinite(i)){var k=parseFloat(i),l=j?k*-1:k;if(null!==f.min&&isFinite(f.min)&&l<parseFloat(f.min)?(k=Math.abs(f.min),j=f.min<0,h=void 0):null!==f.max&&isFinite(f.max)&&l>parseFloat(f.max)&&(k=Math.abs(f.max),j=f.max<0,h=void 0),i=k.toString().replace(".",f.radixPoint).split(""),isFinite(f.digits)){var m=a.inArray(f.radixPoint,i),n=a.inArray(f.radixPoint,h);m===-1&&(i.push(f.radixPoint),m=i.length-1);for(var o=1;o<=f.digits;o++)f.digitsOptional||void 0!==i[m+o]&&i[m+o]!==f.placeholder.charAt(0)?n!==-1&&void 0!==h[n+o]&&(i[m+o]=i[m+o]||h[n+o]):i[m+o]="0";i[i.length-1]===f.radixPoint&&delete i[i.length-1]}if(k.toString()!==i&&k.toString()+"."!==i||j)return i=(f.prefix+i.join("")).split(""),!j||0===k&&"blur"===c.type||(i.unshift(f.negationSymbol.front),i.push(f.negationSymbol.back)),f.numericInput&&(i=i.reverse()),g=f.postFormat(i,f.numericInput?e:e-1,f),g.buffer&&(g.refreshFromBuffer=g.buffer.join("")!==d.join("")),g}}if(f.autoGroup)return g=f.postFormat(d,f.numericInput?e:e-1,f),g.caret=e<(g.isNegative?f.negationSymbol.front.length:0)+f.prefix.length||e>g.buffer.length-(g.isNegative?f.negationSymbol.back.length:0)?g.pos:g.pos+1,g},regex:{integerPart:function(a){return new RegExp("["+b.escapeRegex(a.negationSymbol.front)+"+]?\\d+")},integerNPart:function(a){return new RegExp("[\\d"+b.escapeRegex(a.groupSeparator)+b.escapeRegex(a.placeholder.charAt(0))+"]+")}},signHandler:function(a,b,c,d,e){if(!d&&e.allowMinus&&"-"===a||e.allowPlus&&"+"===a){var f=b.buffer.join("").match(e.regex.integerPart(e));if(f&&f[0].length>0)return b.buffer[f.index]===("-"===a?"+":e.negationSymbol.front)?"-"===a?""!==e.negationSymbol.back?{pos:0,c:e.negationSymbol.front,remove:0,caret:c,insert:{pos:b.buffer.length-1,c:e.negationSymbol.back}}:{pos:0,c:e.negationSymbol.front,remove:0,caret:c}:""!==e.negationSymbol.back?{pos:0,c:"+",remove:[0,b.buffer.length-1],caret:c}:{pos:0,c:"+",remove:0,caret:c}:b.buffer[0]===("-"===a?e.negationSymbol.front:"+")?"-"===a&&""!==e.negationSymbol.back?{remove:[0,b.buffer.length-1],caret:c-1}:{remove:0,caret:c-1}:"-"===a?""!==e.negationSymbol.back?{pos:0,c:e.negationSymbol.front,caret:c+1,insert:{pos:b.buffer.length,c:e.negationSymbol.back}}:{pos:0,c:e.negationSymbol.front,caret:c+1}:{pos:0,c:a,caret:c+1}}return!1},radixHandler:function(b,c,d,e,f){if(!e&&f.numericInput!==!0&&b===f.radixPoint&&void 0!==f.digits&&(isNaN(f.digits)||parseInt(f.digits)>0)){var g=a.inArray(f.radixPoint,c.buffer),h=c.buffer.join("").match(f.regex.integerPart(f));if(g!==-1&&c.validPositions[g])return c.validPositions[g-1]?{caret:g+1}:{pos:h.index,c:h[0],caret:g+1};if(!h||"0"===h[0]&&h.index+1!==d)return c.buffer[h?h.index:d]="0",{pos:(h?h.index:d)+1,c:f.radixPoint}}return!1},leadingZeroHandler:function(b,c,d,e,f,g){if(!e){var h=c.buffer.slice("");if(h.splice(0,f.prefix.length),h.splice(h.length-f.suffix.length,f.suffix.length),f.numericInput===!0){var h=h.reverse(),i=h[0];if("0"===i&&void 0===c.validPositions[d-1])return{pos:d,remove:h.length-1}}else{d-=f.prefix.length;var j=a.inArray(f.radixPoint,h),k=h.slice(0,j!==-1?j:void 0).join("").match(f.regex.integerNPart(f));if(k&&(j===-1||d<=j)){var l=j===-1?0:parseInt(h.slice(j+1).join(""));if(0===k[0].indexOf(""!==f.placeholder?f.placeholder.charAt(0):"0")&&(k.index+1===d||g!==!0&&0===l))return c.buffer.splice(k.index+f.prefix.length,1),{pos:k.index+f.prefix.length,remove:k.index+f.prefix.length};if("0"===b&&d<=k.index&&k[0]!==f.groupSeparator)return!1}}}return!0},definitions:{"~":{validator:function(c,d,e,f,g,h){var i=g.signHandler(c,d,e,f,g);if(!i&&(i=g.radixHandler(c,d,e,f,g),!i&&(i=f?new RegExp("[0-9"+b.escapeRegex(g.groupSeparator)+"]").test(c):new RegExp("[0-9]").test(c),i===!0&&(i=g.leadingZeroHandler(c,d,e,f,g,h),i===!0)))){var j=a.inArray(g.radixPoint,d.buffer);i=j!==-1&&(g.digitsOptional===!1||d.validPositions[e])&&g.numericInput!==!0&&e>j&&!f?{pos:e,remove:e}:{pos:e}}return i},cardinality:1},"+":{validator:function(a,b,c,d,e){var f=e.signHandler(a,b,c,d,e);return!f&&(d&&e.allowMinus&&a===e.negationSymbol.front||e.allowMinus&&"-"===a||e.allowPlus&&"+"===a)&&(f=!(!d&&"-"===a)||(""!==e.negationSymbol.back?{pos:c,c:"-"===a?e.negationSymbol.front:"+",caret:c+1,insert:{pos:b.buffer.length,c:e.negationSymbol.back}}:{pos:c,c:"-"===a?e.negationSymbol.front:"+",caret:c+1})),f},cardinality:1,placeholder:""},"-":{validator:function(a,b,c,d,e){var f=e.signHandler(a,b,c,d,e);return!f&&d&&e.allowMinus&&a===e.negationSymbol.back&&(f=!0),f},cardinality:1,placeholder:""},":":{validator:function(a,c,d,e,f){var g=f.signHandler(a,c,d,e,f);if(!g){var h="["+b.escapeRegex(f.radixPoint)+"]";g=new RegExp(h).test(a),g&&c.validPositions[d]&&c.validPositions[d].match.placeholder===f.radixPoint&&(g={caret:d+1})}return g},cardinality:1,placeholder:function(a){return a.radixPoint}}},onUnMask:function(a,c,d){if(""===c&&d.nullable===!0)return c;var e=a.replace(d.prefix,"");return e=e.replace(d.suffix,""),e=e.replace(new RegExp(b.escapeRegex(d.groupSeparator),"g"),""),d.unmaskAsNumber?(""!==d.radixPoint&&e.indexOf(d.radixPoint)!==-1&&(e=e.replace(b.escapeRegex.call(this,d.radixPoint),".")),Number(e)):e},isComplete:function(a,c){var d=a.join(""),e=a.slice();if(c.postFormat(e,0,c),e.join("")!==d)return!1;var f=d.replace(c.prefix,"");return f=f.replace(c.suffix,""),f=f.replace(new RegExp(b.escapeRegex(c.groupSeparator),"g"),""),","===c.radixPoint&&(f=f.replace(b.escapeRegex(c.radixPoint),".")),isFinite(f)},onBeforeMask:function(a,c){if(c.numericInput===!0&&(a=a.split("").reverse().join("")),""!==c.radixPoint&&isFinite(a)){var d=a.split("."),e=""!==c.groupSeparator?parseInt(c.groupSize):0;2===d.length&&(d[0].length>e||d[1].length>e)&&(a=a.toString().replace(".",c.radixPoint))}var f=a.match(/,/g),g=a.match(/\./g);if(g&&f?g.length>f.length?(a=a.replace(/\./g,""),a=a.replace(",",c.radixPoint)):f.length>g.length?(a=a.replace(/,/g,""),a=a.replace(".",c.radixPoint)):a=a.indexOf(".")<a.indexOf(",")?a.replace(/\./g,""):a=a.replace(/,/g,""):a=a.replace(new RegExp(b.escapeRegex(c.groupSeparator),"g"),""),0===c.digits&&(a.indexOf(".")!==-1?a=a.substring(0,a.indexOf(".")):a.indexOf(",")!==-1&&(a=a.substring(0,a.indexOf(",")))),""!==c.radixPoint&&isFinite(c.digits)&&a.indexOf(c.radixPoint)!==-1){var h=a.split(c.radixPoint),i=h[1].match(new RegExp("\\d*"))[0];if(parseInt(c.digits)<i.toString().length){var j=Math.pow(10,parseInt(c.digits));a=a.replace(b.escapeRegex(c.radixPoint),"."),a=Math.round(parseFloat(a)*j)/j,a=a.toString().replace(".",c.radixPoint)}}return c.numericInput===!0&&(a=a.split("").reverse().join("")),a.toString()},canClearPosition:function(a,b,c,d,e){var f=a.validPositions[b].input,g=f!==e.radixPoint||null!==a.validPositions[b].match.fn&&e.decimalProtect===!1||isFinite(f)||b===c||f===e.groupSeparator||f===e.negationSymbol.front||f===e.negationSymbol.back;return g},onKeyDown:function(c,d,e,f){var g=a(this);if(c.ctrlKey)switch(c.keyCode){case b.keyCode.UP:g.val(parseFloat(this.inputmask.unmaskedvalue())+parseInt(f.step)),g.trigger("setvalue");break;case b.keyCode.DOWN:g.val(parseFloat(this.inputmask.unmaskedvalue())-parseInt(f.step)),g.trigger("setvalue")}}},currency:{prefix:"$ ",groupSeparator:",",alias:"numeric",placeholder:"0",autoGroup:!0,digits:2,digitsOptional:!1,clearMaskOnLostFocus:!1},decimal:{alias:"numeric"},integer:{alias:"numeric",digits:0,radixPoint:""},percentage:{alias:"numeric",digits:2,radixPoint:".",placeholder:"0",autoGroup:!1,min:0,max:100,suffix:" %",allowPlus:!1,allowMinus:!1}}),b}(jQuery,Inputmask),function(a,b){function c(a,b){var c=(a.mask||a).replace(/#/g,"9").replace(/\)/,"9").replace(/[+()#-]/g,""),d=(b.mask||b).replace(/#/g,"9").replace(/\)/,"9").replace(/[+()#-]/g,""),e=(a.mask||a).split("#")[0],f=(b.mask||b).split("#")[0];return 0===f.indexOf(e)?-1:0===e.indexOf(f)?1:c.localeCompare(d)}var d=b.prototype.analyseMask;return b.prototype.analyseMask=function(b,c){function e(a,c,d){c=c||"",d=d||g,""!==c&&(d[c]={});for(var f="",h=d[c]||d,i=a.length-1;i>=0;i--)b=a[i].mask||a[i],f=b.substr(0,1),h[f]=h[f]||[],h[f].unshift(b.substr(1)),a.splice(i,1);for(var j in h)h[j].length>500&&e(h[j].slice(),j,h)}function f(b){var d="",e=[];for(var g in b)a.isArray(b[g])?1===b[g].length?e.push(g+b[g]):e.push(g+c.groupmarker.start+b[g].join(c.groupmarker.end+c.alternatormarker+c.groupmarker.start)+c.groupmarker.end):e.push(g+f(b[g]));return d+=1===e.length?e[0]:c.groupmarker.start+e.join(c.groupmarker.end+c.alternatormarker+c.groupmarker.start)+c.groupmarker.end}var g={};c.phoneCodes&&c.phoneCodes.length>1e3&&(b=b.substr(1,b.length-2),e(b.split(c.groupmarker.end+c.alternatormarker+c.groupmarker.start)),b=f(g));var h=d.call(this,b,c);return h},b.extendAliases({abstractphone:{groupmarker:{start:"<",end:">"},countrycode:"",phoneCodes:[],mask:function(a){return a.definitions={"#":a.definitions[9]},a.phoneCodes.sort(c)},keepStatic:!0,onBeforeMask:function(a,b){var c=a.replace(/^0{1,2}/,"").replace(/[\s]/g,"");return(c.indexOf(b.countrycode)>1||c.indexOf(b.countrycode)===-1)&&(c="+"+b.countrycode+c),c},onUnMask:function(a,b,c){return b},inputmode:"tel"}}),b}(jQuery,Inputmask),function(a,b){return b.extendAliases({Regex:{mask:"r",greedy:!1,repeat:"*",regex:null,regexTokens:null,tokenizer:/\[\^?]?(?:[^\\\]]+|\\[\S\s]?)*]?|\\(?:0(?:[0-3][0-7]{0,2}|[4-7][0-7]?)?|[1-9][0-9]*|x[0-9A-Fa-f]{2}|u[0-9A-Fa-f]{4}|c[A-Za-z]|[\S\s]?)|\((?:\?[:=!]?)?|(?:[?*+]|\{[0-9]+(?:,[0-9]*)?\})\??|[^.?*+^${[()|\\]+|./g,quantifierFilter:/[0-9]+[^,]/,isComplete:function(a,b){return new RegExp(b.regex).test(a.join(""))},definitions:{r:{validator:function(b,c,d,e,f){function g(a,b){this.matches=[],this.isGroup=a||!1,this.isQuantifier=b||!1,this.quantifier={min:1,max:1},this.repeaterPart=void 0}function h(){var a,b,c=new g,d=[];for(f.regexTokens=[];a=f.tokenizer.exec(f.regex);)switch(b=a[0],b.charAt(0)){case"(":d.push(new g((!0)));break;case")":k=d.pop(),d.length>0?d[d.length-1].matches.push(k):c.matches.push(k);break;case"{":case"+":case"*":var e=new g((!1),(!0));b=b.replace(/[{}]/g,"");var h=b.split(","),i=isNaN(h[0])?h[0]:parseInt(h[0]),j=1===h.length?i:isNaN(h[1])?h[1]:parseInt(h[1]);if(e.quantifier={min:i,max:j},d.length>0){var l=d[d.length-1].matches;a=l.pop(),a.isGroup||(k=new g((!0)),k.matches.push(a),a=k),l.push(a),l.push(e)}else a=c.matches.pop(),a.isGroup||(k=new g((!0)),k.matches.push(a),a=k),c.matches.push(a),c.matches.push(e);break;default:d.length>0?d[d.length-1].matches.push(b):c.matches.push(b)}c.matches.length>0&&f.regexTokens.push(c)}function i(b,c){var d=!1;c&&(m+="(",o++);for(var e=0;e<b.matches.length;e++){var f=b.matches[e];if(f.isGroup===!0)d=i(f,!0);else if(f.isQuantifier===!0){var g=a.inArray(f,b.matches),h=b.matches[g-1],k=m;if(isNaN(f.quantifier.max)){for(;f.repeaterPart&&f.repeaterPart!==m&&f.repeaterPart.length>m.length&&!(d=i(h,!0)););d=d||i(h,!0),d&&(f.repeaterPart=m),m=k+f.quantifier.max}else{for(var l=0,n=f.quantifier.max-1;l<n&&!(d=i(h,!0));l++);m=k+"{"+f.quantifier.min+","+f.quantifier.max+"}"}}else if(void 0!==f.matches)for(var p=0;p<f.length&&!(d=i(f[p],c));p++);else{var q;if("["==f.charAt(0)){q=m,q+=f;for(var r=0;r<o;r++)q+=")";var s=new RegExp("^("+q+")$");d=s.test(j)}else for(var t=0,u=f.length;t<u;t++)if("\\"!==f.charAt(t)){q=m,q+=f.substr(0,t+1),q=q.replace(/\|$/,"");for(var r=0;r<o;r++)q+=")";var s=new RegExp("^("+q+")$");if(d=s.test(j))break}m+=f}if(d)break}return c&&(m+=")",o--),d}var j,k,l=c.buffer.slice(),m="",n=!1,o=0;null===f.regexTokens&&h(),l.splice(d,0,b),j=l.join("");for(var p=0;p<f.regexTokens.length;p++){var q=f.regexTokens[p];if(n=i(q,q.isGroup))break}return n},cardinality:1}}}}),b}(jQuery,Inputmask);
+/*! jquery-placepicker 20-04-2016 */
++function(a,b){function c(c,d){function e(){var a='<div class="input-group"><span class="input-group-btn"><button type="button" data-toggle="collapse" href="#'+d.mapContainerId+'" class="btn btn-default"><span class="glyphicon glyphicon-globe"></span></button></span></div>';return a}function f(){if(d.mapContainerId){var b=a(c),f=b.parent(),g=f.children().index(c);b.replaceWith(e()),f.children().eq(g).append(c)}}function g(a){if(a){var b={query:a};w&&w.textSearch(b,function(a,b){if(b===google.maps.places.PlacesServiceStatus.OK)for(var c=0;c<a.length;c++)return void o(a[c])})}}function h(a){v.geocode({latLng:a},function(a,b){if(b===google.maps.GeocoderStatus.OK&&a[0]){var c=a[0];o(c,!1)}})}function i(){return q=a(d.map).get(0),q||d.mapContainerId&&(q=a("#"+d.mapContainerId+" .placepicker-map").get(0)),q?!0:!1}function j(){i()&&(r=new google.maps.Map(q,d.mapOptions),t.bindTo("bounds",r),google.maps.event.addListener(r,"click",function(a){var b=a.latLng;s.setPosition(b),r.panTo(b),c.blur(),h(b)}),s=new google.maps.Marker({map:r}),w=new google.maps.places.PlacesService(r),a(q).parent().on("show.bs.collapse",function(b){a(b.target).css("display","block").find("img[src*='gstatic.com/'], img[src*='googleapis.com/']").css("max-width","none"),c.value?u.resize():u.geoLocation(),a(b.target).css("display","")}))}function k(){t=new google.maps.places.Autocomplete(c,d.autoCompleteOptions),google.maps.event.addListener(t,"place_changed",function(){var a=t.getPlace();a.geometry&&o(a)})}function l(){u.resize.call(u)}function m(){function b(b,e){if("keydown"===b){var f=e;e=function(b){var d=a(".pac-item-selected").length>0;if((13===b.which||13===b.keyCode)&&!d){var e=a.Event("keydown",{keyCode:40,which:40});f.apply(c,[e])}f.apply(c,[b])}}d.apply(c,[b,e])}var d=c.addEventListener?c.addEventListener:c.attachEvent;c.addEventListener=b,c.attachEvent=b}function n(){if(v=new google.maps.Geocoder,m(),f(),k(),j(),c.value)g(c.value);else{var e=d.latitude||a(d.latitudeInput).prop("value"),h=d.longitude||a(d.longitudeInput).prop("value");e&&h&&u.setLocation(e,h)}a(b).on("resize",l),a(c).on("keypress",function(a){d.preventSubmit&&13===a.keyCode&&(a.preventDefault(),a.stopImmediatePropagation())})}function o(b,e){e="undefined"==typeof e?!0:!1,x=b,u.resize();var f=b.geometry.location;e&&p(f),a(d.latitudeInput).prop("value",f.lat()),a(d.longitudeInput).prop("value",f.lng()),e||(c.value=b.formatted_address),"function"==typeof d.placeChanged&&d.placeChanged.call(u,b)}function p(a){if(r){r.setCenter(a);var b=d.icon||d.placesIcon&&place.icon?place.icon:null;if(b){var c={url:b,size:new google.maps.Size(71,71),origin:new google.maps.Point(0,0),anchor:new google.maps.Point(17,34),scaledSize:new google.maps.Size(35,35)};s.setIcon(c)}s.setPosition(a),s.setVisible(!0)}}var q,r,s,t,u=this,v=null,w=null,x=null,y=null;this.setValue=function(a){c.value=a,g(a)},this.getValue=function(){return c.value},this.setLocation=function(a,b){var c=new google.maps.LatLng(a,b);this.setLatLng(c)},this.getLocation=function(){var a=this.getLatLng();return{latitude:a&&a.lat()||d.latitude,longitude:a&&a.lng()||d.longitude}},this.setLatLng=function(a){y=a,h(y)},this.getLatLng=function(){return x&&x.geometry?x.geometry.location:y},this.getMap=function(){return r},this.reload=function(){r&&g(c.value)},this.resize=function(){if(r){var a=r.getCenter();google.maps.event.trigger(r,"resize"),r.setCenter(a)}},this.geoLocation=function(a){navigator.geolocation?navigator.geolocation.getCurrentPosition(function(b){var c=new google.maps.LatLng(b.coords.latitude,b.coords.longitude);p(c),h(c),a&&a(c)},function(){a&&a(null)}):a&&a(null)},n.call(this)}var d="placepicker",e={map:"",mapOptions:{zoom:15},places:{icons:!1},autoCompleteOptions:{},placeChanged:null,location:null,preventSubmit:!0},f=c;a.fn[d]=function(b){return this.each(function(){return a(this).data(d)||a(this).data(d,new f(this,a.extend({},e,b,a(this).data()))),a(this)})}}(jQuery,window);
 /**
  * jQuery CSS Customizable Scrollbar
  *
@@ -69585,4003 +69587,6 @@ var j=i.match(new RegExp("[-"+b.escapeRegex(f.negationSymbol.front)+"]","g"));if
  *
  */
 !function(l,e){"function"==typeof define&&define.amd?define(["jquery"],e):e(l.jQuery)}(this,function(l){"use strict";function e(e){if(t.webkit&&!e)return{height:0,width:0};if(!t.data.outer){var o={border:"none","box-sizing":"content-box",height:"200px",margin:"0",padding:"0",width:"200px"};t.data.inner=l("<div>").css(l.extend({},o)),t.data.outer=l("<div>").css(l.extend({left:"-1000px",overflow:"scroll",position:"absolute",top:"-1000px"},o)).append(t.data.inner).appendTo("body")}return t.data.outer.scrollLeft(1e3).scrollTop(1e3),{height:Math.ceil(t.data.outer.offset().top-t.data.inner.offset().top||0),width:Math.ceil(t.data.outer.offset().left-t.data.inner.offset().left||0)}}function o(){var l=e(!0);return!(l.height||l.width)}function s(l){var e=l.originalEvent;return e.axis&&e.axis===e.HORIZONTAL_AXIS?!1:e.wheelDeltaX?!1:!0}var r=!1,t={data:{index:0,name:"scrollbar"},macosx:/mac/i.test(navigator.platform),mobile:/android|webos|iphone|ipad|ipod|blackberry/i.test(navigator.userAgent),overlay:null,scroll:null,scrolls:[],webkit:/webkit/i.test(navigator.userAgent)&&!/edge\/\d+/i.test(navigator.userAgent)};t.scrolls.add=function(l){this.remove(l).push(l)},t.scrolls.remove=function(e){for(;l.inArray(e,this)>=0;)this.splice(l.inArray(e,this),1);return this};var i={autoScrollSize:!0,autoUpdate:!0,debug:!1,disableBodyScroll:!1,duration:200,ignoreMobile:!1,ignoreOverlay:!1,scrollStep:30,showArrows:!1,stepScrolling:!0,scrollx:null,scrolly:null,onDestroy:null,onInit:null,onScroll:null,onUpdate:null},n=function(s){t.scroll||(t.overlay=o(),t.scroll=e(),a(),l(window).resize(function(){var l=!1;if(t.scroll&&(t.scroll.height||t.scroll.width)){var o=e();(o.height!==t.scroll.height||o.width!==t.scroll.width)&&(t.scroll=o,l=!0)}a(l)})),this.container=s,this.namespace=".scrollbar_"+t.data.index++,this.options=l.extend({},i,window.jQueryScrollbarOptions||{}),this.scrollTo=null,this.scrollx={},this.scrolly={},s.data(t.data.name,this),t.scrolls.add(this)};n.prototype={destroy:function(){if(this.wrapper){this.container.removeData(t.data.name),t.scrolls.remove(this);var e=this.container.scrollLeft(),o=this.container.scrollTop();this.container.insertBefore(this.wrapper).css({height:"",margin:"","max-height":""}).removeClass("scroll-content scroll-scrollx_visible scroll-scrolly_visible").off(this.namespace).scrollLeft(e).scrollTop(o),this.scrollx.scroll.removeClass("scroll-scrollx_visible").find("div").andSelf().off(this.namespace),this.scrolly.scroll.removeClass("scroll-scrolly_visible").find("div").andSelf().off(this.namespace),this.wrapper.remove(),l(document).add("body").off(this.namespace),l.isFunction(this.options.onDestroy)&&this.options.onDestroy.apply(this,[this.container])}},init:function(e){var o=this,r=this.container,i=this.containerWrapper||r,n=this.namespace,c=l.extend(this.options,e||{}),a={x:this.scrollx,y:this.scrolly},d=this.wrapper,h={scrollLeft:r.scrollLeft(),scrollTop:r.scrollTop()};if(t.mobile&&c.ignoreMobile||t.overlay&&c.ignoreOverlay||t.macosx&&!t.webkit)return!1;if(d)i.css({height:"auto","margin-bottom":-1*t.scroll.height+"px","margin-right":-1*t.scroll.width+"px","max-height":""});else{if(this.wrapper=d=l("<div>").addClass("scroll-wrapper").addClass(r.attr("class")).css("position","absolute"==r.css("position")?"absolute":"relative").insertBefore(r).append(r),r.is("textarea")&&(this.containerWrapper=i=l("<div>").insertBefore(r).append(r),d.addClass("scroll-textarea")),i.addClass("scroll-content").css({height:"auto","margin-bottom":-1*t.scroll.height+"px","margin-right":-1*t.scroll.width+"px","max-height":""}),r.on("scroll"+n,function(e){l.isFunction(c.onScroll)&&c.onScroll.call(o,{maxScroll:a.y.maxScrollOffset,scroll:r.scrollTop(),size:a.y.size,visible:a.y.visible},{maxScroll:a.x.maxScrollOffset,scroll:r.scrollLeft(),size:a.x.size,visible:a.x.visible}),a.x.isVisible&&a.x.scroll.bar.css("left",r.scrollLeft()*a.x.kx+"px"),a.y.isVisible&&a.y.scroll.bar.css("top",r.scrollTop()*a.y.kx+"px")}),d.on("scroll"+n,function(){d.scrollTop(0).scrollLeft(0)}),c.disableBodyScroll){var p=function(l){s(l)?a.y.isVisible&&a.y.mousewheel(l):a.x.isVisible&&a.x.mousewheel(l)};d.on("MozMousePixelScroll"+n,p),d.on("mousewheel"+n,p),t.mobile&&d.on("touchstart"+n,function(e){var o=e.originalEvent.touches&&e.originalEvent.touches[0]||e,s={pageX:o.pageX,pageY:o.pageY},t={left:r.scrollLeft(),top:r.scrollTop()};l(document).on("touchmove"+n,function(l){var e=l.originalEvent.targetTouches&&l.originalEvent.targetTouches[0]||l;r.scrollLeft(t.left+s.pageX-e.pageX),r.scrollTop(t.top+s.pageY-e.pageY),l.preventDefault()}),l(document).on("touchend"+n,function(){l(document).off(n)})})}l.isFunction(c.onInit)&&c.onInit.apply(this,[r])}l.each(a,function(e,t){var i=null,d=1,h="x"===e?"scrollLeft":"scrollTop",p=c.scrollStep,u=function(){var l=r[h]();r[h](l+p),1==d&&l+p>=f&&(l=r[h]()),-1==d&&f>=l+p&&(l=r[h]()),r[h]()==l&&i&&i()},f=0;t.scroll||(t.scroll=o._getScroll(c["scroll"+e]).addClass("scroll-"+e),c.showArrows&&t.scroll.addClass("scroll-element_arrows_visible"),t.mousewheel=function(l){if(!t.isVisible||"x"===e&&s(l))return!0;if("y"===e&&!s(l))return a.x.mousewheel(l),!0;var i=-1*l.originalEvent.wheelDelta||l.originalEvent.detail,n=t.size-t.visible-t.offset;return(i>0&&n>f||0>i&&f>0)&&(f+=i,0>f&&(f=0),f>n&&(f=n),o.scrollTo=o.scrollTo||{},o.scrollTo[h]=f,setTimeout(function(){o.scrollTo&&(r.stop().animate(o.scrollTo,240,"linear",function(){f=r[h]()}),o.scrollTo=null)},1)),l.preventDefault(),!1},t.scroll.on("MozMousePixelScroll"+n,t.mousewheel).on("mousewheel"+n,t.mousewheel).on("mouseenter"+n,function(){f=r[h]()}),t.scroll.find(".scroll-arrow, .scroll-element_track").on("mousedown"+n,function(s){if(1!=s.which)return!0;d=1;var n={eventOffset:s["x"===e?"pageX":"pageY"],maxScrollValue:t.size-t.visible-t.offset,scrollbarOffset:t.scroll.bar.offset()["x"===e?"left":"top"],scrollbarSize:t.scroll.bar["x"===e?"outerWidth":"outerHeight"]()},a=0,v=0;return l(this).hasClass("scroll-arrow")?(d=l(this).hasClass("scroll-arrow_more")?1:-1,p=c.scrollStep*d,f=d>0?n.maxScrollValue:0):(d=n.eventOffset>n.scrollbarOffset+n.scrollbarSize?1:n.eventOffset<n.scrollbarOffset?-1:0,p=Math.round(.75*t.visible)*d,f=n.eventOffset-n.scrollbarOffset-(c.stepScrolling?1==d?n.scrollbarSize:0:Math.round(n.scrollbarSize/2)),f=r[h]()+f/t.kx),o.scrollTo=o.scrollTo||{},o.scrollTo[h]=c.stepScrolling?r[h]()+p:f,c.stepScrolling&&(i=function(){f=r[h](),clearInterval(v),clearTimeout(a),a=0,v=0},a=setTimeout(function(){v=setInterval(u,40)},c.duration+100)),setTimeout(function(){o.scrollTo&&(r.animate(o.scrollTo,c.duration),o.scrollTo=null)},1),o._handleMouseDown(i,s)}),t.scroll.bar.on("mousedown"+n,function(s){if(1!=s.which)return!0;var i=s["x"===e?"pageX":"pageY"],c=r[h]();return t.scroll.addClass("scroll-draggable"),l(document).on("mousemove"+n,function(l){var o=parseInt((l["x"===e?"pageX":"pageY"]-i)/t.kx,10);r[h](c+o)}),o._handleMouseDown(function(){t.scroll.removeClass("scroll-draggable"),f=r[h]()},s)}))}),l.each(a,function(l,e){var o="scroll-scroll"+l+"_visible",s="x"==l?a.y:a.x;e.scroll.removeClass(o),s.scroll.removeClass(o),i.removeClass(o)}),l.each(a,function(e,o){l.extend(o,"x"==e?{offset:parseInt(r.css("left"),10)||0,size:r.prop("scrollWidth"),visible:d.width()}:{offset:parseInt(r.css("top"),10)||0,size:r.prop("scrollHeight"),visible:d.height()})}),this._updateScroll("x",this.scrollx),this._updateScroll("y",this.scrolly),l.isFunction(c.onUpdate)&&c.onUpdate.apply(this,[r]),l.each(a,function(l,e){var o="x"===l?"left":"top",s="x"===l?"outerWidth":"outerHeight",t="x"===l?"width":"height",i=parseInt(r.css(o),10)||0,n=e.size,a=e.visible+i,d=e.scroll.size[s]()+(parseInt(e.scroll.size.css(o),10)||0);c.autoScrollSize&&(e.scrollbarSize=parseInt(d*a/n,10),e.scroll.bar.css(t,e.scrollbarSize+"px")),e.scrollbarSize=e.scroll.bar[s](),e.kx=(d-e.scrollbarSize)/(n-a)||1,e.maxScrollOffset=n-a}),r.scrollLeft(h.scrollLeft).scrollTop(h.scrollTop).trigger("scroll")},_getScroll:function(e){var o={advanced:['<div class="scroll-element">','<div class="scroll-element_corner"></div>','<div class="scroll-arrow scroll-arrow_less"></div>','<div class="scroll-arrow scroll-arrow_more"></div>','<div class="scroll-element_outer">','<div class="scroll-element_size"></div>','<div class="scroll-element_inner-wrapper">','<div class="scroll-element_inner scroll-element_track">','<div class="scroll-element_inner-bottom"></div>',"</div>","</div>",'<div class="scroll-bar">','<div class="scroll-bar_body">','<div class="scroll-bar_body-inner"></div>',"</div>",'<div class="scroll-bar_bottom"></div>','<div class="scroll-bar_center"></div>',"</div>","</div>","</div>"].join(""),simple:['<div class="scroll-element">','<div class="scroll-element_outer">','<div class="scroll-element_size"></div>','<div class="scroll-element_track"></div>','<div class="scroll-bar"></div>',"</div>","</div>"].join("")};return o[e]&&(e=o[e]),e||(e=o.simple),e="string"==typeof e?l(e).appendTo(this.wrapper):l(e),l.extend(e,{bar:e.find(".scroll-bar"),size:e.find(".scroll-element_size"),track:e.find(".scroll-element_track")}),e},_handleMouseDown:function(e,o){var s=this.namespace;return l(document).on("blur"+s,function(){l(document).add("body").off(s),e&&e()}),l(document).on("dragstart"+s,function(l){return l.preventDefault(),!1}),l(document).on("mouseup"+s,function(){l(document).add("body").off(s),e&&e()}),l("body").on("selectstart"+s,function(l){return l.preventDefault(),!1}),o&&o.preventDefault(),!1},_updateScroll:function(e,o){var s=this.container,r=this.containerWrapper||s,i="scroll-scroll"+e+"_visible",n="x"===e?this.scrolly:this.scrollx,c=parseInt(this.container.css("x"===e?"left":"top"),10)||0,a=this.wrapper,d=o.size,h=o.visible+c;o.isVisible=d-h>1,o.isVisible?(o.scroll.addClass(i),n.scroll.addClass(i),r.addClass(i)):(o.scroll.removeClass(i),n.scroll.removeClass(i),r.removeClass(i)),"y"===e&&(s.is("textarea")||h>d?r.css({height:h+t.scroll.height+"px","max-height":"none"}):r.css({"max-height":h+t.scroll.height+"px"})),(o.size!=s.prop("scrollWidth")||n.size!=s.prop("scrollHeight")||o.visible!=a.width()||n.visible!=a.height()||o.offset!=(parseInt(s.css("left"),10)||0)||n.offset!=(parseInt(s.css("top"),10)||0))&&(l.extend(this.scrollx,{offset:parseInt(s.css("left"),10)||0,size:s.prop("scrollWidth"),visible:a.width()}),l.extend(this.scrolly,{offset:parseInt(s.css("top"),10)||0,size:this.container.prop("scrollHeight"),visible:a.height()}),this._updateScroll("x"===e?"y":"x",n))}};var c=n;l.fn.scrollbar=function(e,o){return"string"!=typeof e&&(o=e,e="init"),"undefined"==typeof o&&(o=[]),l.isArray(o)||(o=[o]),this.not("body, .scroll-wrapper").each(function(){var s=l(this),r=s.data(t.data.name);(r||"init"===e)&&(r||(r=new c(s)),r[e]&&r[e].apply(r,o))}),this},l.fn.scrollbar.options=i;var a=function(){var l=0,e=0;return function(o){var s,i,n,c,d,h,p;for(s=0;s<t.scrolls.length;s++)c=t.scrolls[s],i=c.container,n=c.options,d=c.wrapper,h=c.scrollx,p=c.scrolly,(o||n.autoUpdate&&d&&d.is(":visible")&&(i.prop("scrollWidth")!=h.size||i.prop("scrollHeight")!=p.size||d.width()!=h.visible||d.height()!=p.visible))&&(c.init(),n.debug&&(window.console&&console.log({scrollHeight:i.prop("scrollHeight")+":"+c.scrolly.size,scrollWidth:i.prop("scrollWidth")+":"+c.scrollx.size,visibleHeight:d.height()+":"+c.scrolly.visible,visibleWidth:d.width()+":"+c.scrollx.visible},!0),e++));r&&e>10?(window.console&&console.log("Scroll updates exceed 10"),a=function(){}):(clearTimeout(l),l=setTimeout(a,300))}}();window.angular&&!function(l){l.module("jQueryScrollbar",[]).provider("jQueryScrollbar",function(){var e=i;return{setOptions:function(o){l.extend(e,o)},$get:function(){return{options:l.copy(e)}}}}).directive("jqueryScrollbar",["jQueryScrollbar","$parse",function(l,e){return{restrict:"AC",link:function(o,s,r){var t=e(r.jqueryScrollbar),i=t(o);s.scrollbar(i||l.options).on("$destroy",function(){s.scrollbar("destroy")})}}}])}(window.angular)});
-/*! jquery-placepicker 20-04-2016 */
-+function(a,b){function c(c,d){function e(){var a='<div class="input-group"><span class="input-group-btn"><button type="button" data-toggle="collapse" href="#'+d.mapContainerId+'" class="btn btn-default"><span class="glyphicon glyphicon-globe"></span></button></span></div>';return a}function f(){if(d.mapContainerId){var b=a(c),f=b.parent(),g=f.children().index(c);b.replaceWith(e()),f.children().eq(g).append(c)}}function g(a){if(a){var b={query:a};w&&w.textSearch(b,function(a,b){if(b===google.maps.places.PlacesServiceStatus.OK)for(var c=0;c<a.length;c++)return void o(a[c])})}}function h(a){v.geocode({latLng:a},function(a,b){if(b===google.maps.GeocoderStatus.OK&&a[0]){var c=a[0];o(c,!1)}})}function i(){return q=a(d.map).get(0),q||d.mapContainerId&&(q=a("#"+d.mapContainerId+" .placepicker-map").get(0)),q?!0:!1}function j(){i()&&(r=new google.maps.Map(q,d.mapOptions),t.bindTo("bounds",r),google.maps.event.addListener(r,"click",function(a){var b=a.latLng;s.setPosition(b),r.panTo(b),c.blur(),h(b)}),s=new google.maps.Marker({map:r}),w=new google.maps.places.PlacesService(r),a(q).parent().on("show.bs.collapse",function(b){a(b.target).css("display","block").find("img[src*='gstatic.com/'], img[src*='googleapis.com/']").css("max-width","none"),c.value?u.resize():u.geoLocation(),a(b.target).css("display","")}))}function k(){t=new google.maps.places.Autocomplete(c,d.autoCompleteOptions),google.maps.event.addListener(t,"place_changed",function(){var a=t.getPlace();a.geometry&&o(a)})}function l(){u.resize.call(u)}function m(){function b(b,e){if("keydown"===b){var f=e;e=function(b){var d=a(".pac-item-selected").length>0;if((13===b.which||13===b.keyCode)&&!d){var e=a.Event("keydown",{keyCode:40,which:40});f.apply(c,[e])}f.apply(c,[b])}}d.apply(c,[b,e])}var d=c.addEventListener?c.addEventListener:c.attachEvent;c.addEventListener=b,c.attachEvent=b}function n(){if(v=new google.maps.Geocoder,m(),f(),k(),j(),c.value)g(c.value);else{var e=d.latitude||a(d.latitudeInput).prop("value"),h=d.longitude||a(d.longitudeInput).prop("value");e&&h&&u.setLocation(e,h)}a(b).on("resize",l),a(c).on("keypress",function(a){d.preventSubmit&&13===a.keyCode&&(a.preventDefault(),a.stopImmediatePropagation())})}function o(b,e){e="undefined"==typeof e?!0:!1,x=b,u.resize();var f=b.geometry.location;e&&p(f),a(d.latitudeInput).prop("value",f.lat()),a(d.longitudeInput).prop("value",f.lng()),e||(c.value=b.formatted_address),"function"==typeof d.placeChanged&&d.placeChanged.call(u,b)}function p(a){if(r){r.setCenter(a);var b=d.icon||d.placesIcon&&place.icon?place.icon:null;if(b){var c={url:b,size:new google.maps.Size(71,71),origin:new google.maps.Point(0,0),anchor:new google.maps.Point(17,34),scaledSize:new google.maps.Size(35,35)};s.setIcon(c)}s.setPosition(a),s.setVisible(!0)}}var q,r,s,t,u=this,v=null,w=null,x=null,y=null;this.setValue=function(a){c.value=a,g(a)},this.getValue=function(){return c.value},this.setLocation=function(a,b){var c=new google.maps.LatLng(a,b);this.setLatLng(c)},this.getLocation=function(){var a=this.getLatLng();return{latitude:a&&a.lat()||d.latitude,longitude:a&&a.lng()||d.longitude}},this.setLatLng=function(a){y=a,h(y)},this.getLatLng=function(){return x&&x.geometry?x.geometry.location:y},this.getMap=function(){return r},this.reload=function(){r&&g(c.value)},this.resize=function(){if(r){var a=r.getCenter();google.maps.event.trigger(r,"resize"),r.setCenter(a)}},this.geoLocation=function(a){navigator.geolocation?navigator.geolocation.getCurrentPosition(function(b){var c=new google.maps.LatLng(b.coords.latitude,b.coords.longitude);p(c),h(c),a&&a(c)},function(){a&&a(null)}):a&&a(null)},n.call(this)}var d="placepicker",e={map:"",mapOptions:{zoom:15},places:{icons:!1},autoCompleteOptions:{},placeChanged:null,location:null,preventSubmit:!0},f=c;a.fn[d]=function(b){return this.each(function(){return a(this).data(d)||a(this).data(d,new f(this,a.extend({},e,b,a(this).data()))),a(this)})}}(jQuery,window);
-/**
- * DaData.ru Suggestions jQuery plugin, version 17.5.0
- *
- * DaData.ru Suggestions jQuery plugin is freely distributable under the terms of MIT-style license
- * Built on DevBridge Autocomplete for jQuery (https://github.com/devbridge/jQuery-Autocomplete)
- * For details, see https://github.com/hflabs/suggestions-jquery
- */
-(function (global, factory) {
-	typeof exports === 'object' && typeof module !== 'undefined' ? factory(require('jquery')) :
-	typeof define === 'function' && define.amd ? define(['jquery'], factory) :
-	(factory(global.$));
-}(this, (function ($) { 'use strict';
-
-$ = 'default' in $ ? $['default'] : $;
-
-var KEYS = {
-        ENTER: 13,
-        ESC:   27,
-        TAB:   9,
-        SPACE: 32,
-        UP:    38,
-        DOWN:  40
-    };
-var EVENT_NS = '.suggestions';
-var DATA_ATTR_KEY = 'suggestions';
-var WORD_DELIMITERS = '\\s"\'~\\*\\.,:\\|\\[\\]\\(\\)\\{\\}<>№';
-var WORD_SPLITTER = new RegExp('[' + WORD_DELIMITERS + ']+', 'g');
-var WORD_PARTS_DELIMITERS = '\\-\\+\\/\\\\\\?!@#$%^&';
-var WORD_PARTS_SPLITTER = new RegExp('[' + WORD_PARTS_DELIMITERS + ']+', 'g');
-
-var utils = (function () {
-    var uniqueId = 0;
-    return {
-        escapeRegExChars: function (value) {
-            return value.replace(/[\-\[\]\/\{\}\(\)\*\+\?\.\\\^\$\|]/g, "\\$&");
-        },
-        escapeHtml: function (str) {
-            var map = {
-                '&': '&amp;',
-                '<': '&lt;',
-                '>': '&gt;',
-                '"': '&quot;',
-                "'": '&#x27;',
-                '/': '&#x2F;'
-            };
-
-            if (str) {
-                $.each(map, function(ch, html){
-                    str = str.replace(new RegExp(ch, 'g'), html);
-                });
-            }
-            return str;
-        },
-        getDefaultType: function () {
-            return ($.support.cors ? 'POST' : 'GET');
-        },
-        getDefaultContentType: function () {
-            return ($.support.cors ? 'application/json' : 'application/x-www-form-urlencoded');
-        },
-        fixURLProtocol: function(url){
-            return $.support.cors ? url : url.replace(/^https?:/, location.protocol);
-        },
-        addUrlParams: function (url, params) {
-            return url + (/\?/.test(url) ? '&' : '?') + $.param(params);
-        },
-        serialize: function (data) {
-            if ($.support.cors) {
-                return JSON.stringify(data, function (key, value) {
-                    return value === null ? undefined : value;
-                });
-            } else {
-                data = this.compactObject(data);
-                return $.param(data, true);
-            }
-        },
-        compact: function (array) {
-            return $.grep(array, function (el) {
-                return !!el;
-            });
-        },
-        delay: function (handler, delay) {
-            return setTimeout(handler, delay || 0);
-        },
-        uniqueId: function (prefix) {
-            return (prefix || '') + ++uniqueId;
-        },
-        slice: function(obj, start) {
-            return Array.prototype.slice.call(obj, start);
-        },
-        indexBy: function (data, field, indexField) {
-            var result = {};
-
-            $.each(data, function (i, obj) {
-                var key = obj[field],
-                    val = {};
-
-                if (indexField) {
-                    val[indexField] = i;
-                }
-
-                result[key] = $.extend(true, val, obj);
-            });
-
-            return result;
-        },
-
-        /**
-         * Compares two objects, but only fields that are set in both
-         * @param a
-         * @param b
-         * @returns {boolean}
-         */
-        areSame: function self(a, b) {
-            var same = true;
-
-            if (typeof a != typeof b) {
-                return false;
-            }
-
-            if (typeof a == 'object' && a != null && b != null) {
-                $.each(a, function (i, value) {
-                    return same = self(value, b[i]);
-                });
-                return same;
-            }
-
-            return a === b;
-        },
-
-        /**
-         * Returns array1 minus array2
-         */
-        arrayMinus: function(array1, array2) {
-            return array2 ? $.grep(array1, function(el, i){
-                return $.inArray(el, array2) === -1;
-            }) : array1;
-        },
-        /**
-         * Returns array1 minus array2
-         * if value in array1 in enclosed by value in array2, it is considered a match
-         */
-        arrayMinusWithPartialMatching: function(array1, array2) {
-            return array2 ? $.grep(array1, function(el, i){
-                return !array2.some(function(el2) {
-                    return el2.indexOf(el) === 0;
-                })
-            }) : array1;
-        },
-        /**
-         * Пересечение массивов: ([1,2,3,4], [2,4,5,6]) => [2,4]
-         * Исходные массивы не меняются
-         * @param {Array} array1
-         * @param {Array} array2
-         * @returns {Array}
-         */
-        arraysIntersection: function(array1, array2) {
-            var result = [];
-            if (!$.isArray(array1) || !$.isArray(array2)) {
-                return result;
-            }
-            $.each(array1, function(index, item) {
-                if ($.inArray(item, array2) >= 0) {
-                    result.push(item);
-                }
-            });
-            return result;
-        },
-        getWords: function(str, stopwords) {
-            // Split numbers and letters written together
-            str = str.replace(/(\d+)([а-яА-ЯёЁ]{2,})/g, '$1 $2')
-                .replace(/([а-яА-ЯёЁ]+)(\d+)/g, '$1 $2');
-
-            var words = this.compact(str.split(WORD_SPLITTER)),
-                lastWord = words.pop(),
-                goodWords = this.arrayMinus(words, stopwords);
-
-            goodWords.push(lastWord);
-            return goodWords;
-        },
-        /**
-         * Returns normalized string without stopwords
-         */
-        normalize: function(str, stopwords) {
-            var that = this;
-            return that.getWords(str, stopwords).join(' ');
-        },
-        /**
-         * Returns true if str1 includes str2 plus something else, false otherwise.
-         */
-        stringEncloses: function(str1, str2) {
-            return str1.length > str2.length && str1.indexOf(str2) !== -1;
-        },
-        fieldsNotEmpty: function(obj, fields){
-            if (!$.isPlainObject(obj)) {
-                return false;
-            }
-            var result = true;
-            $.each(fields, function (i, field) {
-                return result = !!(obj[field]);
-            });
-            return result;
-        },
-        getDeepValue: function self(obj, name) {
-            var path = name.split('.'),
-                step = path.shift();
-
-            return obj && (path.length ? self(obj[step], path.join('.')) : obj[step]);
-        },
-        reWordExtractor: function () {
-            return new RegExp('([^' + WORD_DELIMITERS + ']*)([' + WORD_DELIMITERS + ']*)', 'g');
-        },
-        formatToken: function (token) {
-            return token && token.toLowerCase().replace(/[ёЁ]/g, 'е');
-        },
-        withSubTokens: function (tokens) {
-            var result = [];
-
-            $.each(tokens, function (i, token) {
-                var subtokens = token.split(WORD_PARTS_SPLITTER);
-
-                result.push(token);
-
-                if (subtokens.length > 1) {
-                    result = result.concat(utils.compact(subtokens));
-                }
-            });
-
-            return result;
-        },
-
-        /**
-         * Возвращает массив с ключами переданного объекта
-         * Используется нативный Object.keys если он есть
-         * @param {Object} obj
-         * @returns {Array}
-         */
-        objectKeys: function(obj) {
-            if (Object.keys) {
-                return Object.keys(obj);
-            }
-            var keys = [];
-            $.each(obj, function(name) {
-                keys.push(name);
-            });
-            return keys;
-        },
-
-        /**
-         * Возвращает копию объекта без пустых элементов
-         * @param obj
-         */
-        compactObject: function(obj) {
-            var copy = $.extend(true, {}, obj);
-
-            $.each(copy, function (key, val) {
-                if (val === null || val === undefined || val === '') {
-                    delete copy[key];
-                }
-            });
-
-            return copy;
-        }
-
-    };
-}());
-
-/**
- * Matchers return index of suitable suggestion
- * Context inside is optionally set in types.js
- */
-var matchers = function() {
-
-    /**
-     * Factory to create same parent checker function
-     * @param preprocessFn called on each value before comparison
-     * @returns {Function} same parent checker function
-     */
-    function sameParentChecker (preprocessFn) {
-        return function (suggestions) {
-            if (suggestions.length === 0) {
-                return false;
-            }
-            if (suggestions.length === 1) {
-                return true;
-            }
-
-            var parentValue = preprocessFn(suggestions[0].value),
-                aliens = $.grep(suggestions, function (suggestion) {
-                    return preprocessFn(suggestion.value).indexOf(parentValue) === 0;
-                }, true);
-
-            return aliens.length === 0;
-        }
-    }
-
-    /**
-     * Default same parent checker. Compares raw values.
-     * @type {Function}
-     */
-    var haveSameParent = sameParentChecker(function(val) { return val; });
-
-    /**
-     * Same parent checker for addresses. Strips house and extension before comparison.
-     * @type {Function}
-     */
-    var haveSameParentAddress = sameParentChecker(function(val) {
-        return val.replace(/, (?:д|вл|двлд|к) .+$/, '');
-    });
-
-    return {
-
-        /**
-         * Matches query against suggestions, removing all the stopwords.
-         */
-        matchByNormalizedQuery: function (query, suggestions) {
-            var queryLowerCase = query.toLowerCase(),
-                stopwords = this && this.stopwords,
-                normalizedQuery = utils.normalize(queryLowerCase, stopwords),
-                matches = [];
-
-            $.each(suggestions, function(i, suggestion) {
-                var suggestedValue = suggestion.value.toLowerCase();
-                // if query encloses suggestion, than it has already been selected
-                // so we should not select it anymore
-                if (utils.stringEncloses(queryLowerCase, suggestedValue)) {
-                    return false;
-                }
-                // if there is suggestion that contains query as its part
-                // than we should ignore all other matches, even full ones
-                if (suggestedValue.indexOf(normalizedQuery) > 0) {
-                    return false;
-                }
-                if (normalizedQuery === utils.normalize(suggestedValue, stopwords)) {
-                    matches.push(i);
-                }
-            });
-
-            return matches.length === 1 ? matches[0] : -1;
-        },
-
-        /**
-         * Matches query against suggestions word-by-word (with respect to stopwords).
-         * Matches if query words are a subset of suggested words.
-         */
-        matchByWords: function (query, suggestions) {
-            var stopwords = this && this.stopwords,
-                queryLowerCase = query.toLowerCase(),
-                queryTokens,
-                matches = [];
-
-            if (haveSameParent(suggestions)) {
-                queryTokens = utils.withSubTokens(utils.getWords(queryLowerCase, stopwords));
-
-                $.each(suggestions, function(i, suggestion) {
-                    var suggestedValue = suggestion.value.toLowerCase();
-
-                    if (utils.stringEncloses(queryLowerCase, suggestedValue)) {
-                        return false;
-                    }
-
-                    // check if query words are a subset of suggested words
-                    var suggestionWords = utils.withSubTokens(utils.getWords(suggestedValue, stopwords));
-
-                    if (utils.arrayMinus(queryTokens, suggestionWords).length === 0) {
-                        matches.push(i);
-                    }
-                });
-            }
-
-            return matches.length === 1 ? matches[0] : -1;
-        },
-
-        matchByWordsAddress: function (query, suggestions) {
-            var stopwords = this && this.stopwords,
-                queryLowerCase = query.toLowerCase(),
-                queryTokens,
-                index = -1;
-
-            if (haveSameParentAddress(suggestions)) {
-                queryTokens = utils.withSubTokens(utils.getWords(queryLowerCase, stopwords));
-
-                $.each(suggestions, function(i, suggestion) {
-                    var suggestedValue = suggestion.value.toLowerCase();
-
-                    if (utils.stringEncloses(queryLowerCase, suggestedValue)) {
-                        return false;
-                    }
-
-                    // check if query words are a subset of suggested words
-                    var suggestionWords = utils.withSubTokens(utils.getWords(suggestedValue, stopwords));
-
-                    if (utils.arrayMinus(queryTokens, suggestionWords).length === 0) {
-                        index = i;
-                        return false;
-                    }
-                });
-            }
-
-            return index;
-        },
-
-        /**
-         * Matches query against values contained in suggestion fields
-         * for cases, when there is only one suggestion
-         * only considers fields specified in fieldsStopwords map
-         * uses partial matching:
-         *   "0445" vs { value: "ALFA-BANK", data: { "bic": "044525593" }} is a match
-         */
-        matchByFields: function (query, suggestions) {
-            var stopwords = this && this.stopwords,
-                fieldsStopwords = this && this.fieldsStopwords,
-                tokens = utils.withSubTokens(utils.getWords(query.toLowerCase(), stopwords)),
-                suggestionWords = [];
-
-            if (suggestions.length === 1) {
-                if (fieldsStopwords) {
-                    $.each(fieldsStopwords, function (field, stopwords) {
-                        var fieldValue = utils.getDeepValue(suggestions[0], field),
-                            fieldWords = fieldValue && utils.withSubTokens(utils.getWords(fieldValue.toLowerCase(), stopwords));
-
-                        if (fieldWords && fieldWords.length) {
-                            suggestionWords = suggestionWords.concat(fieldWords);
-                        }
-                    });
-                }
-
-                if (utils.arrayMinusWithPartialMatching(tokens, suggestionWords).length === 0) {
-                    return 0;
-                }
-            }
-
-            return -1;
-        }
-
-    };
-
-}();
-
-var DEFAULT_OPTIONS = {
-    autoSelectFirst: false,
-    // основной url, может быть переопределен
-    serviceUrl: 'https://suggestions.dadata.ru/suggestions/api/4_1/rs',
-    // url, который заменяет serviceUrl + method + type
-    // то есть, если он задан, то для всех запросов будет использоваться именно он
-    // если не поддерживается cors то к url будут добавлены параметры ?token=...&version=...
-    // и заменен протокол на протокол текущей страницы
-    url: null,
-    onSearchStart: $.noop,
-    onSearchComplete: $.noop,
-    onSearchError: $.noop,
-    onSuggestionsFetch: null,
-    onSelect: null,
-    onSelectNothing: null,
-    onInvalidateSelection: null,
-    minChars: 1,
-    deferRequestBy: 100,
-    params: {},
-    paramName: 'query',
-    timeout: 3000,
-    formatResult: null,
-    formatSelected: null,
-    noCache: false,
-    containerClass: 'suggestions-suggestions',
-    tabDisabled: false,
-    triggerSelectOnSpace: false,
-    triggerSelectOnEnter: true,
-    triggerSelectOnBlur: true,
-    preventBadQueries: false,
-    hint: 'Выберите вариант или продолжите ввод',
-    noSuggestionsHint: {
-        NAME:       'Неизвестное ФИО',
-        ADDRESS:    'Неизвестный адрес',
-        EMAIL:      'Неизвестная эл. почта',
-        PARTY:      'Неизвестная организация',
-        BANK:       'Неизвестный банк'
-    },
-    type: null,
-    requestMode: 'suggest',
-    count: 5,
-    $helpers: null,
-    headers: null,
-    scrollOnFocus: true,
-    mobileWidth: 980,
-    initializeInterval: 100
-};
-
-/**
- * Type is a bundle of properties:
- * - urlSuffix Mandatory. String
- * - matchers Mandatory. Array of functions (with optional data bound as a context) that find appropriate suggestion to select
- * - `fieldNames` Map fields of suggestion.data to their displayable names
- * - `unformattableTokens` Array of strings which should not be highlighted
- * - `dataComponents` Array of 'bound's can be set as `bounds` option. Order is important.
- *
- * flags:
- * - `alwaysContinueSelecting` Forbids to hide dropdown after selecting
- * - `geoEnabled` Makes to detect client's location for passing it to all requests
- * - `enrichmentEnabled` Makes to send additional request when a suggestion is selected
- *
- * and methods:
- * - `isDataComplete` Checks if suggestion.data can be operated as full data of it's type
- * - `composeValue` returns string value based on suggestion.data
- * - `formatResult` returns html of a suggestion. Overrides default method
- * - `formatResultInn` returns html of suggestion.data.inn
- * - `isQueryRequestable` checks if query is appropriated for requesting server
- * - `formatSelected` returns string to be inserted in textbox
- */
-
-var ADDRESS_STOPWORDS = ['ао', 'аобл', 'дом', 'респ', 'а/я', 'аал', 'автодорога', 'аллея', 'арбан', 'аул', 'б-р', 'берег', 'бугор', 'вал', 'вл', 'волость', 'въезд', 'высел', 'г', 'городок', 'гск', 'д', 'двлд', 'днп', 'дор', 'дп', 'ж/д_будка', 'ж/д_казарм', 'ж/д_оп', 'ж/д_платф', 'ж/д_пост', 'ж/д_рзд', 'ж/д_ст', 'жилзона', 'жилрайон', 'жт', 'заезд', 'заимка', 'зона', 'к', 'казарма', 'канал', 'кв', 'кв-л', 'км', 'кольцо', 'комн', 'кордон', 'коса', 'кп', 'край', 'линия', 'лпх', 'м', 'массив', 'местность', 'мкр', 'мост', 'н/п', 'наб', 'нп', 'обл', 'округ', 'остров', 'оф', 'п', 'п/о', 'п/р', 'п/ст', 'парк', 'пгт', 'пер', 'переезд', 'пл', 'пл-ка', 'платф', 'погост', 'полустанок', 'починок', 'пр-кт', 'проезд', 'промзона', 'просек', 'просека', 'проселок', 'проток', 'протока', 'проулок', 'р-н', 'рзд', 'россия', 'рп', 'ряды', 'с', 'с/а', 'с/мо', 'с/о', 'с/п', 'с/с', 'сад', 'сквер', 'сл', 'снт', 'спуск', 'ст', 'ст-ца', 'стр', 'тер', 'тракт', 'туп', 'у', 'ул', 'уч-к', 'ф/х', 'ферма', 'х', 'ш', 'бульвар', 'владение', 'выселки', 'гаражно-строительный', 'город', 'деревня', 'домовладение', 'дорога', 'квартал', 'километр', 'комната', 'корпус', 'литер', 'леспромхоз', 'местечко', 'микрорайон', 'набережная', 'область', 'переулок', 'платформа', 'площадка', 'площадь', 'поселение', 'поселок', 'проспект', 'разъезд', 'район', 'республика', 'село', 'сельсовет', 'слобода', 'сооружение', 'станица', 'станция', 'строение', 'территория', 'тупик', 'улица', 'улус', 'участок', 'хутор', 'шоссе'];
-
-/**
- * Компоненты адреса
- * @type {*[]}
- * id {String} Наименование типа
- * fields {Array of Strings}
- * forBounds {Boolean} может использоваться в ограничениях
- * forLocations {Boolean}
- * kladrFormat {Object}
- * fiasType {String} Наименование соответствующего ФИАС типа
- */
-var ADDRESS_COMPONENTS = [
-    {
-        id: 'kladr_id',
-        fields: ['kladr_id'],
-        forBounds: false,
-        forLocations: true
-    },
-    {
-        id: 'postal_code',
-        fields: ['postal_code'],
-        forBounds: false,
-        forLocations: true
-    },
-    {
-        id: 'country',
-        fields: ['country'],
-        forBounds: false,
-        forLocations: true
-    },
-    {
-        id: 'region_fias_id',
-        fields: ['region_fias_id'],
-        forBounds: false,
-        forLocations: true
-    },
-    {
-        id: 'region_type_full',
-        fields: ['region_type_full'],
-        forBounds: false,
-        forLocations: true,
-        kladrFormat: { digits: 2, zeros: 11 },
-        fiasType: 'region_fias_id'
-    },
-    {
-        id: 'region',
-        fields: ['region', 'region_type', 'region_type_full', 'region_with_type'],
-        forBounds: true,
-        forLocations: true,
-        kladrFormat: { digits: 2, zeros: 11 },
-        fiasType: 'region_fias_id'
-    },
-    {
-        id: 'area_fias_id',
-        fields: ['area_fias_id'],
-        forBounds: false,
-        forLocations: true
-    },
-    {
-        id: 'area_type_full',
-        fields: ['area_type_full'],
-        forBounds: false,
-        forLocations: true,
-        kladrFormat: { digits: 5, zeros: 8 },
-        fiasType: 'area_fias_id'
-    },
-    {
-        id: 'area',
-        fields: ['area', 'area_type', 'area_type_full', 'area_with_type'],
-        forBounds: true,
-        forLocations: true,
-        kladrFormat: { digits: 5, zeros: 8 },
-        fiasType: 'area_fias_id'
-    },
-    {
-        id: 'city_fias_id',
-        fields: ['city_fias_id'],
-        forBounds: false,
-        forLocations: true
-    },
-    {
-        id: 'city_type_full',
-        fields: ['city_type_full'],
-        forBounds: false,
-        forLocations: true,
-        kladrFormat: { digits: 8, zeros: 5 },
-        fiasType: 'city_fias_id'
-    },
-    {
-        id: 'city',
-        fields: ['city', 'city_type', 'city_type_full', 'city_with_type'],
-        forBounds: true,
-        forLocations: true,
-        kladrFormat: { digits: 8, zeros: 5 },
-        fiasType: 'city_fias_id'
-    },
-    {
-        id: 'city_district_fias_id',
-        fields: ['city_district_fias_id'],
-        forBounds: false,
-        forLocations: true
-    },
-    {
-        id: 'city_district_type_full',
-        fields: ['city_district_type_full'],
-        forBounds: false,
-        forLocations: true,
-        kladrFormat: { digits: 11, zeros: 2 },
-        fiasType: 'city_district_fias_id'
-    },
-    {
-        id: 'city_district',
-        fields: ['city_district', 'city_district_type', 'city_district_type_full', 'city_district_with_type'],
-        forBounds: true,
-        forLocations: true,
-        kladrFormat: { digits: 11, zeros: 2 },
-        fiasType: 'city_district_fias_id'
-    },
-    {
-        id: 'settlement_fias_id',
-        fields: ['settlement_fias_id'],
-        forBounds: false,
-        forLocations: true
-    },
-    {
-        id: 'settlement_type_full',
-        fields: ['settlement_type_full'],
-        forBounds: false,
-        forLocations: true,
-        kladrFormat: { digits: 11, zeros: 2 },
-        fiasType: 'settlement_fias_id'
-    },
-    {
-        id: 'settlement',
-        fields: ['settlement', 'settlement_type', 'settlement_type_full', 'settlement_with_type'],
-        forBounds: true,
-        forLocations: true,
-        kladrFormat: { digits: 11, zeros: 2 },
-        fiasType: 'settlement_fias_id'
-    },
-    {
-        id: 'street_fias_id',
-        fields: ['street_fias_id'],
-        forBounds: false,
-        forLocations: true
-    },
-    {
-        id: 'street_type_full',
-        fields: ['street_type_full'],
-        forBounds: false,
-        forLocations: true,
-        kladrFormat: { digits: 15, zeros: 2 },
-        fiasType: 'street_fias_id'
-    },
-    {
-        id: 'street',
-        fields: ['street', 'street_type', 'street_type_full', 'street_with_type'],
-        forBounds: true,
-        forLocations: true,
-        kladrFormat: { digits: 15, zeros: 2 },
-        fiasType: 'street_fias_id'
-    },
-    {
-        id: 'house',
-        fields: ['house', 'house_type', 'house_type_full',
-            'block', 'block_type'],
-        forBounds: true,
-        forLocations: false,
-        kladrFormat: { digits: 19 }
-    }
-
-];
-
-var rHasMatch = /<strong>/;
-
-var innPartsLengths = {
-    'LEGAL': [2, 2, 5, 1],
-    'INDIVIDUAL': [2, 2, 6, 2]
-};
-
-function valueStartsWith (suggestion, field) {
-    var fieldValue = suggestion.data && suggestion.data[field];
-
-    return fieldValue &&
-        new RegExp('^' + utils.escapeRegExChars(fieldValue) + '([' + WORD_DELIMITERS + ']|$)','i')
-            .test(suggestion.value);
-}
-
-function chooseFormattedField (formattedMain, formattedAlt) {
-    return rHasMatch.test(formattedAlt) && !rHasMatch.test(formattedMain)
-        ? formattedAlt
-        : formattedMain;
-}
-
-function formattedField (main, alt, currentValue, suggestion, options) {
-    var that = this,
-        formattedMain = that.highlightMatches(main, currentValue, suggestion, options),
-        formattedAlt = that.highlightMatches(alt, currentValue, suggestion, options);
-
-    return chooseFormattedField(formattedMain, formattedAlt);
-}
-
-var types = {};
-
-types['NAME'] = {
-    urlSuffix: 'fio',
-    matchers: [matchers.matchByNormalizedQuery, matchers.matchByWords],
-    // names for labels, describing which fields are displayed
-    fieldNames: {
-        surname: 'фамилия',
-        name: 'имя',
-        patronymic: 'отчество'
-    },
-    // try to suggest even if a suggestion has been selected manually
-    alwaysContinueSelecting: true,
-    isDataComplete: function (suggestion) {
-        var that = this,
-            params = that.options.params,
-            data = suggestion.data,
-            fields;
-
-        if ($.isFunction(params)) {
-            params = params.call(that.element, suggestion.value);
-        }
-        if (params && params.parts) {
-            fields = $.map(params.parts, function (part) {
-                return part.toLowerCase();
-            });
-        } else {
-            // when NAME is first, patronymic is mot mandatory
-            fields = ['surname', 'name'];
-            // when SURNAME is first, it is
-            if (valueStartsWith(suggestion, 'surname')) {
-                fields.push('patronymic');
-            }
-        }
-        return utils.fieldsNotEmpty(data, fields);
-    },
-    composeValue: function (data) {
-        return utils.compact([data.surname, data.name, data.patronymic]).join(' ');
-    }
-};
-
-types['ADDRESS'] = {
-    urlSuffix: 'address',
-    matchers: [
-        $.proxy(matchers.matchByNormalizedQuery, { stopwords: ADDRESS_STOPWORDS }),
-        $.proxy(matchers.matchByWordsAddress, { stopwords: ADDRESS_STOPWORDS })
-    ],
-    dataComponents: ADDRESS_COMPONENTS,
-    dataComponentsById: utils.indexBy(ADDRESS_COMPONENTS, 'id', 'index'),
-    unformattableTokens: ADDRESS_STOPWORDS,
-    enrichmentEnabled: true,
-    geoEnabled: true,
-    isDataComplete: function (suggestion) {
-        var fields = [this.bounds.to || 'flat'],
-            data = suggestion.data;
-
-        return !$.isPlainObject(data) || utils.fieldsNotEmpty(data, fields);
-    },
-    composeValue: function (data, options) {
-        var region = data.region_with_type || utils.compact([data.region, data.region_type]).join(' ') || data.region_type_full,
-            area = data.area_with_type || utils.compact([data.area_type, data.area]).join(' ') || data.area_type_full,
-            city = data.city_with_type || utils.compact([data.city_type, data.city]).join(' ') || data.city_type_full,
-            settelement = data.settlement_with_type || utils.compact([data.settlement_type, data.settlement]).join(' ') || data.settlement_type_full,
-            cityDistrict = data.city_district_with_type || utils.compact([data.city_district_type, data.city_district]).join(' ') || data.city_district_type_full,
-            street = data.street_with_type || utils.compact([data.street_type, data.street]).join(' ') || data.street_type_full,
-            house = utils.compact([data.house_type, data.house, data.block_type, data.block]).join(' '),
-            flat = utils.compact([data.flat_type, data.flat]).join(' '),
-            postal_box = data.postal_box && ('а/я ' + data.postal_box),
-            result;
-
-        // если регион совпадает с городом
-        // например г Москва, г Москва
-        // то не показываем регион
-        if (region === city) {
-            region = '';
-        }
-
-        // иногда не показываем район
-        if (!(options && options.saveCityDistrict)) {
-            if (options && options.excludeCityDistrict) {
-                // если район явно запрещен
-                cityDistrict = '';
-            } else if (cityDistrict && !data.city_district_fias_id) {
-                // если район взят из ОКАТО (у него пустой city_district_fias_id)
-                cityDistrict = '';
-            }
-        }
-
-        result = utils.compact([
-            region,
-            area,
-            city,
-            cityDistrict,
-            settelement,
-            street,
-            house,
-            flat,
-            postal_box
-        ]).join(', ');
-
-        return result;
-    },
-    formatResult: function() {
-        var componentsUnderCityDistrict = [],
-            _underCityDistrict = false;
-
-        $.each(ADDRESS_COMPONENTS, function () {
-            if (_underCityDistrict) componentsUnderCityDistrict.push(this.id);
-            if (this.id === 'city_district') _underCityDistrict = true;
-        });
-
-        return function (value, currentValue, suggestion, options) {
-            var that = this,
-                district = suggestion.data && suggestion.data.city_district_with_type;
-
-            value = that.highlightMatches(value, currentValue, suggestion, options);
-            value = that.wrapFormattedValue(value, suggestion);
-
-            if (district && (!that.bounds.own.length || that.bounds.own.indexOf('street') >= 0)
-                && !$.isEmptyObject(that.copyDataComponents(suggestion.data, componentsUnderCityDistrict))) {
-                value +=
-                    '<div class="' + that.classes.subtext + '">' +
-                    that.highlightMatches(district, currentValue, suggestion) +
-                    '</div>';
-            }
-
-            return value;
-        };
-    }(),
-    /**
-     * @param instance
-     * @param options
-     * @param options.suggestion
-     * @param options.hasSameValues
-     * @param options.hasBeenEnreached
-     */
-    getSuggestionValue: function(instance, options) {
-        var formattedValue = null;
-
-        if (options.hasSameValues) {
-            if (instance.options.restrict_value) {
-                // Can not use unrestricted address,
-                // because some components (from constraints) must be omitted
-                formattedValue = this.getValueWithinConstraints(instance, options.suggestion);
-            } else if (instance.bounds.own.length) {
-                // Can not use unrestricted address,
-                // because only components from bounds must be included
-                formattedValue = this.getValueWithinBounds(instance, options.suggestion);
-            } else {
-                // Can use full unrestricted address
-                formattedValue = options.suggestion.unrestricted_value;
-            }
-        } else if (options.hasBeenEnriched) {
-            if (instance.options.restrict_value) {
-                formattedValue = this.getValueWithinConstraints(instance, options.suggestion, { excludeCityDistrict: true });
-            }
-        }
-
-        return formattedValue;
-    },
-    /*
-     * Compose suggestion value with respect to constraints
-     */
-    getValueWithinConstraints: function (instance, suggestion, options) {
-        return this.composeValue(instance.getUnrestrictedData(suggestion.data), options);
-    },
-    /*
-     * Compose suggestion value with respect to bounds
-     */
-    getValueWithinBounds: function (instance, suggestion, options) {
-        // для корректного составления адреса нужен city_district_fias_id
-        var data = instance.copyDataComponents(suggestion.data, instance.bounds.own.concat(['city_district_fias_id']));
-
-        return this.composeValue(data, options);
-    }
-
-};
-
-types['PARTY'] = {
-    urlSuffix: 'party',
-    matchers: [
-        $.proxy(matchers.matchByFields, {
-            // These fields of suggestion's `data` used by by-words matcher
-            fieldsStopwords: {
-                'value': null,
-                'data.address.value': ADDRESS_STOPWORDS,
-                'data.inn': null,
-                'data.ogrn': null
-            }
-        })
-    ],
-    dataComponents: ADDRESS_COMPONENTS,
-    geoEnabled: true,
-    formatResult: function (value, currentValue, suggestion, options) {
-        var that = this,
-            formattedInn = that.type.formatResultInn.call(that, suggestion, currentValue),
-            formatterOGRN = that.highlightMatches(utils.getDeepValue(suggestion.data, 'ogrn'), currentValue, suggestion),
-            formattedInnOGRN = chooseFormattedField(formattedInn, formatterOGRN),
-            formattedFIO = that.highlightMatches(utils.getDeepValue(suggestion.data, 'management.name'), currentValue, suggestion),
-            address = utils.getDeepValue(suggestion.data, 'address.value') || '';
-
-        if (that.isMobile) {
-            (options || (options = {})).maxLength = 50;
-        }
-
-        value = formattedField.call(that, value, utils.getDeepValue(suggestion.data, 'name.latin'), currentValue, suggestion, options);
-        value = that.wrapFormattedValue(value, suggestion);
-
-        if (address) {
-            address = address.replace(/^(\d{6}?\s+|Россия,\s+)/i, '');
-            if (that.isMobile) {
-                // keep only two first words
-                address = address.replace(new RegExp('^([^' + WORD_DELIMITERS + ']+[' + WORD_DELIMITERS + ']+[^' + WORD_DELIMITERS + ']+).*'), '$1');
-            } else {
-                address = that.highlightMatches(address, currentValue, suggestion, {
-                    unformattableTokens: ADDRESS_STOPWORDS
-                });
-            }
-        }
-
-        if (formattedInnOGRN || address || formattedFIO) {
-            value +=
-                '<div class="' + that.classes.subtext + '">' +
-                '<span class="' + that.classes.subtext_inline + '">' + (formattedInnOGRN || '') + '</span>' +
-                (chooseFormattedField(address, formattedFIO) || '') +
-                '</div>';
-        }
-        return value;
-    },
-    formatResultInn: function(suggestion, currentValue) {
-        var that = this,
-            inn = suggestion.data && suggestion.data.inn,
-            innPartsLength = innPartsLengths[suggestion.data && suggestion.data.type],
-            innParts,
-            formattedInn,
-            rDigit = /\d/;
-
-        if (inn) {
-            formattedInn = that.highlightMatches(inn, currentValue, suggestion);
-            if (innPartsLength) {
-                formattedInn = formattedInn.split('');
-                innParts = $.map(innPartsLength, function (partLength) {
-                    var formattedPart = '',
-                        ch;
-
-                    while (partLength && (ch = formattedInn.shift())) {
-                        formattedPart += ch;
-                        if (rDigit.test(ch)) partLength--;
-                    }
-
-                    return formattedPart;
-                });
-                formattedInn = innParts.join('<span class="' + that.classes.subtext_delimiter + '"></span>') +
-                    formattedInn.join('');
-            }
-
-            return formattedInn;
-        }
-    }
-};
-
-types['EMAIL'] = {
-    urlSuffix: 'email',
-    matchers: [matchers.matchByNormalizedQuery],
-    isQueryRequestable: function (query) {
-        return this.options.suggest_local || query.indexOf('@') >= 0;
-    }
-};
-
-types['BANK'] = {
-    urlSuffix: 'bank',
-    matchers: [$.proxy(matchers.matchByFields, {
-        // These fields of suggestion's `data` used by by-words matcher
-        fieldsStopwords: {
-            'value': null,
-            'data.bic': null,
-            'data.swift': null
-        }
-    })],
-    dataComponents: ADDRESS_COMPONENTS,
-    geoEnabled: true,
-    formatResult: function (value, currentValue, suggestion, options) {
-        var that = this,
-            formattedBIC = that.highlightMatches(utils.getDeepValue(suggestion.data, 'bic'), currentValue, suggestion),
-            address = utils.getDeepValue(suggestion.data, 'address.value') || '';
-
-        value = that.highlightMatches(value, currentValue, suggestion, options);
-        value = that.wrapFormattedValue(value, suggestion);
-
-        if (address) {
-            address = address.replace(/^\d{6}( РОССИЯ)?, /i, '');
-            if (that.isMobile) {
-                // keep only two first words
-                address = address.replace(new RegExp('^([^' + WORD_DELIMITERS + ']+[' + WORD_DELIMITERS + ']+[^' + WORD_DELIMITERS + ']+).*'), '$1');
-            } else {
-                address = that.highlightMatches(address, currentValue, suggestion, {
-                    unformattableTokens: ADDRESS_STOPWORDS
-                });
-            }
-        }
-
-        if (formattedBIC || address) {
-            value +=
-                '<div class="' + that.classes.subtext + '">' +
-                '<span class="' + that.classes.subtext_inline + '">' + formattedBIC + '</span>' +
-                address +
-                '</div>';
-        }
-        return value;
-    },
-    formatSelected: function (suggestion) {
-        return utils.getDeepValue(suggestion, 'data.name.payment');
-    }
-};
-
-$.extend(DEFAULT_OPTIONS, {
-    suggest_local: true
-});
-
-var notificator = {
-
-    chains: {},
-
-    'on': function (name, method) {
-        this.get(name).push(method);
-        return this;
-    },
-
-    'get': function (name) {
-        var chains = this.chains;
-        return chains[name] || (chains[name] = []);
-    }
-};
-
-var serviceMethods = {
-    'suggest': {
-        defaultParams: {
-            type: utils.getDefaultType(),
-            dataType: 'json',
-            contentType: utils.getDefaultContentType()
-        },
-        addTypeInUrl: true
-    },
-    'detectAddressByIp': {
-        defaultParams: {
-            type: 'GET',
-            dataType: 'json'
-        },
-        addTypeInUrl: false
-    },
-    'status': {
-        defaultParams: {
-            type: 'GET',
-            dataType: 'json'
-        },
-        addTypeInUrl: true
-    },
-    'findById': {
-        defaultParams: {
-            type: utils.getDefaultType(),
-            dataType: 'json',
-            contentType: utils.getDefaultContentType()
-        },
-        addTypeInUrl: true
-    }
-};
-
-var requestModes = {
-    'suggest': {
-        method: 'suggest',
-        userSelect: true,
-        updateValue: true,
-        enrichmentEnabled: true
-    },
-    'findById': {
-        method: 'findById',
-        userSelect: false,
-        updateValue: false,
-        enrichmentEnabled: false
-    }
-};
-
-function Suggestions(el, options) {
-    var that = this;
-
-    // Shared variables:
-    that.element = el;
-    that.el = $(el);
-    that.suggestions = [];
-    that.badQueries = [];
-    that.selectedIndex = -1;
-    that.currentValue = that.element.value;
-    that.intervalId = 0;
-    that.cachedResponse = {};
-    that.enrichmentCache = {};
-    that.currentRequest = null;
-    that.inputPhase = $.Deferred();
-    that.fetchPhase = $.Deferred();
-    that.enrichPhase = $.Deferred();
-    that.onChangeTimeout = null;
-    that.triggering = {};
-    that.$wrapper = null;
-    that.options = $.extend({}, DEFAULT_OPTIONS, options);
-    that.classes = {
-        hint: 'suggestions-hint',
-        mobile: 'suggestions-mobile',
-        nowrap: 'suggestions-nowrap',
-        selected: 'suggestions-selected',
-        suggestion: 'suggestions-suggestion',
-        subtext: 'suggestions-subtext',
-        subtext_inline: 'suggestions-subtext suggestions-subtext_inline',
-        subtext_delimiter: 'suggestions-subtext-delimiter',
-        subtext_label: 'suggestions-subtext suggestions-subtext_label',
-        removeConstraint: 'suggestions-remove',
-        value: 'suggestions-value'
-    };
-    that.disabled = false;
-    that.selection = null;
-    that.$viewport = $(window);
-    that.$body = $(document.body);
-    that.type = null;
-    that.status = {};
-
-    that.setupElement();
-
-    that.initializer = $.Deferred();
-
-    if (that.el.is(':visible')) {
-        that.initializer.resolve();
-    } else {
-        that.deferInitialization();
-    }
-
-    that.initializer.done($.proxy(that.initialize, that));
-}
-
-Suggestions.prototype = {
-
-    // Creation and destruction
-
-    initialize: function () {
-        var that = this;
-
-        that.uniqueId = utils.uniqueId('i');
-
-        that.createWrapper();
-        that.notify('initialize');
-
-        that.bindWindowEvents();
-
-        that.setOptions();
-        that.fixPosition();
-    },
-
-    /**
-     * Initialize when element is firstly interacted
-     */
-    deferInitialization: function () {
-        var that = this,
-            events = 'mouseover focus keydown',
-            timer,
-            callback = function () {
-                that.initializer.resolve();
-                that.enable();
-            };
-
-        that.initializer.always(function(){
-            that.el.off(events, callback);
-            clearInterval(timer);
-        });
-
-        that.disabled = true;
-        that.el.on(events, callback);
-        timer = setInterval(function(){
-            if (that.el.is(':visible')) {
-                callback();
-            }
-        }, that.options.initializeInterval);
-    },
-
-    isInitialized: function () {
-        return this.initializer.state() === 'resolved';
-    },
-
-    dispose: function () {
-        var that = this;
-
-        that.initializer.reject();
-        that.notify('dispose');
-        that.el.removeData(DATA_ATTR_KEY)
-            .removeClass('suggestions-input');
-        that.unbindWindowEvents();
-        that.removeWrapper();
-        that.el.trigger('suggestions-dispose');
-    },
-
-    notify: function (chainName) {
-        var that = this,
-            args = utils.slice(arguments, 1);
-
-        return $.map(notificator.get(chainName), function (method) {
-            return method.apply(that, args);
-        });
-    },
-
-    createWrapper: function () {
-        var that = this;
-
-        that.$wrapper = $('<div class="suggestions-wrapper"/>');
-        that.el.after(that.$wrapper);
-
-        that.$wrapper.on('mousedown' + EVENT_NS, $.proxy(that.onMousedown, that));
-    },
-
-    removeWrapper: function () {
-        var that = this;
-
-        if (that.$wrapper) {
-            that.$wrapper.remove();
-        }
-        $(that.options.$helpers).off(EVENT_NS);
-    },
-
-    /** This whole handler is needed to prevent blur event on textbox
-     * when suggestion is clicked (blur leads to suggestions hide, so we need to prevent it).
-     * See https://github.com/jquery/jquery-ui/blob/master/ui/autocomplete.js for details
-     */
-    onMousedown: function (e) {
-        var that = this;
-
-        // prevent moving focus out of the text field
-        e.preventDefault();
-
-        // IE doesn't prevent moving focus even with e.preventDefault()
-        // so we set a flag to know when we should ignore the blur event
-        that.cancelBlur = true;
-        utils.delay(function () {
-            delete that.cancelBlur;
-        });
-
-        // clicking on the scrollbar causes focus to shift to the body
-        // but we can't detect a mouseup or a click immediately afterward
-        // so we have to track the next mousedown and close the menu if
-        // the user clicks somewhere outside of the autocomplete
-        if ($(e.target).closest(".ui-menu-item").length == 0) {
-            utils.delay(function () {
-                $(document).one("mousedown", function (e) {
-                    var $elements = that.el
-                        .add(that.$wrapper)
-                        .add(that.options.$helpers);
-
-                    if (that.options.floating) {
-                        $elements = $elements.add(that.$container);
-                    }
-
-                    $elements = $elements.filter(function () {
-                        return this === e.target || $.contains(this, e.target);
-                    });
-
-                    if (!$elements.length) {
-                        that.hide();
-                    }
-                });
-            });
-        }
-    },
-
-    bindWindowEvents: function () {
-        var that = this,
-            handler = $.proxy(that.fixPosition, that);
-
-        that.$viewport
-            .on('resize' + EVENT_NS + that.uniqueId, handler)
-            .on('scroll' + EVENT_NS + that.uniqueId, handler);
-    },
-
-    unbindWindowEvents: function () {
-        this.$viewport
-            .off('resize' + EVENT_NS + this.uniqueId)
-            .off('scroll' + EVENT_NS + this.uniqueId);
-    },
-
-    scrollToTop: function () {
-        var that = this,
-            scrollTarget = that.options.scrollOnFocus;
-
-        if (scrollTarget === true) {
-            scrollTarget = that.el;
-        }
-        if (scrollTarget instanceof $ && scrollTarget.length > 0) {
-            $('body,html').animate({
-                scrollTop: scrollTarget.offset().top
-            }, 'fast');
-        }
-    },
-
-    // Configuration methods
-
-    setOptions: function (suppliedOptions) {
-        var that = this;
-
-        $.extend(that.options, suppliedOptions);
-
-        // Check mandatory options
-        $.each({
-            'type': types,
-            'requestMode': requestModes
-        }, function (option, available) {
-            that[option] = available[that.options[option]];
-            if (!that[option]) {
-                that.disable();
-                throw '`' + option + '` option is incorrect! Must be one of: ' + $.map(available, function (value, name) {
-                    return '"' + name + '"';
-                }).join(', ');
-            }
-        });
-
-        $(that.options.$helpers)
-            .off(EVENT_NS)
-            .on('mousedown' + EVENT_NS, $.proxy(that.onMousedown, that));
-
-        if (that.isInitialized()) {
-            that.notify('setOptions');
-        }
-    },
-
-    // Common public methods
-
-    fixPosition: function (e) {
-        var that = this,
-            elLayout = {},
-            wrapperOffset,
-            origin;
-
-        that.isMobile = that.$viewport.width() <= that.options.mobileWidth;
-
-        if (!that.isInitialized() || (e && e.type == 'scroll' && !(that.options.floating || that.isMobile))) return;
-        that.$container.appendTo(that.options.floating ? that.$body : that.$wrapper);
-
-        that.notify('resetPosition');
-        // reset input's padding to default, determined by css
-        that.el.css('paddingLeft', '');
-        that.el.css('paddingRight', '');
-        elLayout.paddingLeft = parseFloat(that.el.css('paddingLeft'));
-        elLayout.paddingRight = parseFloat(that.el.css('paddingRight'));
-
-        $.extend(elLayout, that.el.offset());
-        elLayout.borderTop = that.el.css('border-top-style') == 'none' ? 0 : parseFloat(that.el.css('border-top-width'));
-        elLayout.borderLeft = that.el.css('border-left-style') == 'none' ? 0 : parseFloat(that.el.css('border-left-width'));
-        elLayout.innerHeight = that.el.innerHeight();
-        elLayout.innerWidth = that.el.innerWidth();
-        elLayout.outerHeight = that.el.outerHeight();
-        elLayout.componentsLeft = 0;
-        elLayout.componentsRight = 0;
-        wrapperOffset = that.$wrapper.offset();
-
-        origin = {
-            top: elLayout.top - wrapperOffset.top,
-            left: elLayout.left - wrapperOffset.left
-        };
-
-        that.notify('fixPosition', origin, elLayout);
-
-        if (elLayout.componentsLeft > elLayout.paddingLeft) {
-            that.el.css('paddingLeft', elLayout.componentsLeft + 'px');
-        }
-        if (elLayout.componentsRight > elLayout.paddingRight) {
-            that.el.css('paddingRight', elLayout.componentsRight + 'px');
-        }
-    },
-
-    clearCache: function () {
-        this.cachedResponse = {};
-        this.enrichmentCache = {};
-        this.badQueries = [];
-    },
-
-    clear: function () {
-        var that = this;
-
-        if (that.isInitialized()) {
-            that.clearCache();
-            that.currentValue = '';
-            that.selection = null;
-            that.hide();
-            that.suggestions = [];
-            that.el.val('');
-            that.el.trigger('suggestions-clear');
-            that.notify('clear');
-        }
-    },
-
-    disable: function () {
-        var that = this;
-
-        that.disabled = true;
-        that.abortRequest();
-        if (that.visible) {
-            that.hide();
-        }
-    },
-
-    enable: function () {
-        this.disabled = false;
-    },
-
-    isUnavailable: function () {
-        return this.disabled;
-    },
-
-    update: function () {
-        var that = this,
-            query = that.el.val();
-
-        if (that.isInitialized()) {
-            that.currentValue = query;
-            if (that.isQueryRequestable(query)) {
-                that.updateSuggestions(query);
-            } else {
-                that.hide();
-            }
-        }
-    },
-
-    setSuggestion: function (suggestion) {
-        var that = this,
-            data,
-            value;
-
-        if ($.isPlainObject(suggestion) && $.isPlainObject(suggestion.data)) {
-            suggestion = $.extend(true, {}, suggestion);
-
-            if (that.bounds.own.length) {
-                that.checkValueBounds(suggestion);
-                data = that.copyDataComponents(suggestion.data, that.bounds.all);
-                if (suggestion.data.kladr_id) {
-                    data.kladr_id = that.getBoundedKladrId(suggestion.data.kladr_id, that.bounds.all);
-                }
-                suggestion.data = data;
-            }
-
-            that.selection = suggestion;
-
-            // `that.suggestions` required by `that.getSuggestionValue` and must be set before
-            that.suggestions = [suggestion];
-            value = that.getSuggestionValue(suggestion) || '';
-            that.currentValue = value;
-            that.el.val(value);
-            that.abortRequest();
-            that.el.trigger('suggestions-set');
-        }
-    },
-
-    /**
-     * Fetch full object for current INPUT's value
-     * if no suitable object found, clean input element
-     */
-    fixData: function () {
-        var that = this,
-            fullQuery = that.extendedCurrentValue(),
-            currentValue = that.el.val(),
-            resolver = $.Deferred();
-
-        resolver
-            .done(function (suggestion) {
-                that.selectSuggestion(suggestion, 0, currentValue, { hasBeenEnriched: true });
-                that.el.trigger('suggestions-fixdata', suggestion);
-            })
-            .fail(function () {
-                that.selection = null;
-                that.currentValue = '';
-                that.el.val(that.currentValue);
-                that.el.trigger('suggestions-fixdata');
-            });
-
-        if (that.isQueryRequestable(fullQuery)) {
-            that.currentValue = fullQuery;
-            that.getSuggestions(fullQuery, { count: 1, from_bound: null, to_bound: null })
-                .done(function (suggestions) {
-                    // data fetched
-                    var suggestion = suggestions[0];
-                    if (suggestion) {
-                        resolver.resolve(suggestion);
-                    } else {
-                        resolver.reject();
-                    }
-                })
-                .fail(function () {
-                    // no data fetched
-                    resolver.reject();
-                });
-        } else {
-            resolver.reject();
-        }
-    },
-
-    // Querying related methods
-
-    /**
-     * Looks up parent instances
-     * @returns {String} current value prepended by parents' values
-     */
-    extendedCurrentValue: function () {
-        var that = this,
-            parentInstance = that.getParentInstance(),
-            parentValue = parentInstance && parentInstance.extendedCurrentValue(),
-            currentValue = $.trim(that.el.val());
-
-        return utils.compact([parentValue, currentValue]).join(' ');
-    },
-
-    getAjaxParams: function (method, custom) {
-        var that = this,
-            token = $.trim(that.options.token),
-            partner = $.trim(that.options.partner),
-            serviceUrl = that.options.serviceUrl,
-            url = that.options.url,
-            serviceMethod = serviceMethods[method],
-            params = $.extend({
-                timeout: that.options.timeout
-            }, serviceMethod.defaultParams),
-            headers = {};
-
-        if (url) {
-            serviceUrl = url;
-        } else {
-            if (!/\/$/.test(serviceUrl)) {
-                serviceUrl += '/';
-            }
-            serviceUrl += method;
-            if (serviceMethod.addTypeInUrl) {
-                serviceUrl += '/' + that.type.urlSuffix;
-            }
-        }
-
-        serviceUrl = utils.fixURLProtocol(serviceUrl);
-
-        if ($.support.cors) {
-            // for XMLHttpRequest put token in header
-            if (token) {
-                headers['Authorization'] = 'Token ' + token;
-            }
-            if (partner) {
-                headers['X-Partner'] = partner;
-            }
-            headers['X-Version'] = Suggestions.version;
-            if (!params.headers) {
-                params.headers = {};
-            }
-            $.extend(params.headers, that.options.headers, headers);
-        } else {
-            // for XDomainRequest put token into URL
-            if (token) {
-                headers['token'] = token;
-            }
-            if (partner) {
-                headers['partner'] = partner;
-            }
-            headers['version'] = Suggestions.version;
-            serviceUrl = utils.addUrlParams(serviceUrl, headers);
-        }
-
-        params.url = serviceUrl;
-
-        return $.extend(params, custom);
-    },
-
-    isQueryRequestable: function (query) {
-        var that = this,
-            result;
-
-        result = query.length >= that.options.minChars;
-
-        if (result && that.type.isQueryRequestable) {
-            result = that.type.isQueryRequestable.call(that, query);
-        }
-
-        return result;
-    },
-
-    constructRequestParams: function (query, customParams) {
-        var that = this,
-            options = that.options,
-            params = $.isFunction(options.params)
-                ? options.params.call(that.element, query)
-                : $.extend({}, options.params);
-
-        if (that.type.constructRequestParams) {
-            $.extend(params, that.type.constructRequestParams.call(that));
-        }
-        $.each(that.notify('requestParams'), function (i, hookParams) {
-            $.extend(params, hookParams);
-        });
-        params[options.paramName] = query;
-        if ($.isNumeric(options.count) && options.count > 0) {
-            params.count = options.count;
-        }
-
-        return $.extend(params, customParams);
-    },
-
-    updateSuggestions: function (query) {
-        var that = this;
-
-        that.fetchPhase = that.getSuggestions(query)
-            .done(function (suggestions) {
-                that.assignSuggestions(suggestions, query);
-            });
-    },
-
-    /**
-     * Get suggestions from cache or from server
-     * @param {String} query
-     * @param {Object} customParams parameters specified here will be passed to request body
-     * @param {Object} requestOptions
-     * @param {Boolean} [requestOptions.noCallbacks]  flag, request competence callbacks will not be invoked
-     * @param {Boolean} [requestOptions.useEnrichmentCache]
-     * @return {$.Deferred} waiter which is to be resolved with suggestions as argument
-     */
-    getSuggestions: function (query, customParams, requestOptions) {
-        var response,
-            that = this,
-            options = that.options,
-            noCallbacks = requestOptions && requestOptions.noCallbacks,
-            useEnrichmentCache = requestOptions && requestOptions.useEnrichmentCache,
-            params = that.constructRequestParams(query, customParams),
-            cacheKey = $.param(params || {}),
-            resolver = $.Deferred();
-
-        response = that.cachedResponse[cacheKey];
-        if (response && $.isArray(response.suggestions)) {
-            resolver.resolve(response.suggestions);
-        } else {
-            if (that.isBadQuery(query)) {
-                resolver.reject();
-            } else {
-                if (!noCallbacks && options.onSearchStart.call(that.element, params) === false) {
-                    resolver.reject();
-                } else {
-                    that.doGetSuggestions(params)
-                        .done(function (response) {
-                            // if response is correct and current value has not been changed
-                            if (that.processResponse(response) && query == that.currentValue) {
-
-                                // Cache results if cache is not disabled:
-                                if (!options.noCache) {
-                                    if (useEnrichmentCache) {
-                                        that.enrichmentCache[query] = response.suggestions[0];
-                                    } else {
-                                        that.enrichResponse(response, query);
-                                        that.cachedResponse[cacheKey] = response;
-                                        if (options.preventBadQueries && response.suggestions.length === 0) {
-                                            that.badQueries.push(query);
-                                        }
-                                    }
-                                }
-
-                                resolver.resolve(response.suggestions);
-                            } else {
-                                resolver.reject();
-                            }
-                            if (!noCallbacks) {
-                                options.onSearchComplete.call(that.element, query, response.suggestions);
-                            }
-                        }).fail(function (jqXHR, textStatus, errorThrown) {
-                        resolver.reject();
-                        if (!noCallbacks && textStatus !== 'abort') {
-                            options.onSearchError.call(that.element, query, jqXHR, textStatus, errorThrown);
-                        }
-                    });
-                }
-            }
-        }
-        return resolver;
-    },
-
-    /**
-     * Sends an AJAX request to server suggest method.
-     * @param {Object} params request params
-     * @returns {$.Deferred} response promise
-     */
-    doGetSuggestions: function (params) {
-        var that = this,
-            request = $.ajax(
-                that.getAjaxParams(that.requestMode.method, { data: utils.serialize(params) })
-            );
-
-        that.abortRequest();
-        that.currentRequest = request;
-        that.notify('request');
-
-        request.always(function () {
-            that.currentRequest = null;
-            that.notify('request');
-        });
-
-        return request;
-    },
-
-    isBadQuery: function (q) {
-        if (!this.options.preventBadQueries) {
-            return false;
-        }
-
-        var result = false;
-        $.each(this.badQueries, function (i, query) {
-            return !(result = q.indexOf(query) === 0);
-        });
-        return result;
-    },
-
-    abortRequest: function () {
-        var that = this;
-
-        if (that.currentRequest) {
-            that.currentRequest.abort();
-        }
-    },
-
-    /**
-     * Checks response format and data
-     * @return {Boolean} response contains acceptable data
-     */
-    processResponse: function (response) {
-        var that = this,
-            suggestions;
-
-        if (!response || !$.isArray(response.suggestions)) {
-            return false;
-        }
-
-        that.verifySuggestionsFormat(response.suggestions);
-        that.setUnrestrictedValues(response.suggestions);
-
-        if ($.isFunction(that.options.onSuggestionsFetch)) {
-            suggestions = that.options.onSuggestionsFetch.call(that.element, response.suggestions);
-            if ($.isArray(suggestions)) {
-                response.suggestions = suggestions;
-            }
-        }
-
-        return true;
-    },
-
-    verifySuggestionsFormat: function (suggestions) {
-        if (typeof suggestions[0] === 'string') {
-            $.each(suggestions, function (i, value) {
-                suggestions[i] = { value: value, data: null };
-            });
-        }
-    },
-
-    /**
-     * Gets string to set as input value
-     *
-     * @param suggestion
-     * @param {Object} [selectionOptions]
-     * @param {boolean} selectionOptions.hasBeenEnriched
-     * @param {boolean} selectionOptions.hasSameValues
-     * @return {string}
-     */
-    getSuggestionValue: function (suggestion, selectionOptions) {
-        var that = this,
-            formatSelected = that.options.formatSelected || that.type.formatSelected,
-            hasSameValues = selectionOptions && selectionOptions.hasSameValues,
-            hasBeenEnriched = selectionOptions && selectionOptions.hasBeenEnriched,
-            formattedValue,
-            typeFormattedValue = null;
-
-
-        if ($.isFunction(formatSelected)) {
-            formattedValue = formatSelected.call(that, suggestion);
-        }
-
-        if (typeof formattedValue !== 'string' || formattedValue.length == 0) {
-            formattedValue = suggestion.value;
-
-            if (that.type.getSuggestionValue) {
-                typeFormattedValue = that.type.getSuggestionValue(that, {
-                    suggestion: suggestion,
-                    hasSameValues: hasSameValues,
-                    hasBeenEnriched: hasBeenEnriched,
-                });
-
-                if (typeFormattedValue !== null) {
-                    formattedValue = typeFormattedValue;
-                }
-            }
-        }
-
-        return formattedValue;
-    },
-
-    hasSameValues: function(suggestion){
-        var hasSame = false;
-
-        $.each(this.suggestions, function(i, anotherSuggestion){
-            if (anotherSuggestion.value === suggestion.value && anotherSuggestion !== suggestion) {
-                hasSame = true;
-                return false;
-            }
-        });
-
-        return hasSame;
-    },
-
-    assignSuggestions: function (suggestions, query) {
-        var that = this;
-        that.suggestions = suggestions;
-        that.notify('assignSuggestions', query);
-    },
-
-    shouldRestrictValues: function () {
-        var that = this;
-        // treat suggestions value as restricted only if there is one constraint
-        // and restrict_value is true
-        return that.options.restrict_value
-            && that.constraints
-            && Object.keys(that.constraints).length == 1;
-    },
-
-    /**
-     * Fills suggestion.unrestricted_value property
-     */
-    setUnrestrictedValues: function (suggestions) {
-        var that = this,
-            shouldRestrict = that.shouldRestrictValues(),
-            label = that.getFirstConstraintLabel();
-
-        $.each(suggestions, function (i, suggestion) {
-            if (!suggestion.unrestricted_value) {
-                suggestion.unrestricted_value = shouldRestrict ? label + ', ' + suggestion.value : suggestion.value;
-            }
-        });
-    },
-
-    areSuggestionsSame: function (a, b) {
-        return a && b &&
-            a.value === b.value &&
-            utils.areSame(a.data, b.data);
-    }
-
-};
-
-/**
- * Methods related to INPUT's behavior
- */
-
-var methods = {
-
-    setupElement: function () {
-        // Remove autocomplete attribute to prevent native suggestions:
-        this.el
-            .attr('autocomplete', 'off')
-            .addClass('suggestions-input')
-            .css('box-sizing', 'border-box');
-    },
-
-    bindElementEvents: function () {
-        var that = this;
-
-        that.el.on('keydown' + EVENT_NS, $.proxy(that.onElementKeyDown, that));
-        // IE is buggy, it doesn't trigger `input` on text deletion, so use following events
-        that.el.on(['keyup' + EVENT_NS, 'cut' + EVENT_NS, 'paste' + EVENT_NS, 'input' + EVENT_NS].join(' '), $.proxy(that.onElementKeyUp, that));
-        that.el.on('blur' + EVENT_NS, $.proxy(that.onElementBlur, that));
-        that.el.on('focus' + EVENT_NS, $.proxy(that.onElementFocus, that));
-    },
-
-    unbindElementEvents: function () {
-        this.el.off(EVENT_NS);
-    },
-
-    onElementBlur: function () {
-        var that = this;
-
-        // suggestion was clicked, blur should be ignored
-        // see container mousedown handler
-        if (that.cancelBlur) {
-            that.cancelBlur = false;
-            return;
-        }
-
-        if (that.options.triggerSelectOnBlur) {
-            if (!that.isUnavailable()) {
-                that.selectCurrentValue({ noSpace: true })
-                    .always(function () {
-                        // For NAMEs selecting keeps suggestions list visible, so hide it
-                        that.hide();
-                    });
-            }
-        } else {
-            that.hide();
-        }
-
-        if (that.fetchPhase.abort) {
-            that.fetchPhase.abort();
-        }
-    },
-
-    onElementFocus: function () {
-        var that = this;
-
-        if (!that.cancelFocus) {
-            // defer methods to allow browser update input's style before
-            utils.delay($.proxy(that.completeOnFocus, that));
-        }
-        that.cancelFocus = false;
-    },
-
-    onElementKeyDown: function (e) {
-        var that = this;
-
-        if (that.isUnavailable()) {
-            return;
-        }
-
-        if (!that.visible) {
-            switch (e.which) {
-                // If suggestions are hidden and user presses arrow down, display suggestions
-                case KEYS.DOWN:
-                    that.suggest();
-                    break;
-                // if no suggestions available and user pressed Enter
-                case KEYS.ENTER:
-                    if (that.options.triggerSelectOnEnter) {
-                        that.triggerOnSelectNothing();
-                    }
-                    break;
-            }
-            return;
-        }
-
-        switch (e.which) {
-            case KEYS.ESC:
-                that.el.val(that.currentValue);
-                that.hide();
-                that.abortRequest();
-                break;
-
-            case KEYS.TAB:
-                if (that.options.tabDisabled === false) {
-                    return;
-                }
-                break;
-
-            case KEYS.ENTER:
-                if (that.options.triggerSelectOnEnter) {
-                    that.selectCurrentValue();
-                }
-                break;
-
-            case KEYS.SPACE:
-                if (that.options.triggerSelectOnSpace && that.isCursorAtEnd()) {
-                    e.preventDefault();
-                    that.selectCurrentValue({ continueSelecting: true, dontEnrich: true })
-                        .fail(function () {
-                            // If all data fetched but nothing selected
-                            that.currentValue += ' ';
-                            that.el.val(that.currentValue);
-                            that.proceedChangedValue();
-                        });
-                }
-                return;
-            case KEYS.UP:
-                that.moveUp();
-                break;
-            case KEYS.DOWN:
-                that.moveDown();
-                break;
-            default:
-                return;
-        }
-
-        // Cancel event if function did not return:
-        e.stopImmediatePropagation();
-        e.preventDefault();
-    },
-
-    onElementKeyUp: function (e) {
-        var that = this;
-
-        if (that.isUnavailable()) {
-            return;
-        }
-
-        switch (e.which) {
-            case KEYS.UP:
-            case KEYS.DOWN:
-            case KEYS.ENTER:
-                return;
-        }
-
-        // Cancel pending change
-        clearTimeout(that.onChangeTimeout);
-        that.inputPhase.reject();
-
-        if (that.currentValue !== that.el.val()) {
-            that.proceedChangedValue();
-        }
-    },
-
-    proceedChangedValue: function () {
-        var that = this;
-
-        // Cancel fetching, because it became obsolete
-        that.abortRequest();
-
-        that.inputPhase = $.Deferred()
-            .done($.proxy(that.onValueChange, that));
-
-        if (that.options.deferRequestBy > 0) {
-            // Defer lookup in case when value changes very quickly:
-            that.onChangeTimeout = utils.delay(function () {
-                that.inputPhase.resolve();
-            }, that.options.deferRequestBy);
-        } else {
-            that.inputPhase.resolve();
-        }
-    },
-
-    onValueChange: function () {
-        var that = this,
-            currentSelection;
-
-        if (that.selection) {
-            currentSelection = that.selection;
-            that.selection = null;
-            that.trigger('InvalidateSelection', currentSelection);
-        }
-
-        that.selectedIndex = -1;
-
-        that.update();
-        that.notify('valueChange');
-    },
-
-    completeOnFocus: function () {
-        var that = this;
-
-        if (that.isUnavailable()) {
-            return;
-        }
-
-        if (that.isElementFocused()) {
-            that.fixPosition();
-            that.update();
-            if (that.isMobile) {
-                that.setCursorAtEnd();
-                that.scrollToTop();
-            }
-        }
-    },
-
-    isElementFocused: function () {
-        return document.activeElement === this.element;
-    },
-
-    isCursorAtEnd: function () {
-        var that = this,
-            valLength = that.el.val().length,
-            selectionStart,
-            range;
-
-        // `selectionStart` and `selectionEnd` are not supported by some input types
-        try {
-            selectionStart = that.element.selectionStart;
-            if (typeof selectionStart === 'number') {
-                return selectionStart === valLength;
-            }
-        } catch (ex) {
-        }
-
-        if (document.selection) {
-            range = document.selection.createRange();
-            range.moveStart('character', -valLength);
-            return valLength === range.text.length;
-        }
-        return true;
-    },
-
-    setCursorAtEnd: function () {
-        var element = this.element;
-
-        // `selectionStart` and `selectionEnd` are not supported by some input types
-        try {
-            element.selectionEnd = element.selectionStart = element.value.length;
-            element.scrollLeft = element.scrollWidth;
-        } catch (ex) {
-            element.value = element.value;
-        }
-    }
-
-};
-
-$.extend(Suggestions.prototype, methods);
-
-notificator
-    .on('initialize', methods.bindElementEvents)
-    .on('dispose', methods.unbindElementEvents);
-
-/**
- * Methods related to plugin's authorization on server
- */
-
-// keys are "[type][token]"
-var statusRequests = {};
-
-function resetTokens () {
-    $.each(statusRequests, function(){
-        this.abort();
-    });
-    statusRequests = {};
-}
-
-resetTokens();
-
-var methods$1 = {
-
-    checkStatus: function () {
-        var that = this,
-            token = $.trim(that.options.token),
-            requestKey = that.options.type + token,
-            request = statusRequests[requestKey];
-
-        if (!request) {
-            request = statusRequests[requestKey] = $.ajax(that.getAjaxParams('status'));
-        }
-
-        request
-            .done(function(status){
-                if (status.search) {
-                    $.extend(that.status, status);
-                } else {
-                    triggerError('Service Unavailable');
-                }
-            })
-            .fail(function(){
-                triggerError(request.statusText);
-            });
-
-        function triggerError(errorThrown){
-            // If unauthorized
-            if ($.isFunction(that.options.onSearchError)) {
-                that.options.onSearchError.call(that.element, null, request, 'error', errorThrown);
-            }
-        }
-    }
-
-};
-
-Suggestions.resetTokens = resetTokens;
-
-$.extend(Suggestions.prototype, methods$1);
-
-notificator
-    .on('setOptions', methods$1.checkStatus);
-
-//export { methods, resetTokens };
-
-var locationRequest;
-var defaultGeoLocation = true;
-
-function resetLocation () {
-    locationRequest = null;
-    DEFAULT_OPTIONS.geoLocation = defaultGeoLocation;
-}
-
-var methods$2 = {
-
-    checkLocation: function () {
-        var that = this,
-            providedLocation = that.options.geoLocation;
-
-        if (!that.type.geoEnabled || !providedLocation) {
-            return;
-        }
-
-        that.geoLocation = $.Deferred();
-        if ($.isPlainObject(providedLocation) || $.isArray(providedLocation)) {
-            that.geoLocation.resolve(providedLocation);
-        } else {
-            if (!locationRequest) {
-                locationRequest = $.ajax(that.getAjaxParams('detectAddressByIp'));
-            }
-
-            locationRequest
-                .done(function (resp) {
-                    var locationData = resp && resp.location && resp.location.data;
-                    if (locationData && locationData.kladr_id) {
-                        that.geoLocation.resolve(locationData);
-                    } else {
-                        that.geoLocation.reject();
-                    }
-                })
-                .fail(function(){
-                    that.geoLocation.reject();
-                });
-        }
-    },
-
-    /**
-     * Public method to get `geoLocation` promise
-     * @returns {$.Deferred}
-     */
-    getGeoLocation: function () {
-        return this.geoLocation;
-    },
-
-    constructParams: function () {
-        var that = this,
-            params = {};
-
-        if (that.geoLocation && $.isFunction(that.geoLocation.promise) && that.geoLocation.state() == 'resolved') {
-            that.geoLocation.done(function (locationData) {
-                params['locations_boost'] = $.makeArray(locationData);
-            });
-        }
-
-        return params;
-    }
-
-};
-
-
-// Disable this feature when GET method used. See SUG-202
-if (utils.getDefaultType() != 'GET') {
-    $.extend(DEFAULT_OPTIONS, {
-        geoLocation: defaultGeoLocation
-    });
-
-    $.extend(Suggestions, {
-        resetLocation: resetLocation
-    });
-
-    $.extend(Suggestions.prototype, {
-        getGeoLocation: methods$2.getGeoLocation
-    });
-
-    notificator
-        .on('setOptions', methods$2.checkLocation)
-        .on('requestParams', methods$2.constructParams);
-}
-
-var methods$3 = {
-
-    enrichSuggestion: function (suggestion, selectionOptions) {
-        var that = this,
-            resolver = $.Deferred();
-
-        if (!that.status.enrich || !that.type.enrichmentEnabled || !that.requestMode.enrichmentEnabled ||
-            selectionOptions && selectionOptions.dontEnrich) {
-            return resolver.resolve(suggestion);
-        }
-
-        // if current suggestion is already enriched, use it
-        if (suggestion.data && suggestion.data.qc != null) {
-            return resolver.resolve(suggestion);
-        }
-
-        that.disableDropdown();
-
-        // Set `currentValue` to make `processResponse` to consider enrichment response valid
-        that.currentValue = suggestion.unrestricted_value ;
-
-        // prevent request abortion during onBlur
-        that.enrichPhase = that.getSuggestions(
-            suggestion.unrestricted_value,
-            {
-                count: 1,
-                locations: null,
-                locations_boost: null,
-                from_bound: null,
-                to_bound: null
-            },
-            {
-                noCallbacks: true,
-                useEnrichmentCache: true
-            }
-        )
-            .always(function () {
-                that.enableDropdown();
-            })
-            .done(function (suggestions) {
-                var enrichedSuggestion = suggestions && suggestions[0];
-
-                resolver.resolve(enrichedSuggestion || suggestion, !!enrichedSuggestion);
-            })
-            .fail(function () {
-                resolver.resolve(suggestion);
-            });
-
-        return resolver;
-    },
-
-    /**
-     * Injects enriched suggestion into response
-     * @param response
-     * @param query
-     */
-    enrichResponse: function (response, query) {
-        var that = this,
-            enrichedSuggestion = that.enrichmentCache[query];
-
-        if (enrichedSuggestion) {
-            $.each(response.suggestions, function(i, suggestion){
-                if (suggestion.value === query) {
-                    response.suggestions[i] = enrichedSuggestion;
-                    return false;
-                }
-            });
-        }
-    }
-
-};
-
-$.extend(Suggestions.prototype, methods$3);
-
-/**
- * Methods related to suggestions dropdown list
- */
-
-function highlightMatches(chunks) {
-    return $.map(chunks, function (chunk) {
-        var text = utils.escapeHtml(chunk.text);
-
-        if (text && chunk.matched) {
-            text = '<strong>' + text + '</strong>';
-        }
-        return text;
-    }).join('');
-}
-
-function nowrapLinkedParts(formattedStr, nowrapClass) {
-    var delimitedParts = formattedStr.split(', ');
-    // string has no delimiters, should not wrap
-    if (delimitedParts.length === 1) {
-        return formattedStr;
-    }
-    // disable word-wrap inside delimited parts
-    return $.map(delimitedParts, function (part) {
-        return '<span class="' + nowrapClass + '">' + part + '</span>'
-    }).join(', ');
-}
-
-function hasAnotherSuggestion (suggestions, suggestion) {
-    var result = false;
-
-    $.each(suggestions, function (i, s) {
-        result = s.value == suggestion.value && s != suggestion;
-        if (result) {
-            return false;
-        }
-    });
-
-    return result;
-}
-
-var optionsUsed = {
-    width: 'auto',
-    floating: false
-};
-
-var methods$4 = {
-
-    createContainer: function () {
-        var that = this,
-            suggestionSelector = '.' + that.classes.suggestion,
-            options = that.options,
-            $container = $('<div/>')
-                .addClass(options.containerClass)
-                .css({
-                    position: 'absolute',
-                    display: 'none'
-                });
-
-        that.$container = $container;
-
-        $container.on('click' + EVENT_NS, suggestionSelector, $.proxy(that.onSuggestionClick, that));
-    },
-
-    removeContainer: function () {
-        var that = this;
-
-        if (that.options.floating) {
-            that.$container.remove();
-        }
-    },
-
-    setContainerOptions: function () {
-        var that = this,
-            mousedownEvent = 'mousedown' + EVENT_NS;
-
-        that.$container.off(mousedownEvent);
-        if (that.options.floating) {
-            that.$container.on(mousedownEvent, $.proxy(that.onMousedown, that));
-        }
-    },
-
-    /**
-     * Listen for click event on suggestions list:
-     */
-    onSuggestionClick: function (e) {
-        var that = this,
-            $el = $(e.target),
-            index;
-
-        if (!that.dropdownDisabled) {
-            that.cancelFocus = true;
-            that.el.focus();
-
-            while ($el.length && !(index = $el.attr('data-index'))) {
-                $el = $el.closest('.' + that.classes.suggestion);
-            }
-
-            if (index && !isNaN(index)) {
-                that.select(+index);
-            }
-        }
-    },
-
-    // Dropdown UI methods
-
-    setDropdownPosition: function (origin, elLayout) {
-        var that = this,
-            scrollLeft = that.$viewport.scrollLeft(),
-            style;
-
-        if (that.isMobile) {
-            style = that.options.floating ? {
-                left: scrollLeft + 'px',
-                top: elLayout.top + elLayout.outerHeight + 'px'
-            } : {
-                left: origin.left - elLayout.left + scrollLeft + 'px',
-                top: origin.top + elLayout.outerHeight + 'px'
-            };
-            style.width = that.$viewport.width() + 'px';
-        } else {
-            style = that.options.floating ? {
-                left: elLayout.left + 'px',
-                top: elLayout.top + elLayout.borderTop + elLayout.innerHeight + 'px'
-            } : {
-                left: origin.left + 'px',
-                top: origin.top + elLayout.borderTop + elLayout.innerHeight + 'px'
-            };
-
-            // Defer to let body show scrollbars
-            utils.delay(function () {
-                var width = that.options.width;
-
-                if (width === 'auto') {
-                    width = that.el.outerWidth();
-                }
-                that.$container.outerWidth(width);
-            });
-        }
-
-        that.$container
-            .toggleClass(that.classes.mobile, that.isMobile)
-            .css(style);
-
-        that.containerItemsPadding = elLayout.left + elLayout.borderLeft + elLayout.paddingLeft - scrollLeft;
-    },
-
-    setItemsPositions: function () {
-        var that = this,
-            $items = that.getSuggestionsItems();
-
-        $items.css('paddingLeft', that.isMobile ? that.containerItemsPadding + 'px' : '');
-    },
-
-    getSuggestionsItems: function () {
-        return this.$container.children('.' + this.classes.suggestion);
-    },
-
-    toggleDropdownEnabling: function (enable) {
-        this.dropdownDisabled = !enable;
-        this.$container.attr('disabled', !enable);
-    },
-
-    disableDropdown: function () {
-        this.toggleDropdownEnabling(false);
-    },
-
-    enableDropdown: function () {
-        this.toggleDropdownEnabling(true);
-    },
-
-    /**
-     * Shows if there are any suggestions besides currently selected
-     * @returns {boolean}
-     */
-    hasSuggestionsToChoose: function () {
-        var that = this;
-
-        return that.suggestions.length > 1 ||
-            (that.suggestions.length === 1 &&
-                (!that.selection || $.trim(that.suggestions[0].value) !== $.trim(that.selection.value))
-            );
-    },
-
-    suggest: function () {
-        var that = this,
-            options = that.options,
-            formatResult,
-            html = [];
-
-        if (!that.requestMode.userSelect) {
-            return ;
-        }
-
-        // если нечего показывать, то сообщаем об этом
-        if (!that.hasSuggestionsToChoose()) {
-
-            if (that.suggestions.length) {
-                that.hide();
-                return
-            } else {
-                html.push('<div class="' + that.classes.hint + '">' + options.noSuggestionsHint[options.type] + '</div>');
-            }
-
-        } else {
-
-            formatResult = options.formatResult || that.type.formatResult || that.formatResult;
-
-            // Build hint html
-            if (!that.isMobile && options.hint && that.suggestions.length) {
-                html.push('<div class="' + that.classes.hint + '">' + options.hint + '</div>');
-            }
-            that.selectedIndex = -1;
-            // Build suggestions inner HTML:
-            $.each(that.suggestions, function (i, suggestion) {
-                var labels = that.makeSuggestionLabel(that.suggestions, suggestion);
-
-                if (suggestion == that.selection) {
-                    that.selectedIndex = i;
-                }
-
-                html.push('<div class="' + that.classes.suggestion + '" data-index="' + i + '">');
-                html.push(formatResult.call(that, suggestion.value, that.currentValue, suggestion, {
-                    unformattableTokens: that.type.unformattableTokens
-                }));
-                if (labels) {
-                    html.push('<span class="' + that.classes.subtext_label + '">' + utils.escapeHtml(labels) + '</span>');
-                }
-                html.push('</div>');
-            });
-
-        }
-
-        that.$container.html(html.join(''));
-
-        // Select first value by default:
-        if (options.autoSelectFirst && that.selectedIndex === -1) {
-            that.selectedIndex = 0;
-        }
-        if (that.selectedIndex !== -1) {
-            that.getSuggestionsItems().eq(that.selectedIndex).addClass(that.classes.selected);
-        }
-
-        if ($.isFunction(options.beforeRender)) {
-            options.beforeRender.call(that.element, that.$container);
-        }
-
-        that.$container.show();
-        that.visible = true;
-        that.fixPosition();
-        that.setItemsPositions();
-    },
-
-    wrapFormattedValue: function (value, suggestion) {
-        var that = this,
-            status = utils.getDeepValue(suggestion.data, 'state.status');
-
-        return '<span class="' + that.classes.value + '"' + (status ? ' data-suggestion-status="' + status + '"' : '') + '>' +
-            value +
-            '</span>';
-    },
-
-    formatResult: function (value, currentValue, suggestion, options) {
-        var that = this;
-
-        value = that.highlightMatches(value, currentValue, suggestion, options);
-
-        return that.wrapFormattedValue(value, suggestion);
-    },
-
-    /**
-     * Makes HTML contents for suggestion item
-     * @param {String} value string to be displayed as a value
-     * @param {String} currentValue contents of the textbox
-     * @param suggestion whole suggestion object with displaying value and other fields
-     * @param {Object} [options] set of flags:
-     *          `unformattableTokens` - array of search tokens, that are not to be highlighted
-     *          `maxLength` - if set, `value` is limited by this length
-     * @returns {String} HTML to be inserted in the list
-     */
-    highlightMatches: function (value, currentValue, suggestion, options) {
-
-        var that = this,
-            chunks = [],
-            unformattableTokens = options && options.unformattableTokens,
-            maxLength = options && options.maxLength,
-            tokens, tokenMatchers, preferredTokens,
-            rWords = utils.reWordExtractor(),
-            match, word, i, chunk, formattedStr;
-
-        if (!value) return '';
-
-        tokens = utils.compact(utils.formatToken(currentValue).split(WORD_SPLITTER));
-
-        // Move unformattableTokens to the end.
-        // This will help to apply them only if no other tokens match
-        preferredTokens = utils.arrayMinus(tokens, unformattableTokens);
-        tokens = utils.withSubTokens(preferredTokens.concat(utils.arrayMinus(tokens, preferredTokens)));
-
-        tokenMatchers = $.map(tokens, function (token) {
-            return new RegExp('^((.*)([' + WORD_PARTS_DELIMITERS + ']+))?' +
-                '(' + utils.escapeRegExChars(token) + ')' +
-                '([^' + WORD_PARTS_DELIMITERS + ']*[' + WORD_PARTS_DELIMITERS + ']*)', 'i');
-        });
-
-        // parse string by words
-        while ((match = rWords.exec(value)) && match[0]) {
-            word = match[1];
-            chunks.push({
-                text: word,
-
-                // upper case means a word is a name and can be highlighted even if presents in unformattableTokens
-                hasUpperCase: word.toLowerCase() !== word,
-                formatted: utils.formatToken(word),
-                matchable: true
-            });
-            if (match[2]) {
-                chunks.push({
-                    text: match[2]
-                });
-            }
-        }
-
-        // use simple loop because length can change
-        for (i = 0; i < chunks.length; i++) {
-            chunk = chunks[i];
-            if (chunk.matchable && !chunk.matched && ($.inArray(chunk.formatted, unformattableTokens) === -1 || chunk.hasUpperCase)) {
-                $.each(tokenMatchers, function (j, matcher) {
-                    var tokenMatch = matcher.exec(chunk.formatted),
-                        length, nextIndex = i + 1;
-
-                    if (tokenMatch) {
-                        tokenMatch = {
-                            before: tokenMatch[1] || '',
-                            beforeText: tokenMatch[2] || '',
-                            beforeDelimiter: tokenMatch[3] || '',
-                            text: tokenMatch[4] || '',
-                            after: tokenMatch[5] || ''
-                        };
-
-                        if (tokenMatch.before) {
-                            // insert chunk before current
-                            chunks.splice(i, 0, {
-                                text: chunk.text.substr(0, tokenMatch.beforeText.length),
-                                formatted: tokenMatch.beforeText,
-                                matchable: true
-                            }, {
-                                text: tokenMatch.beforeDelimiter
-                            });
-                            nextIndex += 2;
-
-                            length = tokenMatch.before.length;
-                            chunk.text = chunk.text.substr(length);
-                            chunk.formatted = chunk.formatted.substr(length);
-                            i--;
-                        }
-
-                        length = tokenMatch.text.length + tokenMatch.after.length;
-                        if (chunk.formatted.length > length) {
-                            chunks.splice(nextIndex, 0, {
-                                text: chunk.text.substr(length),
-                                formatted: chunk.formatted.substr(length),
-                                matchable: true
-                            });
-                            chunk.text = chunk.text.substr(0, length);
-                            chunk.formatted = chunk.formatted.substr(0, length);
-                        }
-
-                        if (tokenMatch.after) {
-                            length = tokenMatch.text.length;
-                            chunks.splice(nextIndex, 0, {
-                                text: chunk.text.substr(length),
-                                formatted: chunk.formatted.substr(length)
-                            });
-                            chunk.text = chunk.text.substr(0, length);
-                            chunk.formatted = chunk.formatted.substr(0, length);
-                        }
-                        chunk.matched = true;
-                        return false;
-                    }
-                });
-            }
-        }
-
-        if (maxLength) {
-            for (i = 0; i < chunks.length && maxLength >= 0; i++) {
-                chunk = chunks[i];
-                maxLength -= chunk.text.length;
-                if (maxLength < 0) {
-                    chunk.text = chunk.text.substr(0, chunk.text.length + maxLength) + '...';
-                }
-            }
-            chunks.length = i;
-        }
-
-        formattedStr = highlightMatches(chunks);
-        return nowrapLinkedParts(formattedStr, that.classes.nowrap);
-    },
-
-    makeSuggestionLabel: function (suggestions, suggestion) {
-        var that = this,
-            fieldNames = that.type.fieldNames,
-            nameData = {},
-            rWords = utils.reWordExtractor(),
-            match, word,
-            labels = [];
-
-        if (fieldNames && hasAnotherSuggestion(suggestions, suggestion) && suggestion.data) {
-
-            $.each(fieldNames, function (field) {
-                var value = suggestion.data[field];
-                if (value) {
-                    nameData[field] = utils.formatToken(value);
-                }
-            });
-
-            if (!$.isEmptyObject(nameData)) {
-                while ((match = rWords.exec(utils.formatToken(suggestion.value))) && (word = match[1])) {
-                    $.each(nameData, function (i, value) {
-                        if (value == word) {
-                            labels.push(fieldNames[i]);
-                            delete nameData[i];
-                            return false;
-                        }
-                    });
-                }
-
-                if (labels.length) {
-                    return labels.join(', ');
-                }
-            }
-        }
-    },
-
-    hide: function () {
-        var that = this;
-        that.visible = false;
-        that.selectedIndex = -1;
-        that.$container
-            .hide()
-            .empty();
-    },
-
-    activate: function (index) {
-        var that = this,
-            $activeItem,
-            selected = that.classes.selected,
-            $children;
-
-        if (!that.dropdownDisabled) {
-            $children = that.getSuggestionsItems();
-
-            $children.removeClass(selected);
-
-            that.selectedIndex = index;
-
-            if (that.selectedIndex !== -1 && $children.length > that.selectedIndex) {
-                $activeItem = $children.eq(that.selectedIndex);
-                $activeItem.addClass(selected);
-                return $activeItem;
-            }
-        }
-
-        return null;
-    },
-
-    deactivate: function (restoreValue) {
-        var that = this;
-
-        if (!that.dropdownDisabled) {
-            that.selectedIndex = -1;
-            that.getSuggestionsItems().removeClass(that.classes.selected);
-            if (restoreValue) {
-                that.el.val(that.currentValue);
-            }
-        }
-    },
-
-    moveUp: function () {
-        var that = this;
-
-        if (that.dropdownDisabled) {
-            return;
-        }
-        if (that.selectedIndex === -1) {
-            if (that.suggestions.length) {
-                that.adjustScroll(that.suggestions.length - 1);
-            }
-            return;
-        }
-
-        if (that.selectedIndex === 0) {
-            that.deactivate(true);
-            return;
-        }
-
-        that.adjustScroll(that.selectedIndex - 1);
-    },
-
-    moveDown: function () {
-        var that = this;
-
-        if (that.dropdownDisabled) {
-            return;
-        }
-        if (that.selectedIndex === (that.suggestions.length - 1)) {
-            that.deactivate(true);
-            return;
-        }
-
-        that.adjustScroll(that.selectedIndex + 1);
-    },
-
-    adjustScroll: function (index) {
-        var that = this,
-            $activeItem = that.activate(index),
-            itemTop,
-            itemBottom,
-            scrollTop = that.$container.scrollTop(),
-            containerHeight;
-
-        if (!$activeItem || !$activeItem.length) {
-            return;
-        }
-
-        itemTop = $activeItem.position().top;
-        if (itemTop < 0 ) {
-            that.$container.scrollTop(scrollTop + itemTop);
-        } else {
-            itemBottom = itemTop + $activeItem.outerHeight();
-            containerHeight = that.$container.innerHeight();
-            if (itemBottom > containerHeight) {
-                that.$container.scrollTop(scrollTop - containerHeight + itemBottom);
-            }
-        }
-
-        that.el.val(that.suggestions[index].value);
-    }
-
-};
-
-$.extend(DEFAULT_OPTIONS, optionsUsed);
-
-$.extend(Suggestions.prototype, methods$4);
-
-notificator
-    .on('initialize', methods$4.createContainer)
-    .on('dispose', methods$4.removeContainer)
-    .on('setOptions', methods$4.setContainerOptions)
-    .on('fixPosition', methods$4.setDropdownPosition)
-    .on('fixPosition', methods$4.setItemsPositions)
-    .on('assignSuggestions', methods$4.suggest);
-
-/**
- * Methods related to right-sided component
- */
-
-var QUEUE_NAME = 'addon';
-var BEFORE_SHOW_ADDON = 50;
-var BEFORE_RESTORE_PADDING = 1000;
-
-var optionsUsed$1 = {
-    addon: null
-};
-
-var ADDON_TYPES = {
-    'NONE': 'none',
-    'SPINNER': 'spinner',
-    'CLEAR': 'clear'
-};
-
-var Addon = function (owner) {
-    var that = this,
-        $el = $('<span class="suggestions-addon"/>');
-
-    that.owner = owner;
-    that.$el = $el;
-    that.type = ADDON_TYPES.NONE;
-    that.visible = false;
-    that.initialPadding = null;
-
-    $el.on('click', $.proxy(that, 'onClick'));
-};
-
-Addon.prototype = {
-
-    checkType: function () {
-        var that = this,
-            type = that.owner.options.addon,
-            isTypeCorrect = false;
-
-        $.each(ADDON_TYPES, function (key, value) {
-            isTypeCorrect = value == type;
-            if (isTypeCorrect) {
-                return false;
-            }
-        });
-
-        if (!isTypeCorrect) {
-            type = that.owner.isMobile ? ADDON_TYPES.CLEAR : ADDON_TYPES.SPINNER;
-        }
-
-        if (type != that.type) {
-            that.type = type;
-            that.$el.attr('data-addon-type', type);
-            that.toggle(true);
-        }
-    },
-
-    toggle: function (immediate) {
-        var that = this,
-            visible;
-
-        switch (that.type) {
-            case ADDON_TYPES.CLEAR:
-                visible = !!that.owner.currentValue;
-                break;
-            case ADDON_TYPES.SPINNER:
-                visible = !!that.owner.currentRequest;
-                break;
-            default:
-                visible = false;
-        }
-
-        if (visible != that.visible) {
-            that.visible = visible;
-            if (visible) {
-                that.show(immediate);
-            } else {
-                that.hide(immediate);
-            }
-        }
-    },
-
-    show: function (immediate) {
-        var that = this,
-            style = {'opacity': 1};
-
-        if (immediate) {
-            that.$el
-                .show()
-                .css(style);
-            that.showBackground(true);
-        } else {
-            that.$el
-                .stop(true, true)
-                .delay(BEFORE_SHOW_ADDON)
-                .queue(function () {
-                    that.$el.show();
-                    that.showBackground();
-                    that.$el.dequeue();
-                })
-                .animate(style, 'fast');
-        }
-    },
-
-    hide: function (immediate) {
-        var that = this,
-            style = {'opacity': 0};
-
-        if (immediate) {
-            that.$el
-                .hide()
-                .css(style);
-        }
-        that.$el
-            .stop(true)
-            .animate(style, {
-                duration: 'fast',
-                complete: function () {
-                    that.$el.hide();
-                    that.hideBackground();
-                }
-            });
-    },
-
-    fixPosition: function(origin, elLayout){
-        var that = this,
-            addonSize = elLayout.innerHeight;
-
-        that.checkType();
-        that.$el.css({
-            left: origin.left + elLayout.borderLeft + elLayout.innerWidth - addonSize + 'px',
-            top: origin.top + elLayout.borderTop + 'px',
-            height: addonSize,
-            width: addonSize
-        });
-
-        that.initialPadding = elLayout.paddingRight;
-        that.width = addonSize;
-        if (that.visible) {
-            elLayout.componentsRight += addonSize;
-        }
-    },
-
-    showBackground: function (immediate) {
-        var that = this,
-            $el = that.owner.el,
-            style = {'paddingRight': that.width};
-
-        if (that.width > that.initialPadding) {
-            that.stopBackground();
-            if (immediate) {
-                $el.css(style);
-            } else {
-                $el
-                    .animate(style, { duration: 'fast', queue: QUEUE_NAME })
-                    .dequeue(QUEUE_NAME);
-            }
-        }
-    },
-
-    hideBackground: function (immediate) {
-        var that = this,
-            $el = that.owner.el,
-            style = {'paddingRight': that.initialPadding};
-
-        if (that.width > that.initialPadding) {
-            that.stopBackground(true);
-            if (immediate) {
-                $el.css(style);
-            } else {
-                $el
-                    .delay(BEFORE_RESTORE_PADDING, QUEUE_NAME)
-                    .animate(style, { duration: 'fast', queue: QUEUE_NAME })
-                    .dequeue(QUEUE_NAME);
-            }
-        }
-    },
-
-    stopBackground: function (gotoEnd) {
-        this.owner.el.stop(QUEUE_NAME, true, gotoEnd);
-    },
-
-    onClick: function (e) {
-        var that = this;
-
-        if (that.type == ADDON_TYPES.CLEAR) {
-            that.owner.clear();
-        }
-    }
-
-};
-
-var methods$5 = {
-
-    createAddon: function () {
-        var that = this,
-            addon = new Addon(that);
-
-        that.$wrapper.append(addon.$el);
-        that.addon = addon;
-    },
-
-    fixAddonPosition: function (origin, elLayout) {
-        this.addon.fixPosition(origin, elLayout);
-    },
-
-    checkAddonType: function () {
-        this.addon.checkType();
-    },
-
-    checkAddonVisibility: function () {
-        this.addon.toggle();
-    },
-
-    stopBackground: function () {
-        this.addon.stopBackground();
-    }
-
-};
-
-$.extend(DEFAULT_OPTIONS, optionsUsed$1);
-
-notificator
-    .on('initialize', methods$5.createAddon)
-    .on('setOptions', methods$5.checkAddonType)
-    .on('fixPosition', methods$5.fixAddonPosition)
-    .on('clear', methods$5.checkAddonVisibility)
-    .on('valueChange', methods$5.checkAddonVisibility)
-    .on('request', methods$5.checkAddonVisibility)
-    .on('resetPosition', methods$5.stopBackground);
-
-/**
- * Methods related to CONSTRAINTS component
- */
-var optionsUsed$2 = {
-    constraints: null,
-    restrict_value: false
-};
-
-var fiasParamNames = [
-  'region_fias_id',
-  'area_fias_id',
-  'city_fias_id',
-  'city_district_fias_id',
-  'settlement_fias_id',
-  'street_fias_id'
-];
-
-/**
- * Compares two suggestion objects
- * @param suggestion
- * @param instance other Suggestions instance
- */
-function belongsToArea(suggestion, instance){
-    var parentSuggestion = instance.selection,
-        result = parentSuggestion && parentSuggestion.data && instance.bounds;
-
-    if (result) {
-        $.each(instance.bounds.all, function (i, bound) {
-            return (result = parentSuggestion.data[bound] === suggestion.data[bound]);
-        });
-    }
-    return result;
-}
-
-/**
- * @param {Object} data  fields
- * @param {Suggestions} instance
- * @constructor
- */
-var ConstraintLocation = function(data, instance){
-    var that = this,
-        fieldNames,
-        fiasFieldNames,
-        fiasFields = {};
-
-    that.instance = instance;
-    that.fields = {};
-    that.specificity = -1;
-
-    if ($.isPlainObject(data) && instance.type.dataComponents) {
-        $.each(instance.type.dataComponents, function (i, component) {
-            var fieldName = component.id;
-
-            if (component.forLocations && data[fieldName]) {
-                that.fields[fieldName] = data[fieldName];
-                that.specificity = i;
-            }
-        });
-    }
-
-    fieldNames = utils.objectKeys(that.fields);
-    fiasFieldNames = utils.arraysIntersection(fieldNames, fiasParamNames);
-    if (fiasFieldNames.length) {
-        $.each(fiasFieldNames, function(index, fieldName) {
-            fiasFields[fieldName] = that.fields[fieldName];
-        });
-        that.fields = fiasFields;
-        that.specificity = that.getFiasSpecificity(fiasFieldNames);
-    } else if (that.fields.kladr_id) {
-        that.fields = { kladr_id: that.fields.kladr_id };
-        that.specificity = that.getKladrSpecificity(that.fields.kladr_id);
-    }
-};
-
-$.extend(ConstraintLocation.prototype, {
-    getLabel: function(){
-        return this.instance.type.composeValue(this.fields, { saveCityDistrict: true });
-    },
-
-    getFields: function () {
-        return this.fields;
-    },
-
-    isValid: function(){
-        return !$.isEmptyObject(this.fields);
-    },
-
-    /**
-     * Возвращает specificity для КЛАДР
-     * Описание ниже, в getFiasSpecificity
-     * @param kladr_id
-     * @returns {number}
-     */
-    getKladrSpecificity: function (kladr_id) {
-        var specificity = -1,
-            significantLength;
-
-        this.significantKladr = kladr_id.replace(/^(\d{2})(\d*?)(0+)$/g, '$1$2');
-        significantLength = this.significantKladr.length;
-
-        $.each(this.instance.type.dataComponents, function (i, component) {
-            if (component.kladrFormat && significantLength === component.kladrFormat.digits) {
-                specificity = i;
-            }
-        });
-
-        return specificity;
-    },
-
-    /**
-     * Возвращает особую величину specificity для ФИАС
-     * Specificity это индекс для массива this.instance.type.dataComponents
-     * до которого (включительно) обрежется этот массив при формировании строки адреса.
-     * Этот параметр нужен для случаев, когда в настройках плагина restrict_value = true
-     * Например, установлено ограничение (locations) по region_fias_id (Краснодарский край)
-     * В выпадашке нажимаем на "г. Сочи"
-     * Если restrict_value отключен, то выведется значение "Краснодарский край, г Сочи"
-     * Если включен, то просто "г Сочи"
-     *
-     * @param fiasFieldNames
-     * @returns {number}
-     */
-    getFiasSpecificity: function (fiasFieldNames) {
-        var specificity = -1;
-
-        $.each(this.instance.type.dataComponents, function (i, component) {
-            if (component.fiasType && ($.inArray(component.fiasType, fiasFieldNames) > -1) && specificity < i) {
-                specificity = i;
-            }
-        });
-
-        return specificity;
-    },
-
-    containsData: function (data){
-        var result = true;
-
-        if (this.fields.kladr_id) {
-            return !!data.kladr_id && data.kladr_id.indexOf(this.significantKladr) === 0;
-        } else {
-            $.each(this.fields, function(fieldName, value){
-                return result = !!data[fieldName] && data[fieldName].toLowerCase() === value.toLowerCase();
-            });
-
-            return result;
-        }
-    }
-});
-
-Suggestions.ConstraintLocation = ConstraintLocation;
-
-/**
- * @param {Object} data
- * @param {Object|Array} data.locations
- * @param {string} [data.label]
- * @param {boolean} [data.deletable]
- * @param {Suggestions} [instance]
- * @constructor
- */
-var Constraint = function(data, instance) {
-    this.id = utils.uniqueId('c');
-    this.deletable = !!data.deletable;
-    this.instance = instance;
-
-    this.locations = $.map($.makeArray(data && (data.locations || data.restrictions)), function (data) {
-        return new ConstraintLocation(data, instance);
-    });
-
-    this.locations = $.grep(this.locations, function(location) {
-        return location.isValid();
-    });
-
-    this.label = data.label;
-    if (this.label == null && instance.type.composeValue) {
-        this.label = $.map(this.locations, function (location) {
-            return location.getLabel();
-        }).join(', ');
-    }
-
-    if (this.label && this.isValid()) {
-        this.$el = $(document.createElement('li'))
-            .append($(document.createElement('span')).text(this.label))
-            .attr('data-constraint-id', this.id);
-
-        if (this.deletable) {
-            this.$el.append(
-                $(document.createElement('span'))
-                    .addClass(instance.classes.removeConstraint)
-            );
-        }
-    }
-};
-
-$.extend(Constraint.prototype, {
-    isValid: function () {
-        return this.locations.length > 0;
-    },
-    getFields: function(){
-        return $.map(this.locations, function(location){
-            return location.getFields();
-        });
-    }
-});
-
-var methods$6 = {
-
-    createConstraints: function () {
-        var that = this;
-
-        that.constraints = {};
-
-        that.$constraints = $('<ul class="suggestions-constraints"/>');
-        that.$wrapper.append(that.$constraints);
-        that.$constraints.on('click', '.' + that.classes.removeConstraint, $.proxy(that.onConstraintRemoveClick, that));
-    },
-
-    setConstraintsPosition: function(origin, elLayout){
-        var that = this;
-
-        that.$constraints.css({
-            left: origin.left + elLayout.borderLeft + elLayout.paddingLeft + 'px',
-            top: origin.top + elLayout.borderTop + Math.round((elLayout.innerHeight - that.$constraints.height()) / 2) + 'px'
-        });
-
-        elLayout.componentsLeft += that.$constraints.outerWidth(true) + elLayout.paddingLeft;
-    },
-
-    onConstraintRemoveClick: function (e) {
-        var that = this,
-            $item = $(e.target).closest('li'),
-            id = $item.attr('data-constraint-id');
-
-        // Delete constraint data before animation to let correct requests to be sent while fading
-        delete that.constraints[id];
-        // Request for new suggestions
-        that.update();
-
-        $item.fadeOut('fast', function () {
-            that.removeConstraint(id);
-        });
-    },
-
-    setupConstraints: function () {
-        var that = this,
-            constraints = that.options.constraints,
-            $parent;
-
-        if (!constraints) {
-            that.unbindFromParent();
-            return;
-        }
-
-        if (constraints instanceof $ || typeof constraints === 'string' || typeof constraints.nodeType === 'number') {
-            $parent = $(constraints);
-            if (!$parent.is(that.constraints)) {
-                that.unbindFromParent();
-                if (!$parent.is(that.el)) {
-                    that.constraints = $parent;
-                    that.bindToParent();
-                }
-            }
-        } else {
-            that._constraintsUpdating = true;
-            $.each(that.constraints, $.proxy(that.removeConstraint, that));
-            $.each($.makeArray(constraints), function (i, constraint) {
-                that.addConstraint(constraint);
-            });
-            that._constraintsUpdating = false;
-            that.fixPosition();
-        }
-    },
-
-    filteredLocation: function (data) {
-        var locationComponents = [],
-            location = {};
-
-        $.each(this.type.dataComponents, function () {
-            if (this.forLocations) locationComponents.push(this.id);
-        });
-
-        if ($.isPlainObject(data)) {
-            // Copy to location only allowed fields
-            $.each(data, function (key, value) {
-                if (value && locationComponents.indexOf(key) >= 0) {
-                    location[key] = value;
-                }
-            });
-        }
-
-        if (!$.isEmptyObject(location)) {
-            return location.kladr_id ? { kladr_id: location.kladr_id } : location;
-        }
-    },
-
-    addConstraint: function (constraint) {
-        var that = this;
-
-        constraint = new Constraint(constraint, that);
-
-        if (constraint.isValid()) {
-            that.constraints[constraint.id] = constraint;
-
-            if (constraint.$el) {
-                that.$constraints.append(constraint.$el);
-                if (!that._constraintsUpdating) {
-                    that.fixPosition();
-                }
-            }
-        }
-    },
-
-    removeConstraint: function (id) {
-        var that = this;
-        delete that.constraints[id];
-        that.$constraints.children('[data-constraint-id="' + id + '"]').remove();
-        if (!that._constraintsUpdating) {
-            that.fixPosition();
-        }
-    },
-
-    constructConstraintsParams: function () {
-        var that = this,
-            locations = [],
-            constraints = that.constraints,
-            parentInstance,
-            parentData,
-            params = {};
-
-        while (constraints instanceof $ && (parentInstance = constraints.suggestions()) &&
-            !(parentData = utils.getDeepValue(parentInstance, 'selection.data'))
-        ) {
-            constraints = parentInstance.constraints;
-        }
-
-        if (constraints instanceof $) {
-            parentData = (new ConstraintLocation(parentData, parentInstance))
-                .getFields();
-
-            if (parentData) {
-                params.locations = [ parentData ];
-                params.restrict_value = true;
-            }
-        } else {
-            if (constraints) {
-                $.each(constraints, function (id, constraint) {
-                    locations = locations.concat(constraint.getFields());
-                });
-
-                if (locations.length) {
-                    params.locations = locations;
-                    params.restrict_value = that.options.restrict_value;
-                }
-            }
-        }
-
-        return params;
-    },
-
-    /**
-     * Returns label of the first constraint (if any), empty string otherwise
-     * @returns {String}
-     */
-    getFirstConstraintLabel: function() {
-        var that = this,
-            constraints_id = $.isPlainObject(that.constraints) && Object.keys(that.constraints)[0];
-
-        return constraints_id ? that.constraints[constraints_id].label : '';
-    },
-
-    bindToParent: function () {
-        var that = this;
-
-        that.constraints
-            .on([
-                    'suggestions-select.' + that.uniqueId,
-                    'suggestions-invalidateselection.' + that.uniqueId,
-                    'suggestions-clear.' + that.uniqueId
-                ].join(' '),
-                $.proxy(that.onParentSelectionChanged, that)
-            )
-            .on('suggestions-dispose.' + that.uniqueId, $.proxy(that.onParentDispose, that));
-    },
-
-    unbindFromParent: function  () {
-        var that = this,
-            $parent = that.constraints;
-
-        if ($parent instanceof $) {
-            $parent.off('.' + that.uniqueId);
-        }
-    },
-
-    onParentSelectionChanged: function (e, suggestion, valueChanged) {
-        // Don't clear if parent has been just enriched
-        if (e.type !== 'suggestions-select' || valueChanged) {
-            this.clear();
-        }
-    },
-
-    onParentDispose: function (e) {
-        this.unbindFromParent();
-    },
-
-    getParentInstance: function () {
-        return this.constraints instanceof $ && this.constraints.suggestions();
-    },
-
-    shareWithParent: function (suggestion) {
-        // that is the parent control's instance
-        var that = this.getParentInstance();
-
-        if (!that || that.type !== this.type || belongsToArea(suggestion, that)) {
-            return;
-        }
-
-        that.shareWithParent(suggestion);
-        that.setSuggestion(suggestion);
-    },
-
-    /**
-     * Pick only fields that absent in restriction
-     */
-    getUnrestrictedData: function (data) {
-        var that = this,
-            restrictedKeys = [],
-            unrestrictedData = {},
-            maxSpecificity = -1;
-
-        // Find most specific location that could restrict current data
-        $.each(that.constraints, function (id, constraint) {
-            $.each(constraint.locations, function (i, location) {
-                if (location.containsData(data) && location.specificity > maxSpecificity) {
-                    maxSpecificity = location.specificity;
-                }
-            });
-        });
-
-        if (maxSpecificity >= 0) {
-
-            // Для городов-регионов нужно также отсечь и город
-            if (data.region_kladr_id && data.region_kladr_id === data.city_kladr_id) {
-                restrictedKeys.push.apply(restrictedKeys, that.type.dataComponentsById['city'].fields);
-            }
-
-            // Collect all fieldnames from all restricted components
-            $.each(that.type.dataComponents.slice(0, maxSpecificity + 1), function (i, component) {
-                restrictedKeys.push.apply(restrictedKeys, component.fields);
-            });
-
-            // Copy skipping restricted fields
-            $.each(data, function (key, value) {
-                if (restrictedKeys.indexOf(key) === -1) {
-                    unrestrictedData[key] = value;
-                }
-            });
-        } else {
-            unrestrictedData = data;
-        }
-
-        return unrestrictedData;
-    }
-
-};
-
-$.extend(DEFAULT_OPTIONS, optionsUsed$2);
-
-$.extend(Suggestions.prototype, methods$6);
-
-// Disable this feature when GET method used. See SUG-202
-if (utils.getDefaultType() != 'GET') {
-    notificator
-        .on('initialize', methods$6.createConstraints)
-        .on('setOptions', methods$6.setupConstraints)
-        .on('fixPosition', methods$6.setConstraintsPosition)
-        .on('requestParams', methods$6.constructConstraintsParams)
-        .on('dispose', methods$6.unbindFromParent);
-}
-
-/**
- * Methods for selecting a suggestion
- */
-
-var methods$7 = {
-
-    proceedQuery: function (query) {
-        var that = this;
-
-        if (query.length >= that.options.minChars) {
-            that.updateSuggestions(query);
-        } else {
-            that.hide();
-        }
-    },
-
-    /**
-     * Selects current or first matched suggestion, but firstly waits for data ready
-     * @param selectionOptions
-     * @returns {$.Deferred} promise, resolved with index of selected suggestion or rejected if nothing matched
-     */
-    selectCurrentValue: function (selectionOptions) {
-        var that = this,
-            result = $.Deferred();
-
-        // force onValueChange to be executed if it has been deferred
-        that.inputPhase.resolve();
-
-        that.fetchPhase
-            .done(function () {
-                var index;
-
-                // When suggestion has already been selected and not modified
-                if (that.selection && !that.visible) {
-                    result.reject();
-                } else {
-                    index = that.findSuggestionIndex();
-
-                    that.select(index, selectionOptions);
-
-                    if (index === -1) {
-                        result.reject();
-                    } else {
-                        result.resolve(index);
-                    }
-                }
-            })
-            .fail(function () {
-                result.reject();
-            });
-
-        return result;
-    },
-
-    /**
-     * Selects first when user interaction is not supposed
-     */
-    selectFoundSuggestion: function () {
-        var that = this;
-
-        if (!that.requestMode.userSelect) {
-            that.select(0);
-        }
-    },
-
-    /**
-     * Selects current or first matched suggestion
-     * @returns {number} index of found suggestion
-     */
-    findSuggestionIndex: function() {
-        var that = this,
-            index = that.selectedIndex,
-            value;
-
-        if (index === -1) {
-            // matchers always operate with trimmed strings
-            value = $.trim(that.el.val());
-            if (value) {
-                $.each(that.type.matchers, function (i, matcher) {
-                    index = matcher(value, that.suggestions);
-                    return index === -1;
-                });
-            }
-        }
-
-        return index;
-    },
-
-    /**
-     * Selects a suggestion at specified index
-     * @param index index of suggestion to select. Can be -1
-     * @param {Object} selectionOptions
-     * @param {boolean} [selectionOptions.continueSelecting]  prevents hiding after selection
-     * @param {boolean} [selectionOptions.noSpace]  prevents adding space at the end of current value
-     */
-    select: function (index, selectionOptions) {
-        var that = this,
-            suggestion = that.suggestions[index],
-            continueSelecting = selectionOptions && selectionOptions.continueSelecting,
-            currentValue = that.currentValue,
-            hasSameValues;
-
-        // Prevent recursive execution
-        if (that.triggering['Select'])
-            return;
-
-        // if no suggestion to select
-        if (!suggestion) {
-            if (!continueSelecting && !that.selection) {
-                that.triggerOnSelectNothing();
-            }
-            that.onSelectComplete(continueSelecting);
-            return;
-        }
-
-        hasSameValues = that.hasSameValues(suggestion);
-
-        that.enrichSuggestion(suggestion, selectionOptions)
-            .done(function (enrichedSuggestion, hasBeenEnriched) {
-                that.selectSuggestion(enrichedSuggestion, index, currentValue, $.extend({
-                    hasBeenEnriched: hasBeenEnriched,
-                    hasSameValues: hasSameValues
-                }, selectionOptions));
-            });
-
-    },
-
-    /**
-     * Formats and selects final (enriched) suggestion
-     * @param suggestion
-     * @param index
-     * @param lastValue
-     * @param {Object} selectionOptions
-     * @param {boolean} [selectionOptions.continueSelecting]  prevents hiding after selection
-     * @param {boolean} [selectionOptions.noSpace]  prevents adding space at the end of current value
-     * @param {boolean} selectionOptions.hasBeenEnriched
-     * @param {boolean} selectionOptions.hasSameValues
-     */
-    selectSuggestion: function (suggestion, index, lastValue, selectionOptions) {
-        var that = this,
-            continueSelecting = selectionOptions.continueSelecting,
-            assumeDataComplete = !that.type.isDataComplete || that.type.isDataComplete.call(that, suggestion),
-            currentSelection = that.selection;
-
-        // Prevent recursive execution
-        if (that.triggering['Select'])
-            return;
-
-        if (that.type.alwaysContinueSelecting) {
-            continueSelecting = true;
-        }
-
-        if (assumeDataComplete) {
-            continueSelecting = false;
-        }
-
-        // `suggestions` cat be empty, e.g. during `fixData`
-        if (selectionOptions.hasBeenEnriched && that.suggestions[index]) {
-            that.suggestions[index].data = suggestion.data;
-        }
-
-        if (that.requestMode.updateValue) {
-            that.checkValueBounds(suggestion);
-            that.currentValue = that.getSuggestionValue(suggestion, selectionOptions);
-
-            if (that.currentValue && !selectionOptions.noSpace && !assumeDataComplete) {
-                that.currentValue += ' ';
-            }
-            that.el.val(that.currentValue);
-        }
-
-        if (that.currentValue) {
-            that.selection = suggestion;
-            if (!that.areSuggestionsSame(suggestion, currentSelection)) {
-                that.trigger('Select', suggestion, that.currentValue != lastValue);
-            }
-            if (that.requestMode.userSelect) {
-                that.onSelectComplete(continueSelecting);
-            }
-        } else {
-            that.selection = null;
-            that.triggerOnSelectNothing();
-        }
-
-        that.shareWithParent(suggestion);
-    },
-
-    onSelectComplete: function (continueSelecting) {
-        var that = this;
-
-        if (continueSelecting) {
-            that.selectedIndex = -1;
-            that.updateSuggestions(that.currentValue);
-        } else {
-            that.hide();
-        }
-    },
-
-    triggerOnSelectNothing: function () {
-        var that = this;
-
-        if (!that.triggering['SelectNothing']) {
-            that.trigger('SelectNothing', that.currentValue);
-        }
-    },
-
-    trigger: function (event) {
-        var that = this,
-            args = utils.slice(arguments, 1),
-            callback = that.options['on' + event];
-
-        that.triggering[event] = true;
-        if ($.isFunction(callback)) {
-            callback.apply(that.element, args);
-        }
-        that.el.trigger.call(that.el, 'suggestions-' + event.toLowerCase(), args);
-        that.triggering[event] = false;
-    }
-
-};
-
-$.extend(Suggestions.prototype, methods$7);
-
-notificator
-    .on('assignSuggestions', methods$7.selectFoundSuggestion);
-
-/**
- * features for connected instances
- */
-
-var optionsUsed$3 = {
-    bounds: null
-};
-
-var methods$8 = {
-
-    setupBounds: function () {
-        this.bounds = {
-            from: null,
-            to: null
-        };
-    },
-
-    setBoundsOptions: function () {
-        var that = this,
-            boundsAvailable = [],
-            newBounds = $.trim(that.options.bounds).split('-'),
-            boundFrom = newBounds[0],
-            boundTo = newBounds[newBounds.length - 1],
-            boundsOwn = [],
-            boundIsOwn,
-            boundsAll = [],
-            indexTo;
-
-        if (that.type.dataComponents) {
-            $.each(that.type.dataComponents, function () {
-                if (this.forBounds) {
-                    boundsAvailable.push(this.id);
-                }
-            });
-        }
-
-        if ($.inArray(boundFrom, boundsAvailable) === -1) {
-            boundFrom = null;
-        }
-
-        indexTo = $.inArray(boundTo, boundsAvailable);
-        if (indexTo === -1 || indexTo === boundsAvailable.length - 1) {
-            boundTo = null;
-        }
-
-        if (boundFrom || boundTo) {
-            boundIsOwn = !boundFrom;
-            $.each(boundsAvailable, function (i, bound) {
-                if (bound == boundFrom) {
-                    boundIsOwn = true;
-                }
-                boundsAll.push(bound);
-                if (boundIsOwn) {
-                    boundsOwn.push(bound);
-                }
-                if (bound == boundTo) {
-                    return false;
-                }
-            });
-        }
-
-        that.bounds.from = boundFrom;
-        that.bounds.to = boundTo;
-        that.bounds.all = boundsAll;
-        that.bounds.own = boundsOwn;
-    },
-
-    constructBoundsParams: function () {
-        var that = this,
-            params = {};
-
-        if (that.bounds.from) {
-            params['from_bound'] = { value: that.bounds.from };
-        }
-        if (that.bounds.to) {
-            params['to_bound'] = { value: that.bounds.to };
-        }
-
-        return params;
-    },
-
-    /**
-     * Подстраивает suggestion.value под that.bounds.own
-     * Ничего не возвращает, меняет в самом suggestion
-     * @param suggestion
-     */
-    checkValueBounds: function (suggestion) {
-        var that = this,
-            valueData;
-
-        // If any bounds set up
-        if (that.bounds.own.length && that.type.composeValue) {
-            // делаем копию
-            var bounds = that.bounds.own.slice(0);
-            // если роль текущего инстанса плагина показывать только район города
-            // то для корректного формировния нужен city_district_fias_id
-            if (bounds.length === 1 && bounds[0] === 'city_district') {
-                bounds.push('city_district_fias_id');
-            }
-            valueData = that.copyDataComponents(suggestion.data, bounds);
-            suggestion.value = that.type.composeValue(valueData);
-        }
-    },
-
-    copyDataComponents: function (data, components) {
-        var result = {},
-            dataComponentsById = this.type.dataComponentsById;
-
-        if (dataComponentsById) {
-            $.each(components, function (i, component) {
-                $.each(dataComponentsById[component].fields, function (i, field) {
-                    if (data[field] != null) {
-                        result[field] = data[field];
-                    }
-                });
-            });
-        }
-
-        return result;
-    },
-
-    getBoundedKladrId: function (kladr_id, boundsRange) {
-        var boundTo = boundsRange[boundsRange.length - 1],
-            kladrFormat;
-
-        $.each(this.type.dataComponents, function(i, component){
-            if (component.id === boundTo) {
-                kladrFormat = component.kladrFormat;
-                return false;
-            }
-        });
-
-        return kladr_id.substr(0, kladrFormat.digits) + (new Array((kladrFormat.zeros || 0) + 1).join('0'));
-    }
-
-};
-
-$.extend(DEFAULT_OPTIONS, optionsUsed$3);
-
-$.extend(Suggestions.prototype, methods$8);
-
-notificator
-    .on('initialize', methods$8.setupBounds)
-    .on('setOptions', methods$8.setBoundsOptions)
-    .on('requestParams', methods$8.constructBoundsParams);
-
-Suggestions.defaultOptions = DEFAULT_OPTIONS;
-
-Suggestions.version = '17.5.0';
-
-$.Suggestions = Suggestions;
-
-// Create chainable jQuery plugin:
-$.fn.suggestions = function (options, args) {
-    // If function invoked without argument return
-    // instance of the first matched element:
-    if (arguments.length === 0) {
-        return this.first().data(DATA_ATTR_KEY);
-    }
-
-    return this.each(function () {
-        var inputElement = $(this),
-            instance = inputElement.data(DATA_ATTR_KEY);
-
-        if (typeof options === 'string') {
-            if (instance && typeof instance[options] === 'function') {
-                instance[options](args);
-            }
-        } else {
-            // If instance already exists, destroy it:
-            if (instance && instance.dispose) {
-                instance.dispose();
-            }
-            instance = new Suggestions(this, options);
-            inputElement.data(DATA_ATTR_KEY, instance);
-        }
-    });
-};
-
-})));
-
 ;(function (global, factory) {
     typeof exports === 'object' && typeof module !== 'undefined' ? module.exports = factory() :
     typeof define === 'function' && define.amd ? define(factory) :
@@ -88491,6 +84496,4001 @@ return hooks;
 	return moment;
 }));
 
+/**
+ * DaData.ru Suggestions jQuery plugin, version 17.5.0
+ *
+ * DaData.ru Suggestions jQuery plugin is freely distributable under the terms of MIT-style license
+ * Built on DevBridge Autocomplete for jQuery (https://github.com/devbridge/jQuery-Autocomplete)
+ * For details, see https://github.com/hflabs/suggestions-jquery
+ */
+(function (global, factory) {
+	typeof exports === 'object' && typeof module !== 'undefined' ? factory(require('jquery')) :
+	typeof define === 'function' && define.amd ? define(['jquery'], factory) :
+	(factory(global.$));
+}(this, (function ($) { 'use strict';
+
+$ = 'default' in $ ? $['default'] : $;
+
+var KEYS = {
+        ENTER: 13,
+        ESC:   27,
+        TAB:   9,
+        SPACE: 32,
+        UP:    38,
+        DOWN:  40
+    };
+var EVENT_NS = '.suggestions';
+var DATA_ATTR_KEY = 'suggestions';
+var WORD_DELIMITERS = '\\s"\'~\\*\\.,:\\|\\[\\]\\(\\)\\{\\}<>№';
+var WORD_SPLITTER = new RegExp('[' + WORD_DELIMITERS + ']+', 'g');
+var WORD_PARTS_DELIMITERS = '\\-\\+\\/\\\\\\?!@#$%^&';
+var WORD_PARTS_SPLITTER = new RegExp('[' + WORD_PARTS_DELIMITERS + ']+', 'g');
+
+var utils = (function () {
+    var uniqueId = 0;
+    return {
+        escapeRegExChars: function (value) {
+            return value.replace(/[\-\[\]\/\{\}\(\)\*\+\?\.\\\^\$\|]/g, "\\$&");
+        },
+        escapeHtml: function (str) {
+            var map = {
+                '&': '&amp;',
+                '<': '&lt;',
+                '>': '&gt;',
+                '"': '&quot;',
+                "'": '&#x27;',
+                '/': '&#x2F;'
+            };
+
+            if (str) {
+                $.each(map, function(ch, html){
+                    str = str.replace(new RegExp(ch, 'g'), html);
+                });
+            }
+            return str;
+        },
+        getDefaultType: function () {
+            return ($.support.cors ? 'POST' : 'GET');
+        },
+        getDefaultContentType: function () {
+            return ($.support.cors ? 'application/json' : 'application/x-www-form-urlencoded');
+        },
+        fixURLProtocol: function(url){
+            return $.support.cors ? url : url.replace(/^https?:/, location.protocol);
+        },
+        addUrlParams: function (url, params) {
+            return url + (/\?/.test(url) ? '&' : '?') + $.param(params);
+        },
+        serialize: function (data) {
+            if ($.support.cors) {
+                return JSON.stringify(data, function (key, value) {
+                    return value === null ? undefined : value;
+                });
+            } else {
+                data = this.compactObject(data);
+                return $.param(data, true);
+            }
+        },
+        compact: function (array) {
+            return $.grep(array, function (el) {
+                return !!el;
+            });
+        },
+        delay: function (handler, delay) {
+            return setTimeout(handler, delay || 0);
+        },
+        uniqueId: function (prefix) {
+            return (prefix || '') + ++uniqueId;
+        },
+        slice: function(obj, start) {
+            return Array.prototype.slice.call(obj, start);
+        },
+        indexBy: function (data, field, indexField) {
+            var result = {};
+
+            $.each(data, function (i, obj) {
+                var key = obj[field],
+                    val = {};
+
+                if (indexField) {
+                    val[indexField] = i;
+                }
+
+                result[key] = $.extend(true, val, obj);
+            });
+
+            return result;
+        },
+
+        /**
+         * Compares two objects, but only fields that are set in both
+         * @param a
+         * @param b
+         * @returns {boolean}
+         */
+        areSame: function self(a, b) {
+            var same = true;
+
+            if (typeof a != typeof b) {
+                return false;
+            }
+
+            if (typeof a == 'object' && a != null && b != null) {
+                $.each(a, function (i, value) {
+                    return same = self(value, b[i]);
+                });
+                return same;
+            }
+
+            return a === b;
+        },
+
+        /**
+         * Returns array1 minus array2
+         */
+        arrayMinus: function(array1, array2) {
+            return array2 ? $.grep(array1, function(el, i){
+                return $.inArray(el, array2) === -1;
+            }) : array1;
+        },
+        /**
+         * Returns array1 minus array2
+         * if value in array1 in enclosed by value in array2, it is considered a match
+         */
+        arrayMinusWithPartialMatching: function(array1, array2) {
+            return array2 ? $.grep(array1, function(el, i){
+                return !array2.some(function(el2) {
+                    return el2.indexOf(el) === 0;
+                })
+            }) : array1;
+        },
+        /**
+         * Пересечение массивов: ([1,2,3,4], [2,4,5,6]) => [2,4]
+         * Исходные массивы не меняются
+         * @param {Array} array1
+         * @param {Array} array2
+         * @returns {Array}
+         */
+        arraysIntersection: function(array1, array2) {
+            var result = [];
+            if (!$.isArray(array1) || !$.isArray(array2)) {
+                return result;
+            }
+            $.each(array1, function(index, item) {
+                if ($.inArray(item, array2) >= 0) {
+                    result.push(item);
+                }
+            });
+            return result;
+        },
+        getWords: function(str, stopwords) {
+            // Split numbers and letters written together
+            str = str.replace(/(\d+)([а-яА-ЯёЁ]{2,})/g, '$1 $2')
+                .replace(/([а-яА-ЯёЁ]+)(\d+)/g, '$1 $2');
+
+            var words = this.compact(str.split(WORD_SPLITTER)),
+                lastWord = words.pop(),
+                goodWords = this.arrayMinus(words, stopwords);
+
+            goodWords.push(lastWord);
+            return goodWords;
+        },
+        /**
+         * Returns normalized string without stopwords
+         */
+        normalize: function(str, stopwords) {
+            var that = this;
+            return that.getWords(str, stopwords).join(' ');
+        },
+        /**
+         * Returns true if str1 includes str2 plus something else, false otherwise.
+         */
+        stringEncloses: function(str1, str2) {
+            return str1.length > str2.length && str1.indexOf(str2) !== -1;
+        },
+        fieldsNotEmpty: function(obj, fields){
+            if (!$.isPlainObject(obj)) {
+                return false;
+            }
+            var result = true;
+            $.each(fields, function (i, field) {
+                return result = !!(obj[field]);
+            });
+            return result;
+        },
+        getDeepValue: function self(obj, name) {
+            var path = name.split('.'),
+                step = path.shift();
+
+            return obj && (path.length ? self(obj[step], path.join('.')) : obj[step]);
+        },
+        reWordExtractor: function () {
+            return new RegExp('([^' + WORD_DELIMITERS + ']*)([' + WORD_DELIMITERS + ']*)', 'g');
+        },
+        formatToken: function (token) {
+            return token && token.toLowerCase().replace(/[ёЁ]/g, 'е');
+        },
+        withSubTokens: function (tokens) {
+            var result = [];
+
+            $.each(tokens, function (i, token) {
+                var subtokens = token.split(WORD_PARTS_SPLITTER);
+
+                result.push(token);
+
+                if (subtokens.length > 1) {
+                    result = result.concat(utils.compact(subtokens));
+                }
+            });
+
+            return result;
+        },
+
+        /**
+         * Возвращает массив с ключами переданного объекта
+         * Используется нативный Object.keys если он есть
+         * @param {Object} obj
+         * @returns {Array}
+         */
+        objectKeys: function(obj) {
+            if (Object.keys) {
+                return Object.keys(obj);
+            }
+            var keys = [];
+            $.each(obj, function(name) {
+                keys.push(name);
+            });
+            return keys;
+        },
+
+        /**
+         * Возвращает копию объекта без пустых элементов
+         * @param obj
+         */
+        compactObject: function(obj) {
+            var copy = $.extend(true, {}, obj);
+
+            $.each(copy, function (key, val) {
+                if (val === null || val === undefined || val === '') {
+                    delete copy[key];
+                }
+            });
+
+            return copy;
+        }
+
+    };
+}());
+
+/**
+ * Matchers return index of suitable suggestion
+ * Context inside is optionally set in types.js
+ */
+var matchers = function() {
+
+    /**
+     * Factory to create same parent checker function
+     * @param preprocessFn called on each value before comparison
+     * @returns {Function} same parent checker function
+     */
+    function sameParentChecker (preprocessFn) {
+        return function (suggestions) {
+            if (suggestions.length === 0) {
+                return false;
+            }
+            if (suggestions.length === 1) {
+                return true;
+            }
+
+            var parentValue = preprocessFn(suggestions[0].value),
+                aliens = $.grep(suggestions, function (suggestion) {
+                    return preprocessFn(suggestion.value).indexOf(parentValue) === 0;
+                }, true);
+
+            return aliens.length === 0;
+        }
+    }
+
+    /**
+     * Default same parent checker. Compares raw values.
+     * @type {Function}
+     */
+    var haveSameParent = sameParentChecker(function(val) { return val; });
+
+    /**
+     * Same parent checker for addresses. Strips house and extension before comparison.
+     * @type {Function}
+     */
+    var haveSameParentAddress = sameParentChecker(function(val) {
+        return val.replace(/, (?:д|вл|двлд|к) .+$/, '');
+    });
+
+    return {
+
+        /**
+         * Matches query against suggestions, removing all the stopwords.
+         */
+        matchByNormalizedQuery: function (query, suggestions) {
+            var queryLowerCase = query.toLowerCase(),
+                stopwords = this && this.stopwords,
+                normalizedQuery = utils.normalize(queryLowerCase, stopwords),
+                matches = [];
+
+            $.each(suggestions, function(i, suggestion) {
+                var suggestedValue = suggestion.value.toLowerCase();
+                // if query encloses suggestion, than it has already been selected
+                // so we should not select it anymore
+                if (utils.stringEncloses(queryLowerCase, suggestedValue)) {
+                    return false;
+                }
+                // if there is suggestion that contains query as its part
+                // than we should ignore all other matches, even full ones
+                if (suggestedValue.indexOf(normalizedQuery) > 0) {
+                    return false;
+                }
+                if (normalizedQuery === utils.normalize(suggestedValue, stopwords)) {
+                    matches.push(i);
+                }
+            });
+
+            return matches.length === 1 ? matches[0] : -1;
+        },
+
+        /**
+         * Matches query against suggestions word-by-word (with respect to stopwords).
+         * Matches if query words are a subset of suggested words.
+         */
+        matchByWords: function (query, suggestions) {
+            var stopwords = this && this.stopwords,
+                queryLowerCase = query.toLowerCase(),
+                queryTokens,
+                matches = [];
+
+            if (haveSameParent(suggestions)) {
+                queryTokens = utils.withSubTokens(utils.getWords(queryLowerCase, stopwords));
+
+                $.each(suggestions, function(i, suggestion) {
+                    var suggestedValue = suggestion.value.toLowerCase();
+
+                    if (utils.stringEncloses(queryLowerCase, suggestedValue)) {
+                        return false;
+                    }
+
+                    // check if query words are a subset of suggested words
+                    var suggestionWords = utils.withSubTokens(utils.getWords(suggestedValue, stopwords));
+
+                    if (utils.arrayMinus(queryTokens, suggestionWords).length === 0) {
+                        matches.push(i);
+                    }
+                });
+            }
+
+            return matches.length === 1 ? matches[0] : -1;
+        },
+
+        matchByWordsAddress: function (query, suggestions) {
+            var stopwords = this && this.stopwords,
+                queryLowerCase = query.toLowerCase(),
+                queryTokens,
+                index = -1;
+
+            if (haveSameParentAddress(suggestions)) {
+                queryTokens = utils.withSubTokens(utils.getWords(queryLowerCase, stopwords));
+
+                $.each(suggestions, function(i, suggestion) {
+                    var suggestedValue = suggestion.value.toLowerCase();
+
+                    if (utils.stringEncloses(queryLowerCase, suggestedValue)) {
+                        return false;
+                    }
+
+                    // check if query words are a subset of suggested words
+                    var suggestionWords = utils.withSubTokens(utils.getWords(suggestedValue, stopwords));
+
+                    if (utils.arrayMinus(queryTokens, suggestionWords).length === 0) {
+                        index = i;
+                        return false;
+                    }
+                });
+            }
+
+            return index;
+        },
+
+        /**
+         * Matches query against values contained in suggestion fields
+         * for cases, when there is only one suggestion
+         * only considers fields specified in fieldsStopwords map
+         * uses partial matching:
+         *   "0445" vs { value: "ALFA-BANK", data: { "bic": "044525593" }} is a match
+         */
+        matchByFields: function (query, suggestions) {
+            var stopwords = this && this.stopwords,
+                fieldsStopwords = this && this.fieldsStopwords,
+                tokens = utils.withSubTokens(utils.getWords(query.toLowerCase(), stopwords)),
+                suggestionWords = [];
+
+            if (suggestions.length === 1) {
+                if (fieldsStopwords) {
+                    $.each(fieldsStopwords, function (field, stopwords) {
+                        var fieldValue = utils.getDeepValue(suggestions[0], field),
+                            fieldWords = fieldValue && utils.withSubTokens(utils.getWords(fieldValue.toLowerCase(), stopwords));
+
+                        if (fieldWords && fieldWords.length) {
+                            suggestionWords = suggestionWords.concat(fieldWords);
+                        }
+                    });
+                }
+
+                if (utils.arrayMinusWithPartialMatching(tokens, suggestionWords).length === 0) {
+                    return 0;
+                }
+            }
+
+            return -1;
+        }
+
+    };
+
+}();
+
+var DEFAULT_OPTIONS = {
+    autoSelectFirst: false,
+    // основной url, может быть переопределен
+    serviceUrl: 'https://suggestions.dadata.ru/suggestions/api/4_1/rs',
+    // url, который заменяет serviceUrl + method + type
+    // то есть, если он задан, то для всех запросов будет использоваться именно он
+    // если не поддерживается cors то к url будут добавлены параметры ?token=...&version=...
+    // и заменен протокол на протокол текущей страницы
+    url: null,
+    onSearchStart: $.noop,
+    onSearchComplete: $.noop,
+    onSearchError: $.noop,
+    onSuggestionsFetch: null,
+    onSelect: null,
+    onSelectNothing: null,
+    onInvalidateSelection: null,
+    minChars: 1,
+    deferRequestBy: 100,
+    params: {},
+    paramName: 'query',
+    timeout: 3000,
+    formatResult: null,
+    formatSelected: null,
+    noCache: false,
+    containerClass: 'suggestions-suggestions',
+    tabDisabled: false,
+    triggerSelectOnSpace: false,
+    triggerSelectOnEnter: true,
+    triggerSelectOnBlur: true,
+    preventBadQueries: false,
+    hint: 'Выберите вариант или продолжите ввод',
+    noSuggestionsHint: {
+        NAME:       'Неизвестное ФИО',
+        ADDRESS:    'Неизвестный адрес',
+        EMAIL:      'Неизвестная эл. почта',
+        PARTY:      'Неизвестная организация',
+        BANK:       'Неизвестный банк'
+    },
+    type: null,
+    requestMode: 'suggest',
+    count: 5,
+    $helpers: null,
+    headers: null,
+    scrollOnFocus: true,
+    mobileWidth: 980,
+    initializeInterval: 100
+};
+
+/**
+ * Type is a bundle of properties:
+ * - urlSuffix Mandatory. String
+ * - matchers Mandatory. Array of functions (with optional data bound as a context) that find appropriate suggestion to select
+ * - `fieldNames` Map fields of suggestion.data to their displayable names
+ * - `unformattableTokens` Array of strings which should not be highlighted
+ * - `dataComponents` Array of 'bound's can be set as `bounds` option. Order is important.
+ *
+ * flags:
+ * - `alwaysContinueSelecting` Forbids to hide dropdown after selecting
+ * - `geoEnabled` Makes to detect client's location for passing it to all requests
+ * - `enrichmentEnabled` Makes to send additional request when a suggestion is selected
+ *
+ * and methods:
+ * - `isDataComplete` Checks if suggestion.data can be operated as full data of it's type
+ * - `composeValue` returns string value based on suggestion.data
+ * - `formatResult` returns html of a suggestion. Overrides default method
+ * - `formatResultInn` returns html of suggestion.data.inn
+ * - `isQueryRequestable` checks if query is appropriated for requesting server
+ * - `formatSelected` returns string to be inserted in textbox
+ */
+
+var ADDRESS_STOPWORDS = ['ао', 'аобл', 'дом', 'респ', 'а/я', 'аал', 'автодорога', 'аллея', 'арбан', 'аул', 'б-р', 'берег', 'бугор', 'вал', 'вл', 'волость', 'въезд', 'высел', 'г', 'городок', 'гск', 'д', 'двлд', 'днп', 'дор', 'дп', 'ж/д_будка', 'ж/д_казарм', 'ж/д_оп', 'ж/д_платф', 'ж/д_пост', 'ж/д_рзд', 'ж/д_ст', 'жилзона', 'жилрайон', 'жт', 'заезд', 'заимка', 'зона', 'к', 'казарма', 'канал', 'кв', 'кв-л', 'км', 'кольцо', 'комн', 'кордон', 'коса', 'кп', 'край', 'линия', 'лпх', 'м', 'массив', 'местность', 'мкр', 'мост', 'н/п', 'наб', 'нп', 'обл', 'округ', 'остров', 'оф', 'п', 'п/о', 'п/р', 'п/ст', 'парк', 'пгт', 'пер', 'переезд', 'пл', 'пл-ка', 'платф', 'погост', 'полустанок', 'починок', 'пр-кт', 'проезд', 'промзона', 'просек', 'просека', 'проселок', 'проток', 'протока', 'проулок', 'р-н', 'рзд', 'россия', 'рп', 'ряды', 'с', 'с/а', 'с/мо', 'с/о', 'с/п', 'с/с', 'сад', 'сквер', 'сл', 'снт', 'спуск', 'ст', 'ст-ца', 'стр', 'тер', 'тракт', 'туп', 'у', 'ул', 'уч-к', 'ф/х', 'ферма', 'х', 'ш', 'бульвар', 'владение', 'выселки', 'гаражно-строительный', 'город', 'деревня', 'домовладение', 'дорога', 'квартал', 'километр', 'комната', 'корпус', 'литер', 'леспромхоз', 'местечко', 'микрорайон', 'набережная', 'область', 'переулок', 'платформа', 'площадка', 'площадь', 'поселение', 'поселок', 'проспект', 'разъезд', 'район', 'республика', 'село', 'сельсовет', 'слобода', 'сооружение', 'станица', 'станция', 'строение', 'территория', 'тупик', 'улица', 'улус', 'участок', 'хутор', 'шоссе'];
+
+/**
+ * Компоненты адреса
+ * @type {*[]}
+ * id {String} Наименование типа
+ * fields {Array of Strings}
+ * forBounds {Boolean} может использоваться в ограничениях
+ * forLocations {Boolean}
+ * kladrFormat {Object}
+ * fiasType {String} Наименование соответствующего ФИАС типа
+ */
+var ADDRESS_COMPONENTS = [
+    {
+        id: 'kladr_id',
+        fields: ['kladr_id'],
+        forBounds: false,
+        forLocations: true
+    },
+    {
+        id: 'postal_code',
+        fields: ['postal_code'],
+        forBounds: false,
+        forLocations: true
+    },
+    {
+        id: 'country',
+        fields: ['country'],
+        forBounds: false,
+        forLocations: true
+    },
+    {
+        id: 'region_fias_id',
+        fields: ['region_fias_id'],
+        forBounds: false,
+        forLocations: true
+    },
+    {
+        id: 'region_type_full',
+        fields: ['region_type_full'],
+        forBounds: false,
+        forLocations: true,
+        kladrFormat: { digits: 2, zeros: 11 },
+        fiasType: 'region_fias_id'
+    },
+    {
+        id: 'region',
+        fields: ['region', 'region_type', 'region_type_full', 'region_with_type'],
+        forBounds: true,
+        forLocations: true,
+        kladrFormat: { digits: 2, zeros: 11 },
+        fiasType: 'region_fias_id'
+    },
+    {
+        id: 'area_fias_id',
+        fields: ['area_fias_id'],
+        forBounds: false,
+        forLocations: true
+    },
+    {
+        id: 'area_type_full',
+        fields: ['area_type_full'],
+        forBounds: false,
+        forLocations: true,
+        kladrFormat: { digits: 5, zeros: 8 },
+        fiasType: 'area_fias_id'
+    },
+    {
+        id: 'area',
+        fields: ['area', 'area_type', 'area_type_full', 'area_with_type'],
+        forBounds: true,
+        forLocations: true,
+        kladrFormat: { digits: 5, zeros: 8 },
+        fiasType: 'area_fias_id'
+    },
+    {
+        id: 'city_fias_id',
+        fields: ['city_fias_id'],
+        forBounds: false,
+        forLocations: true
+    },
+    {
+        id: 'city_type_full',
+        fields: ['city_type_full'],
+        forBounds: false,
+        forLocations: true,
+        kladrFormat: { digits: 8, zeros: 5 },
+        fiasType: 'city_fias_id'
+    },
+    {
+        id: 'city',
+        fields: ['city', 'city_type', 'city_type_full', 'city_with_type'],
+        forBounds: true,
+        forLocations: true,
+        kladrFormat: { digits: 8, zeros: 5 },
+        fiasType: 'city_fias_id'
+    },
+    {
+        id: 'city_district_fias_id',
+        fields: ['city_district_fias_id'],
+        forBounds: false,
+        forLocations: true
+    },
+    {
+        id: 'city_district_type_full',
+        fields: ['city_district_type_full'],
+        forBounds: false,
+        forLocations: true,
+        kladrFormat: { digits: 11, zeros: 2 },
+        fiasType: 'city_district_fias_id'
+    },
+    {
+        id: 'city_district',
+        fields: ['city_district', 'city_district_type', 'city_district_type_full', 'city_district_with_type'],
+        forBounds: true,
+        forLocations: true,
+        kladrFormat: { digits: 11, zeros: 2 },
+        fiasType: 'city_district_fias_id'
+    },
+    {
+        id: 'settlement_fias_id',
+        fields: ['settlement_fias_id'],
+        forBounds: false,
+        forLocations: true
+    },
+    {
+        id: 'settlement_type_full',
+        fields: ['settlement_type_full'],
+        forBounds: false,
+        forLocations: true,
+        kladrFormat: { digits: 11, zeros: 2 },
+        fiasType: 'settlement_fias_id'
+    },
+    {
+        id: 'settlement',
+        fields: ['settlement', 'settlement_type', 'settlement_type_full', 'settlement_with_type'],
+        forBounds: true,
+        forLocations: true,
+        kladrFormat: { digits: 11, zeros: 2 },
+        fiasType: 'settlement_fias_id'
+    },
+    {
+        id: 'street_fias_id',
+        fields: ['street_fias_id'],
+        forBounds: false,
+        forLocations: true
+    },
+    {
+        id: 'street_type_full',
+        fields: ['street_type_full'],
+        forBounds: false,
+        forLocations: true,
+        kladrFormat: { digits: 15, zeros: 2 },
+        fiasType: 'street_fias_id'
+    },
+    {
+        id: 'street',
+        fields: ['street', 'street_type', 'street_type_full', 'street_with_type'],
+        forBounds: true,
+        forLocations: true,
+        kladrFormat: { digits: 15, zeros: 2 },
+        fiasType: 'street_fias_id'
+    },
+    {
+        id: 'house',
+        fields: ['house', 'house_type', 'house_type_full',
+            'block', 'block_type'],
+        forBounds: true,
+        forLocations: false,
+        kladrFormat: { digits: 19 }
+    }
+
+];
+
+var rHasMatch = /<strong>/;
+
+var innPartsLengths = {
+    'LEGAL': [2, 2, 5, 1],
+    'INDIVIDUAL': [2, 2, 6, 2]
+};
+
+function valueStartsWith (suggestion, field) {
+    var fieldValue = suggestion.data && suggestion.data[field];
+
+    return fieldValue &&
+        new RegExp('^' + utils.escapeRegExChars(fieldValue) + '([' + WORD_DELIMITERS + ']|$)','i')
+            .test(suggestion.value);
+}
+
+function chooseFormattedField (formattedMain, formattedAlt) {
+    return rHasMatch.test(formattedAlt) && !rHasMatch.test(formattedMain)
+        ? formattedAlt
+        : formattedMain;
+}
+
+function formattedField (main, alt, currentValue, suggestion, options) {
+    var that = this,
+        formattedMain = that.highlightMatches(main, currentValue, suggestion, options),
+        formattedAlt = that.highlightMatches(alt, currentValue, suggestion, options);
+
+    return chooseFormattedField(formattedMain, formattedAlt);
+}
+
+var types = {};
+
+types['NAME'] = {
+    urlSuffix: 'fio',
+    matchers: [matchers.matchByNormalizedQuery, matchers.matchByWords],
+    // names for labels, describing which fields are displayed
+    fieldNames: {
+        surname: 'фамилия',
+        name: 'имя',
+        patronymic: 'отчество'
+    },
+    // try to suggest even if a suggestion has been selected manually
+    alwaysContinueSelecting: true,
+    isDataComplete: function (suggestion) {
+        var that = this,
+            params = that.options.params,
+            data = suggestion.data,
+            fields;
+
+        if ($.isFunction(params)) {
+            params = params.call(that.element, suggestion.value);
+        }
+        if (params && params.parts) {
+            fields = $.map(params.parts, function (part) {
+                return part.toLowerCase();
+            });
+        } else {
+            // when NAME is first, patronymic is mot mandatory
+            fields = ['surname', 'name'];
+            // when SURNAME is first, it is
+            if (valueStartsWith(suggestion, 'surname')) {
+                fields.push('patronymic');
+            }
+        }
+        return utils.fieldsNotEmpty(data, fields);
+    },
+    composeValue: function (data) {
+        return utils.compact([data.surname, data.name, data.patronymic]).join(' ');
+    }
+};
+
+types['ADDRESS'] = {
+    urlSuffix: 'address',
+    matchers: [
+        $.proxy(matchers.matchByNormalizedQuery, { stopwords: ADDRESS_STOPWORDS }),
+        $.proxy(matchers.matchByWordsAddress, { stopwords: ADDRESS_STOPWORDS })
+    ],
+    dataComponents: ADDRESS_COMPONENTS,
+    dataComponentsById: utils.indexBy(ADDRESS_COMPONENTS, 'id', 'index'),
+    unformattableTokens: ADDRESS_STOPWORDS,
+    enrichmentEnabled: true,
+    geoEnabled: true,
+    isDataComplete: function (suggestion) {
+        var fields = [this.bounds.to || 'flat'],
+            data = suggestion.data;
+
+        return !$.isPlainObject(data) || utils.fieldsNotEmpty(data, fields);
+    },
+    composeValue: function (data, options) {
+        var region = data.region_with_type || utils.compact([data.region, data.region_type]).join(' ') || data.region_type_full,
+            area = data.area_with_type || utils.compact([data.area_type, data.area]).join(' ') || data.area_type_full,
+            city = data.city_with_type || utils.compact([data.city_type, data.city]).join(' ') || data.city_type_full,
+            settelement = data.settlement_with_type || utils.compact([data.settlement_type, data.settlement]).join(' ') || data.settlement_type_full,
+            cityDistrict = data.city_district_with_type || utils.compact([data.city_district_type, data.city_district]).join(' ') || data.city_district_type_full,
+            street = data.street_with_type || utils.compact([data.street_type, data.street]).join(' ') || data.street_type_full,
+            house = utils.compact([data.house_type, data.house, data.block_type, data.block]).join(' '),
+            flat = utils.compact([data.flat_type, data.flat]).join(' '),
+            postal_box = data.postal_box && ('а/я ' + data.postal_box),
+            result;
+
+        // если регион совпадает с городом
+        // например г Москва, г Москва
+        // то не показываем регион
+        if (region === city) {
+            region = '';
+        }
+
+        // иногда не показываем район
+        if (!(options && options.saveCityDistrict)) {
+            if (options && options.excludeCityDistrict) {
+                // если район явно запрещен
+                cityDistrict = '';
+            } else if (cityDistrict && !data.city_district_fias_id) {
+                // если район взят из ОКАТО (у него пустой city_district_fias_id)
+                cityDistrict = '';
+            }
+        }
+
+        result = utils.compact([
+            region,
+            area,
+            city,
+            cityDistrict,
+            settelement,
+            street,
+            house,
+            flat,
+            postal_box
+        ]).join(', ');
+
+        return result;
+    },
+    formatResult: function() {
+        var componentsUnderCityDistrict = [],
+            _underCityDistrict = false;
+
+        $.each(ADDRESS_COMPONENTS, function () {
+            if (_underCityDistrict) componentsUnderCityDistrict.push(this.id);
+            if (this.id === 'city_district') _underCityDistrict = true;
+        });
+
+        return function (value, currentValue, suggestion, options) {
+            var that = this,
+                district = suggestion.data && suggestion.data.city_district_with_type;
+
+            value = that.highlightMatches(value, currentValue, suggestion, options);
+            value = that.wrapFormattedValue(value, suggestion);
+
+            if (district && (!that.bounds.own.length || that.bounds.own.indexOf('street') >= 0)
+                && !$.isEmptyObject(that.copyDataComponents(suggestion.data, componentsUnderCityDistrict))) {
+                value +=
+                    '<div class="' + that.classes.subtext + '">' +
+                    that.highlightMatches(district, currentValue, suggestion) +
+                    '</div>';
+            }
+
+            return value;
+        };
+    }(),
+    /**
+     * @param instance
+     * @param options
+     * @param options.suggestion
+     * @param options.hasSameValues
+     * @param options.hasBeenEnreached
+     */
+    getSuggestionValue: function(instance, options) {
+        var formattedValue = null;
+
+        if (options.hasSameValues) {
+            if (instance.options.restrict_value) {
+                // Can not use unrestricted address,
+                // because some components (from constraints) must be omitted
+                formattedValue = this.getValueWithinConstraints(instance, options.suggestion);
+            } else if (instance.bounds.own.length) {
+                // Can not use unrestricted address,
+                // because only components from bounds must be included
+                formattedValue = this.getValueWithinBounds(instance, options.suggestion);
+            } else {
+                // Can use full unrestricted address
+                formattedValue = options.suggestion.unrestricted_value;
+            }
+        } else if (options.hasBeenEnriched) {
+            if (instance.options.restrict_value) {
+                formattedValue = this.getValueWithinConstraints(instance, options.suggestion, { excludeCityDistrict: true });
+            }
+        }
+
+        return formattedValue;
+    },
+    /*
+     * Compose suggestion value with respect to constraints
+     */
+    getValueWithinConstraints: function (instance, suggestion, options) {
+        return this.composeValue(instance.getUnrestrictedData(suggestion.data), options);
+    },
+    /*
+     * Compose suggestion value with respect to bounds
+     */
+    getValueWithinBounds: function (instance, suggestion, options) {
+        // для корректного составления адреса нужен city_district_fias_id
+        var data = instance.copyDataComponents(suggestion.data, instance.bounds.own.concat(['city_district_fias_id']));
+
+        return this.composeValue(data, options);
+    }
+
+};
+
+types['PARTY'] = {
+    urlSuffix: 'party',
+    matchers: [
+        $.proxy(matchers.matchByFields, {
+            // These fields of suggestion's `data` used by by-words matcher
+            fieldsStopwords: {
+                'value': null,
+                'data.address.value': ADDRESS_STOPWORDS,
+                'data.inn': null,
+                'data.ogrn': null
+            }
+        })
+    ],
+    dataComponents: ADDRESS_COMPONENTS,
+    geoEnabled: true,
+    formatResult: function (value, currentValue, suggestion, options) {
+        var that = this,
+            formattedInn = that.type.formatResultInn.call(that, suggestion, currentValue),
+            formatterOGRN = that.highlightMatches(utils.getDeepValue(suggestion.data, 'ogrn'), currentValue, suggestion),
+            formattedInnOGRN = chooseFormattedField(formattedInn, formatterOGRN),
+            formattedFIO = that.highlightMatches(utils.getDeepValue(suggestion.data, 'management.name'), currentValue, suggestion),
+            address = utils.getDeepValue(suggestion.data, 'address.value') || '';
+
+        if (that.isMobile) {
+            (options || (options = {})).maxLength = 50;
+        }
+
+        value = formattedField.call(that, value, utils.getDeepValue(suggestion.data, 'name.latin'), currentValue, suggestion, options);
+        value = that.wrapFormattedValue(value, suggestion);
+
+        if (address) {
+            address = address.replace(/^(\d{6}?\s+|Россия,\s+)/i, '');
+            if (that.isMobile) {
+                // keep only two first words
+                address = address.replace(new RegExp('^([^' + WORD_DELIMITERS + ']+[' + WORD_DELIMITERS + ']+[^' + WORD_DELIMITERS + ']+).*'), '$1');
+            } else {
+                address = that.highlightMatches(address, currentValue, suggestion, {
+                    unformattableTokens: ADDRESS_STOPWORDS
+                });
+            }
+        }
+
+        if (formattedInnOGRN || address || formattedFIO) {
+            value +=
+                '<div class="' + that.classes.subtext + '">' +
+                '<span class="' + that.classes.subtext_inline + '">' + (formattedInnOGRN || '') + '</span>' +
+                (chooseFormattedField(address, formattedFIO) || '') +
+                '</div>';
+        }
+        return value;
+    },
+    formatResultInn: function(suggestion, currentValue) {
+        var that = this,
+            inn = suggestion.data && suggestion.data.inn,
+            innPartsLength = innPartsLengths[suggestion.data && suggestion.data.type],
+            innParts,
+            formattedInn,
+            rDigit = /\d/;
+
+        if (inn) {
+            formattedInn = that.highlightMatches(inn, currentValue, suggestion);
+            if (innPartsLength) {
+                formattedInn = formattedInn.split('');
+                innParts = $.map(innPartsLength, function (partLength) {
+                    var formattedPart = '',
+                        ch;
+
+                    while (partLength && (ch = formattedInn.shift())) {
+                        formattedPart += ch;
+                        if (rDigit.test(ch)) partLength--;
+                    }
+
+                    return formattedPart;
+                });
+                formattedInn = innParts.join('<span class="' + that.classes.subtext_delimiter + '"></span>') +
+                    formattedInn.join('');
+            }
+
+            return formattedInn;
+        }
+    }
+};
+
+types['EMAIL'] = {
+    urlSuffix: 'email',
+    matchers: [matchers.matchByNormalizedQuery],
+    isQueryRequestable: function (query) {
+        return this.options.suggest_local || query.indexOf('@') >= 0;
+    }
+};
+
+types['BANK'] = {
+    urlSuffix: 'bank',
+    matchers: [$.proxy(matchers.matchByFields, {
+        // These fields of suggestion's `data` used by by-words matcher
+        fieldsStopwords: {
+            'value': null,
+            'data.bic': null,
+            'data.swift': null
+        }
+    })],
+    dataComponents: ADDRESS_COMPONENTS,
+    geoEnabled: true,
+    formatResult: function (value, currentValue, suggestion, options) {
+        var that = this,
+            formattedBIC = that.highlightMatches(utils.getDeepValue(suggestion.data, 'bic'), currentValue, suggestion),
+            address = utils.getDeepValue(suggestion.data, 'address.value') || '';
+
+        value = that.highlightMatches(value, currentValue, suggestion, options);
+        value = that.wrapFormattedValue(value, suggestion);
+
+        if (address) {
+            address = address.replace(/^\d{6}( РОССИЯ)?, /i, '');
+            if (that.isMobile) {
+                // keep only two first words
+                address = address.replace(new RegExp('^([^' + WORD_DELIMITERS + ']+[' + WORD_DELIMITERS + ']+[^' + WORD_DELIMITERS + ']+).*'), '$1');
+            } else {
+                address = that.highlightMatches(address, currentValue, suggestion, {
+                    unformattableTokens: ADDRESS_STOPWORDS
+                });
+            }
+        }
+
+        if (formattedBIC || address) {
+            value +=
+                '<div class="' + that.classes.subtext + '">' +
+                '<span class="' + that.classes.subtext_inline + '">' + formattedBIC + '</span>' +
+                address +
+                '</div>';
+        }
+        return value;
+    },
+    formatSelected: function (suggestion) {
+        return utils.getDeepValue(suggestion, 'data.name.payment');
+    }
+};
+
+$.extend(DEFAULT_OPTIONS, {
+    suggest_local: true
+});
+
+var notificator = {
+
+    chains: {},
+
+    'on': function (name, method) {
+        this.get(name).push(method);
+        return this;
+    },
+
+    'get': function (name) {
+        var chains = this.chains;
+        return chains[name] || (chains[name] = []);
+    }
+};
+
+var serviceMethods = {
+    'suggest': {
+        defaultParams: {
+            type: utils.getDefaultType(),
+            dataType: 'json',
+            contentType: utils.getDefaultContentType()
+        },
+        addTypeInUrl: true
+    },
+    'detectAddressByIp': {
+        defaultParams: {
+            type: 'GET',
+            dataType: 'json'
+        },
+        addTypeInUrl: false
+    },
+    'status': {
+        defaultParams: {
+            type: 'GET',
+            dataType: 'json'
+        },
+        addTypeInUrl: true
+    },
+    'findById': {
+        defaultParams: {
+            type: utils.getDefaultType(),
+            dataType: 'json',
+            contentType: utils.getDefaultContentType()
+        },
+        addTypeInUrl: true
+    }
+};
+
+var requestModes = {
+    'suggest': {
+        method: 'suggest',
+        userSelect: true,
+        updateValue: true,
+        enrichmentEnabled: true
+    },
+    'findById': {
+        method: 'findById',
+        userSelect: false,
+        updateValue: false,
+        enrichmentEnabled: false
+    }
+};
+
+function Suggestions(el, options) {
+    var that = this;
+
+    // Shared variables:
+    that.element = el;
+    that.el = $(el);
+    that.suggestions = [];
+    that.badQueries = [];
+    that.selectedIndex = -1;
+    that.currentValue = that.element.value;
+    that.intervalId = 0;
+    that.cachedResponse = {};
+    that.enrichmentCache = {};
+    that.currentRequest = null;
+    that.inputPhase = $.Deferred();
+    that.fetchPhase = $.Deferred();
+    that.enrichPhase = $.Deferred();
+    that.onChangeTimeout = null;
+    that.triggering = {};
+    that.$wrapper = null;
+    that.options = $.extend({}, DEFAULT_OPTIONS, options);
+    that.classes = {
+        hint: 'suggestions-hint',
+        mobile: 'suggestions-mobile',
+        nowrap: 'suggestions-nowrap',
+        selected: 'suggestions-selected',
+        suggestion: 'suggestions-suggestion',
+        subtext: 'suggestions-subtext',
+        subtext_inline: 'suggestions-subtext suggestions-subtext_inline',
+        subtext_delimiter: 'suggestions-subtext-delimiter',
+        subtext_label: 'suggestions-subtext suggestions-subtext_label',
+        removeConstraint: 'suggestions-remove',
+        value: 'suggestions-value'
+    };
+    that.disabled = false;
+    that.selection = null;
+    that.$viewport = $(window);
+    that.$body = $(document.body);
+    that.type = null;
+    that.status = {};
+
+    that.setupElement();
+
+    that.initializer = $.Deferred();
+
+    if (that.el.is(':visible')) {
+        that.initializer.resolve();
+    } else {
+        that.deferInitialization();
+    }
+
+    that.initializer.done($.proxy(that.initialize, that));
+}
+
+Suggestions.prototype = {
+
+    // Creation and destruction
+
+    initialize: function () {
+        var that = this;
+
+        that.uniqueId = utils.uniqueId('i');
+
+        that.createWrapper();
+        that.notify('initialize');
+
+        that.bindWindowEvents();
+
+        that.setOptions();
+        that.fixPosition();
+    },
+
+    /**
+     * Initialize when element is firstly interacted
+     */
+    deferInitialization: function () {
+        var that = this,
+            events = 'mouseover focus keydown',
+            timer,
+            callback = function () {
+                that.initializer.resolve();
+                that.enable();
+            };
+
+        that.initializer.always(function(){
+            that.el.off(events, callback);
+            clearInterval(timer);
+        });
+
+        that.disabled = true;
+        that.el.on(events, callback);
+        timer = setInterval(function(){
+            if (that.el.is(':visible')) {
+                callback();
+            }
+        }, that.options.initializeInterval);
+    },
+
+    isInitialized: function () {
+        return this.initializer.state() === 'resolved';
+    },
+
+    dispose: function () {
+        var that = this;
+
+        that.initializer.reject();
+        that.notify('dispose');
+        that.el.removeData(DATA_ATTR_KEY)
+            .removeClass('suggestions-input');
+        that.unbindWindowEvents();
+        that.removeWrapper();
+        that.el.trigger('suggestions-dispose');
+    },
+
+    notify: function (chainName) {
+        var that = this,
+            args = utils.slice(arguments, 1);
+
+        return $.map(notificator.get(chainName), function (method) {
+            return method.apply(that, args);
+        });
+    },
+
+    createWrapper: function () {
+        var that = this;
+
+        that.$wrapper = $('<div class="suggestions-wrapper"/>');
+        that.el.after(that.$wrapper);
+
+        that.$wrapper.on('mousedown' + EVENT_NS, $.proxy(that.onMousedown, that));
+    },
+
+    removeWrapper: function () {
+        var that = this;
+
+        if (that.$wrapper) {
+            that.$wrapper.remove();
+        }
+        $(that.options.$helpers).off(EVENT_NS);
+    },
+
+    /** This whole handler is needed to prevent blur event on textbox
+     * when suggestion is clicked (blur leads to suggestions hide, so we need to prevent it).
+     * See https://github.com/jquery/jquery-ui/blob/master/ui/autocomplete.js for details
+     */
+    onMousedown: function (e) {
+        var that = this;
+
+        // prevent moving focus out of the text field
+        e.preventDefault();
+
+        // IE doesn't prevent moving focus even with e.preventDefault()
+        // so we set a flag to know when we should ignore the blur event
+        that.cancelBlur = true;
+        utils.delay(function () {
+            delete that.cancelBlur;
+        });
+
+        // clicking on the scrollbar causes focus to shift to the body
+        // but we can't detect a mouseup or a click immediately afterward
+        // so we have to track the next mousedown and close the menu if
+        // the user clicks somewhere outside of the autocomplete
+        if ($(e.target).closest(".ui-menu-item").length == 0) {
+            utils.delay(function () {
+                $(document).one("mousedown", function (e) {
+                    var $elements = that.el
+                        .add(that.$wrapper)
+                        .add(that.options.$helpers);
+
+                    if (that.options.floating) {
+                        $elements = $elements.add(that.$container);
+                    }
+
+                    $elements = $elements.filter(function () {
+                        return this === e.target || $.contains(this, e.target);
+                    });
+
+                    if (!$elements.length) {
+                        that.hide();
+                    }
+                });
+            });
+        }
+    },
+
+    bindWindowEvents: function () {
+        var that = this,
+            handler = $.proxy(that.fixPosition, that);
+
+        that.$viewport
+            .on('resize' + EVENT_NS + that.uniqueId, handler)
+            .on('scroll' + EVENT_NS + that.uniqueId, handler);
+    },
+
+    unbindWindowEvents: function () {
+        this.$viewport
+            .off('resize' + EVENT_NS + this.uniqueId)
+            .off('scroll' + EVENT_NS + this.uniqueId);
+    },
+
+    scrollToTop: function () {
+        var that = this,
+            scrollTarget = that.options.scrollOnFocus;
+
+        if (scrollTarget === true) {
+            scrollTarget = that.el;
+        }
+        if (scrollTarget instanceof $ && scrollTarget.length > 0) {
+            $('body,html').animate({
+                scrollTop: scrollTarget.offset().top
+            }, 'fast');
+        }
+    },
+
+    // Configuration methods
+
+    setOptions: function (suppliedOptions) {
+        var that = this;
+
+        $.extend(that.options, suppliedOptions);
+
+        // Check mandatory options
+        $.each({
+            'type': types,
+            'requestMode': requestModes
+        }, function (option, available) {
+            that[option] = available[that.options[option]];
+            if (!that[option]) {
+                that.disable();
+                throw '`' + option + '` option is incorrect! Must be one of: ' + $.map(available, function (value, name) {
+                    return '"' + name + '"';
+                }).join(', ');
+            }
+        });
+
+        $(that.options.$helpers)
+            .off(EVENT_NS)
+            .on('mousedown' + EVENT_NS, $.proxy(that.onMousedown, that));
+
+        if (that.isInitialized()) {
+            that.notify('setOptions');
+        }
+    },
+
+    // Common public methods
+
+    fixPosition: function (e) {
+        var that = this,
+            elLayout = {},
+            wrapperOffset,
+            origin;
+
+        that.isMobile = that.$viewport.width() <= that.options.mobileWidth;
+
+        if (!that.isInitialized() || (e && e.type == 'scroll' && !(that.options.floating || that.isMobile))) return;
+        that.$container.appendTo(that.options.floating ? that.$body : that.$wrapper);
+
+        that.notify('resetPosition');
+        // reset input's padding to default, determined by css
+        that.el.css('paddingLeft', '');
+        that.el.css('paddingRight', '');
+        elLayout.paddingLeft = parseFloat(that.el.css('paddingLeft'));
+        elLayout.paddingRight = parseFloat(that.el.css('paddingRight'));
+
+        $.extend(elLayout, that.el.offset());
+        elLayout.borderTop = that.el.css('border-top-style') == 'none' ? 0 : parseFloat(that.el.css('border-top-width'));
+        elLayout.borderLeft = that.el.css('border-left-style') == 'none' ? 0 : parseFloat(that.el.css('border-left-width'));
+        elLayout.innerHeight = that.el.innerHeight();
+        elLayout.innerWidth = that.el.innerWidth();
+        elLayout.outerHeight = that.el.outerHeight();
+        elLayout.componentsLeft = 0;
+        elLayout.componentsRight = 0;
+        wrapperOffset = that.$wrapper.offset();
+
+        origin = {
+            top: elLayout.top - wrapperOffset.top,
+            left: elLayout.left - wrapperOffset.left
+        };
+
+        that.notify('fixPosition', origin, elLayout);
+
+        if (elLayout.componentsLeft > elLayout.paddingLeft) {
+            that.el.css('paddingLeft', elLayout.componentsLeft + 'px');
+        }
+        if (elLayout.componentsRight > elLayout.paddingRight) {
+            that.el.css('paddingRight', elLayout.componentsRight + 'px');
+        }
+    },
+
+    clearCache: function () {
+        this.cachedResponse = {};
+        this.enrichmentCache = {};
+        this.badQueries = [];
+    },
+
+    clear: function () {
+        var that = this;
+
+        if (that.isInitialized()) {
+            that.clearCache();
+            that.currentValue = '';
+            that.selection = null;
+            that.hide();
+            that.suggestions = [];
+            that.el.val('');
+            that.el.trigger('suggestions-clear');
+            that.notify('clear');
+        }
+    },
+
+    disable: function () {
+        var that = this;
+
+        that.disabled = true;
+        that.abortRequest();
+        if (that.visible) {
+            that.hide();
+        }
+    },
+
+    enable: function () {
+        this.disabled = false;
+    },
+
+    isUnavailable: function () {
+        return this.disabled;
+    },
+
+    update: function () {
+        var that = this,
+            query = that.el.val();
+
+        if (that.isInitialized()) {
+            that.currentValue = query;
+            if (that.isQueryRequestable(query)) {
+                that.updateSuggestions(query);
+            } else {
+                that.hide();
+            }
+        }
+    },
+
+    setSuggestion: function (suggestion) {
+        var that = this,
+            data,
+            value;
+
+        if ($.isPlainObject(suggestion) && $.isPlainObject(suggestion.data)) {
+            suggestion = $.extend(true, {}, suggestion);
+
+            if (that.bounds.own.length) {
+                that.checkValueBounds(suggestion);
+                data = that.copyDataComponents(suggestion.data, that.bounds.all);
+                if (suggestion.data.kladr_id) {
+                    data.kladr_id = that.getBoundedKladrId(suggestion.data.kladr_id, that.bounds.all);
+                }
+                suggestion.data = data;
+            }
+
+            that.selection = suggestion;
+
+            // `that.suggestions` required by `that.getSuggestionValue` and must be set before
+            that.suggestions = [suggestion];
+            value = that.getSuggestionValue(suggestion) || '';
+            that.currentValue = value;
+            that.el.val(value);
+            that.abortRequest();
+            that.el.trigger('suggestions-set');
+        }
+    },
+
+    /**
+     * Fetch full object for current INPUT's value
+     * if no suitable object found, clean input element
+     */
+    fixData: function () {
+        var that = this,
+            fullQuery = that.extendedCurrentValue(),
+            currentValue = that.el.val(),
+            resolver = $.Deferred();
+
+        resolver
+            .done(function (suggestion) {
+                that.selectSuggestion(suggestion, 0, currentValue, { hasBeenEnriched: true });
+                that.el.trigger('suggestions-fixdata', suggestion);
+            })
+            .fail(function () {
+                that.selection = null;
+                that.currentValue = '';
+                that.el.val(that.currentValue);
+                that.el.trigger('suggestions-fixdata');
+            });
+
+        if (that.isQueryRequestable(fullQuery)) {
+            that.currentValue = fullQuery;
+            that.getSuggestions(fullQuery, { count: 1, from_bound: null, to_bound: null })
+                .done(function (suggestions) {
+                    // data fetched
+                    var suggestion = suggestions[0];
+                    if (suggestion) {
+                        resolver.resolve(suggestion);
+                    } else {
+                        resolver.reject();
+                    }
+                })
+                .fail(function () {
+                    // no data fetched
+                    resolver.reject();
+                });
+        } else {
+            resolver.reject();
+        }
+    },
+
+    // Querying related methods
+
+    /**
+     * Looks up parent instances
+     * @returns {String} current value prepended by parents' values
+     */
+    extendedCurrentValue: function () {
+        var that = this,
+            parentInstance = that.getParentInstance(),
+            parentValue = parentInstance && parentInstance.extendedCurrentValue(),
+            currentValue = $.trim(that.el.val());
+
+        return utils.compact([parentValue, currentValue]).join(' ');
+    },
+
+    getAjaxParams: function (method, custom) {
+        var that = this,
+            token = $.trim(that.options.token),
+            partner = $.trim(that.options.partner),
+            serviceUrl = that.options.serviceUrl,
+            url = that.options.url,
+            serviceMethod = serviceMethods[method],
+            params = $.extend({
+                timeout: that.options.timeout
+            }, serviceMethod.defaultParams),
+            headers = {};
+
+        if (url) {
+            serviceUrl = url;
+        } else {
+            if (!/\/$/.test(serviceUrl)) {
+                serviceUrl += '/';
+            }
+            serviceUrl += method;
+            if (serviceMethod.addTypeInUrl) {
+                serviceUrl += '/' + that.type.urlSuffix;
+            }
+        }
+
+        serviceUrl = utils.fixURLProtocol(serviceUrl);
+
+        if ($.support.cors) {
+            // for XMLHttpRequest put token in header
+            if (token) {
+                headers['Authorization'] = 'Token ' + token;
+            }
+            if (partner) {
+                headers['X-Partner'] = partner;
+            }
+            headers['X-Version'] = Suggestions.version;
+            if (!params.headers) {
+                params.headers = {};
+            }
+            $.extend(params.headers, that.options.headers, headers);
+        } else {
+            // for XDomainRequest put token into URL
+            if (token) {
+                headers['token'] = token;
+            }
+            if (partner) {
+                headers['partner'] = partner;
+            }
+            headers['version'] = Suggestions.version;
+            serviceUrl = utils.addUrlParams(serviceUrl, headers);
+        }
+
+        params.url = serviceUrl;
+
+        return $.extend(params, custom);
+    },
+
+    isQueryRequestable: function (query) {
+        var that = this,
+            result;
+
+        result = query.length >= that.options.minChars;
+
+        if (result && that.type.isQueryRequestable) {
+            result = that.type.isQueryRequestable.call(that, query);
+        }
+
+        return result;
+    },
+
+    constructRequestParams: function (query, customParams) {
+        var that = this,
+            options = that.options,
+            params = $.isFunction(options.params)
+                ? options.params.call(that.element, query)
+                : $.extend({}, options.params);
+
+        if (that.type.constructRequestParams) {
+            $.extend(params, that.type.constructRequestParams.call(that));
+        }
+        $.each(that.notify('requestParams'), function (i, hookParams) {
+            $.extend(params, hookParams);
+        });
+        params[options.paramName] = query;
+        if ($.isNumeric(options.count) && options.count > 0) {
+            params.count = options.count;
+        }
+
+        return $.extend(params, customParams);
+    },
+
+    updateSuggestions: function (query) {
+        var that = this;
+
+        that.fetchPhase = that.getSuggestions(query)
+            .done(function (suggestions) {
+                that.assignSuggestions(suggestions, query);
+            });
+    },
+
+    /**
+     * Get suggestions from cache or from server
+     * @param {String} query
+     * @param {Object} customParams parameters specified here will be passed to request body
+     * @param {Object} requestOptions
+     * @param {Boolean} [requestOptions.noCallbacks]  flag, request competence callbacks will not be invoked
+     * @param {Boolean} [requestOptions.useEnrichmentCache]
+     * @return {$.Deferred} waiter which is to be resolved with suggestions as argument
+     */
+    getSuggestions: function (query, customParams, requestOptions) {
+        var response,
+            that = this,
+            options = that.options,
+            noCallbacks = requestOptions && requestOptions.noCallbacks,
+            useEnrichmentCache = requestOptions && requestOptions.useEnrichmentCache,
+            params = that.constructRequestParams(query, customParams),
+            cacheKey = $.param(params || {}),
+            resolver = $.Deferred();
+
+        response = that.cachedResponse[cacheKey];
+        if (response && $.isArray(response.suggestions)) {
+            resolver.resolve(response.suggestions);
+        } else {
+            if (that.isBadQuery(query)) {
+                resolver.reject();
+            } else {
+                if (!noCallbacks && options.onSearchStart.call(that.element, params) === false) {
+                    resolver.reject();
+                } else {
+                    that.doGetSuggestions(params)
+                        .done(function (response) {
+                            // if response is correct and current value has not been changed
+                            if (that.processResponse(response) && query == that.currentValue) {
+
+                                // Cache results if cache is not disabled:
+                                if (!options.noCache) {
+                                    if (useEnrichmentCache) {
+                                        that.enrichmentCache[query] = response.suggestions[0];
+                                    } else {
+                                        that.enrichResponse(response, query);
+                                        that.cachedResponse[cacheKey] = response;
+                                        if (options.preventBadQueries && response.suggestions.length === 0) {
+                                            that.badQueries.push(query);
+                                        }
+                                    }
+                                }
+
+                                resolver.resolve(response.suggestions);
+                            } else {
+                                resolver.reject();
+                            }
+                            if (!noCallbacks) {
+                                options.onSearchComplete.call(that.element, query, response.suggestions);
+                            }
+                        }).fail(function (jqXHR, textStatus, errorThrown) {
+                        resolver.reject();
+                        if (!noCallbacks && textStatus !== 'abort') {
+                            options.onSearchError.call(that.element, query, jqXHR, textStatus, errorThrown);
+                        }
+                    });
+                }
+            }
+        }
+        return resolver;
+    },
+
+    /**
+     * Sends an AJAX request to server suggest method.
+     * @param {Object} params request params
+     * @returns {$.Deferred} response promise
+     */
+    doGetSuggestions: function (params) {
+        var that = this,
+            request = $.ajax(
+                that.getAjaxParams(that.requestMode.method, { data: utils.serialize(params) })
+            );
+
+        that.abortRequest();
+        that.currentRequest = request;
+        that.notify('request');
+
+        request.always(function () {
+            that.currentRequest = null;
+            that.notify('request');
+        });
+
+        return request;
+    },
+
+    isBadQuery: function (q) {
+        if (!this.options.preventBadQueries) {
+            return false;
+        }
+
+        var result = false;
+        $.each(this.badQueries, function (i, query) {
+            return !(result = q.indexOf(query) === 0);
+        });
+        return result;
+    },
+
+    abortRequest: function () {
+        var that = this;
+
+        if (that.currentRequest) {
+            that.currentRequest.abort();
+        }
+    },
+
+    /**
+     * Checks response format and data
+     * @return {Boolean} response contains acceptable data
+     */
+    processResponse: function (response) {
+        var that = this,
+            suggestions;
+
+        if (!response || !$.isArray(response.suggestions)) {
+            return false;
+        }
+
+        that.verifySuggestionsFormat(response.suggestions);
+        that.setUnrestrictedValues(response.suggestions);
+
+        if ($.isFunction(that.options.onSuggestionsFetch)) {
+            suggestions = that.options.onSuggestionsFetch.call(that.element, response.suggestions);
+            if ($.isArray(suggestions)) {
+                response.suggestions = suggestions;
+            }
+        }
+
+        return true;
+    },
+
+    verifySuggestionsFormat: function (suggestions) {
+        if (typeof suggestions[0] === 'string') {
+            $.each(suggestions, function (i, value) {
+                suggestions[i] = { value: value, data: null };
+            });
+        }
+    },
+
+    /**
+     * Gets string to set as input value
+     *
+     * @param suggestion
+     * @param {Object} [selectionOptions]
+     * @param {boolean} selectionOptions.hasBeenEnriched
+     * @param {boolean} selectionOptions.hasSameValues
+     * @return {string}
+     */
+    getSuggestionValue: function (suggestion, selectionOptions) {
+        var that = this,
+            formatSelected = that.options.formatSelected || that.type.formatSelected,
+            hasSameValues = selectionOptions && selectionOptions.hasSameValues,
+            hasBeenEnriched = selectionOptions && selectionOptions.hasBeenEnriched,
+            formattedValue,
+            typeFormattedValue = null;
+
+
+        if ($.isFunction(formatSelected)) {
+            formattedValue = formatSelected.call(that, suggestion);
+        }
+
+        if (typeof formattedValue !== 'string' || formattedValue.length == 0) {
+            formattedValue = suggestion.value;
+
+            if (that.type.getSuggestionValue) {
+                typeFormattedValue = that.type.getSuggestionValue(that, {
+                    suggestion: suggestion,
+                    hasSameValues: hasSameValues,
+                    hasBeenEnriched: hasBeenEnriched,
+                });
+
+                if (typeFormattedValue !== null) {
+                    formattedValue = typeFormattedValue;
+                }
+            }
+        }
+
+        return formattedValue;
+    },
+
+    hasSameValues: function(suggestion){
+        var hasSame = false;
+
+        $.each(this.suggestions, function(i, anotherSuggestion){
+            if (anotherSuggestion.value === suggestion.value && anotherSuggestion !== suggestion) {
+                hasSame = true;
+                return false;
+            }
+        });
+
+        return hasSame;
+    },
+
+    assignSuggestions: function (suggestions, query) {
+        var that = this;
+        that.suggestions = suggestions;
+        that.notify('assignSuggestions', query);
+    },
+
+    shouldRestrictValues: function () {
+        var that = this;
+        // treat suggestions value as restricted only if there is one constraint
+        // and restrict_value is true
+        return that.options.restrict_value
+            && that.constraints
+            && Object.keys(that.constraints).length == 1;
+    },
+
+    /**
+     * Fills suggestion.unrestricted_value property
+     */
+    setUnrestrictedValues: function (suggestions) {
+        var that = this,
+            shouldRestrict = that.shouldRestrictValues(),
+            label = that.getFirstConstraintLabel();
+
+        $.each(suggestions, function (i, suggestion) {
+            if (!suggestion.unrestricted_value) {
+                suggestion.unrestricted_value = shouldRestrict ? label + ', ' + suggestion.value : suggestion.value;
+            }
+        });
+    },
+
+    areSuggestionsSame: function (a, b) {
+        return a && b &&
+            a.value === b.value &&
+            utils.areSame(a.data, b.data);
+    }
+
+};
+
+/**
+ * Methods related to INPUT's behavior
+ */
+
+var methods = {
+
+    setupElement: function () {
+        // Remove autocomplete attribute to prevent native suggestions:
+        this.el
+            .attr('autocomplete', 'off')
+            .addClass('suggestions-input')
+            .css('box-sizing', 'border-box');
+    },
+
+    bindElementEvents: function () {
+        var that = this;
+
+        that.el.on('keydown' + EVENT_NS, $.proxy(that.onElementKeyDown, that));
+        // IE is buggy, it doesn't trigger `input` on text deletion, so use following events
+        that.el.on(['keyup' + EVENT_NS, 'cut' + EVENT_NS, 'paste' + EVENT_NS, 'input' + EVENT_NS].join(' '), $.proxy(that.onElementKeyUp, that));
+        that.el.on('blur' + EVENT_NS, $.proxy(that.onElementBlur, that));
+        that.el.on('focus' + EVENT_NS, $.proxy(that.onElementFocus, that));
+    },
+
+    unbindElementEvents: function () {
+        this.el.off(EVENT_NS);
+    },
+
+    onElementBlur: function () {
+        var that = this;
+
+        // suggestion was clicked, blur should be ignored
+        // see container mousedown handler
+        if (that.cancelBlur) {
+            that.cancelBlur = false;
+            return;
+        }
+
+        if (that.options.triggerSelectOnBlur) {
+            if (!that.isUnavailable()) {
+                that.selectCurrentValue({ noSpace: true })
+                    .always(function () {
+                        // For NAMEs selecting keeps suggestions list visible, so hide it
+                        that.hide();
+                    });
+            }
+        } else {
+            that.hide();
+        }
+
+        if (that.fetchPhase.abort) {
+            that.fetchPhase.abort();
+        }
+    },
+
+    onElementFocus: function () {
+        var that = this;
+
+        if (!that.cancelFocus) {
+            // defer methods to allow browser update input's style before
+            utils.delay($.proxy(that.completeOnFocus, that));
+        }
+        that.cancelFocus = false;
+    },
+
+    onElementKeyDown: function (e) {
+        var that = this;
+
+        if (that.isUnavailable()) {
+            return;
+        }
+
+        if (!that.visible) {
+            switch (e.which) {
+                // If suggestions are hidden and user presses arrow down, display suggestions
+                case KEYS.DOWN:
+                    that.suggest();
+                    break;
+                // if no suggestions available and user pressed Enter
+                case KEYS.ENTER:
+                    if (that.options.triggerSelectOnEnter) {
+                        that.triggerOnSelectNothing();
+                    }
+                    break;
+            }
+            return;
+        }
+
+        switch (e.which) {
+            case KEYS.ESC:
+                that.el.val(that.currentValue);
+                that.hide();
+                that.abortRequest();
+                break;
+
+            case KEYS.TAB:
+                if (that.options.tabDisabled === false) {
+                    return;
+                }
+                break;
+
+            case KEYS.ENTER:
+                if (that.options.triggerSelectOnEnter) {
+                    that.selectCurrentValue();
+                }
+                break;
+
+            case KEYS.SPACE:
+                if (that.options.triggerSelectOnSpace && that.isCursorAtEnd()) {
+                    e.preventDefault();
+                    that.selectCurrentValue({ continueSelecting: true, dontEnrich: true })
+                        .fail(function () {
+                            // If all data fetched but nothing selected
+                            that.currentValue += ' ';
+                            that.el.val(that.currentValue);
+                            that.proceedChangedValue();
+                        });
+                }
+                return;
+            case KEYS.UP:
+                that.moveUp();
+                break;
+            case KEYS.DOWN:
+                that.moveDown();
+                break;
+            default:
+                return;
+        }
+
+        // Cancel event if function did not return:
+        e.stopImmediatePropagation();
+        e.preventDefault();
+    },
+
+    onElementKeyUp: function (e) {
+        var that = this;
+
+        if (that.isUnavailable()) {
+            return;
+        }
+
+        switch (e.which) {
+            case KEYS.UP:
+            case KEYS.DOWN:
+            case KEYS.ENTER:
+                return;
+        }
+
+        // Cancel pending change
+        clearTimeout(that.onChangeTimeout);
+        that.inputPhase.reject();
+
+        if (that.currentValue !== that.el.val()) {
+            that.proceedChangedValue();
+        }
+    },
+
+    proceedChangedValue: function () {
+        var that = this;
+
+        // Cancel fetching, because it became obsolete
+        that.abortRequest();
+
+        that.inputPhase = $.Deferred()
+            .done($.proxy(that.onValueChange, that));
+
+        if (that.options.deferRequestBy > 0) {
+            // Defer lookup in case when value changes very quickly:
+            that.onChangeTimeout = utils.delay(function () {
+                that.inputPhase.resolve();
+            }, that.options.deferRequestBy);
+        } else {
+            that.inputPhase.resolve();
+        }
+    },
+
+    onValueChange: function () {
+        var that = this,
+            currentSelection;
+
+        if (that.selection) {
+            currentSelection = that.selection;
+            that.selection = null;
+            that.trigger('InvalidateSelection', currentSelection);
+        }
+
+        that.selectedIndex = -1;
+
+        that.update();
+        that.notify('valueChange');
+    },
+
+    completeOnFocus: function () {
+        var that = this;
+
+        if (that.isUnavailable()) {
+            return;
+        }
+
+        if (that.isElementFocused()) {
+            that.fixPosition();
+            that.update();
+            if (that.isMobile) {
+                that.setCursorAtEnd();
+                that.scrollToTop();
+            }
+        }
+    },
+
+    isElementFocused: function () {
+        return document.activeElement === this.element;
+    },
+
+    isCursorAtEnd: function () {
+        var that = this,
+            valLength = that.el.val().length,
+            selectionStart,
+            range;
+
+        // `selectionStart` and `selectionEnd` are not supported by some input types
+        try {
+            selectionStart = that.element.selectionStart;
+            if (typeof selectionStart === 'number') {
+                return selectionStart === valLength;
+            }
+        } catch (ex) {
+        }
+
+        if (document.selection) {
+            range = document.selection.createRange();
+            range.moveStart('character', -valLength);
+            return valLength === range.text.length;
+        }
+        return true;
+    },
+
+    setCursorAtEnd: function () {
+        var element = this.element;
+
+        // `selectionStart` and `selectionEnd` are not supported by some input types
+        try {
+            element.selectionEnd = element.selectionStart = element.value.length;
+            element.scrollLeft = element.scrollWidth;
+        } catch (ex) {
+            element.value = element.value;
+        }
+    }
+
+};
+
+$.extend(Suggestions.prototype, methods);
+
+notificator
+    .on('initialize', methods.bindElementEvents)
+    .on('dispose', methods.unbindElementEvents);
+
+/**
+ * Methods related to plugin's authorization on server
+ */
+
+// keys are "[type][token]"
+var statusRequests = {};
+
+function resetTokens () {
+    $.each(statusRequests, function(){
+        this.abort();
+    });
+    statusRequests = {};
+}
+
+resetTokens();
+
+var methods$1 = {
+
+    checkStatus: function () {
+        var that = this,
+            token = $.trim(that.options.token),
+            requestKey = that.options.type + token,
+            request = statusRequests[requestKey];
+
+        if (!request) {
+            request = statusRequests[requestKey] = $.ajax(that.getAjaxParams('status'));
+        }
+
+        request
+            .done(function(status){
+                if (status.search) {
+                    $.extend(that.status, status);
+                } else {
+                    triggerError('Service Unavailable');
+                }
+            })
+            .fail(function(){
+                triggerError(request.statusText);
+            });
+
+        function triggerError(errorThrown){
+            // If unauthorized
+            if ($.isFunction(that.options.onSearchError)) {
+                that.options.onSearchError.call(that.element, null, request, 'error', errorThrown);
+            }
+        }
+    }
+
+};
+
+Suggestions.resetTokens = resetTokens;
+
+$.extend(Suggestions.prototype, methods$1);
+
+notificator
+    .on('setOptions', methods$1.checkStatus);
+
+//export { methods, resetTokens };
+
+var locationRequest;
+var defaultGeoLocation = true;
+
+function resetLocation () {
+    locationRequest = null;
+    DEFAULT_OPTIONS.geoLocation = defaultGeoLocation;
+}
+
+var methods$2 = {
+
+    checkLocation: function () {
+        var that = this,
+            providedLocation = that.options.geoLocation;
+
+        if (!that.type.geoEnabled || !providedLocation) {
+            return;
+        }
+
+        that.geoLocation = $.Deferred();
+        if ($.isPlainObject(providedLocation) || $.isArray(providedLocation)) {
+            that.geoLocation.resolve(providedLocation);
+        } else {
+            if (!locationRequest) {
+                locationRequest = $.ajax(that.getAjaxParams('detectAddressByIp'));
+            }
+
+            locationRequest
+                .done(function (resp) {
+                    var locationData = resp && resp.location && resp.location.data;
+                    if (locationData && locationData.kladr_id) {
+                        that.geoLocation.resolve(locationData);
+                    } else {
+                        that.geoLocation.reject();
+                    }
+                })
+                .fail(function(){
+                    that.geoLocation.reject();
+                });
+        }
+    },
+
+    /**
+     * Public method to get `geoLocation` promise
+     * @returns {$.Deferred}
+     */
+    getGeoLocation: function () {
+        return this.geoLocation;
+    },
+
+    constructParams: function () {
+        var that = this,
+            params = {};
+
+        if (that.geoLocation && $.isFunction(that.geoLocation.promise) && that.geoLocation.state() == 'resolved') {
+            that.geoLocation.done(function (locationData) {
+                params['locations_boost'] = $.makeArray(locationData);
+            });
+        }
+
+        return params;
+    }
+
+};
+
+
+// Disable this feature when GET method used. See SUG-202
+if (utils.getDefaultType() != 'GET') {
+    $.extend(DEFAULT_OPTIONS, {
+        geoLocation: defaultGeoLocation
+    });
+
+    $.extend(Suggestions, {
+        resetLocation: resetLocation
+    });
+
+    $.extend(Suggestions.prototype, {
+        getGeoLocation: methods$2.getGeoLocation
+    });
+
+    notificator
+        .on('setOptions', methods$2.checkLocation)
+        .on('requestParams', methods$2.constructParams);
+}
+
+var methods$3 = {
+
+    enrichSuggestion: function (suggestion, selectionOptions) {
+        var that = this,
+            resolver = $.Deferred();
+
+        if (!that.status.enrich || !that.type.enrichmentEnabled || !that.requestMode.enrichmentEnabled ||
+            selectionOptions && selectionOptions.dontEnrich) {
+            return resolver.resolve(suggestion);
+        }
+
+        // if current suggestion is already enriched, use it
+        if (suggestion.data && suggestion.data.qc != null) {
+            return resolver.resolve(suggestion);
+        }
+
+        that.disableDropdown();
+
+        // Set `currentValue` to make `processResponse` to consider enrichment response valid
+        that.currentValue = suggestion.unrestricted_value ;
+
+        // prevent request abortion during onBlur
+        that.enrichPhase = that.getSuggestions(
+            suggestion.unrestricted_value,
+            {
+                count: 1,
+                locations: null,
+                locations_boost: null,
+                from_bound: null,
+                to_bound: null
+            },
+            {
+                noCallbacks: true,
+                useEnrichmentCache: true
+            }
+        )
+            .always(function () {
+                that.enableDropdown();
+            })
+            .done(function (suggestions) {
+                var enrichedSuggestion = suggestions && suggestions[0];
+
+                resolver.resolve(enrichedSuggestion || suggestion, !!enrichedSuggestion);
+            })
+            .fail(function () {
+                resolver.resolve(suggestion);
+            });
+
+        return resolver;
+    },
+
+    /**
+     * Injects enriched suggestion into response
+     * @param response
+     * @param query
+     */
+    enrichResponse: function (response, query) {
+        var that = this,
+            enrichedSuggestion = that.enrichmentCache[query];
+
+        if (enrichedSuggestion) {
+            $.each(response.suggestions, function(i, suggestion){
+                if (suggestion.value === query) {
+                    response.suggestions[i] = enrichedSuggestion;
+                    return false;
+                }
+            });
+        }
+    }
+
+};
+
+$.extend(Suggestions.prototype, methods$3);
+
+/**
+ * Methods related to suggestions dropdown list
+ */
+
+function highlightMatches(chunks) {
+    return $.map(chunks, function (chunk) {
+        var text = utils.escapeHtml(chunk.text);
+
+        if (text && chunk.matched) {
+            text = '<strong>' + text + '</strong>';
+        }
+        return text;
+    }).join('');
+}
+
+function nowrapLinkedParts(formattedStr, nowrapClass) {
+    var delimitedParts = formattedStr.split(', ');
+    // string has no delimiters, should not wrap
+    if (delimitedParts.length === 1) {
+        return formattedStr;
+    }
+    // disable word-wrap inside delimited parts
+    return $.map(delimitedParts, function (part) {
+        return '<span class="' + nowrapClass + '">' + part + '</span>'
+    }).join(', ');
+}
+
+function hasAnotherSuggestion (suggestions, suggestion) {
+    var result = false;
+
+    $.each(suggestions, function (i, s) {
+        result = s.value == suggestion.value && s != suggestion;
+        if (result) {
+            return false;
+        }
+    });
+
+    return result;
+}
+
+var optionsUsed = {
+    width: 'auto',
+    floating: false
+};
+
+var methods$4 = {
+
+    createContainer: function () {
+        var that = this,
+            suggestionSelector = '.' + that.classes.suggestion,
+            options = that.options,
+            $container = $('<div/>')
+                .addClass(options.containerClass)
+                .css({
+                    position: 'absolute',
+                    display: 'none'
+                });
+
+        that.$container = $container;
+
+        $container.on('click' + EVENT_NS, suggestionSelector, $.proxy(that.onSuggestionClick, that));
+    },
+
+    removeContainer: function () {
+        var that = this;
+
+        if (that.options.floating) {
+            that.$container.remove();
+        }
+    },
+
+    setContainerOptions: function () {
+        var that = this,
+            mousedownEvent = 'mousedown' + EVENT_NS;
+
+        that.$container.off(mousedownEvent);
+        if (that.options.floating) {
+            that.$container.on(mousedownEvent, $.proxy(that.onMousedown, that));
+        }
+    },
+
+    /**
+     * Listen for click event on suggestions list:
+     */
+    onSuggestionClick: function (e) {
+        var that = this,
+            $el = $(e.target),
+            index;
+
+        if (!that.dropdownDisabled) {
+            that.cancelFocus = true;
+            that.el.focus();
+
+            while ($el.length && !(index = $el.attr('data-index'))) {
+                $el = $el.closest('.' + that.classes.suggestion);
+            }
+
+            if (index && !isNaN(index)) {
+                that.select(+index);
+            }
+        }
+    },
+
+    // Dropdown UI methods
+
+    setDropdownPosition: function (origin, elLayout) {
+        var that = this,
+            scrollLeft = that.$viewport.scrollLeft(),
+            style;
+
+        if (that.isMobile) {
+            style = that.options.floating ? {
+                left: scrollLeft + 'px',
+                top: elLayout.top + elLayout.outerHeight + 'px'
+            } : {
+                left: origin.left - elLayout.left + scrollLeft + 'px',
+                top: origin.top + elLayout.outerHeight + 'px'
+            };
+            style.width = that.$viewport.width() + 'px';
+        } else {
+            style = that.options.floating ? {
+                left: elLayout.left + 'px',
+                top: elLayout.top + elLayout.borderTop + elLayout.innerHeight + 'px'
+            } : {
+                left: origin.left + 'px',
+                top: origin.top + elLayout.borderTop + elLayout.innerHeight + 'px'
+            };
+
+            // Defer to let body show scrollbars
+            utils.delay(function () {
+                var width = that.options.width;
+
+                if (width === 'auto') {
+                    width = that.el.outerWidth();
+                }
+                that.$container.outerWidth(width);
+            });
+        }
+
+        that.$container
+            .toggleClass(that.classes.mobile, that.isMobile)
+            .css(style);
+
+        that.containerItemsPadding = elLayout.left + elLayout.borderLeft + elLayout.paddingLeft - scrollLeft;
+    },
+
+    setItemsPositions: function () {
+        var that = this,
+            $items = that.getSuggestionsItems();
+
+        $items.css('paddingLeft', that.isMobile ? that.containerItemsPadding + 'px' : '');
+    },
+
+    getSuggestionsItems: function () {
+        return this.$container.children('.' + this.classes.suggestion);
+    },
+
+    toggleDropdownEnabling: function (enable) {
+        this.dropdownDisabled = !enable;
+        this.$container.attr('disabled', !enable);
+    },
+
+    disableDropdown: function () {
+        this.toggleDropdownEnabling(false);
+    },
+
+    enableDropdown: function () {
+        this.toggleDropdownEnabling(true);
+    },
+
+    /**
+     * Shows if there are any suggestions besides currently selected
+     * @returns {boolean}
+     */
+    hasSuggestionsToChoose: function () {
+        var that = this;
+
+        return that.suggestions.length > 1 ||
+            (that.suggestions.length === 1 &&
+                (!that.selection || $.trim(that.suggestions[0].value) !== $.trim(that.selection.value))
+            );
+    },
+
+    suggest: function () {
+        var that = this,
+            options = that.options,
+            formatResult,
+            html = [];
+
+        if (!that.requestMode.userSelect) {
+            return ;
+        }
+
+        // если нечего показывать, то сообщаем об этом
+        if (!that.hasSuggestionsToChoose()) {
+
+            if (that.suggestions.length) {
+                that.hide();
+                return
+            } else {
+                html.push('<div class="' + that.classes.hint + '">' + options.noSuggestionsHint[options.type] + '</div>');
+            }
+
+        } else {
+
+            formatResult = options.formatResult || that.type.formatResult || that.formatResult;
+
+            // Build hint html
+            if (!that.isMobile && options.hint && that.suggestions.length) {
+                html.push('<div class="' + that.classes.hint + '">' + options.hint + '</div>');
+            }
+            that.selectedIndex = -1;
+            // Build suggestions inner HTML:
+            $.each(that.suggestions, function (i, suggestion) {
+                var labels = that.makeSuggestionLabel(that.suggestions, suggestion);
+
+                if (suggestion == that.selection) {
+                    that.selectedIndex = i;
+                }
+
+                html.push('<div class="' + that.classes.suggestion + '" data-index="' + i + '">');
+                html.push(formatResult.call(that, suggestion.value, that.currentValue, suggestion, {
+                    unformattableTokens: that.type.unformattableTokens
+                }));
+                if (labels) {
+                    html.push('<span class="' + that.classes.subtext_label + '">' + utils.escapeHtml(labels) + '</span>');
+                }
+                html.push('</div>');
+            });
+
+        }
+
+        that.$container.html(html.join(''));
+
+        // Select first value by default:
+        if (options.autoSelectFirst && that.selectedIndex === -1) {
+            that.selectedIndex = 0;
+        }
+        if (that.selectedIndex !== -1) {
+            that.getSuggestionsItems().eq(that.selectedIndex).addClass(that.classes.selected);
+        }
+
+        if ($.isFunction(options.beforeRender)) {
+            options.beforeRender.call(that.element, that.$container);
+        }
+
+        that.$container.show();
+        that.visible = true;
+        that.fixPosition();
+        that.setItemsPositions();
+    },
+
+    wrapFormattedValue: function (value, suggestion) {
+        var that = this,
+            status = utils.getDeepValue(suggestion.data, 'state.status');
+
+        return '<span class="' + that.classes.value + '"' + (status ? ' data-suggestion-status="' + status + '"' : '') + '>' +
+            value +
+            '</span>';
+    },
+
+    formatResult: function (value, currentValue, suggestion, options) {
+        var that = this;
+
+        value = that.highlightMatches(value, currentValue, suggestion, options);
+
+        return that.wrapFormattedValue(value, suggestion);
+    },
+
+    /**
+     * Makes HTML contents for suggestion item
+     * @param {String} value string to be displayed as a value
+     * @param {String} currentValue contents of the textbox
+     * @param suggestion whole suggestion object with displaying value and other fields
+     * @param {Object} [options] set of flags:
+     *          `unformattableTokens` - array of search tokens, that are not to be highlighted
+     *          `maxLength` - if set, `value` is limited by this length
+     * @returns {String} HTML to be inserted in the list
+     */
+    highlightMatches: function (value, currentValue, suggestion, options) {
+
+        var that = this,
+            chunks = [],
+            unformattableTokens = options && options.unformattableTokens,
+            maxLength = options && options.maxLength,
+            tokens, tokenMatchers, preferredTokens,
+            rWords = utils.reWordExtractor(),
+            match, word, i, chunk, formattedStr;
+
+        if (!value) return '';
+
+        tokens = utils.compact(utils.formatToken(currentValue).split(WORD_SPLITTER));
+
+        // Move unformattableTokens to the end.
+        // This will help to apply them only if no other tokens match
+        preferredTokens = utils.arrayMinus(tokens, unformattableTokens);
+        tokens = utils.withSubTokens(preferredTokens.concat(utils.arrayMinus(tokens, preferredTokens)));
+
+        tokenMatchers = $.map(tokens, function (token) {
+            return new RegExp('^((.*)([' + WORD_PARTS_DELIMITERS + ']+))?' +
+                '(' + utils.escapeRegExChars(token) + ')' +
+                '([^' + WORD_PARTS_DELIMITERS + ']*[' + WORD_PARTS_DELIMITERS + ']*)', 'i');
+        });
+
+        // parse string by words
+        while ((match = rWords.exec(value)) && match[0]) {
+            word = match[1];
+            chunks.push({
+                text: word,
+
+                // upper case means a word is a name and can be highlighted even if presents in unformattableTokens
+                hasUpperCase: word.toLowerCase() !== word,
+                formatted: utils.formatToken(word),
+                matchable: true
+            });
+            if (match[2]) {
+                chunks.push({
+                    text: match[2]
+                });
+            }
+        }
+
+        // use simple loop because length can change
+        for (i = 0; i < chunks.length; i++) {
+            chunk = chunks[i];
+            if (chunk.matchable && !chunk.matched && ($.inArray(chunk.formatted, unformattableTokens) === -1 || chunk.hasUpperCase)) {
+                $.each(tokenMatchers, function (j, matcher) {
+                    var tokenMatch = matcher.exec(chunk.formatted),
+                        length, nextIndex = i + 1;
+
+                    if (tokenMatch) {
+                        tokenMatch = {
+                            before: tokenMatch[1] || '',
+                            beforeText: tokenMatch[2] || '',
+                            beforeDelimiter: tokenMatch[3] || '',
+                            text: tokenMatch[4] || '',
+                            after: tokenMatch[5] || ''
+                        };
+
+                        if (tokenMatch.before) {
+                            // insert chunk before current
+                            chunks.splice(i, 0, {
+                                text: chunk.text.substr(0, tokenMatch.beforeText.length),
+                                formatted: tokenMatch.beforeText,
+                                matchable: true
+                            }, {
+                                text: tokenMatch.beforeDelimiter
+                            });
+                            nextIndex += 2;
+
+                            length = tokenMatch.before.length;
+                            chunk.text = chunk.text.substr(length);
+                            chunk.formatted = chunk.formatted.substr(length);
+                            i--;
+                        }
+
+                        length = tokenMatch.text.length + tokenMatch.after.length;
+                        if (chunk.formatted.length > length) {
+                            chunks.splice(nextIndex, 0, {
+                                text: chunk.text.substr(length),
+                                formatted: chunk.formatted.substr(length),
+                                matchable: true
+                            });
+                            chunk.text = chunk.text.substr(0, length);
+                            chunk.formatted = chunk.formatted.substr(0, length);
+                        }
+
+                        if (tokenMatch.after) {
+                            length = tokenMatch.text.length;
+                            chunks.splice(nextIndex, 0, {
+                                text: chunk.text.substr(length),
+                                formatted: chunk.formatted.substr(length)
+                            });
+                            chunk.text = chunk.text.substr(0, length);
+                            chunk.formatted = chunk.formatted.substr(0, length);
+                        }
+                        chunk.matched = true;
+                        return false;
+                    }
+                });
+            }
+        }
+
+        if (maxLength) {
+            for (i = 0; i < chunks.length && maxLength >= 0; i++) {
+                chunk = chunks[i];
+                maxLength -= chunk.text.length;
+                if (maxLength < 0) {
+                    chunk.text = chunk.text.substr(0, chunk.text.length + maxLength) + '...';
+                }
+            }
+            chunks.length = i;
+        }
+
+        formattedStr = highlightMatches(chunks);
+        return nowrapLinkedParts(formattedStr, that.classes.nowrap);
+    },
+
+    makeSuggestionLabel: function (suggestions, suggestion) {
+        var that = this,
+            fieldNames = that.type.fieldNames,
+            nameData = {},
+            rWords = utils.reWordExtractor(),
+            match, word,
+            labels = [];
+
+        if (fieldNames && hasAnotherSuggestion(suggestions, suggestion) && suggestion.data) {
+
+            $.each(fieldNames, function (field) {
+                var value = suggestion.data[field];
+                if (value) {
+                    nameData[field] = utils.formatToken(value);
+                }
+            });
+
+            if (!$.isEmptyObject(nameData)) {
+                while ((match = rWords.exec(utils.formatToken(suggestion.value))) && (word = match[1])) {
+                    $.each(nameData, function (i, value) {
+                        if (value == word) {
+                            labels.push(fieldNames[i]);
+                            delete nameData[i];
+                            return false;
+                        }
+                    });
+                }
+
+                if (labels.length) {
+                    return labels.join(', ');
+                }
+            }
+        }
+    },
+
+    hide: function () {
+        var that = this;
+        that.visible = false;
+        that.selectedIndex = -1;
+        that.$container
+            .hide()
+            .empty();
+    },
+
+    activate: function (index) {
+        var that = this,
+            $activeItem,
+            selected = that.classes.selected,
+            $children;
+
+        if (!that.dropdownDisabled) {
+            $children = that.getSuggestionsItems();
+
+            $children.removeClass(selected);
+
+            that.selectedIndex = index;
+
+            if (that.selectedIndex !== -1 && $children.length > that.selectedIndex) {
+                $activeItem = $children.eq(that.selectedIndex);
+                $activeItem.addClass(selected);
+                return $activeItem;
+            }
+        }
+
+        return null;
+    },
+
+    deactivate: function (restoreValue) {
+        var that = this;
+
+        if (!that.dropdownDisabled) {
+            that.selectedIndex = -1;
+            that.getSuggestionsItems().removeClass(that.classes.selected);
+            if (restoreValue) {
+                that.el.val(that.currentValue);
+            }
+        }
+    },
+
+    moveUp: function () {
+        var that = this;
+
+        if (that.dropdownDisabled) {
+            return;
+        }
+        if (that.selectedIndex === -1) {
+            if (that.suggestions.length) {
+                that.adjustScroll(that.suggestions.length - 1);
+            }
+            return;
+        }
+
+        if (that.selectedIndex === 0) {
+            that.deactivate(true);
+            return;
+        }
+
+        that.adjustScroll(that.selectedIndex - 1);
+    },
+
+    moveDown: function () {
+        var that = this;
+
+        if (that.dropdownDisabled) {
+            return;
+        }
+        if (that.selectedIndex === (that.suggestions.length - 1)) {
+            that.deactivate(true);
+            return;
+        }
+
+        that.adjustScroll(that.selectedIndex + 1);
+    },
+
+    adjustScroll: function (index) {
+        var that = this,
+            $activeItem = that.activate(index),
+            itemTop,
+            itemBottom,
+            scrollTop = that.$container.scrollTop(),
+            containerHeight;
+
+        if (!$activeItem || !$activeItem.length) {
+            return;
+        }
+
+        itemTop = $activeItem.position().top;
+        if (itemTop < 0 ) {
+            that.$container.scrollTop(scrollTop + itemTop);
+        } else {
+            itemBottom = itemTop + $activeItem.outerHeight();
+            containerHeight = that.$container.innerHeight();
+            if (itemBottom > containerHeight) {
+                that.$container.scrollTop(scrollTop - containerHeight + itemBottom);
+            }
+        }
+
+        that.el.val(that.suggestions[index].value);
+    }
+
+};
+
+$.extend(DEFAULT_OPTIONS, optionsUsed);
+
+$.extend(Suggestions.prototype, methods$4);
+
+notificator
+    .on('initialize', methods$4.createContainer)
+    .on('dispose', methods$4.removeContainer)
+    .on('setOptions', methods$4.setContainerOptions)
+    .on('fixPosition', methods$4.setDropdownPosition)
+    .on('fixPosition', methods$4.setItemsPositions)
+    .on('assignSuggestions', methods$4.suggest);
+
+/**
+ * Methods related to right-sided component
+ */
+
+var QUEUE_NAME = 'addon';
+var BEFORE_SHOW_ADDON = 50;
+var BEFORE_RESTORE_PADDING = 1000;
+
+var optionsUsed$1 = {
+    addon: null
+};
+
+var ADDON_TYPES = {
+    'NONE': 'none',
+    'SPINNER': 'spinner',
+    'CLEAR': 'clear'
+};
+
+var Addon = function (owner) {
+    var that = this,
+        $el = $('<span class="suggestions-addon"/>');
+
+    that.owner = owner;
+    that.$el = $el;
+    that.type = ADDON_TYPES.NONE;
+    that.visible = false;
+    that.initialPadding = null;
+
+    $el.on('click', $.proxy(that, 'onClick'));
+};
+
+Addon.prototype = {
+
+    checkType: function () {
+        var that = this,
+            type = that.owner.options.addon,
+            isTypeCorrect = false;
+
+        $.each(ADDON_TYPES, function (key, value) {
+            isTypeCorrect = value == type;
+            if (isTypeCorrect) {
+                return false;
+            }
+        });
+
+        if (!isTypeCorrect) {
+            type = that.owner.isMobile ? ADDON_TYPES.CLEAR : ADDON_TYPES.SPINNER;
+        }
+
+        if (type != that.type) {
+            that.type = type;
+            that.$el.attr('data-addon-type', type);
+            that.toggle(true);
+        }
+    },
+
+    toggle: function (immediate) {
+        var that = this,
+            visible;
+
+        switch (that.type) {
+            case ADDON_TYPES.CLEAR:
+                visible = !!that.owner.currentValue;
+                break;
+            case ADDON_TYPES.SPINNER:
+                visible = !!that.owner.currentRequest;
+                break;
+            default:
+                visible = false;
+        }
+
+        if (visible != that.visible) {
+            that.visible = visible;
+            if (visible) {
+                that.show(immediate);
+            } else {
+                that.hide(immediate);
+            }
+        }
+    },
+
+    show: function (immediate) {
+        var that = this,
+            style = {'opacity': 1};
+
+        if (immediate) {
+            that.$el
+                .show()
+                .css(style);
+            that.showBackground(true);
+        } else {
+            that.$el
+                .stop(true, true)
+                .delay(BEFORE_SHOW_ADDON)
+                .queue(function () {
+                    that.$el.show();
+                    that.showBackground();
+                    that.$el.dequeue();
+                })
+                .animate(style, 'fast');
+        }
+    },
+
+    hide: function (immediate) {
+        var that = this,
+            style = {'opacity': 0};
+
+        if (immediate) {
+            that.$el
+                .hide()
+                .css(style);
+        }
+        that.$el
+            .stop(true)
+            .animate(style, {
+                duration: 'fast',
+                complete: function () {
+                    that.$el.hide();
+                    that.hideBackground();
+                }
+            });
+    },
+
+    fixPosition: function(origin, elLayout){
+        var that = this,
+            addonSize = elLayout.innerHeight;
+
+        that.checkType();
+        that.$el.css({
+            left: origin.left + elLayout.borderLeft + elLayout.innerWidth - addonSize + 'px',
+            top: origin.top + elLayout.borderTop + 'px',
+            height: addonSize,
+            width: addonSize
+        });
+
+        that.initialPadding = elLayout.paddingRight;
+        that.width = addonSize;
+        if (that.visible) {
+            elLayout.componentsRight += addonSize;
+        }
+    },
+
+    showBackground: function (immediate) {
+        var that = this,
+            $el = that.owner.el,
+            style = {'paddingRight': that.width};
+
+        if (that.width > that.initialPadding) {
+            that.stopBackground();
+            if (immediate) {
+                $el.css(style);
+            } else {
+                $el
+                    .animate(style, { duration: 'fast', queue: QUEUE_NAME })
+                    .dequeue(QUEUE_NAME);
+            }
+        }
+    },
+
+    hideBackground: function (immediate) {
+        var that = this,
+            $el = that.owner.el,
+            style = {'paddingRight': that.initialPadding};
+
+        if (that.width > that.initialPadding) {
+            that.stopBackground(true);
+            if (immediate) {
+                $el.css(style);
+            } else {
+                $el
+                    .delay(BEFORE_RESTORE_PADDING, QUEUE_NAME)
+                    .animate(style, { duration: 'fast', queue: QUEUE_NAME })
+                    .dequeue(QUEUE_NAME);
+            }
+        }
+    },
+
+    stopBackground: function (gotoEnd) {
+        this.owner.el.stop(QUEUE_NAME, true, gotoEnd);
+    },
+
+    onClick: function (e) {
+        var that = this;
+
+        if (that.type == ADDON_TYPES.CLEAR) {
+            that.owner.clear();
+        }
+    }
+
+};
+
+var methods$5 = {
+
+    createAddon: function () {
+        var that = this,
+            addon = new Addon(that);
+
+        that.$wrapper.append(addon.$el);
+        that.addon = addon;
+    },
+
+    fixAddonPosition: function (origin, elLayout) {
+        this.addon.fixPosition(origin, elLayout);
+    },
+
+    checkAddonType: function () {
+        this.addon.checkType();
+    },
+
+    checkAddonVisibility: function () {
+        this.addon.toggle();
+    },
+
+    stopBackground: function () {
+        this.addon.stopBackground();
+    }
+
+};
+
+$.extend(DEFAULT_OPTIONS, optionsUsed$1);
+
+notificator
+    .on('initialize', methods$5.createAddon)
+    .on('setOptions', methods$5.checkAddonType)
+    .on('fixPosition', methods$5.fixAddonPosition)
+    .on('clear', methods$5.checkAddonVisibility)
+    .on('valueChange', methods$5.checkAddonVisibility)
+    .on('request', methods$5.checkAddonVisibility)
+    .on('resetPosition', methods$5.stopBackground);
+
+/**
+ * Methods related to CONSTRAINTS component
+ */
+var optionsUsed$2 = {
+    constraints: null,
+    restrict_value: false
+};
+
+var fiasParamNames = [
+  'region_fias_id',
+  'area_fias_id',
+  'city_fias_id',
+  'city_district_fias_id',
+  'settlement_fias_id',
+  'street_fias_id'
+];
+
+/**
+ * Compares two suggestion objects
+ * @param suggestion
+ * @param instance other Suggestions instance
+ */
+function belongsToArea(suggestion, instance){
+    var parentSuggestion = instance.selection,
+        result = parentSuggestion && parentSuggestion.data && instance.bounds;
+
+    if (result) {
+        $.each(instance.bounds.all, function (i, bound) {
+            return (result = parentSuggestion.data[bound] === suggestion.data[bound]);
+        });
+    }
+    return result;
+}
+
+/**
+ * @param {Object} data  fields
+ * @param {Suggestions} instance
+ * @constructor
+ */
+var ConstraintLocation = function(data, instance){
+    var that = this,
+        fieldNames,
+        fiasFieldNames,
+        fiasFields = {};
+
+    that.instance = instance;
+    that.fields = {};
+    that.specificity = -1;
+
+    if ($.isPlainObject(data) && instance.type.dataComponents) {
+        $.each(instance.type.dataComponents, function (i, component) {
+            var fieldName = component.id;
+
+            if (component.forLocations && data[fieldName]) {
+                that.fields[fieldName] = data[fieldName];
+                that.specificity = i;
+            }
+        });
+    }
+
+    fieldNames = utils.objectKeys(that.fields);
+    fiasFieldNames = utils.arraysIntersection(fieldNames, fiasParamNames);
+    if (fiasFieldNames.length) {
+        $.each(fiasFieldNames, function(index, fieldName) {
+            fiasFields[fieldName] = that.fields[fieldName];
+        });
+        that.fields = fiasFields;
+        that.specificity = that.getFiasSpecificity(fiasFieldNames);
+    } else if (that.fields.kladr_id) {
+        that.fields = { kladr_id: that.fields.kladr_id };
+        that.specificity = that.getKladrSpecificity(that.fields.kladr_id);
+    }
+};
+
+$.extend(ConstraintLocation.prototype, {
+    getLabel: function(){
+        return this.instance.type.composeValue(this.fields, { saveCityDistrict: true });
+    },
+
+    getFields: function () {
+        return this.fields;
+    },
+
+    isValid: function(){
+        return !$.isEmptyObject(this.fields);
+    },
+
+    /**
+     * Возвращает specificity для КЛАДР
+     * Описание ниже, в getFiasSpecificity
+     * @param kladr_id
+     * @returns {number}
+     */
+    getKladrSpecificity: function (kladr_id) {
+        var specificity = -1,
+            significantLength;
+
+        this.significantKladr = kladr_id.replace(/^(\d{2})(\d*?)(0+)$/g, '$1$2');
+        significantLength = this.significantKladr.length;
+
+        $.each(this.instance.type.dataComponents, function (i, component) {
+            if (component.kladrFormat && significantLength === component.kladrFormat.digits) {
+                specificity = i;
+            }
+        });
+
+        return specificity;
+    },
+
+    /**
+     * Возвращает особую величину specificity для ФИАС
+     * Specificity это индекс для массива this.instance.type.dataComponents
+     * до которого (включительно) обрежется этот массив при формировании строки адреса.
+     * Этот параметр нужен для случаев, когда в настройках плагина restrict_value = true
+     * Например, установлено ограничение (locations) по region_fias_id (Краснодарский край)
+     * В выпадашке нажимаем на "г. Сочи"
+     * Если restrict_value отключен, то выведется значение "Краснодарский край, г Сочи"
+     * Если включен, то просто "г Сочи"
+     *
+     * @param fiasFieldNames
+     * @returns {number}
+     */
+    getFiasSpecificity: function (fiasFieldNames) {
+        var specificity = -1;
+
+        $.each(this.instance.type.dataComponents, function (i, component) {
+            if (component.fiasType && ($.inArray(component.fiasType, fiasFieldNames) > -1) && specificity < i) {
+                specificity = i;
+            }
+        });
+
+        return specificity;
+    },
+
+    containsData: function (data){
+        var result = true;
+
+        if (this.fields.kladr_id) {
+            return !!data.kladr_id && data.kladr_id.indexOf(this.significantKladr) === 0;
+        } else {
+            $.each(this.fields, function(fieldName, value){
+                return result = !!data[fieldName] && data[fieldName].toLowerCase() === value.toLowerCase();
+            });
+
+            return result;
+        }
+    }
+});
+
+Suggestions.ConstraintLocation = ConstraintLocation;
+
+/**
+ * @param {Object} data
+ * @param {Object|Array} data.locations
+ * @param {string} [data.label]
+ * @param {boolean} [data.deletable]
+ * @param {Suggestions} [instance]
+ * @constructor
+ */
+var Constraint = function(data, instance) {
+    this.id = utils.uniqueId('c');
+    this.deletable = !!data.deletable;
+    this.instance = instance;
+
+    this.locations = $.map($.makeArray(data && (data.locations || data.restrictions)), function (data) {
+        return new ConstraintLocation(data, instance);
+    });
+
+    this.locations = $.grep(this.locations, function(location) {
+        return location.isValid();
+    });
+
+    this.label = data.label;
+    if (this.label == null && instance.type.composeValue) {
+        this.label = $.map(this.locations, function (location) {
+            return location.getLabel();
+        }).join(', ');
+    }
+
+    if (this.label && this.isValid()) {
+        this.$el = $(document.createElement('li'))
+            .append($(document.createElement('span')).text(this.label))
+            .attr('data-constraint-id', this.id);
+
+        if (this.deletable) {
+            this.$el.append(
+                $(document.createElement('span'))
+                    .addClass(instance.classes.removeConstraint)
+            );
+        }
+    }
+};
+
+$.extend(Constraint.prototype, {
+    isValid: function () {
+        return this.locations.length > 0;
+    },
+    getFields: function(){
+        return $.map(this.locations, function(location){
+            return location.getFields();
+        });
+    }
+});
+
+var methods$6 = {
+
+    createConstraints: function () {
+        var that = this;
+
+        that.constraints = {};
+
+        that.$constraints = $('<ul class="suggestions-constraints"/>');
+        that.$wrapper.append(that.$constraints);
+        that.$constraints.on('click', '.' + that.classes.removeConstraint, $.proxy(that.onConstraintRemoveClick, that));
+    },
+
+    setConstraintsPosition: function(origin, elLayout){
+        var that = this;
+
+        that.$constraints.css({
+            left: origin.left + elLayout.borderLeft + elLayout.paddingLeft + 'px',
+            top: origin.top + elLayout.borderTop + Math.round((elLayout.innerHeight - that.$constraints.height()) / 2) + 'px'
+        });
+
+        elLayout.componentsLeft += that.$constraints.outerWidth(true) + elLayout.paddingLeft;
+    },
+
+    onConstraintRemoveClick: function (e) {
+        var that = this,
+            $item = $(e.target).closest('li'),
+            id = $item.attr('data-constraint-id');
+
+        // Delete constraint data before animation to let correct requests to be sent while fading
+        delete that.constraints[id];
+        // Request for new suggestions
+        that.update();
+
+        $item.fadeOut('fast', function () {
+            that.removeConstraint(id);
+        });
+    },
+
+    setupConstraints: function () {
+        var that = this,
+            constraints = that.options.constraints,
+            $parent;
+
+        if (!constraints) {
+            that.unbindFromParent();
+            return;
+        }
+
+        if (constraints instanceof $ || typeof constraints === 'string' || typeof constraints.nodeType === 'number') {
+            $parent = $(constraints);
+            if (!$parent.is(that.constraints)) {
+                that.unbindFromParent();
+                if (!$parent.is(that.el)) {
+                    that.constraints = $parent;
+                    that.bindToParent();
+                }
+            }
+        } else {
+            that._constraintsUpdating = true;
+            $.each(that.constraints, $.proxy(that.removeConstraint, that));
+            $.each($.makeArray(constraints), function (i, constraint) {
+                that.addConstraint(constraint);
+            });
+            that._constraintsUpdating = false;
+            that.fixPosition();
+        }
+    },
+
+    filteredLocation: function (data) {
+        var locationComponents = [],
+            location = {};
+
+        $.each(this.type.dataComponents, function () {
+            if (this.forLocations) locationComponents.push(this.id);
+        });
+
+        if ($.isPlainObject(data)) {
+            // Copy to location only allowed fields
+            $.each(data, function (key, value) {
+                if (value && locationComponents.indexOf(key) >= 0) {
+                    location[key] = value;
+                }
+            });
+        }
+
+        if (!$.isEmptyObject(location)) {
+            return location.kladr_id ? { kladr_id: location.kladr_id } : location;
+        }
+    },
+
+    addConstraint: function (constraint) {
+        var that = this;
+
+        constraint = new Constraint(constraint, that);
+
+        if (constraint.isValid()) {
+            that.constraints[constraint.id] = constraint;
+
+            if (constraint.$el) {
+                that.$constraints.append(constraint.$el);
+                if (!that._constraintsUpdating) {
+                    that.fixPosition();
+                }
+            }
+        }
+    },
+
+    removeConstraint: function (id) {
+        var that = this;
+        delete that.constraints[id];
+        that.$constraints.children('[data-constraint-id="' + id + '"]').remove();
+        if (!that._constraintsUpdating) {
+            that.fixPosition();
+        }
+    },
+
+    constructConstraintsParams: function () {
+        var that = this,
+            locations = [],
+            constraints = that.constraints,
+            parentInstance,
+            parentData,
+            params = {};
+
+        while (constraints instanceof $ && (parentInstance = constraints.suggestions()) &&
+            !(parentData = utils.getDeepValue(parentInstance, 'selection.data'))
+        ) {
+            constraints = parentInstance.constraints;
+        }
+
+        if (constraints instanceof $) {
+            parentData = (new ConstraintLocation(parentData, parentInstance))
+                .getFields();
+
+            if (parentData) {
+                params.locations = [ parentData ];
+                params.restrict_value = true;
+            }
+        } else {
+            if (constraints) {
+                $.each(constraints, function (id, constraint) {
+                    locations = locations.concat(constraint.getFields());
+                });
+
+                if (locations.length) {
+                    params.locations = locations;
+                    params.restrict_value = that.options.restrict_value;
+                }
+            }
+        }
+
+        return params;
+    },
+
+    /**
+     * Returns label of the first constraint (if any), empty string otherwise
+     * @returns {String}
+     */
+    getFirstConstraintLabel: function() {
+        var that = this,
+            constraints_id = $.isPlainObject(that.constraints) && Object.keys(that.constraints)[0];
+
+        return constraints_id ? that.constraints[constraints_id].label : '';
+    },
+
+    bindToParent: function () {
+        var that = this;
+
+        that.constraints
+            .on([
+                    'suggestions-select.' + that.uniqueId,
+                    'suggestions-invalidateselection.' + that.uniqueId,
+                    'suggestions-clear.' + that.uniqueId
+                ].join(' '),
+                $.proxy(that.onParentSelectionChanged, that)
+            )
+            .on('suggestions-dispose.' + that.uniqueId, $.proxy(that.onParentDispose, that));
+    },
+
+    unbindFromParent: function  () {
+        var that = this,
+            $parent = that.constraints;
+
+        if ($parent instanceof $) {
+            $parent.off('.' + that.uniqueId);
+        }
+    },
+
+    onParentSelectionChanged: function (e, suggestion, valueChanged) {
+        // Don't clear if parent has been just enriched
+        if (e.type !== 'suggestions-select' || valueChanged) {
+            this.clear();
+        }
+    },
+
+    onParentDispose: function (e) {
+        this.unbindFromParent();
+    },
+
+    getParentInstance: function () {
+        return this.constraints instanceof $ && this.constraints.suggestions();
+    },
+
+    shareWithParent: function (suggestion) {
+        // that is the parent control's instance
+        var that = this.getParentInstance();
+
+        if (!that || that.type !== this.type || belongsToArea(suggestion, that)) {
+            return;
+        }
+
+        that.shareWithParent(suggestion);
+        that.setSuggestion(suggestion);
+    },
+
+    /**
+     * Pick only fields that absent in restriction
+     */
+    getUnrestrictedData: function (data) {
+        var that = this,
+            restrictedKeys = [],
+            unrestrictedData = {},
+            maxSpecificity = -1;
+
+        // Find most specific location that could restrict current data
+        $.each(that.constraints, function (id, constraint) {
+            $.each(constraint.locations, function (i, location) {
+                if (location.containsData(data) && location.specificity > maxSpecificity) {
+                    maxSpecificity = location.specificity;
+                }
+            });
+        });
+
+        if (maxSpecificity >= 0) {
+
+            // Для городов-регионов нужно также отсечь и город
+            if (data.region_kladr_id && data.region_kladr_id === data.city_kladr_id) {
+                restrictedKeys.push.apply(restrictedKeys, that.type.dataComponentsById['city'].fields);
+            }
+
+            // Collect all fieldnames from all restricted components
+            $.each(that.type.dataComponents.slice(0, maxSpecificity + 1), function (i, component) {
+                restrictedKeys.push.apply(restrictedKeys, component.fields);
+            });
+
+            // Copy skipping restricted fields
+            $.each(data, function (key, value) {
+                if (restrictedKeys.indexOf(key) === -1) {
+                    unrestrictedData[key] = value;
+                }
+            });
+        } else {
+            unrestrictedData = data;
+        }
+
+        return unrestrictedData;
+    }
+
+};
+
+$.extend(DEFAULT_OPTIONS, optionsUsed$2);
+
+$.extend(Suggestions.prototype, methods$6);
+
+// Disable this feature when GET method used. See SUG-202
+if (utils.getDefaultType() != 'GET') {
+    notificator
+        .on('initialize', methods$6.createConstraints)
+        .on('setOptions', methods$6.setupConstraints)
+        .on('fixPosition', methods$6.setConstraintsPosition)
+        .on('requestParams', methods$6.constructConstraintsParams)
+        .on('dispose', methods$6.unbindFromParent);
+}
+
+/**
+ * Methods for selecting a suggestion
+ */
+
+var methods$7 = {
+
+    proceedQuery: function (query) {
+        var that = this;
+
+        if (query.length >= that.options.minChars) {
+            that.updateSuggestions(query);
+        } else {
+            that.hide();
+        }
+    },
+
+    /**
+     * Selects current or first matched suggestion, but firstly waits for data ready
+     * @param selectionOptions
+     * @returns {$.Deferred} promise, resolved with index of selected suggestion or rejected if nothing matched
+     */
+    selectCurrentValue: function (selectionOptions) {
+        var that = this,
+            result = $.Deferred();
+
+        // force onValueChange to be executed if it has been deferred
+        that.inputPhase.resolve();
+
+        that.fetchPhase
+            .done(function () {
+                var index;
+
+                // When suggestion has already been selected and not modified
+                if (that.selection && !that.visible) {
+                    result.reject();
+                } else {
+                    index = that.findSuggestionIndex();
+
+                    that.select(index, selectionOptions);
+
+                    if (index === -1) {
+                        result.reject();
+                    } else {
+                        result.resolve(index);
+                    }
+                }
+            })
+            .fail(function () {
+                result.reject();
+            });
+
+        return result;
+    },
+
+    /**
+     * Selects first when user interaction is not supposed
+     */
+    selectFoundSuggestion: function () {
+        var that = this;
+
+        if (!that.requestMode.userSelect) {
+            that.select(0);
+        }
+    },
+
+    /**
+     * Selects current or first matched suggestion
+     * @returns {number} index of found suggestion
+     */
+    findSuggestionIndex: function() {
+        var that = this,
+            index = that.selectedIndex,
+            value;
+
+        if (index === -1) {
+            // matchers always operate with trimmed strings
+            value = $.trim(that.el.val());
+            if (value) {
+                $.each(that.type.matchers, function (i, matcher) {
+                    index = matcher(value, that.suggestions);
+                    return index === -1;
+                });
+            }
+        }
+
+        return index;
+    },
+
+    /**
+     * Selects a suggestion at specified index
+     * @param index index of suggestion to select. Can be -1
+     * @param {Object} selectionOptions
+     * @param {boolean} [selectionOptions.continueSelecting]  prevents hiding after selection
+     * @param {boolean} [selectionOptions.noSpace]  prevents adding space at the end of current value
+     */
+    select: function (index, selectionOptions) {
+        var that = this,
+            suggestion = that.suggestions[index],
+            continueSelecting = selectionOptions && selectionOptions.continueSelecting,
+            currentValue = that.currentValue,
+            hasSameValues;
+
+        // Prevent recursive execution
+        if (that.triggering['Select'])
+            return;
+
+        // if no suggestion to select
+        if (!suggestion) {
+            if (!continueSelecting && !that.selection) {
+                that.triggerOnSelectNothing();
+            }
+            that.onSelectComplete(continueSelecting);
+            return;
+        }
+
+        hasSameValues = that.hasSameValues(suggestion);
+
+        that.enrichSuggestion(suggestion, selectionOptions)
+            .done(function (enrichedSuggestion, hasBeenEnriched) {
+                that.selectSuggestion(enrichedSuggestion, index, currentValue, $.extend({
+                    hasBeenEnriched: hasBeenEnriched,
+                    hasSameValues: hasSameValues
+                }, selectionOptions));
+            });
+
+    },
+
+    /**
+     * Formats and selects final (enriched) suggestion
+     * @param suggestion
+     * @param index
+     * @param lastValue
+     * @param {Object} selectionOptions
+     * @param {boolean} [selectionOptions.continueSelecting]  prevents hiding after selection
+     * @param {boolean} [selectionOptions.noSpace]  prevents adding space at the end of current value
+     * @param {boolean} selectionOptions.hasBeenEnriched
+     * @param {boolean} selectionOptions.hasSameValues
+     */
+    selectSuggestion: function (suggestion, index, lastValue, selectionOptions) {
+        var that = this,
+            continueSelecting = selectionOptions.continueSelecting,
+            assumeDataComplete = !that.type.isDataComplete || that.type.isDataComplete.call(that, suggestion),
+            currentSelection = that.selection;
+
+        // Prevent recursive execution
+        if (that.triggering['Select'])
+            return;
+
+        if (that.type.alwaysContinueSelecting) {
+            continueSelecting = true;
+        }
+
+        if (assumeDataComplete) {
+            continueSelecting = false;
+        }
+
+        // `suggestions` cat be empty, e.g. during `fixData`
+        if (selectionOptions.hasBeenEnriched && that.suggestions[index]) {
+            that.suggestions[index].data = suggestion.data;
+        }
+
+        if (that.requestMode.updateValue) {
+            that.checkValueBounds(suggestion);
+            that.currentValue = that.getSuggestionValue(suggestion, selectionOptions);
+
+            if (that.currentValue && !selectionOptions.noSpace && !assumeDataComplete) {
+                that.currentValue += ' ';
+            }
+            that.el.val(that.currentValue);
+        }
+
+        if (that.currentValue) {
+            that.selection = suggestion;
+            if (!that.areSuggestionsSame(suggestion, currentSelection)) {
+                that.trigger('Select', suggestion, that.currentValue != lastValue);
+            }
+            if (that.requestMode.userSelect) {
+                that.onSelectComplete(continueSelecting);
+            }
+        } else {
+            that.selection = null;
+            that.triggerOnSelectNothing();
+        }
+
+        that.shareWithParent(suggestion);
+    },
+
+    onSelectComplete: function (continueSelecting) {
+        var that = this;
+
+        if (continueSelecting) {
+            that.selectedIndex = -1;
+            that.updateSuggestions(that.currentValue);
+        } else {
+            that.hide();
+        }
+    },
+
+    triggerOnSelectNothing: function () {
+        var that = this;
+
+        if (!that.triggering['SelectNothing']) {
+            that.trigger('SelectNothing', that.currentValue);
+        }
+    },
+
+    trigger: function (event) {
+        var that = this,
+            args = utils.slice(arguments, 1),
+            callback = that.options['on' + event];
+
+        that.triggering[event] = true;
+        if ($.isFunction(callback)) {
+            callback.apply(that.element, args);
+        }
+        that.el.trigger.call(that.el, 'suggestions-' + event.toLowerCase(), args);
+        that.triggering[event] = false;
+    }
+
+};
+
+$.extend(Suggestions.prototype, methods$7);
+
+notificator
+    .on('assignSuggestions', methods$7.selectFoundSuggestion);
+
+/**
+ * features for connected instances
+ */
+
+var optionsUsed$3 = {
+    bounds: null
+};
+
+var methods$8 = {
+
+    setupBounds: function () {
+        this.bounds = {
+            from: null,
+            to: null
+        };
+    },
+
+    setBoundsOptions: function () {
+        var that = this,
+            boundsAvailable = [],
+            newBounds = $.trim(that.options.bounds).split('-'),
+            boundFrom = newBounds[0],
+            boundTo = newBounds[newBounds.length - 1],
+            boundsOwn = [],
+            boundIsOwn,
+            boundsAll = [],
+            indexTo;
+
+        if (that.type.dataComponents) {
+            $.each(that.type.dataComponents, function () {
+                if (this.forBounds) {
+                    boundsAvailable.push(this.id);
+                }
+            });
+        }
+
+        if ($.inArray(boundFrom, boundsAvailable) === -1) {
+            boundFrom = null;
+        }
+
+        indexTo = $.inArray(boundTo, boundsAvailable);
+        if (indexTo === -1 || indexTo === boundsAvailable.length - 1) {
+            boundTo = null;
+        }
+
+        if (boundFrom || boundTo) {
+            boundIsOwn = !boundFrom;
+            $.each(boundsAvailable, function (i, bound) {
+                if (bound == boundFrom) {
+                    boundIsOwn = true;
+                }
+                boundsAll.push(bound);
+                if (boundIsOwn) {
+                    boundsOwn.push(bound);
+                }
+                if (bound == boundTo) {
+                    return false;
+                }
+            });
+        }
+
+        that.bounds.from = boundFrom;
+        that.bounds.to = boundTo;
+        that.bounds.all = boundsAll;
+        that.bounds.own = boundsOwn;
+    },
+
+    constructBoundsParams: function () {
+        var that = this,
+            params = {};
+
+        if (that.bounds.from) {
+            params['from_bound'] = { value: that.bounds.from };
+        }
+        if (that.bounds.to) {
+            params['to_bound'] = { value: that.bounds.to };
+        }
+
+        return params;
+    },
+
+    /**
+     * Подстраивает suggestion.value под that.bounds.own
+     * Ничего не возвращает, меняет в самом suggestion
+     * @param suggestion
+     */
+    checkValueBounds: function (suggestion) {
+        var that = this,
+            valueData;
+
+        // If any bounds set up
+        if (that.bounds.own.length && that.type.composeValue) {
+            // делаем копию
+            var bounds = that.bounds.own.slice(0);
+            // если роль текущего инстанса плагина показывать только район города
+            // то для корректного формировния нужен city_district_fias_id
+            if (bounds.length === 1 && bounds[0] === 'city_district') {
+                bounds.push('city_district_fias_id');
+            }
+            valueData = that.copyDataComponents(suggestion.data, bounds);
+            suggestion.value = that.type.composeValue(valueData);
+        }
+    },
+
+    copyDataComponents: function (data, components) {
+        var result = {},
+            dataComponentsById = this.type.dataComponentsById;
+
+        if (dataComponentsById) {
+            $.each(components, function (i, component) {
+                $.each(dataComponentsById[component].fields, function (i, field) {
+                    if (data[field] != null) {
+                        result[field] = data[field];
+                    }
+                });
+            });
+        }
+
+        return result;
+    },
+
+    getBoundedKladrId: function (kladr_id, boundsRange) {
+        var boundTo = boundsRange[boundsRange.length - 1],
+            kladrFormat;
+
+        $.each(this.type.dataComponents, function(i, component){
+            if (component.id === boundTo) {
+                kladrFormat = component.kladrFormat;
+                return false;
+            }
+        });
+
+        return kladr_id.substr(0, kladrFormat.digits) + (new Array((kladrFormat.zeros || 0) + 1).join('0'));
+    }
+
+};
+
+$.extend(DEFAULT_OPTIONS, optionsUsed$3);
+
+$.extend(Suggestions.prototype, methods$8);
+
+notificator
+    .on('initialize', methods$8.setupBounds)
+    .on('setOptions', methods$8.setBoundsOptions)
+    .on('requestParams', methods$8.constructBoundsParams);
+
+Suggestions.defaultOptions = DEFAULT_OPTIONS;
+
+Suggestions.version = '17.5.0';
+
+$.Suggestions = Suggestions;
+
+// Create chainable jQuery plugin:
+$.fn.suggestions = function (options, args) {
+    // If function invoked without argument return
+    // instance of the first matched element:
+    if (arguments.length === 0) {
+        return this.first().data(DATA_ATTR_KEY);
+    }
+
+    return this.each(function () {
+        var inputElement = $(this),
+            instance = inputElement.data(DATA_ATTR_KEY);
+
+        if (typeof options === 'string') {
+            if (instance && typeof instance[options] === 'function') {
+                instance[options](args);
+            }
+        } else {
+            // If instance already exists, destroy it:
+            if (instance && instance.dispose) {
+                instance.dispose();
+            }
+            instance = new Suggestions(this, options);
+            inputElement.data(DATA_ATTR_KEY, instance);
+        }
+    });
+};
+
+})));
+
 /*
  * Author: Alex Gibson
  * https://github.com/alexgibson/notify.js
@@ -88687,8 +88687,6 @@ return hooks;
     return Notify;
 
 }));
-/*! pace 1.0.2 */
-(function(){var a,b,c,d,e,f,g,h,i,j,k,l,m,n,o,p,q,r,s,t,u,v,w,x,y,z,A,B,C,D,E,F,G,H,I,J,K,L,M,N,O,P,Q,R,S,T,U,V,W,X=[].slice,Y={}.hasOwnProperty,Z=function(a,b){function c(){this.constructor=a}for(var d in b)Y.call(b,d)&&(a[d]=b[d]);return c.prototype=b.prototype,a.prototype=new c,a.__super__=b.prototype,a},$=[].indexOf||function(a){for(var b=0,c=this.length;c>b;b++)if(b in this&&this[b]===a)return b;return-1};for(u={catchupTime:100,initialRate:.03,minTime:250,ghostTime:100,maxProgressPerFrame:20,easeFactor:1.25,startOnPageLoad:!0,restartOnPushState:!0,restartOnRequestAfter:500,target:"body",elements:{checkInterval:100,selectors:["body"]},eventLag:{minSamples:10,sampleCount:3,lagThreshold:3},ajax:{trackMethods:["GET"],trackWebSockets:!0,ignoreURLs:[]}},C=function(){var a;return null!=(a="undefined"!=typeof performance&&null!==performance&&"function"==typeof performance.now?performance.now():void 0)?a:+new Date},E=window.requestAnimationFrame||window.mozRequestAnimationFrame||window.webkitRequestAnimationFrame||window.msRequestAnimationFrame,t=window.cancelAnimationFrame||window.mozCancelAnimationFrame,null==E&&(E=function(a){return setTimeout(a,50)},t=function(a){return clearTimeout(a)}),G=function(a){var b,c;return b=C(),(c=function(){var d;return d=C()-b,d>=33?(b=C(),a(d,function(){return E(c)})):setTimeout(c,33-d)})()},F=function(){var a,b,c;return c=arguments[0],b=arguments[1],a=3<=arguments.length?X.call(arguments,2):[],"function"==typeof c[b]?c[b].apply(c,a):c[b]},v=function(){var a,b,c,d,e,f,g;for(b=arguments[0],d=2<=arguments.length?X.call(arguments,1):[],f=0,g=d.length;g>f;f++)if(c=d[f])for(a in c)Y.call(c,a)&&(e=c[a],null!=b[a]&&"object"==typeof b[a]&&null!=e&&"object"==typeof e?v(b[a],e):b[a]=e);return b},q=function(a){var b,c,d,e,f;for(c=b=0,e=0,f=a.length;f>e;e++)d=a[e],c+=Math.abs(d),b++;return c/b},x=function(a,b){var c,d,e;if(null==a&&(a="options"),null==b&&(b=!0),e=document.querySelector("[data-pace-"+a+"]")){if(c=e.getAttribute("data-pace-"+a),!b)return c;try{return JSON.parse(c)}catch(f){return d=f,"undefined"!=typeof console&&null!==console?console.error("Error parsing inline pace options",d):void 0}}},g=function(){function a(){}return a.prototype.on=function(a,b,c,d){var e;return null==d&&(d=!1),null==this.bindings&&(this.bindings={}),null==(e=this.bindings)[a]&&(e[a]=[]),this.bindings[a].push({handler:b,ctx:c,once:d})},a.prototype.once=function(a,b,c){return this.on(a,b,c,!0)},a.prototype.off=function(a,b){var c,d,e;if(null!=(null!=(d=this.bindings)?d[a]:void 0)){if(null==b)return delete this.bindings[a];for(c=0,e=[];c<this.bindings[a].length;)e.push(this.bindings[a][c].handler===b?this.bindings[a].splice(c,1):c++);return e}},a.prototype.trigger=function(){var a,b,c,d,e,f,g,h,i;if(c=arguments[0],a=2<=arguments.length?X.call(arguments,1):[],null!=(g=this.bindings)?g[c]:void 0){for(e=0,i=[];e<this.bindings[c].length;)h=this.bindings[c][e],d=h.handler,b=h.ctx,f=h.once,d.apply(null!=b?b:this,a),i.push(f?this.bindings[c].splice(e,1):e++);return i}},a}(),j=window.Pace||{},window.Pace=j,v(j,g.prototype),D=j.options=v({},u,window.paceOptions,x()),U=["ajax","document","eventLag","elements"],Q=0,S=U.length;S>Q;Q++)K=U[Q],D[K]===!0&&(D[K]=u[K]);i=function(a){function b(){return V=b.__super__.constructor.apply(this,arguments)}return Z(b,a),b}(Error),b=function(){function a(){this.progress=0}return a.prototype.getElement=function(){var a;if(null==this.el){if(a=document.querySelector(D.target),!a)throw new i;this.el=document.createElement("div"),this.el.className="pace pace-active",document.body.className=document.body.className.replace(/pace-done/g,""),document.body.className+=" pace-running",this.el.innerHTML='<div class="pace-progress">\n  <div class="pace-progress-inner"></div>\n</div>\n<div class="pace-activity"></div>',null!=a.firstChild?a.insertBefore(this.el,a.firstChild):a.appendChild(this.el)}return this.el},a.prototype.finish=function(){var a;return a=this.getElement(),a.className=a.className.replace("pace-active",""),a.className+=" pace-inactive",document.body.className=document.body.className.replace("pace-running",""),document.body.className+=" pace-done"},a.prototype.update=function(a){return this.progress=a,this.render()},a.prototype.destroy=function(){try{this.getElement().parentNode.removeChild(this.getElement())}catch(a){i=a}return this.el=void 0},a.prototype.render=function(){var a,b,c,d,e,f,g;if(null==document.querySelector(D.target))return!1;for(a=this.getElement(),d="translate3d("+this.progress+"%, 0, 0)",g=["webkitTransform","msTransform","transform"],e=0,f=g.length;f>e;e++)b=g[e],a.children[0].style[b]=d;return(!this.lastRenderedProgress||this.lastRenderedProgress|0!==this.progress|0)&&(a.children[0].setAttribute("data-progress-text",""+(0|this.progress)+"%"),this.progress>=100?c="99":(c=this.progress<10?"0":"",c+=0|this.progress),a.children[0].setAttribute("data-progress",""+c)),this.lastRenderedProgress=this.progress},a.prototype.done=function(){return this.progress>=100},a}(),h=function(){function a(){this.bindings={}}return a.prototype.trigger=function(a,b){var c,d,e,f,g;if(null!=this.bindings[a]){for(f=this.bindings[a],g=[],d=0,e=f.length;e>d;d++)c=f[d],g.push(c.call(this,b));return g}},a.prototype.on=function(a,b){var c;return null==(c=this.bindings)[a]&&(c[a]=[]),this.bindings[a].push(b)},a}(),P=window.XMLHttpRequest,O=window.XDomainRequest,N=window.WebSocket,w=function(a,b){var c,d,e;e=[];for(d in b.prototype)try{e.push(null==a[d]&&"function"!=typeof b[d]?"function"==typeof Object.defineProperty?Object.defineProperty(a,d,{get:function(){return b.prototype[d]},configurable:!0,enumerable:!0}):a[d]=b.prototype[d]:void 0)}catch(f){c=f}return e},A=[],j.ignore=function(){var a,b,c;return b=arguments[0],a=2<=arguments.length?X.call(arguments,1):[],A.unshift("ignore"),c=b.apply(null,a),A.shift(),c},j.track=function(){var a,b,c;return b=arguments[0],a=2<=arguments.length?X.call(arguments,1):[],A.unshift("track"),c=b.apply(null,a),A.shift(),c},J=function(a){var b;if(null==a&&(a="GET"),"track"===A[0])return"force";if(!A.length&&D.ajax){if("socket"===a&&D.ajax.trackWebSockets)return!0;if(b=a.toUpperCase(),$.call(D.ajax.trackMethods,b)>=0)return!0}return!1},k=function(a){function b(){var a,c=this;b.__super__.constructor.apply(this,arguments),a=function(a){var b;return b=a.open,a.open=function(d,e){return J(d)&&c.trigger("request",{type:d,url:e,request:a}),b.apply(a,arguments)}},window.XMLHttpRequest=function(b){var c;return c=new P(b),a(c),c};try{w(window.XMLHttpRequest,P)}catch(d){}if(null!=O){window.XDomainRequest=function(){var b;return b=new O,a(b),b};try{w(window.XDomainRequest,O)}catch(d){}}if(null!=N&&D.ajax.trackWebSockets){window.WebSocket=function(a,b){var d;return d=null!=b?new N(a,b):new N(a),J("socket")&&c.trigger("request",{type:"socket",url:a,protocols:b,request:d}),d};try{w(window.WebSocket,N)}catch(d){}}}return Z(b,a),b}(h),R=null,y=function(){return null==R&&(R=new k),R},I=function(a){var b,c,d,e;for(e=D.ajax.ignoreURLs,c=0,d=e.length;d>c;c++)if(b=e[c],"string"==typeof b){if(-1!==a.indexOf(b))return!0}else if(b.test(a))return!0;return!1},y().on("request",function(b){var c,d,e,f,g;return f=b.type,e=b.request,g=b.url,I(g)?void 0:j.running||D.restartOnRequestAfter===!1&&"force"!==J(f)?void 0:(d=arguments,c=D.restartOnRequestAfter||0,"boolean"==typeof c&&(c=0),setTimeout(function(){var b,c,g,h,i,k;if(b="socket"===f?e.readyState<2:0<(h=e.readyState)&&4>h){for(j.restart(),i=j.sources,k=[],c=0,g=i.length;g>c;c++){if(K=i[c],K instanceof a){K.watch.apply(K,d);break}k.push(void 0)}return k}},c))}),a=function(){function a(){var a=this;this.elements=[],y().on("request",function(){return a.watch.apply(a,arguments)})}return a.prototype.watch=function(a){var b,c,d,e;return d=a.type,b=a.request,e=a.url,I(e)?void 0:(c="socket"===d?new n(b):new o(b),this.elements.push(c))},a}(),o=function(){function a(a){var b,c,d,e,f,g,h=this;if(this.progress=0,null!=window.ProgressEvent)for(c=null,a.addEventListener("progress",function(a){return h.progress=a.lengthComputable?100*a.loaded/a.total:h.progress+(100-h.progress)/2},!1),g=["load","abort","timeout","error"],d=0,e=g.length;e>d;d++)b=g[d],a.addEventListener(b,function(){return h.progress=100},!1);else f=a.onreadystatechange,a.onreadystatechange=function(){var b;return 0===(b=a.readyState)||4===b?h.progress=100:3===a.readyState&&(h.progress=50),"function"==typeof f?f.apply(null,arguments):void 0}}return a}(),n=function(){function a(a){var b,c,d,e,f=this;for(this.progress=0,e=["error","open"],c=0,d=e.length;d>c;c++)b=e[c],a.addEventListener(b,function(){return f.progress=100},!1)}return a}(),d=function(){function a(a){var b,c,d,f;for(null==a&&(a={}),this.elements=[],null==a.selectors&&(a.selectors=[]),f=a.selectors,c=0,d=f.length;d>c;c++)b=f[c],this.elements.push(new e(b))}return a}(),e=function(){function a(a){this.selector=a,this.progress=0,this.check()}return a.prototype.check=function(){var a=this;return document.querySelector(this.selector)?this.done():setTimeout(function(){return a.check()},D.elements.checkInterval)},a.prototype.done=function(){return this.progress=100},a}(),c=function(){function a(){var a,b,c=this;this.progress=null!=(b=this.states[document.readyState])?b:100,a=document.onreadystatechange,document.onreadystatechange=function(){return null!=c.states[document.readyState]&&(c.progress=c.states[document.readyState]),"function"==typeof a?a.apply(null,arguments):void 0}}return a.prototype.states={loading:0,interactive:50,complete:100},a}(),f=function(){function a(){var a,b,c,d,e,f=this;this.progress=0,a=0,e=[],d=0,c=C(),b=setInterval(function(){var g;return g=C()-c-50,c=C(),e.push(g),e.length>D.eventLag.sampleCount&&e.shift(),a=q(e),++d>=D.eventLag.minSamples&&a<D.eventLag.lagThreshold?(f.progress=100,clearInterval(b)):f.progress=100*(3/(a+3))},50)}return a}(),m=function(){function a(a){this.source=a,this.last=this.sinceLastUpdate=0,this.rate=D.initialRate,this.catchup=0,this.progress=this.lastProgress=0,null!=this.source&&(this.progress=F(this.source,"progress"))}return a.prototype.tick=function(a,b){var c;return null==b&&(b=F(this.source,"progress")),b>=100&&(this.done=!0),b===this.last?this.sinceLastUpdate+=a:(this.sinceLastUpdate&&(this.rate=(b-this.last)/this.sinceLastUpdate),this.catchup=(b-this.progress)/D.catchupTime,this.sinceLastUpdate=0,this.last=b),b>this.progress&&(this.progress+=this.catchup*a),c=1-Math.pow(this.progress/100,D.easeFactor),this.progress+=c*this.rate*a,this.progress=Math.min(this.lastProgress+D.maxProgressPerFrame,this.progress),this.progress=Math.max(0,this.progress),this.progress=Math.min(100,this.progress),this.lastProgress=this.progress,this.progress},a}(),L=null,H=null,r=null,M=null,p=null,s=null,j.running=!1,z=function(){return D.restartOnPushState?j.restart():void 0},null!=window.history.pushState&&(T=window.history.pushState,window.history.pushState=function(){return z(),T.apply(window.history,arguments)}),null!=window.history.replaceState&&(W=window.history.replaceState,window.history.replaceState=function(){return z(),W.apply(window.history,arguments)}),l={ajax:a,elements:d,document:c,eventLag:f},(B=function(){var a,c,d,e,f,g,h,i;for(j.sources=L=[],g=["ajax","elements","document","eventLag"],c=0,e=g.length;e>c;c++)a=g[c],D[a]!==!1&&L.push(new l[a](D[a]));for(i=null!=(h=D.extraSources)?h:[],d=0,f=i.length;f>d;d++)K=i[d],L.push(new K(D));return j.bar=r=new b,H=[],M=new m})(),j.stop=function(){return j.trigger("stop"),j.running=!1,r.destroy(),s=!0,null!=p&&("function"==typeof t&&t(p),p=null),B()},j.restart=function(){return j.trigger("restart"),j.stop(),j.start()},j.go=function(){var a;return j.running=!0,r.render(),a=C(),s=!1,p=G(function(b,c){var d,e,f,g,h,i,k,l,n,o,p,q,t,u,v,w;for(l=100-r.progress,e=p=0,f=!0,i=q=0,u=L.length;u>q;i=++q)for(K=L[i],o=null!=H[i]?H[i]:H[i]=[],h=null!=(w=K.elements)?w:[K],k=t=0,v=h.length;v>t;k=++t)g=h[k],n=null!=o[k]?o[k]:o[k]=new m(g),f&=n.done,n.done||(e++,p+=n.tick(b));return d=p/e,r.update(M.tick(b,d)),r.done()||f||s?(r.update(100),j.trigger("done"),setTimeout(function(){return r.finish(),j.running=!1,j.trigger("hide")},Math.max(D.ghostTime,Math.max(D.minTime-(C()-a),0)))):c()})},j.start=function(a){v(D,a),j.running=!0;try{r.render()}catch(b){i=b}return document.querySelector(".pace")?(j.trigger("start"),j.go()):setTimeout(j.start,50)},"function"==typeof define&&define.amd?define(["pace"],function(){return j}):"object"==typeof exports?module.exports=j:D.startOnPageLoad&&j.start()}).call(this);
 /*
 Copyright 2012 Igor Vaynberg
 
@@ -92446,6 +92444,8 @@ the specific language governing permissions and limitations under the Apache Lic
     }
 })(jQuery);
 
+/*! pace 1.0.2 */
+(function(){var a,b,c,d,e,f,g,h,i,j,k,l,m,n,o,p,q,r,s,t,u,v,w,x,y,z,A,B,C,D,E,F,G,H,I,J,K,L,M,N,O,P,Q,R,S,T,U,V,W,X=[].slice,Y={}.hasOwnProperty,Z=function(a,b){function c(){this.constructor=a}for(var d in b)Y.call(b,d)&&(a[d]=b[d]);return c.prototype=b.prototype,a.prototype=new c,a.__super__=b.prototype,a},$=[].indexOf||function(a){for(var b=0,c=this.length;c>b;b++)if(b in this&&this[b]===a)return b;return-1};for(u={catchupTime:100,initialRate:.03,minTime:250,ghostTime:100,maxProgressPerFrame:20,easeFactor:1.25,startOnPageLoad:!0,restartOnPushState:!0,restartOnRequestAfter:500,target:"body",elements:{checkInterval:100,selectors:["body"]},eventLag:{minSamples:10,sampleCount:3,lagThreshold:3},ajax:{trackMethods:["GET"],trackWebSockets:!0,ignoreURLs:[]}},C=function(){var a;return null!=(a="undefined"!=typeof performance&&null!==performance&&"function"==typeof performance.now?performance.now():void 0)?a:+new Date},E=window.requestAnimationFrame||window.mozRequestAnimationFrame||window.webkitRequestAnimationFrame||window.msRequestAnimationFrame,t=window.cancelAnimationFrame||window.mozCancelAnimationFrame,null==E&&(E=function(a){return setTimeout(a,50)},t=function(a){return clearTimeout(a)}),G=function(a){var b,c;return b=C(),(c=function(){var d;return d=C()-b,d>=33?(b=C(),a(d,function(){return E(c)})):setTimeout(c,33-d)})()},F=function(){var a,b,c;return c=arguments[0],b=arguments[1],a=3<=arguments.length?X.call(arguments,2):[],"function"==typeof c[b]?c[b].apply(c,a):c[b]},v=function(){var a,b,c,d,e,f,g;for(b=arguments[0],d=2<=arguments.length?X.call(arguments,1):[],f=0,g=d.length;g>f;f++)if(c=d[f])for(a in c)Y.call(c,a)&&(e=c[a],null!=b[a]&&"object"==typeof b[a]&&null!=e&&"object"==typeof e?v(b[a],e):b[a]=e);return b},q=function(a){var b,c,d,e,f;for(c=b=0,e=0,f=a.length;f>e;e++)d=a[e],c+=Math.abs(d),b++;return c/b},x=function(a,b){var c,d,e;if(null==a&&(a="options"),null==b&&(b=!0),e=document.querySelector("[data-pace-"+a+"]")){if(c=e.getAttribute("data-pace-"+a),!b)return c;try{return JSON.parse(c)}catch(f){return d=f,"undefined"!=typeof console&&null!==console?console.error("Error parsing inline pace options",d):void 0}}},g=function(){function a(){}return a.prototype.on=function(a,b,c,d){var e;return null==d&&(d=!1),null==this.bindings&&(this.bindings={}),null==(e=this.bindings)[a]&&(e[a]=[]),this.bindings[a].push({handler:b,ctx:c,once:d})},a.prototype.once=function(a,b,c){return this.on(a,b,c,!0)},a.prototype.off=function(a,b){var c,d,e;if(null!=(null!=(d=this.bindings)?d[a]:void 0)){if(null==b)return delete this.bindings[a];for(c=0,e=[];c<this.bindings[a].length;)e.push(this.bindings[a][c].handler===b?this.bindings[a].splice(c,1):c++);return e}},a.prototype.trigger=function(){var a,b,c,d,e,f,g,h,i;if(c=arguments[0],a=2<=arguments.length?X.call(arguments,1):[],null!=(g=this.bindings)?g[c]:void 0){for(e=0,i=[];e<this.bindings[c].length;)h=this.bindings[c][e],d=h.handler,b=h.ctx,f=h.once,d.apply(null!=b?b:this,a),i.push(f?this.bindings[c].splice(e,1):e++);return i}},a}(),j=window.Pace||{},window.Pace=j,v(j,g.prototype),D=j.options=v({},u,window.paceOptions,x()),U=["ajax","document","eventLag","elements"],Q=0,S=U.length;S>Q;Q++)K=U[Q],D[K]===!0&&(D[K]=u[K]);i=function(a){function b(){return V=b.__super__.constructor.apply(this,arguments)}return Z(b,a),b}(Error),b=function(){function a(){this.progress=0}return a.prototype.getElement=function(){var a;if(null==this.el){if(a=document.querySelector(D.target),!a)throw new i;this.el=document.createElement("div"),this.el.className="pace pace-active",document.body.className=document.body.className.replace(/pace-done/g,""),document.body.className+=" pace-running",this.el.innerHTML='<div class="pace-progress">\n  <div class="pace-progress-inner"></div>\n</div>\n<div class="pace-activity"></div>',null!=a.firstChild?a.insertBefore(this.el,a.firstChild):a.appendChild(this.el)}return this.el},a.prototype.finish=function(){var a;return a=this.getElement(),a.className=a.className.replace("pace-active",""),a.className+=" pace-inactive",document.body.className=document.body.className.replace("pace-running",""),document.body.className+=" pace-done"},a.prototype.update=function(a){return this.progress=a,this.render()},a.prototype.destroy=function(){try{this.getElement().parentNode.removeChild(this.getElement())}catch(a){i=a}return this.el=void 0},a.prototype.render=function(){var a,b,c,d,e,f,g;if(null==document.querySelector(D.target))return!1;for(a=this.getElement(),d="translate3d("+this.progress+"%, 0, 0)",g=["webkitTransform","msTransform","transform"],e=0,f=g.length;f>e;e++)b=g[e],a.children[0].style[b]=d;return(!this.lastRenderedProgress||this.lastRenderedProgress|0!==this.progress|0)&&(a.children[0].setAttribute("data-progress-text",""+(0|this.progress)+"%"),this.progress>=100?c="99":(c=this.progress<10?"0":"",c+=0|this.progress),a.children[0].setAttribute("data-progress",""+c)),this.lastRenderedProgress=this.progress},a.prototype.done=function(){return this.progress>=100},a}(),h=function(){function a(){this.bindings={}}return a.prototype.trigger=function(a,b){var c,d,e,f,g;if(null!=this.bindings[a]){for(f=this.bindings[a],g=[],d=0,e=f.length;e>d;d++)c=f[d],g.push(c.call(this,b));return g}},a.prototype.on=function(a,b){var c;return null==(c=this.bindings)[a]&&(c[a]=[]),this.bindings[a].push(b)},a}(),P=window.XMLHttpRequest,O=window.XDomainRequest,N=window.WebSocket,w=function(a,b){var c,d,e;e=[];for(d in b.prototype)try{e.push(null==a[d]&&"function"!=typeof b[d]?"function"==typeof Object.defineProperty?Object.defineProperty(a,d,{get:function(){return b.prototype[d]},configurable:!0,enumerable:!0}):a[d]=b.prototype[d]:void 0)}catch(f){c=f}return e},A=[],j.ignore=function(){var a,b,c;return b=arguments[0],a=2<=arguments.length?X.call(arguments,1):[],A.unshift("ignore"),c=b.apply(null,a),A.shift(),c},j.track=function(){var a,b,c;return b=arguments[0],a=2<=arguments.length?X.call(arguments,1):[],A.unshift("track"),c=b.apply(null,a),A.shift(),c},J=function(a){var b;if(null==a&&(a="GET"),"track"===A[0])return"force";if(!A.length&&D.ajax){if("socket"===a&&D.ajax.trackWebSockets)return!0;if(b=a.toUpperCase(),$.call(D.ajax.trackMethods,b)>=0)return!0}return!1},k=function(a){function b(){var a,c=this;b.__super__.constructor.apply(this,arguments),a=function(a){var b;return b=a.open,a.open=function(d,e){return J(d)&&c.trigger("request",{type:d,url:e,request:a}),b.apply(a,arguments)}},window.XMLHttpRequest=function(b){var c;return c=new P(b),a(c),c};try{w(window.XMLHttpRequest,P)}catch(d){}if(null!=O){window.XDomainRequest=function(){var b;return b=new O,a(b),b};try{w(window.XDomainRequest,O)}catch(d){}}if(null!=N&&D.ajax.trackWebSockets){window.WebSocket=function(a,b){var d;return d=null!=b?new N(a,b):new N(a),J("socket")&&c.trigger("request",{type:"socket",url:a,protocols:b,request:d}),d};try{w(window.WebSocket,N)}catch(d){}}}return Z(b,a),b}(h),R=null,y=function(){return null==R&&(R=new k),R},I=function(a){var b,c,d,e;for(e=D.ajax.ignoreURLs,c=0,d=e.length;d>c;c++)if(b=e[c],"string"==typeof b){if(-1!==a.indexOf(b))return!0}else if(b.test(a))return!0;return!1},y().on("request",function(b){var c,d,e,f,g;return f=b.type,e=b.request,g=b.url,I(g)?void 0:j.running||D.restartOnRequestAfter===!1&&"force"!==J(f)?void 0:(d=arguments,c=D.restartOnRequestAfter||0,"boolean"==typeof c&&(c=0),setTimeout(function(){var b,c,g,h,i,k;if(b="socket"===f?e.readyState<2:0<(h=e.readyState)&&4>h){for(j.restart(),i=j.sources,k=[],c=0,g=i.length;g>c;c++){if(K=i[c],K instanceof a){K.watch.apply(K,d);break}k.push(void 0)}return k}},c))}),a=function(){function a(){var a=this;this.elements=[],y().on("request",function(){return a.watch.apply(a,arguments)})}return a.prototype.watch=function(a){var b,c,d,e;return d=a.type,b=a.request,e=a.url,I(e)?void 0:(c="socket"===d?new n(b):new o(b),this.elements.push(c))},a}(),o=function(){function a(a){var b,c,d,e,f,g,h=this;if(this.progress=0,null!=window.ProgressEvent)for(c=null,a.addEventListener("progress",function(a){return h.progress=a.lengthComputable?100*a.loaded/a.total:h.progress+(100-h.progress)/2},!1),g=["load","abort","timeout","error"],d=0,e=g.length;e>d;d++)b=g[d],a.addEventListener(b,function(){return h.progress=100},!1);else f=a.onreadystatechange,a.onreadystatechange=function(){var b;return 0===(b=a.readyState)||4===b?h.progress=100:3===a.readyState&&(h.progress=50),"function"==typeof f?f.apply(null,arguments):void 0}}return a}(),n=function(){function a(a){var b,c,d,e,f=this;for(this.progress=0,e=["error","open"],c=0,d=e.length;d>c;c++)b=e[c],a.addEventListener(b,function(){return f.progress=100},!1)}return a}(),d=function(){function a(a){var b,c,d,f;for(null==a&&(a={}),this.elements=[],null==a.selectors&&(a.selectors=[]),f=a.selectors,c=0,d=f.length;d>c;c++)b=f[c],this.elements.push(new e(b))}return a}(),e=function(){function a(a){this.selector=a,this.progress=0,this.check()}return a.prototype.check=function(){var a=this;return document.querySelector(this.selector)?this.done():setTimeout(function(){return a.check()},D.elements.checkInterval)},a.prototype.done=function(){return this.progress=100},a}(),c=function(){function a(){var a,b,c=this;this.progress=null!=(b=this.states[document.readyState])?b:100,a=document.onreadystatechange,document.onreadystatechange=function(){return null!=c.states[document.readyState]&&(c.progress=c.states[document.readyState]),"function"==typeof a?a.apply(null,arguments):void 0}}return a.prototype.states={loading:0,interactive:50,complete:100},a}(),f=function(){function a(){var a,b,c,d,e,f=this;this.progress=0,a=0,e=[],d=0,c=C(),b=setInterval(function(){var g;return g=C()-c-50,c=C(),e.push(g),e.length>D.eventLag.sampleCount&&e.shift(),a=q(e),++d>=D.eventLag.minSamples&&a<D.eventLag.lagThreshold?(f.progress=100,clearInterval(b)):f.progress=100*(3/(a+3))},50)}return a}(),m=function(){function a(a){this.source=a,this.last=this.sinceLastUpdate=0,this.rate=D.initialRate,this.catchup=0,this.progress=this.lastProgress=0,null!=this.source&&(this.progress=F(this.source,"progress"))}return a.prototype.tick=function(a,b){var c;return null==b&&(b=F(this.source,"progress")),b>=100&&(this.done=!0),b===this.last?this.sinceLastUpdate+=a:(this.sinceLastUpdate&&(this.rate=(b-this.last)/this.sinceLastUpdate),this.catchup=(b-this.progress)/D.catchupTime,this.sinceLastUpdate=0,this.last=b),b>this.progress&&(this.progress+=this.catchup*a),c=1-Math.pow(this.progress/100,D.easeFactor),this.progress+=c*this.rate*a,this.progress=Math.min(this.lastProgress+D.maxProgressPerFrame,this.progress),this.progress=Math.max(0,this.progress),this.progress=Math.min(100,this.progress),this.lastProgress=this.progress,this.progress},a}(),L=null,H=null,r=null,M=null,p=null,s=null,j.running=!1,z=function(){return D.restartOnPushState?j.restart():void 0},null!=window.history.pushState&&(T=window.history.pushState,window.history.pushState=function(){return z(),T.apply(window.history,arguments)}),null!=window.history.replaceState&&(W=window.history.replaceState,window.history.replaceState=function(){return z(),W.apply(window.history,arguments)}),l={ajax:a,elements:d,document:c,eventLag:f},(B=function(){var a,c,d,e,f,g,h,i;for(j.sources=L=[],g=["ajax","elements","document","eventLag"],c=0,e=g.length;e>c;c++)a=g[c],D[a]!==!1&&L.push(new l[a](D[a]));for(i=null!=(h=D.extraSources)?h:[],d=0,f=i.length;f>d;d++)K=i[d],L.push(new K(D));return j.bar=r=new b,H=[],M=new m})(),j.stop=function(){return j.trigger("stop"),j.running=!1,r.destroy(),s=!0,null!=p&&("function"==typeof t&&t(p),p=null),B()},j.restart=function(){return j.trigger("restart"),j.stop(),j.start()},j.go=function(){var a;return j.running=!0,r.render(),a=C(),s=!1,p=G(function(b,c){var d,e,f,g,h,i,k,l,n,o,p,q,t,u,v,w;for(l=100-r.progress,e=p=0,f=!0,i=q=0,u=L.length;u>q;i=++q)for(K=L[i],o=null!=H[i]?H[i]:H[i]=[],h=null!=(w=K.elements)?w:[K],k=t=0,v=h.length;v>t;k=++t)g=h[k],n=null!=o[k]?o[k]:o[k]=new m(g),f&=n.done,n.done||(e++,p+=n.tick(b));return d=p/e,r.update(M.tick(b,d)),r.done()||f||s?(r.update(100),j.trigger("done"),setTimeout(function(){return r.finish(),j.running=!1,j.trigger("hide")},Math.max(D.ghostTime,Math.max(D.minTime-(C()-a),0)))):c()})},j.start=function(a){v(D,a),j.running=!0;try{r.render()}catch(b){i=b}return document.querySelector(".pace")?(j.trigger("start"),j.go()):setTimeout(j.start,50)},"function"==typeof define&&define.amd?define(["pace"],function(){return j}):"object"==typeof exports?module.exports=j:D.startOnPageLoad&&j.start()}).call(this);
 /**!
  * Sortable
  * @author	RubaXa   <trash@rubaxa.org>
@@ -94003,6 +94003,63 @@ the specific language governing permissions and limitations under the Apache Lic
 	};
 });
 
+/*!
+ * tablesort v4.0.1 (2016-07-23)
+ * http://tristen.ca/tablesort/demo/
+ * Copyright (c) 2016 ; Licensed MIT
+ */!function(){function a(b,c){if(!(this instanceof a))return new a(b,c);if(!b||"TABLE"!==b.tagName)throw new Error("Element must be a table");this.init(b,c||{})}var b=[],c=function(a){var b;return window.CustomEvent&&"function"==typeof window.CustomEvent?b=new CustomEvent(a):(b=document.createEvent("CustomEvent"),b.initCustomEvent(a,!1,!1,void 0)),b},d=function(a){return a.getAttribute("data-sort")||a.textContent||a.innerText||""},e=function(a,b){return a=a.toLowerCase(),b=b.toLowerCase(),a===b?0:b>a?1:-1},f=function(a,b){return function(c,d){var e=a(c.td,d.td);return 0===e?b?d.index-c.index:c.index-d.index:e}};a.extend=function(a,c,d){if("function"!=typeof c||"function"!=typeof d)throw new Error("Pattern and sort must be a function");b.push({name:a,pattern:c,sort:d})},a.prototype={init:function(a,b){var c,d,e,f,g=this;if(g.table=a,g.thead=!1,g.options=b,a.rows&&a.rows.length>0)if(a.tHead&&a.tHead.rows.length>0){for(e=0;e<a.tHead.rows.length;e++)if(a.tHead.rows[e].classList.contains("sort-row")){c=a.tHead.rows[e];break}c||(c=a.tHead.rows[a.tHead.rows.length-1]),g.thead=!0}else c=a.rows[0];if(c){var h=function(){g.current&&g.current!==this&&(g.current.classList.remove("sort-up"),g.current.classList.remove("sort-down")),g.current=this,g.sortTable(this)};for(e=0;e<c.cells.length;e++)f=c.cells[e],f.classList.contains("no-sort")||(f.classList.add("sort-header"),f.tabindex=0,f.addEventListener("click",h,!1),f.classList.contains("sort-default")&&(d=f));d&&(g.current=d,g.sortTable(d))}},sortTable:function(a,g){var h,i=this,j=a.cellIndex,k=e,l="",m=[],n=i.thead?0:1,o=a.getAttribute("data-sort-method"),p=a.getAttribute("data-sort-order");if(i.table.dispatchEvent(c("beforeSort")),g?h=a.classList.contains("sort-up")?"sort-up":"sort-down":(h=a.classList.contains("sort-up")?"sort-down":a.classList.contains("sort-down")?"sort-up":"asc"===p?"sort-down":"desc"===p?"sort-up":i.options.descending?"sort-up":"sort-down",a.classList.remove("sort-down"===h?"sort-up":"sort-down"),a.classList.add(h)),!(i.table.rows.length<2)){if(!o){for(;m.length<3&&n<i.table.tBodies[0].rows.length;)l=d(i.table.tBodies[0].rows[n].cells[j]),l=l.trim(),l.length>0&&m.push(l),n++;if(!m)return}for(n=0;n<b.length;n++)if(l=b[n],o){if(l.name===o){k=l.sort;break}}else if(m.every(l.pattern)){k=l.sort;break}for(i.col=j,n=0;n<i.table.tBodies.length;n++){var q,r=[],s={},t=0,u=0;if(!(i.table.tBodies[n].rows.length<2)){for(q=0;q<i.table.tBodies[n].rows.length;q++)l=i.table.tBodies[n].rows[q],l.classList.contains("no-sort")?s[t]=l:r.push({tr:l,td:d(l.cells[i.col]),index:t}),t++;for("sort-down"===h?(r.sort(f(k,!0)),r.reverse()):r.sort(f(k,!1)),q=0;t>q;q++)s[q]?(l=s[q],u++):l=r[q-u].tr,i.table.tBodies[n].appendChild(l)}}i.table.dispatchEvent(c("afterSort"))}},refresh:function(){void 0!==this.current&&this.sortTable(this.current,!0)}},"undefined"!=typeof module&&module.exports?module.exports=a:window.Tablesort=a}();
+/**
+ * @requires tablesort.min.js
+ */
+// Basic dates in dd/mm/yy or dd-mm-yy format.
+// Years can be 4 digits. Days and Months can be 1 or 2 digits.
+(function(){
+	var parseDate = function(date) {
+		date = date.replace(/\-/g, '/');
+		date = date.replace(/(\d{1,2})[\/\-](\d{1,2})[\/\-](\d{2})/, '$1/$2/$3'); // format before getTime
+		
+		return new Date(date).getTime() || -1;
+	};
+	
+	Tablesort.extend('date', function(item) {
+		return (
+				item.search(/(Mon|Tue|Wed|Thu|Fri|Sat|Sun)\.?\,?\s*/i) !== -1 ||
+				item.search(/\d{1,2}[\/\-]\d{1,2}[\/\-]\d{2,4}/) !== -1 ||
+				item.search(/(Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec)/i) !== -1
+			) && !isNaN(parseDate(item));
+	}, function(a, b) {
+		a = a.toLowerCase();
+		b = b.toLowerCase();
+		
+		return parseDate(b) - parseDate(a);
+	});
+}());
+(function(){
+	var cleanNumber = function(i) {
+			return i.replace(/[^\-?0-9.]/g, '');
+		},
+		
+		compareNumber = function(a, b) {
+			a = parseFloat(a);
+			b = parseFloat(b);
+			
+			a = isNaN(a) ? 0 : a;
+			b = isNaN(b) ? 0 : b;
+			
+			return a - b;
+		};
+	
+	Tablesort.extend('number', function(item) {
+		return item.match(/^-?[£\x24Û¢´€]?\d+\s*([,\.]\d{0,2})/) || // Prefixed currency
+			item.match(/^-?\d+\s*([,\.]\d{0,2})?[£\x24Û¢´€]/) || // Suffixed currency
+			item.match(/^-?(\d)*-?([,\.]){0,1}-?(\d)+([E,e][\-+][\d]+)?%?$/); // Number
+	}, function(a, b) {
+		a = cleanNumber(a);
+		b = cleanNumber(b);
+		
+		return compareNumber(b, a);
+	});
+}());
 // Spectrum Colorpicker v1.8.0
 // https://github.com/bgrins/spectrum
 // Author: Brian Grinstead
@@ -96337,60 +96394,3 @@ the specific language governing permissions and limitations under the Apache Lic
 	179:["dae","daeg","daegg","daegs","daen","daenj","daenh","daed","dael","daelg","daelm","daelb","daels","daelt","daelp","daelh","daem","daeb","daebs","daes","daess","daeng","daej","daec","daek","daet","daep","daeh","dya","dyag","dyagg","dyags","dyan","dyanj","dyanh","dyad","dyal","dyalg","dyalm","dyalb","dyals","dyalt","dyalp","dyalh","dyam","dyab","dyabs","dyas","dyass","dyang","dyaj","dyac","dyak","dyat","dyap","dyah","dyae","dyaeg","dyaegg","dyaegs","dyaen","dyaenj","dyaenh","dyaed","dyael","dyaelg","dyaelm","dyaelb","dyaels","dyaelt","dyaelp","dyaelh","dyaem","dyaeb","dyaebs","dyaes","dyaess","dyaeng","dyaej","dyaec","dyaek","dyaet","dyaep","dyaeh","deo","deog","deogg","deogs","deon","deonj","deonh","deod","deol","deolg","deolm","deolb","deols","deolt","deolp","deolh","deom","deob","deobs","deos","deoss","deong","deoj","deoc","deok","deot","deop","deoh","de","deg","degg","degs","den","denj","denh","ded","del","delg","delm","delb","dels","delt","delp","delh","dem","deb","debs","des","dess","deng","dej","dec","dek","det","dep","deh","dyeo","dyeog","dyeogg","dyeogs","dyeon","dyeonj","dyeonh","dyeod","dyeol","dyeolg","dyeolm","dyeolb","dyeols","dyeolt","dyeolp","dyeolh","dyeom","dyeob","dyeobs","dyeos","dyeoss","dyeong","dyeoj","dyeoc","dyeok","dyeot","dyeop","dyeoh","dye","dyeg","dyegg","dyegs","dyen","dyenj","dyenh","dyed","dyel","dyelg","dyelm","dyelb","dyels","dyelt","dyelp","dyelh","dyem","dyeb","dyebs","dyes","dyess","dyeng","dyej","dyec","dyek","dyet","dyep","dyeh","do","dog","dogg","dogs","don","donj","donh","dod","dol","dolg","dolm","dolb","dols","dolt","dolp","dolh","dom","dob","dobs","dos","doss","dong","doj","doc","dok","dot","dop","doh","dwa","dwag","dwagg","dwags","dwan","dwanj","dwanh","dwad","dwal","dwalg","dwalm","dwalb","dwals","dwalt","dwalp","dwalh","dwam","dwab","dwabs","dwas","dwass","dwang","dwaj","dwac","dwak","dwat","dwap","dwah","dwae","dwaeg","dwaegg","dwaegs"],180:["dwaen","dwaenj","dwaenh","dwaed","dwael","dwaelg","dwaelm","dwaelb","dwaels","dwaelt","dwaelp","dwaelh","dwaem","dwaeb","dwaebs","dwaes","dwaess","dwaeng","dwaej","dwaec","dwaek","dwaet","dwaep","dwaeh","doe","doeg","doegg","doegs","doen","doenj","doenh","doed","doel","doelg","doelm","doelb","doels","doelt","doelp","doelh","doem","doeb","doebs","does","doess","doeng","doej","doec","doek","doet","doep","doeh","dyo","dyog","dyogg","dyogs","dyon","dyonj","dyonh","dyod","dyol","dyolg","dyolm","dyolb","dyols","dyolt","dyolp","dyolh","dyom","dyob","dyobs","dyos","dyoss","dyong","dyoj","dyoc","dyok","dyot","dyop","dyoh","du","dug","dugg","dugs","dun","dunj","dunh","dud","dul","dulg","dulm","dulb","duls","dult","dulp","dulh","dum","dub","dubs","dus","duss","dung","duj","duc","duk","dut","dup","duh","dweo","dweog","dweogg","dweogs","dweon","dweonj","dweonh","dweod","dweol","dweolg","dweolm","dweolb","dweols","dweolt","dweolp","dweolh","dweom","dweob","dweobs","dweos","dweoss","dweong","dweoj","dweoc","dweok","dweot","dweop","dweoh","dwe","dweg","dwegg","dwegs","dwen","dwenj","dwenh","dwed","dwel","dwelg","dwelm","dwelb","dwels","dwelt","dwelp","dwelh","dwem","dweb","dwebs","dwes","dwess","dweng","dwej","dwec","dwek","dwet","dwep","dweh","dwi","dwig","dwigg","dwigs","dwin","dwinj","dwinh","dwid","dwil","dwilg","dwilm","dwilb","dwils","dwilt","dwilp","dwilh","dwim","dwib","dwibs","dwis","dwiss","dwing","dwij","dwic","dwik","dwit","dwip","dwih","dyu","dyug","dyugg","dyugs","dyun","dyunj","dyunh","dyud","dyul","dyulg","dyulm","dyulb","dyuls","dyult","dyulp","dyulh","dyum","dyub","dyubs","dyus","dyuss","dyung","dyuj","dyuc","dyuk","dyut","dyup","dyuh","deu","deug","deugg","deugs","deun","deunj","deunh","deud","deul","deulg","deulm","deulb","deuls","deult","deulp","deulh","deum","deub","deubs","deus","deuss","deung","deuj","deuc","deuk","deut","deup","deuh","dyi","dyig","dyigg","dyigs","dyin","dyinj","dyinh","dyid"],181:["dyil","dyilg","dyilm","dyilb","dyils","dyilt","dyilp","dyilh","dyim","dyib","dyibs","dyis","dyiss","dying","dyij","dyic","dyik","dyit","dyip","dyih","di","dig","digg","digs","din","dinj","dinh","did","dil","dilg","dilm","dilb","dils","dilt","dilp","dilh","dim","dib","dibs","dis","diss","ding","dij","dic","dik","dit","dip","dih","dda","ddag","ddagg","ddags","ddan","ddanj","ddanh","ddad","ddal","ddalg","ddalm","ddalb","ddals","ddalt","ddalp","ddalh","ddam","ddab","ddabs","ddas","ddass","ddang","ddaj","ddac","ddak","ddat","ddap","ddah","ddae","ddaeg","ddaegg","ddaegs","ddaen","ddaenj","ddaenh","ddaed","ddael","ddaelg","ddaelm","ddaelb","ddaels","ddaelt","ddaelp","ddaelh","ddaem","ddaeb","ddaebs","ddaes","ddaess","ddaeng","ddaej","ddaec","ddaek","ddaet","ddaep","ddaeh","ddya","ddyag","ddyagg","ddyags","ddyan","ddyanj","ddyanh","ddyad","ddyal","ddyalg","ddyalm","ddyalb","ddyals","ddyalt","ddyalp","ddyalh","ddyam","ddyab","ddyabs","ddyas","ddyass","ddyang","ddyaj","ddyac","ddyak","ddyat","ddyap","ddyah","ddyae","ddyaeg","ddyaegg","ddyaegs","ddyaen","ddyaenj","ddyaenh","ddyaed","ddyael","ddyaelg","ddyaelm","ddyaelb","ddyaels","ddyaelt","ddyaelp","ddyaelh","ddyaem","ddyaeb","ddyaebs","ddyaes","ddyaess","ddyaeng","ddyaej","ddyaec","ddyaek","ddyaet","ddyaep","ddyaeh","ddeo","ddeog","ddeogg","ddeogs","ddeon","ddeonj","ddeonh","ddeod","ddeol","ddeolg","ddeolm","ddeolb","ddeols","ddeolt","ddeolp","ddeolh","ddeom","ddeob","ddeobs","ddeos","ddeoss","ddeong","ddeoj","ddeoc","ddeok","ddeot","ddeop","ddeoh","dde","ddeg","ddegg","ddegs","dden","ddenj","ddenh","dded","ddel","ddelg","ddelm","ddelb","ddels","ddelt","ddelp","ddelh","ddem","ddeb","ddebs","ddes","ddess","ddeng","ddej","ddec","ddek","ddet","ddep","ddeh","ddyeo","ddyeog","ddyeogg","ddyeogs","ddyeon","ddyeonj","ddyeonh","ddyeod","ddyeol","ddyeolg","ddyeolm","ddyeolb","ddyeols","ddyeolt","ddyeolp","ddyeolh","ddyeom","ddyeob","ddyeobs","ddyeos","ddyeoss","ddyeong","ddyeoj","ddyeoc","ddyeok","ddyeot","ddyeop","ddyeoh","ddye","ddyeg","ddyegg","ddyegs","ddyen","ddyenj","ddyenh","ddyed","ddyel","ddyelg","ddyelm","ddyelb"],182:["ddyels","ddyelt","ddyelp","ddyelh","ddyem","ddyeb","ddyebs","ddyes","ddyess","ddyeng","ddyej","ddyec","ddyek","ddyet","ddyep","ddyeh","ddo","ddog","ddogg","ddogs","ddon","ddonj","ddonh","ddod","ddol","ddolg","ddolm","ddolb","ddols","ddolt","ddolp","ddolh","ddom","ddob","ddobs","ddos","ddoss","ddong","ddoj","ddoc","ddok","ddot","ddop","ddoh","ddwa","ddwag","ddwagg","ddwags","ddwan","ddwanj","ddwanh","ddwad","ddwal","ddwalg","ddwalm","ddwalb","ddwals","ddwalt","ddwalp","ddwalh","ddwam","ddwab","ddwabs","ddwas","ddwass","ddwang","ddwaj","ddwac","ddwak","ddwat","ddwap","ddwah","ddwae","ddwaeg","ddwaegg","ddwaegs","ddwaen","ddwaenj","ddwaenh","ddwaed","ddwael","ddwaelg","ddwaelm","ddwaelb","ddwaels","ddwaelt","ddwaelp","ddwaelh","ddwaem","ddwaeb","ddwaebs","ddwaes","ddwaess","ddwaeng","ddwaej","ddwaec","ddwaek","ddwaet","ddwaep","ddwaeh","ddoe","ddoeg","ddoegg","ddoegs","ddoen","ddoenj","ddoenh","ddoed","ddoel","ddoelg","ddoelm","ddoelb","ddoels","ddoelt","ddoelp","ddoelh","ddoem","ddoeb","ddoebs","ddoes","ddoess","ddoeng","ddoej","ddoec","ddoek","ddoet","ddoep","ddoeh","ddyo","ddyog","ddyogg","ddyogs","ddyon","ddyonj","ddyonh","ddyod","ddyol","ddyolg","ddyolm","ddyolb","ddyols","ddyolt","ddyolp","ddyolh","ddyom","ddyob","ddyobs","ddyos","ddyoss","ddyong","ddyoj","ddyoc","ddyok","ddyot","ddyop","ddyoh","ddu","ddug","ddugg","ddugs","ddun","ddunj","ddunh","ddud","ddul","ddulg","ddulm","ddulb","dduls","ddult","ddulp","ddulh","ddum","ddub","ddubs","ddus","dduss","ddung","dduj","dduc","dduk","ddut","ddup","dduh","ddweo","ddweog","ddweogg","ddweogs","ddweon","ddweonj","ddweonh","ddweod","ddweol","ddweolg","ddweolm","ddweolb","ddweols","ddweolt","ddweolp","ddweolh","ddweom","ddweob","ddweobs","ddweos","ddweoss","ddweong","ddweoj","ddweoc","ddweok","ddweot","ddweop","ddweoh","ddwe","ddweg","ddwegg","ddwegs","ddwen","ddwenj","ddwenh","ddwed","ddwel","ddwelg","ddwelm","ddwelb","ddwels","ddwelt","ddwelp","ddwelh","ddwem","ddweb","ddwebs","ddwes","ddwess","ddweng","ddwej","ddwec","ddwek","ddwet","ddwep","ddweh","ddwi","ddwig","ddwigg","ddwigs","ddwin","ddwinj","ddwinh","ddwid","ddwil","ddwilg","ddwilm","ddwilb","ddwils","ddwilt","ddwilp","ddwilh"],183:["ddwim","ddwib","ddwibs","ddwis","ddwiss","ddwing","ddwij","ddwic","ddwik","ddwit","ddwip","ddwih","ddyu","ddyug","ddyugg","ddyugs","ddyun","ddyunj","ddyunh","ddyud","ddyul","ddyulg","ddyulm","ddyulb","ddyuls","ddyult","ddyulp","ddyulh","ddyum","ddyub","ddyubs","ddyus","ddyuss","ddyung","ddyuj","ddyuc","ddyuk","ddyut","ddyup","ddyuh","ddeu","ddeug","ddeugg","ddeugs","ddeun","ddeunj","ddeunh","ddeud","ddeul","ddeulg","ddeulm","ddeulb","ddeuls","ddeult","ddeulp","ddeulh","ddeum","ddeub","ddeubs","ddeus","ddeuss","ddeung","ddeuj","ddeuc","ddeuk","ddeut","ddeup","ddeuh","ddyi","ddyig","ddyigg","ddyigs","ddyin","ddyinj","ddyinh","ddyid","ddyil","ddyilg","ddyilm","ddyilb","ddyils","ddyilt","ddyilp","ddyilh","ddyim","ddyib","ddyibs","ddyis","ddyiss","ddying","ddyij","ddyic","ddyik","ddyit","ddyip","ddyih","ddi","ddig","ddigg","ddigs","ddin","ddinj","ddinh","ddid","ddil","ddilg","ddilm","ddilb","ddils","ddilt","ddilp","ddilh","ddim","ddib","ddibs","ddis","ddiss","dding","ddij","ddic","ddik","ddit","ddip","ddih","ra","rag","ragg","rags","ran","ranj","ranh","rad","ral","ralg","ralm","ralb","rals","ralt","ralp","ralh","ram","rab","rabs","ras","rass","rang","raj","rac","rak","rat","rap","rah","rae","raeg","raegg","raegs","raen","raenj","raenh","raed","rael","raelg","raelm","raelb","raels","raelt","raelp","raelh","raem","raeb","raebs","raes","raess","raeng","raej","raec","raek","raet","raep","raeh","rya","ryag","ryagg","ryags","ryan","ryanj","ryanh","ryad","ryal","ryalg","ryalm","ryalb","ryals","ryalt","ryalp","ryalh","ryam","ryab","ryabs","ryas","ryass","ryang","ryaj","ryac","ryak","ryat","ryap","ryah","ryae","ryaeg","ryaegg","ryaegs","ryaen","ryaenj","ryaenh","ryaed","ryael","ryaelg","ryaelm","ryaelb","ryaels","ryaelt","ryaelp","ryaelh","ryaem","ryaeb","ryaebs","ryaes","ryaess","ryaeng","ryaej","ryaec","ryaek","ryaet","ryaep","ryaeh","reo","reog","reogg","reogs","reon","reonj","reonh","reod","reol","reolg","reolm","reolb","reols","reolt","reolp","reolh","reom","reob","reobs","reos"],184:["reoss","reong","reoj","reoc","reok","reot","reop","reoh","re","reg","regg","regs","ren","renj","renh","red","rel","relg","relm","relb","rels","relt","relp","relh","rem","reb","rebs","res","ress","reng","rej","rec","rek","ret","rep","reh","ryeo","ryeog","ryeogg","ryeogs","ryeon","ryeonj","ryeonh","ryeod","ryeol","ryeolg","ryeolm","ryeolb","ryeols","ryeolt","ryeolp","ryeolh","ryeom","ryeob","ryeobs","ryeos","ryeoss","ryeong","ryeoj","ryeoc","ryeok","ryeot","ryeop","ryeoh","rye","ryeg","ryegg","ryegs","ryen","ryenj","ryenh","ryed","ryel","ryelg","ryelm","ryelb","ryels","ryelt","ryelp","ryelh","ryem","ryeb","ryebs","ryes","ryess","ryeng","ryej","ryec","ryek","ryet","ryep","ryeh","ro","rog","rogg","rogs","ron","ronj","ronh","rod","rol","rolg","rolm","rolb","rols","rolt","rolp","rolh","rom","rob","robs","ros","ross","rong","roj","roc","rok","rot","rop","roh","rwa","rwag","rwagg","rwags","rwan","rwanj","rwanh","rwad","rwal","rwalg","rwalm","rwalb","rwals","rwalt","rwalp","rwalh","rwam","rwab","rwabs","rwas","rwass","rwang","rwaj","rwac","rwak","rwat","rwap","rwah","rwae","rwaeg","rwaegg","rwaegs","rwaen","rwaenj","rwaenh","rwaed","rwael","rwaelg","rwaelm","rwaelb","rwaels","rwaelt","rwaelp","rwaelh","rwaem","rwaeb","rwaebs","rwaes","rwaess","rwaeng","rwaej","rwaec","rwaek","rwaet","rwaep","rwaeh","roe","roeg","roegg","roegs","roen","roenj","roenh","roed","roel","roelg","roelm","roelb","roels","roelt","roelp","roelh","roem","roeb","roebs","roes","roess","roeng","roej","roec","roek","roet","roep","roeh","ryo","ryog","ryogg","ryogs","ryon","ryonj","ryonh","ryod","ryol","ryolg","ryolm","ryolb","ryols","ryolt","ryolp","ryolh","ryom","ryob","ryobs","ryos","ryoss","ryong","ryoj","ryoc","ryok","ryot","ryop","ryoh","ru","rug","rugg","rugs","run","runj","runh","rud","rul","rulg","rulm","rulb","ruls","rult","rulp","rulh","rum","rub","rubs","rus","russ","rung","ruj","ruc"],185:["ruk","rut","rup","ruh","rweo","rweog","rweogg","rweogs","rweon","rweonj","rweonh","rweod","rweol","rweolg","rweolm","rweolb","rweols","rweolt","rweolp","rweolh","rweom","rweob","rweobs","rweos","rweoss","rweong","rweoj","rweoc","rweok","rweot","rweop","rweoh","rwe","rweg","rwegg","rwegs","rwen","rwenj","rwenh","rwed","rwel","rwelg","rwelm","rwelb","rwels","rwelt","rwelp","rwelh","rwem","rweb","rwebs","rwes","rwess","rweng","rwej","rwec","rwek","rwet","rwep","rweh","rwi","rwig","rwigg","rwigs","rwin","rwinj","rwinh","rwid","rwil","rwilg","rwilm","rwilb","rwils","rwilt","rwilp","rwilh","rwim","rwib","rwibs","rwis","rwiss","rwing","rwij","rwic","rwik","rwit","rwip","rwih","ryu","ryug","ryugg","ryugs","ryun","ryunj","ryunh","ryud","ryul","ryulg","ryulm","ryulb","ryuls","ryult","ryulp","ryulh","ryum","ryub","ryubs","ryus","ryuss","ryung","ryuj","ryuc","ryuk","ryut","ryup","ryuh","reu","reug","reugg","reugs","reun","reunj","reunh","reud","reul","reulg","reulm","reulb","reuls","reult","reulp","reulh","reum","reub","reubs","reus","reuss","reung","reuj","reuc","reuk","reut","reup","reuh","ryi","ryig","ryigg","ryigs","ryin","ryinj","ryinh","ryid","ryil","ryilg","ryilm","ryilb","ryils","ryilt","ryilp","ryilh","ryim","ryib","ryibs","ryis","ryiss","rying","ryij","ryic","ryik","ryit","ryip","ryih","ri","rig","rigg","rigs","rin","rinj","rinh","rid","ril","rilg","rilm","rilb","rils","rilt","rilp","rilh","rim","rib","ribs","ris","riss","ring","rij","ric","rik","rit","rip","rih","ma","mag","magg","mags","man","manj","manh","mad","mal","malg","malm","malb","mals","malt","malp","malh","mam","mab","mabs","mas","mass","mang","maj","mac","mak","mat","map","mah","mae","maeg","maegg","maegs","maen","maenj","maenh","maed","mael","maelg","maelm","maelb","maels","maelt","maelp","maelh","maem","maeb","maebs","maes","maess","maeng","maej","maec","maek","maet","maep","maeh"],186:["mya","myag","myagg","myags","myan","myanj","myanh","myad","myal","myalg","myalm","myalb","myals","myalt","myalp","myalh","myam","myab","myabs","myas","myass","myang","myaj","myac","myak","myat","myap","myah","myae","myaeg","myaegg","myaegs","myaen","myaenj","myaenh","myaed","myael","myaelg","myaelm","myaelb","myaels","myaelt","myaelp","myaelh","myaem","myaeb","myaebs","myaes","myaess","myaeng","myaej","myaec","myaek","myaet","myaep","myaeh","meo","meog","meogg","meogs","meon","meonj","meonh","meod","meol","meolg","meolm","meolb","meols","meolt","meolp","meolh","meom","meob","meobs","meos","meoss","meong","meoj","meoc","meok","meot","meop","meoh","me","meg","megg","megs","men","menj","menh","med","mel","melg","melm","melb","mels","melt","melp","melh","mem","meb","mebs","mes","mess","meng","mej","mec","mek","met","mep","meh","myeo","myeog","myeogg","myeogs","myeon","myeonj","myeonh","myeod","myeol","myeolg","myeolm","myeolb","myeols","myeolt","myeolp","myeolh","myeom","myeob","myeobs","myeos","myeoss","myeong","myeoj","myeoc","myeok","myeot","myeop","myeoh","mye","myeg","myegg","myegs","myen","myenj","myenh","myed","myel","myelg","myelm","myelb","myels","myelt","myelp","myelh","myem","myeb","myebs","myes","myess","myeng","myej","myec","myek","myet","myep","myeh","mo","mog","mogg","mogs","mon","monj","monh","mod","mol","molg","molm","molb","mols","molt","molp","molh","mom","mob","mobs","mos","moss","mong","moj","moc","mok","mot","mop","moh","mwa","mwag","mwagg","mwags","mwan","mwanj","mwanh","mwad","mwal","mwalg","mwalm","mwalb","mwals","mwalt","mwalp","mwalh","mwam","mwab","mwabs","mwas","mwass","mwang","mwaj","mwac","mwak","mwat","mwap","mwah","mwae","mwaeg","mwaegg","mwaegs","mwaen","mwaenj","mwaenh","mwaed","mwael","mwaelg","mwaelm","mwaelb","mwaels","mwaelt","mwaelp","mwaelh","mwaem","mwaeb","mwaebs","mwaes","mwaess","mwaeng","mwaej","mwaec","mwaek","mwaet","mwaep","mwaeh","moe","moeg","moegg","moegs"],187:["moen","moenj","moenh","moed","moel","moelg","moelm","moelb","moels","moelt","moelp","moelh","moem","moeb","moebs","moes","moess","moeng","moej","moec","moek","moet","moep","moeh","myo","myog","myogg","myogs","myon","myonj","myonh","myod","myol","myolg","myolm","myolb","myols","myolt","myolp","myolh","myom","myob","myobs","myos","myoss","myong","myoj","myoc","myok","myot","myop","myoh","mu","mug","mugg","mugs","mun","munj","munh","mud","mul","mulg","mulm","mulb","muls","mult","mulp","mulh","mum","mub","mubs","mus","muss","mung","muj","muc","muk","mut","mup","muh","mweo","mweog","mweogg","mweogs","mweon","mweonj","mweonh","mweod","mweol","mweolg","mweolm","mweolb","mweols","mweolt","mweolp","mweolh","mweom","mweob","mweobs","mweos","mweoss","mweong","mweoj","mweoc","mweok","mweot","mweop","mweoh","mwe","mweg","mwegg","mwegs","mwen","mwenj","mwenh","mwed","mwel","mwelg","mwelm","mwelb","mwels","mwelt","mwelp","mwelh","mwem","mweb","mwebs","mwes","mwess","mweng","mwej","mwec","mwek","mwet","mwep","mweh","mwi","mwig","mwigg","mwigs","mwin","mwinj","mwinh","mwid","mwil","mwilg","mwilm","mwilb","mwils","mwilt","mwilp","mwilh","mwim","mwib","mwibs","mwis","mwiss","mwing","mwij","mwic","mwik","mwit","mwip","mwih","myu","myug","myugg","myugs","myun","myunj","myunh","myud","myul","myulg","myulm","myulb","myuls","myult","myulp","myulh","myum","myub","myubs","myus","myuss","myung","myuj","myuc","myuk","myut","myup","myuh","meu","meug","meugg","meugs","meun","meunj","meunh","meud","meul","meulg","meulm","meulb","meuls","meult","meulp","meulh","meum","meub","meubs","meus","meuss","meung","meuj","meuc","meuk","meut","meup","meuh","myi","myig","myigg","myigs","myin","myinj","myinh","myid","myil","myilg","myilm","myilb","myils","myilt","myilp","myilh","myim","myib","myibs","myis","myiss","mying","myij","myic","myik","myit","myip","myih","mi","mig","migg","migs","min","minj","minh","mid"],188:["mil","milg","milm","milb","mils","milt","milp","milh","mim","mib","mibs","mis","miss","ming","mij","mic","mik","mit","mip","mih","ba","bag","bagg","bags","ban","banj","banh","bad","bal","balg","balm","balb","bals","balt","balp","balh","bam","bab","babs","bas","bass","bang","baj","bac","bak","bat","bap","bah","bae","baeg","baegg","baegs","baen","baenj","baenh","baed","bael","baelg","baelm","baelb","baels","baelt","baelp","baelh","baem","baeb","baebs","baes","baess","baeng","baej","baec","baek","baet","baep","baeh","bya","byag","byagg","byags","byan","byanj","byanh","byad","byal","byalg","byalm","byalb","byals","byalt","byalp","byalh","byam","byab","byabs","byas","byass","byang","byaj","byac","byak","byat","byap","byah","byae","byaeg","byaegg","byaegs","byaen","byaenj","byaenh","byaed","byael","byaelg","byaelm","byaelb","byaels","byaelt","byaelp","byaelh","byaem","byaeb","byaebs","byaes","byaess","byaeng","byaej","byaec","byaek","byaet","byaep","byaeh","beo","beog","beogg","beogs","beon","beonj","beonh","beod","beol","beolg","beolm","beolb","beols","beolt","beolp","beolh","beom","beob","beobs","beos","beoss","beong","beoj","beoc","beok","beot","beop","beoh","be","beg","begg","begs","ben","benj","benh","bed","bel","belg","belm","belb","bels","belt","belp","belh","bem","beb","bebs","bes","bess","beng","bej","bec","bek","bet","bep","beh","byeo","byeog","byeogg","byeogs","byeon","byeonj","byeonh","byeod","byeol","byeolg","byeolm","byeolb","byeols","byeolt","byeolp","byeolh","byeom","byeob","byeobs","byeos","byeoss","byeong","byeoj","byeoc","byeok","byeot","byeop","byeoh","bye","byeg","byegg","byegs","byen","byenj","byenh","byed","byel","byelg","byelm","byelb","byels","byelt","byelp","byelh","byem","byeb","byebs","byes","byess","byeng","byej","byec","byek","byet","byep","byeh","bo","bog","bogg","bogs","bon","bonj","bonh","bod","bol","bolg","bolm","bolb"],189:["bols","bolt","bolp","bolh","bom","bob","bobs","bos","boss","bong","boj","boc","bok","bot","bop","boh","bwa","bwag","bwagg","bwags","bwan","bwanj","bwanh","bwad","bwal","bwalg","bwalm","bwalb","bwals","bwalt","bwalp","bwalh","bwam","bwab","bwabs","bwas","bwass","bwang","bwaj","bwac","bwak","bwat","bwap","bwah","bwae","bwaeg","bwaegg","bwaegs","bwaen","bwaenj","bwaenh","bwaed","bwael","bwaelg","bwaelm","bwaelb","bwaels","bwaelt","bwaelp","bwaelh","bwaem","bwaeb","bwaebs","bwaes","bwaess","bwaeng","bwaej","bwaec","bwaek","bwaet","bwaep","bwaeh","boe","boeg","boegg","boegs","boen","boenj","boenh","boed","boel","boelg","boelm","boelb","boels","boelt","boelp","boelh","boem","boeb","boebs","boes","boess","boeng","boej","boec","boek","boet","boep","boeh","byo","byog","byogg","byogs","byon","byonj","byonh","byod","byol","byolg","byolm","byolb","byols","byolt","byolp","byolh","byom","byob","byobs","byos","byoss","byong","byoj","byoc","byok","byot","byop","byoh","bu","bug","bugg","bugs","bun","bunj","bunh","bud","bul","bulg","bulm","bulb","buls","bult","bulp","bulh","bum","bub","bubs","bus","buss","bung","buj","buc","buk","but","bup","buh","bweo","bweog","bweogg","bweogs","bweon","bweonj","bweonh","bweod","bweol","bweolg","bweolm","bweolb","bweols","bweolt","bweolp","bweolh","bweom","bweob","bweobs","bweos","bweoss","bweong","bweoj","bweoc","bweok","bweot","bweop","bweoh","bwe","bweg","bwegg","bwegs","bwen","bwenj","bwenh","bwed","bwel","bwelg","bwelm","bwelb","bwels","bwelt","bwelp","bwelh","bwem","bweb","bwebs","bwes","bwess","bweng","bwej","bwec","bwek","bwet","bwep","bweh","bwi","bwig","bwigg","bwigs","bwin","bwinj","bwinh","bwid","bwil","bwilg","bwilm","bwilb","bwils","bwilt","bwilp","bwilh","bwim","bwib","bwibs","bwis","bwiss","bwing","bwij","bwic","bwik","bwit","bwip","bwih","byu","byug","byugg","byugs","byun","byunj","byunh","byud","byul","byulg","byulm","byulb","byuls","byult","byulp","byulh"],190:["byum","byub","byubs","byus","byuss","byung","byuj","byuc","byuk","byut","byup","byuh","beu","beug","beugg","beugs","beun","beunj","beunh","beud","beul","beulg","beulm","beulb","beuls","beult","beulp","beulh","beum","beub","beubs","beus","beuss","beung","beuj","beuc","beuk","beut","beup","beuh","byi","byig","byigg","byigs","byin","byinj","byinh","byid","byil","byilg","byilm","byilb","byils","byilt","byilp","byilh","byim","byib","byibs","byis","byiss","bying","byij","byic","byik","byit","byip","byih","bi","big","bigg","bigs","bin","binj","binh","bid","bil","bilg","bilm","bilb","bils","bilt","bilp","bilh","bim","bib","bibs","bis","biss","bing","bij","bic","bik","bit","bip","bih","bba","bbag","bbagg","bbags","bban","bbanj","bbanh","bbad","bbal","bbalg","bbalm","bbalb","bbals","bbalt","bbalp","bbalh","bbam","bbab","bbabs","bbas","bbass","bbang","bbaj","bbac","bbak","bbat","bbap","bbah","bbae","bbaeg","bbaegg","bbaegs","bbaen","bbaenj","bbaenh","bbaed","bbael","bbaelg","bbaelm","bbaelb","bbaels","bbaelt","bbaelp","bbaelh","bbaem","bbaeb","bbaebs","bbaes","bbaess","bbaeng","bbaej","bbaec","bbaek","bbaet","bbaep","bbaeh","bbya","bbyag","bbyagg","bbyags","bbyan","bbyanj","bbyanh","bbyad","bbyal","bbyalg","bbyalm","bbyalb","bbyals","bbyalt","bbyalp","bbyalh","bbyam","bbyab","bbyabs","bbyas","bbyass","bbyang","bbyaj","bbyac","bbyak","bbyat","bbyap","bbyah","bbyae","bbyaeg","bbyaegg","bbyaegs","bbyaen","bbyaenj","bbyaenh","bbyaed","bbyael","bbyaelg","bbyaelm","bbyaelb","bbyaels","bbyaelt","bbyaelp","bbyaelh","bbyaem","bbyaeb","bbyaebs","bbyaes","bbyaess","bbyaeng","bbyaej","bbyaec","bbyaek","bbyaet","bbyaep","bbyaeh","bbeo","bbeog","bbeogg","bbeogs","bbeon","bbeonj","bbeonh","bbeod","bbeol","bbeolg","bbeolm","bbeolb","bbeols","bbeolt","bbeolp","bbeolh","bbeom","bbeob","bbeobs","bbeos","bbeoss","bbeong","bbeoj","bbeoc","bbeok","bbeot","bbeop","bbeoh","bbe","bbeg","bbegg","bbegs","bben","bbenj","bbenh","bbed","bbel","bbelg","bbelm","bbelb","bbels","bbelt","bbelp","bbelh","bbem","bbeb","bbebs","bbes"],191:["bbess","bbeng","bbej","bbec","bbek","bbet","bbep","bbeh","bbyeo","bbyeog","bbyeogg","bbyeogs","bbyeon","bbyeonj","bbyeonh","bbyeod","bbyeol","bbyeolg","bbyeolm","bbyeolb","bbyeols","bbyeolt","bbyeolp","bbyeolh","bbyeom","bbyeob","bbyeobs","bbyeos","bbyeoss","bbyeong","bbyeoj","bbyeoc","bbyeok","bbyeot","bbyeop","bbyeoh","bbye","bbyeg","bbyegg","bbyegs","bbyen","bbyenj","bbyenh","bbyed","bbyel","bbyelg","bbyelm","bbyelb","bbyels","bbyelt","bbyelp","bbyelh","bbyem","bbyeb","bbyebs","bbyes","bbyess","bbyeng","bbyej","bbyec","bbyek","bbyet","bbyep","bbyeh","bbo","bbog","bbogg","bbogs","bbon","bbonj","bbonh","bbod","bbol","bbolg","bbolm","bbolb","bbols","bbolt","bbolp","bbolh","bbom","bbob","bbobs","bbos","bboss","bbong","bboj","bboc","bbok","bbot","bbop","bboh","bbwa","bbwag","bbwagg","bbwags","bbwan","bbwanj","bbwanh","bbwad","bbwal","bbwalg","bbwalm","bbwalb","bbwals","bbwalt","bbwalp","bbwalh","bbwam","bbwab","bbwabs","bbwas","bbwass","bbwang","bbwaj","bbwac","bbwak","bbwat","bbwap","bbwah","bbwae","bbwaeg","bbwaegg","bbwaegs","bbwaen","bbwaenj","bbwaenh","bbwaed","bbwael","bbwaelg","bbwaelm","bbwaelb","bbwaels","bbwaelt","bbwaelp","bbwaelh","bbwaem","bbwaeb","bbwaebs","bbwaes","bbwaess","bbwaeng","bbwaej","bbwaec","bbwaek","bbwaet","bbwaep","bbwaeh","bboe","bboeg","bboegg","bboegs","bboen","bboenj","bboenh","bboed","bboel","bboelg","bboelm","bboelb","bboels","bboelt","bboelp","bboelh","bboem","bboeb","bboebs","bboes","bboess","bboeng","bboej","bboec","bboek","bboet","bboep","bboeh","bbyo","bbyog","bbyogg","bbyogs","bbyon","bbyonj","bbyonh","bbyod","bbyol","bbyolg","bbyolm","bbyolb","bbyols","bbyolt","bbyolp","bbyolh","bbyom","bbyob","bbyobs","bbyos","bbyoss","bbyong","bbyoj","bbyoc","bbyok","bbyot","bbyop","bbyoh","bbu","bbug","bbugg","bbugs","bbun","bbunj","bbunh","bbud","bbul","bbulg","bbulm","bbulb","bbuls","bbult","bbulp","bbulh","bbum","bbub","bbubs","bbus","bbuss","bbung","bbuj","bbuc","bbuk","bbut","bbup","bbuh","bbweo","bbweog","bbweogg","bbweogs","bbweon","bbweonj","bbweonh","bbweod","bbweol","bbweolg","bbweolm","bbweolb","bbweols","bbweolt","bbweolp","bbweolh","bbweom","bbweob","bbweobs","bbweos","bbweoss","bbweong","bbweoj","bbweoc"],192:["bbweok","bbweot","bbweop","bbweoh","bbwe","bbweg","bbwegg","bbwegs","bbwen","bbwenj","bbwenh","bbwed","bbwel","bbwelg","bbwelm","bbwelb","bbwels","bbwelt","bbwelp","bbwelh","bbwem","bbweb","bbwebs","bbwes","bbwess","bbweng","bbwej","bbwec","bbwek","bbwet","bbwep","bbweh","bbwi","bbwig","bbwigg","bbwigs","bbwin","bbwinj","bbwinh","bbwid","bbwil","bbwilg","bbwilm","bbwilb","bbwils","bbwilt","bbwilp","bbwilh","bbwim","bbwib","bbwibs","bbwis","bbwiss","bbwing","bbwij","bbwic","bbwik","bbwit","bbwip","bbwih","bbyu","bbyug","bbyugg","bbyugs","bbyun","bbyunj","bbyunh","bbyud","bbyul","bbyulg","bbyulm","bbyulb","bbyuls","bbyult","bbyulp","bbyulh","bbyum","bbyub","bbyubs","bbyus","bbyuss","bbyung","bbyuj","bbyuc","bbyuk","bbyut","bbyup","bbyuh","bbeu","bbeug","bbeugg","bbeugs","bbeun","bbeunj","bbeunh","bbeud","bbeul","bbeulg","bbeulm","bbeulb","bbeuls","bbeult","bbeulp","bbeulh","bbeum","bbeub","bbeubs","bbeus","bbeuss","bbeung","bbeuj","bbeuc","bbeuk","bbeut","bbeup","bbeuh","bbyi","bbyig","bbyigg","bbyigs","bbyin","bbyinj","bbyinh","bbyid","bbyil","bbyilg","bbyilm","bbyilb","bbyils","bbyilt","bbyilp","bbyilh","bbyim","bbyib","bbyibs","bbyis","bbyiss","bbying","bbyij","bbyic","bbyik","bbyit","bbyip","bbyih","bbi","bbig","bbigg","bbigs","bbin","bbinj","bbinh","bbid","bbil","bbilg","bbilm","bbilb","bbils","bbilt","bbilp","bbilh","bbim","bbib","bbibs","bbis","bbiss","bbing","bbij","bbic","bbik","bbit","bbip","bbih","sa","sag","sagg","sags","san","sanj","sanh","sad","sal","salg","salm","salb","sals","salt","salp","salh","sam","sab","sabs","sas","sass","sang","saj","sac","sak","sat","sap","sah","sae","saeg","saegg","saegs","saen","saenj","saenh","saed","sael","saelg","saelm","saelb","saels","saelt","saelp","saelh","saem","saeb","saebs","saes","saess","saeng","saej","saec","saek","saet","saep","saeh","sya","syag","syagg","syags","syan","syanj","syanh","syad","syal","syalg","syalm","syalb","syals","syalt","syalp","syalh","syam","syab","syabs","syas","syass","syang","syaj","syac","syak","syat","syap","syah"],193:["syae","syaeg","syaegg","syaegs","syaen","syaenj","syaenh","syaed","syael","syaelg","syaelm","syaelb","syaels","syaelt","syaelp","syaelh","syaem","syaeb","syaebs","syaes","syaess","syaeng","syaej","syaec","syaek","syaet","syaep","syaeh","seo","seog","seogg","seogs","seon","seonj","seonh","seod","seol","seolg","seolm","seolb","seols","seolt","seolp","seolh","seom","seob","seobs","seos","seoss","seong","seoj","seoc","seok","seot","seop","seoh","se","seg","segg","segs","sen","senj","senh","sed","sel","selg","selm","selb","sels","selt","selp","selh","sem","seb","sebs","ses","sess","seng","sej","sec","sek","set","sep","seh","syeo","syeog","syeogg","syeogs","syeon","syeonj","syeonh","syeod","syeol","syeolg","syeolm","syeolb","syeols","syeolt","syeolp","syeolh","syeom","syeob","syeobs","syeos","syeoss","syeong","syeoj","syeoc","syeok","syeot","syeop","syeoh","sye","syeg","syegg","syegs","syen","syenj","syenh","syed","syel","syelg","syelm","syelb","syels","syelt","syelp","syelh","syem","syeb","syebs","syes","syess","syeng","syej","syec","syek","syet","syep","syeh","so","sog","sogg","sogs","son","sonj","sonh","sod","sol","solg","solm","solb","sols","solt","solp","solh","som","sob","sobs","sos","soss","song","soj","soc","sok","sot","sop","soh","swa","swag","swagg","swags","swan","swanj","swanh","swad","swal","swalg","swalm","swalb","swals","swalt","swalp","swalh","swam","swab","swabs","swas","swass","swang","swaj","swac","swak","swat","swap","swah","swae","swaeg","swaegg","swaegs","swaen","swaenj","swaenh","swaed","swael","swaelg","swaelm","swaelb","swaels","swaelt","swaelp","swaelh","swaem","swaeb","swaebs","swaes","swaess","swaeng","swaej","swaec","swaek","swaet","swaep","swaeh","soe","soeg","soegg","soegs","soen","soenj","soenh","soed","soel","soelg","soelm","soelb","soels","soelt","soelp","soelh","soem","soeb","soebs","soes","soess","soeng","soej","soec","soek","soet","soep","soeh","syo","syog","syogg","syogs"],194:["syon","syonj","syonh","syod","syol","syolg","syolm","syolb","syols","syolt","syolp","syolh","syom","syob","syobs","syos","syoss","syong","syoj","syoc","syok","syot","syop","syoh","su","sug","sugg","sugs","sun","sunj","sunh","sud","sul","sulg","sulm","sulb","suls","sult","sulp","sulh","sum","sub","subs","sus","suss","sung","suj","suc","suk","sut","sup","suh","sweo","sweog","sweogg","sweogs","sweon","sweonj","sweonh","sweod","sweol","sweolg","sweolm","sweolb","sweols","sweolt","sweolp","sweolh","sweom","sweob","sweobs","sweos","sweoss","sweong","sweoj","sweoc","sweok","sweot","sweop","sweoh","swe","sweg","swegg","swegs","swen","swenj","swenh","swed","swel","swelg","swelm","swelb","swels","swelt","swelp","swelh","swem","sweb","swebs","swes","swess","sweng","swej","swec","swek","swet","swep","sweh","swi","swig","swigg","swigs","swin","swinj","swinh","swid","swil","swilg","swilm","swilb","swils","swilt","swilp","swilh","swim","swib","swibs","swis","swiss","swing","swij","swic","swik","swit","swip","swih","syu","syug","syugg","syugs","syun","syunj","syunh","syud","syul","syulg","syulm","syulb","syuls","syult","syulp","syulh","syum","syub","syubs","syus","syuss","syung","syuj","syuc","syuk","syut","syup","syuh","seu","seug","seugg","seugs","seun","seunj","seunh","seud","seul","seulg","seulm","seulb","seuls","seult","seulp","seulh","seum","seub","seubs","seus","seuss","seung","seuj","seuc","seuk","seut","seup","seuh","syi","syig","syigg","syigs","syin","syinj","syinh","syid","syil","syilg","syilm","syilb","syils","syilt","syilp","syilh","syim","syib","syibs","syis","syiss","sying","syij","syic","syik","syit","syip","syih","si","sig","sigg","sigs","sin","sinj","sinh","sid","sil","silg","silm","silb","sils","silt","silp","silh","sim","sib","sibs","sis","siss","sing","sij","sic","sik","sit","sip","sih","ssa","ssag","ssagg","ssags","ssan","ssanj","ssanh","ssad"],
 	195:["ssal","ssalg","ssalm","ssalb","ssals","ssalt","ssalp","ssalh","ssam","ssab","ssabs","ssas","ssass","ssang","ssaj","ssac","ssak","ssat","ssap","ssah","ssae","ssaeg","ssaegg","ssaegs","ssaen","ssaenj","ssaenh","ssaed","ssael","ssaelg","ssaelm","ssaelb","ssaels","ssaelt","ssaelp","ssaelh","ssaem","ssaeb","ssaebs","ssaes","ssaess","ssaeng","ssaej","ssaec","ssaek","ssaet","ssaep","ssaeh","ssya","ssyag","ssyagg","ssyags","ssyan","ssyanj","ssyanh","ssyad","ssyal","ssyalg","ssyalm","ssyalb","ssyals","ssyalt","ssyalp","ssyalh","ssyam","ssyab","ssyabs","ssyas","ssyass","ssyang","ssyaj","ssyac","ssyak","ssyat","ssyap","ssyah","ssyae","ssyaeg","ssyaegg","ssyaegs","ssyaen","ssyaenj","ssyaenh","ssyaed","ssyael","ssyaelg","ssyaelm","ssyaelb","ssyaels","ssyaelt","ssyaelp","ssyaelh","ssyaem","ssyaeb","ssyaebs","ssyaes","ssyaess","ssyaeng","ssyaej","ssyaec","ssyaek","ssyaet","ssyaep","ssyaeh","sseo","sseog","sseogg","sseogs","sseon","sseonj","sseonh","sseod","sseol","sseolg","sseolm","sseolb","sseols","sseolt","sseolp","sseolh","sseom","sseob","sseobs","sseos","sseoss","sseong","sseoj","sseoc","sseok","sseot","sseop","sseoh","sse","sseg","ssegg","ssegs","ssen","ssenj","ssenh","ssed","ssel","sselg","sselm","sselb","ssels","sselt","sselp","sselh","ssem","sseb","ssebs","sses","ssess","sseng","ssej","ssec","ssek","sset","ssep","sseh","ssyeo","ssyeog","ssyeogg","ssyeogs","ssyeon","ssyeonj","ssyeonh","ssyeod","ssyeol","ssyeolg","ssyeolm","ssyeolb","ssyeols","ssyeolt","ssyeolp","ssyeolh","ssyeom","ssyeob","ssyeobs","ssyeos","ssyeoss","ssyeong","ssyeoj","ssyeoc","ssyeok","ssyeot","ssyeop","ssyeoh","ssye","ssyeg","ssyegg","ssyegs","ssyen","ssyenj","ssyenh","ssyed","ssyel","ssyelg","ssyelm","ssyelb","ssyels","ssyelt","ssyelp","ssyelh","ssyem","ssyeb","ssyebs","ssyes","ssyess","ssyeng","ssyej","ssyec","ssyek","ssyet","ssyep","ssyeh","sso","ssog","ssogg","ssogs","sson","ssonj","ssonh","ssod","ssol","ssolg","ssolm","ssolb","ssols","ssolt","ssolp","ssolh","ssom","ssob","ssobs","ssos","ssoss","ssong","ssoj","ssoc","ssok","ssot","ssop","ssoh","sswa","sswag","sswagg","sswags","sswan","sswanj","sswanh","sswad","sswal","sswalg","sswalm","sswalb"],196:["sswals","sswalt","sswalp","sswalh","sswam","sswab","sswabs","sswas","sswass","sswang","sswaj","sswac","sswak","sswat","sswap","sswah","sswae","sswaeg","sswaegg","sswaegs","sswaen","sswaenj","sswaenh","sswaed","sswael","sswaelg","sswaelm","sswaelb","sswaels","sswaelt","sswaelp","sswaelh","sswaem","sswaeb","sswaebs","sswaes","sswaess","sswaeng","sswaej","sswaec","sswaek","sswaet","sswaep","sswaeh","ssoe","ssoeg","ssoegg","ssoegs","ssoen","ssoenj","ssoenh","ssoed","ssoel","ssoelg","ssoelm","ssoelb","ssoels","ssoelt","ssoelp","ssoelh","ssoem","ssoeb","ssoebs","ssoes","ssoess","ssoeng","ssoej","ssoec","ssoek","ssoet","ssoep","ssoeh","ssyo","ssyog","ssyogg","ssyogs","ssyon","ssyonj","ssyonh","ssyod","ssyol","ssyolg","ssyolm","ssyolb","ssyols","ssyolt","ssyolp","ssyolh","ssyom","ssyob","ssyobs","ssyos","ssyoss","ssyong","ssyoj","ssyoc","ssyok","ssyot","ssyop","ssyoh","ssu","ssug","ssugg","ssugs","ssun","ssunj","ssunh","ssud","ssul","ssulg","ssulm","ssulb","ssuls","ssult","ssulp","ssulh","ssum","ssub","ssubs","ssus","ssuss","ssung","ssuj","ssuc","ssuk","ssut","ssup","ssuh","ssweo","ssweog","ssweogg","ssweogs","ssweon","ssweonj","ssweonh","ssweod","ssweol","ssweolg","ssweolm","ssweolb","ssweols","ssweolt","ssweolp","ssweolh","ssweom","ssweob","ssweobs","ssweos","ssweoss","ssweong","ssweoj","ssweoc","ssweok","ssweot","ssweop","ssweoh","sswe","ssweg","sswegg","sswegs","sswen","sswenj","sswenh","sswed","sswel","sswelg","sswelm","sswelb","sswels","sswelt","sswelp","sswelh","sswem","ssweb","sswebs","sswes","sswess","ssweng","sswej","sswec","sswek","sswet","sswep","ssweh","sswi","sswig","sswigg","sswigs","sswin","sswinj","sswinh","sswid","sswil","sswilg","sswilm","sswilb","sswils","sswilt","sswilp","sswilh","sswim","sswib","sswibs","sswis","sswiss","sswing","sswij","sswic","sswik","sswit","sswip","sswih","ssyu","ssyug","ssyugg","ssyugs","ssyun","ssyunj","ssyunh","ssyud","ssyul","ssyulg","ssyulm","ssyulb","ssyuls","ssyult","ssyulp","ssyulh","ssyum","ssyub","ssyubs","ssyus","ssyuss","ssyung","ssyuj","ssyuc","ssyuk","ssyut","ssyup","ssyuh","sseu","sseug","sseugg","sseugs","sseun","sseunj","sseunh","sseud","sseul","sseulg","sseulm","sseulb","sseuls","sseult","sseulp","sseulh"],197:["sseum","sseub","sseubs","sseus","sseuss","sseung","sseuj","sseuc","sseuk","sseut","sseup","sseuh","ssyi","ssyig","ssyigg","ssyigs","ssyin","ssyinj","ssyinh","ssyid","ssyil","ssyilg","ssyilm","ssyilb","ssyils","ssyilt","ssyilp","ssyilh","ssyim","ssyib","ssyibs","ssyis","ssyiss","ssying","ssyij","ssyic","ssyik","ssyit","ssyip","ssyih","ssi","ssig","ssigg","ssigs","ssin","ssinj","ssinh","ssid","ssil","ssilg","ssilm","ssilb","ssils","ssilt","ssilp","ssilh","ssim","ssib","ssibs","ssis","ssiss","ssing","ssij","ssic","ssik","ssit","ssip","ssih","a","ag","agg","ags","an","anj","anh","ad","al","alg","alm","alb","als","alt","alp","alh","am","ab","abs","as","ass","ang","aj","ac","ak","at","ap","ah","ae","aeg","aegg","aegs","aen","aenj","aenh","aed","ael","aelg","aelm","aelb","aels","aelt","aelp","aelh","aem","aeb","aebs","aes","aess","aeng","aej","aec","aek","aet","aep","aeh","ya","yag","yagg","yags","yan","yanj","yanh","yad","yal","yalg","yalm","yalb","yals","yalt","yalp","yalh","yam","yab","yabs","yas","yass","yang","yaj","yac","yak","yat","yap","yah","yae","yaeg","yaegg","yaegs","yaen","yaenj","yaenh","yaed","yael","yaelg","yaelm","yaelb","yaels","yaelt","yaelp","yaelh","yaem","yaeb","yaebs","yaes","yaess","yaeng","yaej","yaec","yaek","yaet","yaep","yaeh","eo","eog","eogg","eogs","eon","eonj","eonh","eod","eol","eolg","eolm","eolb","eols","eolt","eolp","eolh","eom","eob","eobs","eos","eoss","eong","eoj","eoc","eok","eot","eop","eoh","e","eg","egg","egs","en","enj","enh","ed","el","elg","elm","elb","els","elt","elp","elh","em","eb","ebs","es","ess","eng","ej","ec","ek","et","ep","eh","yeo","yeog","yeogg","yeogs","yeon","yeonj","yeonh","yeod","yeol","yeolg","yeolm","yeolb","yeols","yeolt","yeolp","yeolh","yeom","yeob","yeobs","yeos"],198:["yeoss","yeong","yeoj","yeoc","yeok","yeot","yeop","yeoh","ye","yeg","yegg","yegs","yen","yenj","yenh","yed","yel","yelg","yelm","yelb","yels","yelt","yelp","yelh","yem","yeb","yebs","yes","yess","yeng","yej","yec","yek","yet","yep","yeh","o","og","ogg","ogs","on","onj","onh","od","ol","olg","olm","olb","ols","olt","olp","olh","om","ob","obs","os","oss","ong","oj","oc","ok","ot","op","oh","wa","wag","wagg","wags","wan","wanj","wanh","wad","wal","walg","walm","walb","wals","walt","walp","walh","wam","wab","wabs","was","wass","wang","waj","wac","wak","wat","wap","wah","wae","waeg","waegg","waegs","waen","waenj","waenh","waed","wael","waelg","waelm","waelb","waels","waelt","waelp","waelh","waem","waeb","waebs","waes","waess","waeng","waej","waec","waek","waet","waep","waeh","oe","oeg","oegg","oegs","oen","oenj","oenh","oed","oel","oelg","oelm","oelb","oels","oelt","oelp","oelh","oem","oeb","oebs","oes","oess","oeng","oej","oec","oek","oet","oep","oeh","yo","yog","yogg","yogs","yon","yonj","yonh","yod","yol","yolg","yolm","yolb","yols","yolt","yolp","yolh","yom","yob","yobs","yos","yoss","yong","yoj","yoc","yok","yot","yop","yoh","u","ug","ugg","ugs","un","unj","unh","ud","ul","ulg","ulm","ulb","uls","ult","ulp","ulh","um","ub","ubs","us","uss","ung","uj","uc","uk","ut","up","uh","weo","weog","weogg","weogs","weon","weonj","weonh","weod","weol","weolg","weolm","weolb","weols","weolt","weolp","weolh","weom","weob","weobs","weos","weoss","weong","weoj","weoc","weok","weot","weop","weoh","we","weg","wegg","wegs","wen","wenj","wenh","wed","wel","welg","welm","welb","wels","welt","welp","welh","wem","web","webs","wes","wess","weng","wej","wec"],199:["wek","wet","wep","weh","wi","wig","wigg","wigs","win","winj","winh","wid","wil","wilg","wilm","wilb","wils","wilt","wilp","wilh","wim","wib","wibs","wis","wiss","wing","wij","wic","wik","wit","wip","wih","yu","yug","yugg","yugs","yun","yunj","yunh","yud","yul","yulg","yulm","yulb","yuls","yult","yulp","yulh","yum","yub","yubs","yus","yuss","yung","yuj","yuc","yuk","yut","yup","yuh","eu","eug","eugg","eugs","eun","eunj","eunh","eud","eul","eulg","eulm","eulb","euls","eult","eulp","eulh","eum","eub","eubs","eus","euss","eung","euj","euc","euk","eut","eup","euh","yi","yig","yigg","yigs","yin","yinj","yinh","yid","yil","yilg","yilm","yilb","yils","yilt","yilp","yilh","yim","yib","yibs","yis","yiss","ying","yij","yic","yik","yit","yip","yih","i","ig","igg","igs","in","inj","inh","id","il","ilg","ilm","ilb","ils","ilt","ilp","ilh","im","ib","ibs","is","iss","ing","ij","ic","ik","it","ip","ih","ja","jag","jagg","jags","jan","janj","janh","jad","jal","jalg","jalm","jalb","jals","jalt","jalp","jalh","jam","jab","jabs","jas","jass","jang","jaj","jac","jak","jat","jap","jah","jae","jaeg","jaegg","jaegs","jaen","jaenj","jaenh","jaed","jael","jaelg","jaelm","jaelb","jaels","jaelt","jaelp","jaelh","jaem","jaeb","jaebs","jaes","jaess","jaeng","jaej","jaec","jaek","jaet","jaep","jaeh","jya","jyag","jyagg","jyags","jyan","jyanj","jyanh","jyad","jyal","jyalg","jyalm","jyalb","jyals","jyalt","jyalp","jyalh","jyam","jyab","jyabs","jyas","jyass","jyang","jyaj","jyac","jyak","jyat","jyap","jyah","jyae","jyaeg","jyaegg","jyaegs","jyaen","jyaenj","jyaenh","jyaed","jyael","jyaelg","jyaelm","jyaelb","jyaels","jyaelt","jyaelp","jyaelh","jyaem","jyaeb","jyaebs","jyaes","jyaess","jyaeng","jyaej","jyaec","jyaek","jyaet","jyaep","jyaeh"],200:["jeo","jeog","jeogg","jeogs","jeon","jeonj","jeonh","jeod","jeol","jeolg","jeolm","jeolb","jeols","jeolt","jeolp","jeolh","jeom","jeob","jeobs","jeos","jeoss","jeong","jeoj","jeoc","jeok","jeot","jeop","jeoh","je","jeg","jegg","jegs","jen","jenj","jenh","jed","jel","jelg","jelm","jelb","jels","jelt","jelp","jelh","jem","jeb","jebs","jes","jess","jeng","jej","jec","jek","jet","jep","jeh","jyeo","jyeog","jyeogg","jyeogs","jyeon","jyeonj","jyeonh","jyeod","jyeol","jyeolg","jyeolm","jyeolb","jyeols","jyeolt","jyeolp","jyeolh","jyeom","jyeob","jyeobs","jyeos","jyeoss","jyeong","jyeoj","jyeoc","jyeok","jyeot","jyeop","jyeoh","jye","jyeg","jyegg","jyegs","jyen","jyenj","jyenh","jyed","jyel","jyelg","jyelm","jyelb","jyels","jyelt","jyelp","jyelh","jyem","jyeb","jyebs","jyes","jyess","jyeng","jyej","jyec","jyek","jyet","jyep","jyeh","jo","jog","jogg","jogs","jon","jonj","jonh","jod","jol","jolg","jolm","jolb","jols","jolt","jolp","jolh","jom","job","jobs","jos","joss","jong","joj","joc","jok","jot","jop","joh","jwa","jwag","jwagg","jwags","jwan","jwanj","jwanh","jwad","jwal","jwalg","jwalm","jwalb","jwals","jwalt","jwalp","jwalh","jwam","jwab","jwabs","jwas","jwass","jwang","jwaj","jwac","jwak","jwat","jwap","jwah","jwae","jwaeg","jwaegg","jwaegs","jwaen","jwaenj","jwaenh","jwaed","jwael","jwaelg","jwaelm","jwaelb","jwaels","jwaelt","jwaelp","jwaelh","jwaem","jwaeb","jwaebs","jwaes","jwaess","jwaeng","jwaej","jwaec","jwaek","jwaet","jwaep","jwaeh","joe","joeg","joegg","joegs","joen","joenj","joenh","joed","joel","joelg","joelm","joelb","joels","joelt","joelp","joelh","joem","joeb","joebs","joes","joess","joeng","joej","joec","joek","joet","joep","joeh","jyo","jyog","jyogg","jyogs","jyon","jyonj","jyonh","jyod","jyol","jyolg","jyolm","jyolb","jyols","jyolt","jyolp","jyolh","jyom","jyob","jyobs","jyos","jyoss","jyong","jyoj","jyoc","jyok","jyot","jyop","jyoh","ju","jug","jugg","jugs"],201:["jun","junj","junh","jud","jul","julg","julm","julb","juls","jult","julp","julh","jum","jub","jubs","jus","juss","jung","juj","juc","juk","jut","jup","juh","jweo","jweog","jweogg","jweogs","jweon","jweonj","jweonh","jweod","jweol","jweolg","jweolm","jweolb","jweols","jweolt","jweolp","jweolh","jweom","jweob","jweobs","jweos","jweoss","jweong","jweoj","jweoc","jweok","jweot","jweop","jweoh","jwe","jweg","jwegg","jwegs","jwen","jwenj","jwenh","jwed","jwel","jwelg","jwelm","jwelb","jwels","jwelt","jwelp","jwelh","jwem","jweb","jwebs","jwes","jwess","jweng","jwej","jwec","jwek","jwet","jwep","jweh","jwi","jwig","jwigg","jwigs","jwin","jwinj","jwinh","jwid","jwil","jwilg","jwilm","jwilb","jwils","jwilt","jwilp","jwilh","jwim","jwib","jwibs","jwis","jwiss","jwing","jwij","jwic","jwik","jwit","jwip","jwih","jyu","jyug","jyugg","jyugs","jyun","jyunj","jyunh","jyud","jyul","jyulg","jyulm","jyulb","jyuls","jyult","jyulp","jyulh","jyum","jyub","jyubs","jyus","jyuss","jyung","jyuj","jyuc","jyuk","jyut","jyup","jyuh","jeu","jeug","jeugg","jeugs","jeun","jeunj","jeunh","jeud","jeul","jeulg","jeulm","jeulb","jeuls","jeult","jeulp","jeulh","jeum","jeub","jeubs","jeus","jeuss","jeung","jeuj","jeuc","jeuk","jeut","jeup","jeuh","jyi","jyig","jyigg","jyigs","jyin","jyinj","jyinh","jyid","jyil","jyilg","jyilm","jyilb","jyils","jyilt","jyilp","jyilh","jyim","jyib","jyibs","jyis","jyiss","jying","jyij","jyic","jyik","jyit","jyip","jyih","ji","jig","jigg","jigs","jin","jinj","jinh","jid","jil","jilg","jilm","jilb","jils","jilt","jilp","jilh","jim","jib","jibs","jis","jiss","jing","jij","jic","jik","jit","jip","jih","jja","jjag","jjagg","jjags","jjan","jjanj","jjanh","jjad","jjal","jjalg","jjalm","jjalb","jjals","jjalt","jjalp","jjalh","jjam","jjab","jjabs","jjas","jjass","jjang","jjaj","jjac","jjak","jjat","jjap","jjah","jjae","jjaeg","jjaegg","jjaegs","jjaen","jjaenj","jjaenh","jjaed"],202:["jjael","jjaelg","jjaelm","jjaelb","jjaels","jjaelt","jjaelp","jjaelh","jjaem","jjaeb","jjaebs","jjaes","jjaess","jjaeng","jjaej","jjaec","jjaek","jjaet","jjaep","jjaeh","jjya","jjyag","jjyagg","jjyags","jjyan","jjyanj","jjyanh","jjyad","jjyal","jjyalg","jjyalm","jjyalb","jjyals","jjyalt","jjyalp","jjyalh","jjyam","jjyab","jjyabs","jjyas","jjyass","jjyang","jjyaj","jjyac","jjyak","jjyat","jjyap","jjyah","jjyae","jjyaeg","jjyaegg","jjyaegs","jjyaen","jjyaenj","jjyaenh","jjyaed","jjyael","jjyaelg","jjyaelm","jjyaelb","jjyaels","jjyaelt","jjyaelp","jjyaelh","jjyaem","jjyaeb","jjyaebs","jjyaes","jjyaess","jjyaeng","jjyaej","jjyaec","jjyaek","jjyaet","jjyaep","jjyaeh","jjeo","jjeog","jjeogg","jjeogs","jjeon","jjeonj","jjeonh","jjeod","jjeol","jjeolg","jjeolm","jjeolb","jjeols","jjeolt","jjeolp","jjeolh","jjeom","jjeob","jjeobs","jjeos","jjeoss","jjeong","jjeoj","jjeoc","jjeok","jjeot","jjeop","jjeoh","jje","jjeg","jjegg","jjegs","jjen","jjenj","jjenh","jjed","jjel","jjelg","jjelm","jjelb","jjels","jjelt","jjelp","jjelh","jjem","jjeb","jjebs","jjes","jjess","jjeng","jjej","jjec","jjek","jjet","jjep","jjeh","jjyeo","jjyeog","jjyeogg","jjyeogs","jjyeon","jjyeonj","jjyeonh","jjyeod","jjyeol","jjyeolg","jjyeolm","jjyeolb","jjyeols","jjyeolt","jjyeolp","jjyeolh","jjyeom","jjyeob","jjyeobs","jjyeos","jjyeoss","jjyeong","jjyeoj","jjyeoc","jjyeok","jjyeot","jjyeop","jjyeoh","jjye","jjyeg","jjyegg","jjyegs","jjyen","jjyenj","jjyenh","jjyed","jjyel","jjyelg","jjyelm","jjyelb","jjyels","jjyelt","jjyelp","jjyelh","jjyem","jjyeb","jjyebs","jjyes","jjyess","jjyeng","jjyej","jjyec","jjyek","jjyet","jjyep","jjyeh","jjo","jjog","jjogg","jjogs","jjon","jjonj","jjonh","jjod","jjol","jjolg","jjolm","jjolb","jjols","jjolt","jjolp","jjolh","jjom","jjob","jjobs","jjos","jjoss","jjong","jjoj","jjoc","jjok","jjot","jjop","jjoh","jjwa","jjwag","jjwagg","jjwags","jjwan","jjwanj","jjwanh","jjwad","jjwal","jjwalg","jjwalm","jjwalb","jjwals","jjwalt","jjwalp","jjwalh","jjwam","jjwab","jjwabs","jjwas","jjwass","jjwang","jjwaj","jjwac","jjwak","jjwat","jjwap","jjwah","jjwae","jjwaeg","jjwaegg","jjwaegs","jjwaen","jjwaenj","jjwaenh","jjwaed","jjwael","jjwaelg","jjwaelm","jjwaelb"],203:["jjwaels","jjwaelt","jjwaelp","jjwaelh","jjwaem","jjwaeb","jjwaebs","jjwaes","jjwaess","jjwaeng","jjwaej","jjwaec","jjwaek","jjwaet","jjwaep","jjwaeh","jjoe","jjoeg","jjoegg","jjoegs","jjoen","jjoenj","jjoenh","jjoed","jjoel","jjoelg","jjoelm","jjoelb","jjoels","jjoelt","jjoelp","jjoelh","jjoem","jjoeb","jjoebs","jjoes","jjoess","jjoeng","jjoej","jjoec","jjoek","jjoet","jjoep","jjoeh","jjyo","jjyog","jjyogg","jjyogs","jjyon","jjyonj","jjyonh","jjyod","jjyol","jjyolg","jjyolm","jjyolb","jjyols","jjyolt","jjyolp","jjyolh","jjyom","jjyob","jjyobs","jjyos","jjyoss","jjyong","jjyoj","jjyoc","jjyok","jjyot","jjyop","jjyoh","jju","jjug","jjugg","jjugs","jjun","jjunj","jjunh","jjud","jjul","jjulg","jjulm","jjulb","jjuls","jjult","jjulp","jjulh","jjum","jjub","jjubs","jjus","jjuss","jjung","jjuj","jjuc","jjuk","jjut","jjup","jjuh","jjweo","jjweog","jjweogg","jjweogs","jjweon","jjweonj","jjweonh","jjweod","jjweol","jjweolg","jjweolm","jjweolb","jjweols","jjweolt","jjweolp","jjweolh","jjweom","jjweob","jjweobs","jjweos","jjweoss","jjweong","jjweoj","jjweoc","jjweok","jjweot","jjweop","jjweoh","jjwe","jjweg","jjwegg","jjwegs","jjwen","jjwenj","jjwenh","jjwed","jjwel","jjwelg","jjwelm","jjwelb","jjwels","jjwelt","jjwelp","jjwelh","jjwem","jjweb","jjwebs","jjwes","jjwess","jjweng","jjwej","jjwec","jjwek","jjwet","jjwep","jjweh","jjwi","jjwig","jjwigg","jjwigs","jjwin","jjwinj","jjwinh","jjwid","jjwil","jjwilg","jjwilm","jjwilb","jjwils","jjwilt","jjwilp","jjwilh","jjwim","jjwib","jjwibs","jjwis","jjwiss","jjwing","jjwij","jjwic","jjwik","jjwit","jjwip","jjwih","jjyu","jjyug","jjyugg","jjyugs","jjyun","jjyunj","jjyunh","jjyud","jjyul","jjyulg","jjyulm","jjyulb","jjyuls","jjyult","jjyulp","jjyulh","jjyum","jjyub","jjyubs","jjyus","jjyuss","jjyung","jjyuj","jjyuc","jjyuk","jjyut","jjyup","jjyuh","jjeu","jjeug","jjeugg","jjeugs","jjeun","jjeunj","jjeunh","jjeud","jjeul","jjeulg","jjeulm","jjeulb","jjeuls","jjeult","jjeulp","jjeulh","jjeum","jjeub","jjeubs","jjeus","jjeuss","jjeung","jjeuj","jjeuc","jjeuk","jjeut","jjeup","jjeuh","jjyi","jjyig","jjyigg","jjyigs","jjyin","jjyinj","jjyinh","jjyid","jjyil","jjyilg","jjyilm","jjyilb","jjyils","jjyilt","jjyilp","jjyilh"],204:["jjyim","jjyib","jjyibs","jjyis","jjyiss","jjying","jjyij","jjyic","jjyik","jjyit","jjyip","jjyih","jji","jjig","jjigg","jjigs","jjin","jjinj","jjinh","jjid","jjil","jjilg","jjilm","jjilb","jjils","jjilt","jjilp","jjilh","jjim","jjib","jjibs","jjis","jjiss","jjing","jjij","jjic","jjik","jjit","jjip","jjih","ca","cag","cagg","cags","can","canj","canh","cad","cal","calg","calm","calb","cals","calt","calp","calh","cam","cab","cabs","cas","cass","cang","caj","cac","cak","cat","cap","cah","cae","caeg","caegg","caegs","caen","caenj","caenh","caed","cael","caelg","caelm","caelb","caels","caelt","caelp","caelh","caem","caeb","caebs","caes","caess","caeng","caej","caec","caek","caet","caep","caeh","cya","cyag","cyagg","cyags","cyan","cyanj","cyanh","cyad","cyal","cyalg","cyalm","cyalb","cyals","cyalt","cyalp","cyalh","cyam","cyab","cyabs","cyas","cyass","cyang","cyaj","cyac","cyak","cyat","cyap","cyah","cyae","cyaeg","cyaegg","cyaegs","cyaen","cyaenj","cyaenh","cyaed","cyael","cyaelg","cyaelm","cyaelb","cyaels","cyaelt","cyaelp","cyaelh","cyaem","cyaeb","cyaebs","cyaes","cyaess","cyaeng","cyaej","cyaec","cyaek","cyaet","cyaep","cyaeh","ceo","ceog","ceogg","ceogs","ceon","ceonj","ceonh","ceod","ceol","ceolg","ceolm","ceolb","ceols","ceolt","ceolp","ceolh","ceom","ceob","ceobs","ceos","ceoss","ceong","ceoj","ceoc","ceok","ceot","ceop","ceoh","ce","ceg","cegg","cegs","cen","cenj","cenh","ced","cel","celg","celm","celb","cels","celt","celp","celh","cem","ceb","cebs","ces","cess","ceng","cej","cec","cek","cet","cep","ceh","cyeo","cyeog","cyeogg","cyeogs","cyeon","cyeonj","cyeonh","cyeod","cyeol","cyeolg","cyeolm","cyeolb","cyeols","cyeolt","cyeolp","cyeolh","cyeom","cyeob","cyeobs","cyeos","cyeoss","cyeong","cyeoj","cyeoc","cyeok","cyeot","cyeop","cyeoh","cye","cyeg","cyegg","cyegs","cyen","cyenj","cyenh","cyed","cyel","cyelg","cyelm","cyelb","cyels","cyelt","cyelp","cyelh","cyem","cyeb","cyebs","cyes"],205:["cyess","cyeng","cyej","cyec","cyek","cyet","cyep","cyeh","co","cog","cogg","cogs","con","conj","conh","cod","col","colg","colm","colb","cols","colt","colp","colh","com","cob","cobs","cos","coss","cong","coj","coc","cok","cot","cop","coh","cwa","cwag","cwagg","cwags","cwan","cwanj","cwanh","cwad","cwal","cwalg","cwalm","cwalb","cwals","cwalt","cwalp","cwalh","cwam","cwab","cwabs","cwas","cwass","cwang","cwaj","cwac","cwak","cwat","cwap","cwah","cwae","cwaeg","cwaegg","cwaegs","cwaen","cwaenj","cwaenh","cwaed","cwael","cwaelg","cwaelm","cwaelb","cwaels","cwaelt","cwaelp","cwaelh","cwaem","cwaeb","cwaebs","cwaes","cwaess","cwaeng","cwaej","cwaec","cwaek","cwaet","cwaep","cwaeh","coe","coeg","coegg","coegs","coen","coenj","coenh","coed","coel","coelg","coelm","coelb","coels","coelt","coelp","coelh","coem","coeb","coebs","coes","coess","coeng","coej","coec","coek","coet","coep","coeh","cyo","cyog","cyogg","cyogs","cyon","cyonj","cyonh","cyod","cyol","cyolg","cyolm","cyolb","cyols","cyolt","cyolp","cyolh","cyom","cyob","cyobs","cyos","cyoss","cyong","cyoj","cyoc","cyok","cyot","cyop","cyoh","cu","cug","cugg","cugs","cun","cunj","cunh","cud","cul","culg","culm","culb","culs","cult","culp","culh","cum","cub","cubs","cus","cuss","cung","cuj","cuc","cuk","cut","cup","cuh","cweo","cweog","cweogg","cweogs","cweon","cweonj","cweonh","cweod","cweol","cweolg","cweolm","cweolb","cweols","cweolt","cweolp","cweolh","cweom","cweob","cweobs","cweos","cweoss","cweong","cweoj","cweoc","cweok","cweot","cweop","cweoh","cwe","cweg","cwegg","cwegs","cwen","cwenj","cwenh","cwed","cwel","cwelg","cwelm","cwelb","cwels","cwelt","cwelp","cwelh","cwem","cweb","cwebs","cwes","cwess","cweng","cwej","cwec","cwek","cwet","cwep","cweh","cwi","cwig","cwigg","cwigs","cwin","cwinj","cwinh","cwid","cwil","cwilg","cwilm","cwilb","cwils","cwilt","cwilp","cwilh","cwim","cwib","cwibs","cwis","cwiss","cwing","cwij","cwic"],206:["cwik","cwit","cwip","cwih","cyu","cyug","cyugg","cyugs","cyun","cyunj","cyunh","cyud","cyul","cyulg","cyulm","cyulb","cyuls","cyult","cyulp","cyulh","cyum","cyub","cyubs","cyus","cyuss","cyung","cyuj","cyuc","cyuk","cyut","cyup","cyuh","ceu","ceug","ceugg","ceugs","ceun","ceunj","ceunh","ceud","ceul","ceulg","ceulm","ceulb","ceuls","ceult","ceulp","ceulh","ceum","ceub","ceubs","ceus","ceuss","ceung","ceuj","ceuc","ceuk","ceut","ceup","ceuh","cyi","cyig","cyigg","cyigs","cyin","cyinj","cyinh","cyid","cyil","cyilg","cyilm","cyilb","cyils","cyilt","cyilp","cyilh","cyim","cyib","cyibs","cyis","cyiss","cying","cyij","cyic","cyik","cyit","cyip","cyih","ci","cig","cigg","cigs","cin","cinj","cinh","cid","cil","cilg","cilm","cilb","cils","cilt","cilp","cilh","cim","cib","cibs","cis","ciss","cing","cij","cic","cik","cit","cip","cih","ka","kag","kagg","kags","kan","kanj","kanh","kad","kal","kalg","kalm","kalb","kals","kalt","kalp","kalh","kam","kab","kabs","kas","kass","kang","kaj","kac","kak","kat","kap","kah","kae","kaeg","kaegg","kaegs","kaen","kaenj","kaenh","kaed","kael","kaelg","kaelm","kaelb","kaels","kaelt","kaelp","kaelh","kaem","kaeb","kaebs","kaes","kaess","kaeng","kaej","kaec","kaek","kaet","kaep","kaeh","kya","kyag","kyagg","kyags","kyan","kyanj","kyanh","kyad","kyal","kyalg","kyalm","kyalb","kyals","kyalt","kyalp","kyalh","kyam","kyab","kyabs","kyas","kyass","kyang","kyaj","kyac","kyak","kyat","kyap","kyah","kyae","kyaeg","kyaegg","kyaegs","kyaen","kyaenj","kyaenh","kyaed","kyael","kyaelg","kyaelm","kyaelb","kyaels","kyaelt","kyaelp","kyaelh","kyaem","kyaeb","kyaebs","kyaes","kyaess","kyaeng","kyaej","kyaec","kyaek","kyaet","kyaep","kyaeh","keo","keog","keogg","keogs","keon","keonj","keonh","keod","keol","keolg","keolm","keolb","keols","keolt","keolp","keolh","keom","keob","keobs","keos","keoss","keong","keoj","keoc","keok","keot","keop","keoh"],207:["ke","keg","kegg","kegs","ken","kenj","kenh","ked","kel","kelg","kelm","kelb","kels","kelt","kelp","kelh","kem","keb","kebs","kes","kess","keng","kej","kec","kek","ket","kep","keh","kyeo","kyeog","kyeogg","kyeogs","kyeon","kyeonj","kyeonh","kyeod","kyeol","kyeolg","kyeolm","kyeolb","kyeols","kyeolt","kyeolp","kyeolh","kyeom","kyeob","kyeobs","kyeos","kyeoss","kyeong","kyeoj","kyeoc","kyeok","kyeot","kyeop","kyeoh","kye","kyeg","kyegg","kyegs","kyen","kyenj","kyenh","kyed","kyel","kyelg","kyelm","kyelb","kyels","kyelt","kyelp","kyelh","kyem","kyeb","kyebs","kyes","kyess","kyeng","kyej","kyec","kyek","kyet","kyep","kyeh","ko","kog","kogg","kogs","kon","konj","konh","kod","kol","kolg","kolm","kolb","kols","kolt","kolp","kolh","kom","kob","kobs","kos","koss","kong","koj","koc","kok","kot","kop","koh","kwa","kwag","kwagg","kwags","kwan","kwanj","kwanh","kwad","kwal","kwalg","kwalm","kwalb","kwals","kwalt","kwalp","kwalh","kwam","kwab","kwabs","kwas","kwass","kwang","kwaj","kwac","kwak","kwat","kwap","kwah","kwae","kwaeg","kwaegg","kwaegs","kwaen","kwaenj","kwaenh","kwaed","kwael","kwaelg","kwaelm","kwaelb","kwaels","kwaelt","kwaelp","kwaelh","kwaem","kwaeb","kwaebs","kwaes","kwaess","kwaeng","kwaej","kwaec","kwaek","kwaet","kwaep","kwaeh","koe","koeg","koegg","koegs","koen","koenj","koenh","koed","koel","koelg","koelm","koelb","koels","koelt","koelp","koelh","koem","koeb","koebs","koes","koess","koeng","koej","koec","koek","koet","koep","koeh","kyo","kyog","kyogg","kyogs","kyon","kyonj","kyonh","kyod","kyol","kyolg","kyolm","kyolb","kyols","kyolt","kyolp","kyolh","kyom","kyob","kyobs","kyos","kyoss","kyong","kyoj","kyoc","kyok","kyot","kyop","kyoh","ku","kug","kugg","kugs","kun","kunj","kunh","kud","kul","kulg","kulm","kulb","kuls","kult","kulp","kulh","kum","kub","kubs","kus","kuss","kung","kuj","kuc","kuk","kut","kup","kuh","kweo","kweog","kweogg","kweogs"],208:["kweon","kweonj","kweonh","kweod","kweol","kweolg","kweolm","kweolb","kweols","kweolt","kweolp","kweolh","kweom","kweob","kweobs","kweos","kweoss","kweong","kweoj","kweoc","kweok","kweot","kweop","kweoh","kwe","kweg","kwegg","kwegs","kwen","kwenj","kwenh","kwed","kwel","kwelg","kwelm","kwelb","kwels","kwelt","kwelp","kwelh","kwem","kweb","kwebs","kwes","kwess","kweng","kwej","kwec","kwek","kwet","kwep","kweh","kwi","kwig","kwigg","kwigs","kwin","kwinj","kwinh","kwid","kwil","kwilg","kwilm","kwilb","kwils","kwilt","kwilp","kwilh","kwim","kwib","kwibs","kwis","kwiss","kwing","kwij","kwic","kwik","kwit","kwip","kwih","kyu","kyug","kyugg","kyugs","kyun","kyunj","kyunh","kyud","kyul","kyulg","kyulm","kyulb","kyuls","kyult","kyulp","kyulh","kyum","kyub","kyubs","kyus","kyuss","kyung","kyuj","kyuc","kyuk","kyut","kyup","kyuh","keu","keug","keugg","keugs","keun","keunj","keunh","keud","keul","keulg","keulm","keulb","keuls","keult","keulp","keulh","keum","keub","keubs","keus","keuss","keung","keuj","keuc","keuk","keut","keup","keuh","kyi","kyig","kyigg","kyigs","kyin","kyinj","kyinh","kyid","kyil","kyilg","kyilm","kyilb","kyils","kyilt","kyilp","kyilh","kyim","kyib","kyibs","kyis","kyiss","kying","kyij","kyic","kyik","kyit","kyip","kyih","ki","kig","kigg","kigs","kin","kinj","kinh","kid","kil","kilg","kilm","kilb","kils","kilt","kilp","kilh","kim","kib","kibs","kis","kiss","king","kij","kic","kik","kit","kip","kih","ta","tag","tagg","tags","tan","tanj","tanh","tad","tal","talg","talm","talb","tals","talt","talp","talh","tam","tab","tabs","tas","tass","tang","taj","tac","tak","tat","tap","tah","tae","taeg","taegg","taegs","taen","taenj","taenh","taed","tael","taelg","taelm","taelb","taels","taelt","taelp","taelh","taem","taeb","taebs","taes","taess","taeng","taej","taec","taek","taet","taep","taeh","tya","tyag","tyagg","tyags","tyan","tyanj","tyanh","tyad"],209:["tyal","tyalg","tyalm","tyalb","tyals","tyalt","tyalp","tyalh","tyam","tyab","tyabs","tyas","tyass","tyang","tyaj","tyac","tyak","tyat","tyap","tyah","tyae","tyaeg","tyaegg","tyaegs","tyaen","tyaenj","tyaenh","tyaed","tyael","tyaelg","tyaelm","tyaelb","tyaels","tyaelt","tyaelp","tyaelh","tyaem","tyaeb","tyaebs","tyaes","tyaess","tyaeng","tyaej","tyaec","tyaek","tyaet","tyaep","tyaeh","teo","teog","teogg","teogs","teon","teonj","teonh","teod","teol","teolg","teolm","teolb","teols","teolt","teolp","teolh","teom","teob","teobs","teos","teoss","teong","teoj","teoc","teok","teot","teop","teoh","te","teg","tegg","tegs","ten","tenj","tenh","ted","tel","telg","telm","telb","tels","telt","telp","telh","tem","teb","tebs","tes","tess","teng","tej","tec","tek","tet","tep","teh","tyeo","tyeog","tyeogg","tyeogs","tyeon","tyeonj","tyeonh","tyeod","tyeol","tyeolg","tyeolm","tyeolb","tyeols","tyeolt","tyeolp","tyeolh","tyeom","tyeob","tyeobs","tyeos","tyeoss","tyeong","tyeoj","tyeoc","tyeok","tyeot","tyeop","tyeoh","tye","tyeg","tyegg","tyegs","tyen","tyenj","tyenh","tyed","tyel","tyelg","tyelm","tyelb","tyels","tyelt","tyelp","tyelh","tyem","tyeb","tyebs","tyes","tyess","tyeng","tyej","tyec","tyek","tyet","tyep","tyeh","to","tog","togg","togs","ton","tonj","tonh","tod","tol","tolg","tolm","tolb","tols","tolt","tolp","tolh","tom","tob","tobs","tos","toss","tong","toj","toc","tok","tot","top","toh","twa","twag","twagg","twags","twan","twanj","twanh","twad","twal","twalg","twalm","twalb","twals","twalt","twalp","twalh","twam","twab","twabs","twas","twass","twang","twaj","twac","twak","twat","twap","twah","twae","twaeg","twaegg","twaegs","twaen","twaenj","twaenh","twaed","twael","twaelg","twaelm","twaelb","twaels","twaelt","twaelp","twaelh","twaem","twaeb","twaebs","twaes","twaess","twaeng","twaej","twaec","twaek","twaet","twaep","twaeh","toe","toeg","toegg","toegs","toen","toenj","toenh","toed","toel","toelg","toelm","toelb"],210:["toels","toelt","toelp","toelh","toem","toeb","toebs","toes","toess","toeng","toej","toec","toek","toet","toep","toeh","tyo","tyog","tyogg","tyogs","tyon","tyonj","tyonh","tyod","tyol","tyolg","tyolm","tyolb","tyols","tyolt","tyolp","tyolh","tyom","tyob","tyobs","tyos","tyoss","tyong","tyoj","tyoc","tyok","tyot","tyop","tyoh","tu","tug","tugg","tugs","tun","tunj","tunh","tud","tul","tulg","tulm","tulb","tuls","tult","tulp","tulh","tum","tub","tubs","tus","tuss","tung","tuj","tuc","tuk","tut","tup","tuh","tweo","tweog","tweogg","tweogs","tweon","tweonj","tweonh","tweod","tweol","tweolg","tweolm","tweolb","tweols","tweolt","tweolp","tweolh","tweom","tweob","tweobs","tweos","tweoss","tweong","tweoj","tweoc","tweok","tweot","tweop","tweoh","twe","tweg","twegg","twegs","twen","twenj","twenh","twed","twel","twelg","twelm","twelb","twels","twelt","twelp","twelh","twem","tweb","twebs","twes","twess","tweng","twej","twec","twek","twet","twep","tweh","twi","twig","twigg","twigs","twin","twinj","twinh","twid","twil","twilg","twilm","twilb","twils","twilt","twilp","twilh","twim","twib","twibs","twis","twiss","twing","twij","twic","twik","twit","twip","twih","tyu","tyug","tyugg","tyugs","tyun","tyunj","tyunh","tyud","tyul","tyulg","tyulm","tyulb","tyuls","tyult","tyulp","tyulh","tyum","tyub","tyubs","tyus","tyuss","tyung","tyuj","tyuc","tyuk","tyut","tyup","tyuh","teu","teug","teugg","teugs","teun","teunj","teunh","teud","teul","teulg","teulm","teulb","teuls","teult","teulp","teulh","teum","teub","teubs","teus","teuss","teung","teuj","teuc","teuk","teut","teup","teuh","tyi","tyig","tyigg","tyigs","tyin","tyinj","tyinh","tyid","tyil","tyilg","tyilm","tyilb","tyils","tyilt","tyilp","tyilh","tyim","tyib","tyibs","tyis","tyiss","tying","tyij","tyic","tyik","tyit","tyip","tyih","ti","tig","tigg","tigs","tin","tinj","tinh","tid","til","tilg","tilm","tilb","tils","tilt","tilp","tilh"],
 	211:["tim","tib","tibs","tis","tiss","ting","tij","tic","tik","tit","tip","tih","pa","pag","pagg","pags","pan","panj","panh","pad","pal","palg","palm","palb","pals","palt","palp","palh","pam","pab","pabs","pas","pass","pang","paj","pac","pak","pat","pap","pah","pae","paeg","paegg","paegs","paen","paenj","paenh","paed","pael","paelg","paelm","paelb","paels","paelt","paelp","paelh","paem","paeb","paebs","paes","paess","paeng","paej","paec","paek","paet","paep","paeh","pya","pyag","pyagg","pyags","pyan","pyanj","pyanh","pyad","pyal","pyalg","pyalm","pyalb","pyals","pyalt","pyalp","pyalh","pyam","pyab","pyabs","pyas","pyass","pyang","pyaj","pyac","pyak","pyat","pyap","pyah","pyae","pyaeg","pyaegg","pyaegs","pyaen","pyaenj","pyaenh","pyaed","pyael","pyaelg","pyaelm","pyaelb","pyaels","pyaelt","pyaelp","pyaelh","pyaem","pyaeb","pyaebs","pyaes","pyaess","pyaeng","pyaej","pyaec","pyaek","pyaet","pyaep","pyaeh","peo","peog","peogg","peogs","peon","peonj","peonh","peod","peol","peolg","peolm","peolb","peols","peolt","peolp","peolh","peom","peob","peobs","peos","peoss","peong","peoj","peoc","peok","peot","peop","peoh","pe","peg","pegg","pegs","pen","penj","penh","ped","pel","pelg","pelm","pelb","pels","pelt","pelp","pelh","pem","peb","pebs","pes","pess","peng","pej","pec","pek","pet","pep","peh","pyeo","pyeog","pyeogg","pyeogs","pyeon","pyeonj","pyeonh","pyeod","pyeol","pyeolg","pyeolm","pyeolb","pyeols","pyeolt","pyeolp","pyeolh","pyeom","pyeob","pyeobs","pyeos","pyeoss","pyeong","pyeoj","pyeoc","pyeok","pyeot","pyeop","pyeoh","pye","pyeg","pyegg","pyegs","pyen","pyenj","pyenh","pyed","pyel","pyelg","pyelm","pyelb","pyels","pyelt","pyelp","pyelh","pyem","pyeb","pyebs","pyes","pyess","pyeng","pyej","pyec","pyek","pyet","pyep","pyeh","po","pog","pogg","pogs","pon","ponj","ponh","pod","pol","polg","polm","polb","pols","polt","polp","polh","pom","pob","pobs","pos"],212:["poss","pong","poj","poc","pok","pot","pop","poh","pwa","pwag","pwagg","pwags","pwan","pwanj","pwanh","pwad","pwal","pwalg","pwalm","pwalb","pwals","pwalt","pwalp","pwalh","pwam","pwab","pwabs","pwas","pwass","pwang","pwaj","pwac","pwak","pwat","pwap","pwah","pwae","pwaeg","pwaegg","pwaegs","pwaen","pwaenj","pwaenh","pwaed","pwael","pwaelg","pwaelm","pwaelb","pwaels","pwaelt","pwaelp","pwaelh","pwaem","pwaeb","pwaebs","pwaes","pwaess","pwaeng","pwaej","pwaec","pwaek","pwaet","pwaep","pwaeh","poe","poeg","poegg","poegs","poen","poenj","poenh","poed","poel","poelg","poelm","poelb","poels","poelt","poelp","poelh","poem","poeb","poebs","poes","poess","poeng","poej","poec","poek","poet","poep","poeh","pyo","pyog","pyogg","pyogs","pyon","pyonj","pyonh","pyod","pyol","pyolg","pyolm","pyolb","pyols","pyolt","pyolp","pyolh","pyom","pyob","pyobs","pyos","pyoss","pyong","pyoj","pyoc","pyok","pyot","pyop","pyoh","pu","pug","pugg","pugs","pun","punj","punh","pud","pul","pulg","pulm","pulb","puls","pult","pulp","pulh","pum","pub","pubs","pus","puss","pung","puj","puc","puk","put","pup","puh","pweo","pweog","pweogg","pweogs","pweon","pweonj","pweonh","pweod","pweol","pweolg","pweolm","pweolb","pweols","pweolt","pweolp","pweolh","pweom","pweob","pweobs","pweos","pweoss","pweong","pweoj","pweoc","pweok","pweot","pweop","pweoh","pwe","pweg","pwegg","pwegs","pwen","pwenj","pwenh","pwed","pwel","pwelg","pwelm","pwelb","pwels","pwelt","pwelp","pwelh","pwem","pweb","pwebs","pwes","pwess","pweng","pwej","pwec","pwek","pwet","pwep","pweh","pwi","pwig","pwigg","pwigs","pwin","pwinj","pwinh","pwid","pwil","pwilg","pwilm","pwilb","pwils","pwilt","pwilp","pwilh","pwim","pwib","pwibs","pwis","pwiss","pwing","pwij","pwic","pwik","pwit","pwip","pwih","pyu","pyug","pyugg","pyugs","pyun","pyunj","pyunh","pyud","pyul","pyulg","pyulm","pyulb","pyuls","pyult","pyulp","pyulh","pyum","pyub","pyubs","pyus","pyuss","pyung","pyuj","pyuc"],213:["pyuk","pyut","pyup","pyuh","peu","peug","peugg","peugs","peun","peunj","peunh","peud","peul","peulg","peulm","peulb","peuls","peult","peulp","peulh","peum","peub","peubs","peus","peuss","peung","peuj","peuc","peuk","peut","peup","peuh","pyi","pyig","pyigg","pyigs","pyin","pyinj","pyinh","pyid","pyil","pyilg","pyilm","pyilb","pyils","pyilt","pyilp","pyilh","pyim","pyib","pyibs","pyis","pyiss","pying","pyij","pyic","pyik","pyit","pyip","pyih","pi","pig","pigg","pigs","pin","pinj","pinh","pid","pil","pilg","pilm","pilb","pils","pilt","pilp","pilh","pim","pib","pibs","pis","piss","ping","pij","pic","pik","pit","pip","pih","ha","hag","hagg","hags","han","hanj","hanh","had","hal","halg","halm","halb","hals","halt","halp","halh","ham","hab","habs","has","hass","hang","haj","hac","hak","hat","hap","hah","hae","haeg","haegg","haegs","haen","haenj","haenh","haed","hael","haelg","haelm","haelb","haels","haelt","haelp","haelh","haem","haeb","haebs","haes","haess","haeng","haej","haec","haek","haet","haep","haeh","hya","hyag","hyagg","hyags","hyan","hyanj","hyanh","hyad","hyal","hyalg","hyalm","hyalb","hyals","hyalt","hyalp","hyalh","hyam","hyab","hyabs","hyas","hyass","hyang","hyaj","hyac","hyak","hyat","hyap","hyah","hyae","hyaeg","hyaegg","hyaegs","hyaen","hyaenj","hyaenh","hyaed","hyael","hyaelg","hyaelm","hyaelb","hyaels","hyaelt","hyaelp","hyaelh","hyaem","hyaeb","hyaebs","hyaes","hyaess","hyaeng","hyaej","hyaec","hyaek","hyaet","hyaep","hyaeh","heo","heog","heogg","heogs","heon","heonj","heonh","heod","heol","heolg","heolm","heolb","heols","heolt","heolp","heolh","heom","heob","heobs","heos","heoss","heong","heoj","heoc","heok","heot","heop","heoh","he","heg","hegg","hegs","hen","henj","henh","hed","hel","helg","helm","helb","hels","helt","help","helh","hem","heb","hebs","hes","hess","heng","hej","hec","hek","het","hep","heh"],214:["hyeo","hyeog","hyeogg","hyeogs","hyeon","hyeonj","hyeonh","hyeod","hyeol","hyeolg","hyeolm","hyeolb","hyeols","hyeolt","hyeolp","hyeolh","hyeom","hyeob","hyeobs","hyeos","hyeoss","hyeong","hyeoj","hyeoc","hyeok","hyeot","hyeop","hyeoh","hye","hyeg","hyegg","hyegs","hyen","hyenj","hyenh","hyed","hyel","hyelg","hyelm","hyelb","hyels","hyelt","hyelp","hyelh","hyem","hyeb","hyebs","hyes","hyess","hyeng","hyej","hyec","hyek","hyet","hyep","hyeh","ho","hog","hogg","hogs","hon","honj","honh","hod","hol","holg","holm","holb","hols","holt","holp","holh","hom","hob","hobs","hos","hoss","hong","hoj","hoc","hok","hot","hop","hoh","hwa","hwag","hwagg","hwags","hwan","hwanj","hwanh","hwad","hwal","hwalg","hwalm","hwalb","hwals","hwalt","hwalp","hwalh","hwam","hwab","hwabs","hwas","hwass","hwang","hwaj","hwac","hwak","hwat","hwap","hwah","hwae","hwaeg","hwaegg","hwaegs","hwaen","hwaenj","hwaenh","hwaed","hwael","hwaelg","hwaelm","hwaelb","hwaels","hwaelt","hwaelp","hwaelh","hwaem","hwaeb","hwaebs","hwaes","hwaess","hwaeng","hwaej","hwaec","hwaek","hwaet","hwaep","hwaeh","hoe","hoeg","hoegg","hoegs","hoen","hoenj","hoenh","hoed","hoel","hoelg","hoelm","hoelb","hoels","hoelt","hoelp","hoelh","hoem","hoeb","hoebs","hoes","hoess","hoeng","hoej","hoec","hoek","hoet","hoep","hoeh","hyo","hyog","hyogg","hyogs","hyon","hyonj","hyonh","hyod","hyol","hyolg","hyolm","hyolb","hyols","hyolt","hyolp","hyolh","hyom","hyob","hyobs","hyos","hyoss","hyong","hyoj","hyoc","hyok","hyot","hyop","hyoh","hu","hug","hugg","hugs","hun","hunj","hunh","hud","hul","hulg","hulm","hulb","huls","hult","hulp","hulh","hum","hub","hubs","hus","huss","hung","huj","huc","huk","hut","hup","huh","hweo","hweog","hweogg","hweogs","hweon","hweonj","hweonh","hweod","hweol","hweolg","hweolm","hweolb","hweols","hweolt","hweolp","hweolh","hweom","hweob","hweobs","hweos","hweoss","hweong","hweoj","hweoc","hweok","hweot","hweop","hweoh","hwe","hweg","hwegg","hwegs"],215:["hwen","hwenj","hwenh","hwed","hwel","hwelg","hwelm","hwelb","hwels","hwelt","hwelp","hwelh","hwem","hweb","hwebs","hwes","hwess","hweng","hwej","hwec","hwek","hwet","hwep","hweh","hwi","hwig","hwigg","hwigs","hwin","hwinj","hwinh","hwid","hwil","hwilg","hwilm","hwilb","hwils","hwilt","hwilp","hwilh","hwim","hwib","hwibs","hwis","hwiss","hwing","hwij","hwic","hwik","hwit","hwip","hwih","hyu","hyug","hyugg","hyugs","hyun","hyunj","hyunh","hyud","hyul","hyulg","hyulm","hyulb","hyuls","hyult","hyulp","hyulh","hyum","hyub","hyubs","hyus","hyuss","hyung","hyuj","hyuc","hyuk","hyut","hyup","hyuh","heu","heug","heugg","heugs","heun","heunj","heunh","heud","heul","heulg","heulm","heulb","heuls","heult","heulp","heulh","heum","heub","heubs","heus","heuss","heung","heuj","heuc","heuk","heut","heup","heuh","hyi","hyig","hyigg","hyigs","hyin","hyinj","hyinh","hyid","hyil","hyilg","hyilm","hyilb","hyils","hyilt","hyilp","hyilh","hyim","hyib","hyibs","hyis","hyiss","hying","hyij","hyic","hyik","hyit","hyip","hyih","hi","hig","higg","higs","hin","hinj","hinh","hid","hil","hilg","hilm","hilb","hils","hilt","hilp","hilh","him","hib","hibs","his","hiss","hing","hij","hic","hik","hit","hip","hih",null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null],249:["Kay ","Kayng ","Ke ","Ko ","Kol ","Koc ","Kwi ","Kwi ","Kyun ","Kul ","Kum ","Na ","Na ","Na ","La ","Na ","Na ","Na ","Na ","Na ","Nak ","Nak ","Nak ","Nak ","Nak ","Nak ","Nak ","Nan ","Nan ","Nan ","Nan ","Nan ","Nan ","Nam ","Nam ","Nam ","Nam ","Nap ","Nap ","Nap ","Nang ","Nang ","Nang ","Nang ","Nang ","Nay ","Nayng ","No ","No ","No ","No ","No ","No ","No ","No ","No ","No ","No ","No ","Nok ","Nok ","Nok ","Nok ","Nok ","Nok ","Non ","Nong ","Nong ","Nong ","Nong ","Noy ","Noy ","Noy ","Noy ","Nwu ","Nwu ","Nwu ","Nwu ","Nwu ","Nwu ","Nwu ","Nwu ","Nuk ","Nuk ","Num ","Nung ","Nung ","Nung ","Nung ","Nung ","Twu ","La ","Lak ","Lak ","Lan ","Lyeng ","Lo ","Lyul ","Li ","Pey ","Pen ","Pyen ","Pwu ","Pwul ","Pi ","Sak ","Sak ","Sam ","Sayk ","Sayng ","Sep ","Sey ","Sway ","Sin ","Sim ","Sip ","Ya ","Yak ","Yak ","Yang ","Yang ","Yang ","Yang ","Yang ","Yang ","Yang ","Yang ","Ye ","Ye ","Ye ","Ye ","Ye ","Ye ","Ye ","Ye ","Ye ","Ye ","Ye ","Yek ","Yek ","Yek ","Yek ","Yen ","Yen ","Yen ","Yen ","Yen ","Yen ","Yen ","Yen ","Yen ","Yen ","Yen ","Yen ","Yen ","Yen ","Yel ","Yel ","Yel ","Yel ","Yel ","Yel ","Yem ","Yem ","Yem ","Yem ","Yem ","Yep ","Yeng ","Yeng ","Yeng ","Yeng ","Yeng ","Yeng ","Yeng ","Yeng ","Yeng ","Yeng ","Yeng ","Yeng ","Yeng ","Yey ","Yey ","Yey ","Yey ","O ","Yo ","Yo ","Yo ","Yo ","Yo ","Yo ","Yo ","Yo ","Yo ","Yo ","Yong ","Wun ","Wen ","Yu ","Yu ","Yu ","Yu ","Yu ","Yu ","Yu ","Yu ","Yu ","Yu ","Yuk ","Yuk ","Yuk ","Yun ","Yun ","Yun ","Yun ","Yul ","Yul ","Yul ","Yul ","Yung ","I ","I ","I ","I ","I ","I ","I ","I ","I ","I ","I ","I ","I ","I ","Ik ","Ik ","In ","In ","In ","In ","In ","In ","In ","Im ","Im ","Im ","Ip ","Ip ","Ip ","Cang ","Cek ","Ci ","Cip ","Cha ","Chek "],250:["Chey ","Thak ","Thak ","Thang ","Thayk ","Thong ","Pho ","Phok ","Hang ","Hang ","Hyen ","Hwak ","Wu ","Huo ",null,null,"Zhong ",null,"Qing ",null,null,"Xi ","Zhu ","Yi ","Li ","Shen ","Xiang ","Fu ","Jing ","Jing ","Yu ",null,"Hagi ",null,"Zhu ",null,null,"Yi ","Du ",null,null,null,"Fan ","Si ","Guan ",null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null],251:["ff","fi","fl","ffi","ffl","st","st",null,null,null,null,null,null,null,null,null,null,null,null,"mn","me","mi","vn","mkh",null,null,null,null,null,"yi","","ay","`","","d","h","k","l","m","m","t","+","sh","s","sh","s","a","a","","b","g","d","h","v","z",null,"t","y","k","k","l",null,"l",null,"n","n",null,"p","p",null,"ts","ts","r","sh","t","vo","b","k","p","l","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","",null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,"","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","",""],252:["","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","",""],253:["","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","",null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,"","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","",null,null,"","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","",null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,"","","","","","","","","","","","",null,null,null,null],254:[null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,"","","","~",null,null,null,null,null,null,null,null,null,null,null,null,"..","--","-","_","_","(",") ","{","} ","[","] ","[(",")] ","<<",">> ","<","> ","[","] ","{","}",null,null,null,null,"","","","","","","",",",",",".","",";",":","?","!","-","(",")","{","}","{","}","#","&","*","+","-","<",">","=","","\\","$","%","@",null,null,null,null,"","","",null,"",null,"","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","","",null,null,""],255:[null,"!",'"',"#","$","%","&","'","(",")","*","+",",","-",".","/","0","1","2","3","4","5","6","7","8","9",":",";","<","=",">","?","@","A","B","C","D","E","F","G","H","I","J","K","L","M","N","O","P","Q","R","S","T","U","V","W","X","Y","Z","[","\\","]","^","_","`","a","b","c","d","e","f","g","h","i","j","k","l","m","n","o","p","q","r","s","t","u","v","w","x","y","z","{","|","}","~",null,null,".","[","]",",","*","wo","a","i","u","e","o","ya","yu","yo","tu","+","a","i","u","e","o","ka","ki","ku","ke","ko","sa","si","su","se","so","ta","ti","tu","te","to","na","ni","nu","ne","no","ha","hi","hu","he","ho","ma","mi","mu","me","mo","ya","yu","yo","ra","ri","ru","re","ro","wa","n",":",";","","g","gg","gs","n","nj","nh","d","dd","r","lg","lm","lb","ls","lt","lp","rh","m","b","bb","bs","s","ss","","j","jj","c","k","t","p","h",null,null,null,"a","ae","ya","yae","eo","e",null,null,"yeo","ye","o","wa","wae","oe",null,null,"yo","u","weo","we","wi","yu",null,null,"eu","yi","i",null,null,null,"/C","PS","!","-","|","Y=","W=",null,"|","-","|","-","|","#","O",null,null,null,null,null,null,null,null,null,null,"{","|","}","","","",""]}},{}],2:[function(n,u,a){"use strict";var i="function"==typeof Symbol&&"symbol"==typeof Symbol.iterator?function(n){return typeof n}:function(n){return n&&"function"==typeof Symbol&&n.constructor===Symbol&&n!==Symbol.prototype?"symbol":typeof n},e=n("./"),l=n("../../data/charmap.json"),o=function(n){return n&&n.__esModule?n:{default:n}}(l);e.transliterate.setCharmap(o.default);var g=function(n){var u=n;u.transl=e.transliterate,u.slugify=e.slugify,u.transl.noConflict=function(){var n=u.transl;return delete u.transl,n},u.slugify.noConflict=function(){var n=e.slugify;return delete u.slugify,n}};try{"function"==typeof define&&define.amd?(define("transliterate",function(){return e.transliterate}),define("slugify",function(){return e.slugify})):"undefined"!=typeof window&&"object"===i(window.document)?g(window):"undefined"!=typeof WorkerGlobalScope&&"undefined"!=typeof self&&g(self)}catch(n){}void 0!==u&&u.exports&&(u.exports={transliterate:e.transliterate,slugify:e.slugify})},{"../../data/charmap.json":1,"./":3}],3:[function(n,u,a){"use strict";function i(n){return n&&n.__esModule?n:{default:n}}Object.defineProperty(a,"__esModule",{value:!0}),a.slugify=a.transliterate=void 0;var e=n("./transliterate"),l=i(e),o=n("./slugify"),g=i(o);a.transliterate=l.default,a.slugify=g.default},{"./slugify":4,"./transliterate":5}],4:[function(n,u,a){"use strict";Object.defineProperty(a,"__esModule",{value:!0});var i=n("./transliterate"),e=function(n){return n&&n.__esModule?n:{default:n}}(i),l=n("./utils"),o={lowercase:!0,separator:"-",replace:[],replaceAfter:[],ignore:[]},g={},h=function(n,u){var a=u?(0,l.mergeOptions)(o,u):(0,l.mergeOptions)(o,g),i=(0,l.escapeRegExp)(a.separator);a.replaceAfter.push([/[^a-zA-Z0-9]+/g,a.separator],[new RegExp("^("+i+")+|("+i+")+$","g"),""]);var h={replaceAfter:a.replaceAfter,replace:a.replace,ignore:a.ignore},s=(0,e.default)(n,h);return a.lowercase&&(s=s.toLowerCase()),s};h.config=function(n){return void 0===n?g:g=(0,l.mergeOptions)(o,n)},a.default=h,u.exports=a.default},{"./transliterate":5,"./utils":6}],5:[function(n,u,a){"use strict";Object.defineProperty(a,"__esModule",{value:!0}),a.replaceStr=void 0;var i=n("./utils"),e=n("../../data/charmap.json"),l=function(n){return n&&n.__esModule?n:{default:n}}(e),o={},g={unknown:"[?]",replace:[],replaceAfter:[],ignore:[],trim:!0},h={},s=a.replaceStr=function(n,u){var a=n,e=!0,l=!1,o=void 0;try{for(var g,h=u[Symbol.iterator]();!(e=(g=h.next()).done);e=!0){var s=g.value;s[0]instanceof RegExp?s[0].global||(s[0]=new RegExp(s[0].toString().replace(/^\/|\/$/),s[0].flags+"g")):"string"==typeof s[0]&&(s[0]=new RegExp((0,i.escapeRegExp)(s[0]),"g")),s[0]instanceof RegExp&&(a=a.replace(s[0],s[1]))}}catch(n){l=!0,o=n}finally{try{!e&&h.return&&h.return()}finally{if(l)throw o}}return a},y=function n(u,a){var e=a?(0,i.mergeOptions)(g,a):(0,i.mergeOptions)(g,h),y=String(u),b=void 0,w=void 0,d=void 0,j=void 0,t=void 0,Y=void 0;if(e.ignore instanceof Array&&e.ignore.length>0)for(b in e.ignore){d=y.split(e.ignore[b]),j=[];for(w in d)t=e.ignore.slice(0),t.splice(b,1),j.push(n(d[w],(0,i.mergeOptions)(e,{ignore:t,trim:!1})));return j.join(e.ignore[b])}y=s(y,e.replace),y=(0,i.fixChineseSpace)(y);var p=(0,i.ucs2decode)(y),m=[],Z=!0,L=!1,J=void 0;try{for(var r,S=p[Symbol.iterator]();!(Z=(r=S.next()).done);Z=!0)if((Y=r.value)>65535)m.push(e.unknown);else{var C=Y>>8;void 0===o[C]&&(o[C]=l.default[C]||[]),Y&=255;var c=o[C][Y];void 0===c||null===c?m.push(e.unknown):m.push(o[C][Y])}}catch(n){L=!0,J=n}finally{try{!Z&&S.return&&S.return()}finally{if(L)throw J}}e.trim&&m.length>1&&e.replaceAfter.push([/(^ +?)|( +?$)/g,""]);var k=m.join("");return k=s(k,e.replaceAfter)};y.setCharmap=function(n){return o=n||o},y.config=function(n){return void 0===n?h:h=(0,i.mergeOptions)(g,n)},a.default=y},{"../../data/charmap.json":1,"./utils":6}],6:[function(n,u,a){"use strict";Object.defineProperty(a,"__esModule",{value:!0});var i="function"==typeof Symbol&&"symbol"==typeof Symbol.iterator?function(n){return typeof n}:function(n){return n&&"function"==typeof Symbol&&n.constructor===Symbol&&n!==Symbol.prototype?"symbol":typeof n};a.ucs2decode=function(n){for(var u=[],a=0;a<n.length;){var i=n.charCodeAt(a++);if(i>=55296&&i<=56319&&a<n.length){var e=n.charCodeAt(a++);56320==(64512&e)?u.push(((1023&i)<<10)+(1023&e)+65536):(u.push(i),a--)}else u.push(i)}return u},a.fixChineseSpace=function(n){return n.replace(/([^\u4e00-\u9fa5\W])([\u4e00-\u9fa5])/g,"$1 $2")},a.escapeRegExp=function(n){var u=n;return null!==u&&void 0!==u||(u=""),u.replace(/[\-\[\]\/\{\}\(\)\*\+\?\.\\\^\$\|]/g,"\\$&")},a.mergeOptions=function(n,u){var a={},e=u||{};for(var l in n)if(a[l]=void 0===e[l]?n[l]:e[l],a[l]instanceof Array&&(a[l]=a[l].slice(0)),"replace"===l&&"object"===i(a[l])&&!(a[l]instanceof Array)){var o=[];for(var g in a.replace)o.push([g,a.replace[g]]);a.replace=o}return a},a.parseCmdEqualOption=function(n){for(var u=n||{},a="__REPLACE_TOKEN__",i=void 0;u.indexOf(a)>-1;)a+=a;return u.match(/[^\\]\\\\=/)?u=u.replace(/([^\\])\\\\=/g,"$1\\="):u.match(/[^\\]\\=/)&&(u=u.replace(/([^\\])\\=/g,"$1"+a)),i=u.split("=").map(function(n){return n.replace(new RegExp(a,"g"),"=")}),2!==i.length&&(i=!1),i}},{}]},{},[2]);
-/*!
- * tablesort v4.0.1 (2016-07-23)
- * http://tristen.ca/tablesort/demo/
- * Copyright (c) 2016 ; Licensed MIT
- */!function(){function a(b,c){if(!(this instanceof a))return new a(b,c);if(!b||"TABLE"!==b.tagName)throw new Error("Element must be a table");this.init(b,c||{})}var b=[],c=function(a){var b;return window.CustomEvent&&"function"==typeof window.CustomEvent?b=new CustomEvent(a):(b=document.createEvent("CustomEvent"),b.initCustomEvent(a,!1,!1,void 0)),b},d=function(a){return a.getAttribute("data-sort")||a.textContent||a.innerText||""},e=function(a,b){return a=a.toLowerCase(),b=b.toLowerCase(),a===b?0:b>a?1:-1},f=function(a,b){return function(c,d){var e=a(c.td,d.td);return 0===e?b?d.index-c.index:c.index-d.index:e}};a.extend=function(a,c,d){if("function"!=typeof c||"function"!=typeof d)throw new Error("Pattern and sort must be a function");b.push({name:a,pattern:c,sort:d})},a.prototype={init:function(a,b){var c,d,e,f,g=this;if(g.table=a,g.thead=!1,g.options=b,a.rows&&a.rows.length>0)if(a.tHead&&a.tHead.rows.length>0){for(e=0;e<a.tHead.rows.length;e++)if(a.tHead.rows[e].classList.contains("sort-row")){c=a.tHead.rows[e];break}c||(c=a.tHead.rows[a.tHead.rows.length-1]),g.thead=!0}else c=a.rows[0];if(c){var h=function(){g.current&&g.current!==this&&(g.current.classList.remove("sort-up"),g.current.classList.remove("sort-down")),g.current=this,g.sortTable(this)};for(e=0;e<c.cells.length;e++)f=c.cells[e],f.classList.contains("no-sort")||(f.classList.add("sort-header"),f.tabindex=0,f.addEventListener("click",h,!1),f.classList.contains("sort-default")&&(d=f));d&&(g.current=d,g.sortTable(d))}},sortTable:function(a,g){var h,i=this,j=a.cellIndex,k=e,l="",m=[],n=i.thead?0:1,o=a.getAttribute("data-sort-method"),p=a.getAttribute("data-sort-order");if(i.table.dispatchEvent(c("beforeSort")),g?h=a.classList.contains("sort-up")?"sort-up":"sort-down":(h=a.classList.contains("sort-up")?"sort-down":a.classList.contains("sort-down")?"sort-up":"asc"===p?"sort-down":"desc"===p?"sort-up":i.options.descending?"sort-up":"sort-down",a.classList.remove("sort-down"===h?"sort-up":"sort-down"),a.classList.add(h)),!(i.table.rows.length<2)){if(!o){for(;m.length<3&&n<i.table.tBodies[0].rows.length;)l=d(i.table.tBodies[0].rows[n].cells[j]),l=l.trim(),l.length>0&&m.push(l),n++;if(!m)return}for(n=0;n<b.length;n++)if(l=b[n],o){if(l.name===o){k=l.sort;break}}else if(m.every(l.pattern)){k=l.sort;break}for(i.col=j,n=0;n<i.table.tBodies.length;n++){var q,r=[],s={},t=0,u=0;if(!(i.table.tBodies[n].rows.length<2)){for(q=0;q<i.table.tBodies[n].rows.length;q++)l=i.table.tBodies[n].rows[q],l.classList.contains("no-sort")?s[t]=l:r.push({tr:l,td:d(l.cells[i.col]),index:t}),t++;for("sort-down"===h?(r.sort(f(k,!0)),r.reverse()):r.sort(f(k,!1)),q=0;t>q;q++)s[q]?(l=s[q],u++):l=r[q-u].tr,i.table.tBodies[n].appendChild(l)}}i.table.dispatchEvent(c("afterSort"))}},refresh:function(){void 0!==this.current&&this.sortTable(this.current,!0)}},"undefined"!=typeof module&&module.exports?module.exports=a:window.Tablesort=a}();
-/**
- * @requires tablesort.min.js
- */
-// Basic dates in dd/mm/yy or dd-mm-yy format.
-// Years can be 4 digits. Days and Months can be 1 or 2 digits.
-(function(){
-	var parseDate = function(date) {
-		date = date.replace(/\-/g, '/');
-		date = date.replace(/(\d{1,2})[\/\-](\d{1,2})[\/\-](\d{2})/, '$1/$2/$3'); // format before getTime
-		
-		return new Date(date).getTime() || -1;
-	};
-	
-	Tablesort.extend('date', function(item) {
-		return (
-				item.search(/(Mon|Tue|Wed|Thu|Fri|Sat|Sun)\.?\,?\s*/i) !== -1 ||
-				item.search(/\d{1,2}[\/\-]\d{1,2}[\/\-]\d{2,4}/) !== -1 ||
-				item.search(/(Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec)/i) !== -1
-			) && !isNaN(parseDate(item));
-	}, function(a, b) {
-		a = a.toLowerCase();
-		b = b.toLowerCase();
-		
-		return parseDate(b) - parseDate(a);
-	});
-}());
-(function(){
-	var cleanNumber = function(i) {
-			return i.replace(/[^\-?0-9.]/g, '');
-		},
-		
-		compareNumber = function(a, b) {
-			a = parseFloat(a);
-			b = parseFloat(b);
-			
-			a = isNaN(a) ? 0 : a;
-			b = isNaN(b) ? 0 : b;
-			
-			return a - b;
-		};
-	
-	Tablesort.extend('number', function(item) {
-		return item.match(/^-?[£\x24Û¢´€]?\d+\s*([,\.]\d{0,2})/) || // Prefixed currency
-			item.match(/^-?\d+\s*([,\.]\d{0,2})?[£\x24Û¢´€]/) || // Suffixed currency
-			item.match(/^-?(\d)*-?([,\.]){0,1}-?(\d)+([E,e][\-+][\d]+)?%?$/); // Number
-	}, function(a, b) {
-		a = cleanNumber(a);
-		b = cleanNumber(b);
-		
-		return compareNumber(b, a);
-	});
-}());

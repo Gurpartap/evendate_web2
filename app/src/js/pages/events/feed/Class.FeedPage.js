@@ -124,7 +124,7 @@ FeedPage = extending(Page, (function() {
 		PAGE.block_scroll = true;
 		
 		return PAGE.events.fetchFeed(this.fields, this.next_events_length, {city_id: __APP.USER.selected_city.id}, function(events) {
-			var $events = __APP.BUILD.eventCards(PAGE.events.last_pushed);
+			var $events = __APP.BUILD.eventCards(PAGE.events.__last_pushed);
 			
 			PAGE.block_scroll = false;
 			if ($events.length) {

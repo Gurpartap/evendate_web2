@@ -180,7 +180,7 @@ AdminEventSalesPage = extending(AdminEventPage, (function() {
 					enabled: false
 				}
 			},
-			$charts;
+			$charts = $();
 		
 		if (this.event.ticketing_locally) {
 			$charts = tmpl('admin-event-sales-chart', {

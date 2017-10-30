@@ -158,28 +158,35 @@ b.-transform_uppercase,
 p.-transform_uppercase,
 span.-transform_uppercase,
 small.-transform_uppercase,
-label.-transform_uppercase {text-transform: uppercase}
+label.-transform_uppercase {text-transform: uppercase !important}
+
+a.-line_through,
+b.-line_through,
+p.-line_through,
+span.-line_through,
+small.-line_through,
+label.-line_through {text-decoration: line-through !important}
 
 a.-font_weight_lighter,
 p.-font_weight_lighter,
 span.-font_weight_lighter,
 small.-font_weight_lighter,
 label.-font_weight_lighter,
-button.-font_weight_lighter {font-weight: 400}
+button.-font_weight_lighter {font-weight: 400 !important}
 
 a.-font_weight_bolder,
 p.-font_weight_bolder,
 span.-font_weight_bolder,
 small.-font_weight_bolder,
 label.-font_weight_bolder,
-button.-font_weight_bolder {font-weight: 500}
+button.-font_weight_bolder {font-weight: 500 !important}
 
 a.-font_weight_bold,
 p.-font_weight_bold,
 span.-font_weight_bold,
 small.-font_weight_bold,
 label.-font_weight_bold,
-button.-font_weight_bold {font-weight: 600}
+button.-font_weight_bold {font-weight: 600 !important}
 
 
 @supports (--custom_properties: 1) {
@@ -500,8 +507,8 @@ a.-odd:focus {text-decoration: none}
 .action,
 .button,
 .counter,
-.form_radio + .form_label,
-.form_checkbox + .form_label,
+.form_radio_wrapper > .form_label,
+.form_checkbox_wrapper > .form_label,
 form:disabled,
 fieldset:disabled,
 .-unselectable {
@@ -692,8 +699,8 @@ table {
 
 .-unite > *:not(:last-child) {border-right: 0}
 .-unite > *:not(:first-child):not(:last-child) {border-radius: 0}
-.-unite > :first-child {border-radius: 3px 0 0 3px}
-.-unite > :last-child {border-radius: 0 3px 3px 0}
+.-unite > :first-child {border-radius: 2px 0 0 2px}
+.-unite > :last-child {border-radius: 0 2px 2px 0}
 
 .-unite > .button {
 	padding: 0;
@@ -1236,6 +1243,8 @@ table {
 	border-radius: 50px;
 }
 .button.-no_uppercase {text-transform: none}
+
+.button:not(.-size_wide) + .button:not(.-size_wide) {margin-left: 1em}
 
 a.button {line-height: 30px}
 a.button.-size_low {line-height: 1.88rem}
@@ -3303,7 +3312,9 @@ fieldset:disabled .form_select {cursor: default}
 .form {margin: 0 auto}
 
 .form_unit {margin-bottom: 1rem}
+span.form_unit {display: inline-block}
 
+.form_unit:not(:first-child) {margin-top: 1rem}
 .form_unit:last-child {margin-bottom: 0}
 .form_unit:only-child {margin: 0}
 
@@ -3327,6 +3338,8 @@ fieldset:disabled .form_select {cursor: default}
 }
 
 .form_label > label {margin-bottom: 0}
+
+.form_label:empty {margin: 0}
 
 .form_text {
 	font-size: 14px;
@@ -3359,7 +3372,6 @@ fieldset:disabled .form_select {cursor: default}
 }
 
 .form_input:not([size]),
-.form_select,
 .form_textarea {width: 100%}
 
 .form_input + .form_helptext,
@@ -3424,6 +3436,8 @@ fieldset:disabled .form_select {cursor: default}
 	cursor: pointer;
 }
 
+.form_select.-size_wide {width: 100%}
+
 .form_fieldset {
 	padding: 12px 24px;
 }
@@ -3450,17 +3464,63 @@ fieldset:disabled .form_select {cursor: default}
 	font-family: FontAwesome;
 }
 
-/* Form DatePicker */
+.form_input_group {
+	display: flex;
+}
+
+span.form_input_group {display: inline-flex}
+
+.form_input_group > .form_input {order: 2}
+.form_input_group > .form_input:only-child {border-radius: 2px}
+.form_input_group > .form_input:not(:first-child) {
+	border-top-left-radius: 0;
+	border-bottom-left-radius: 0;
+	border-left: 0;
+	padding-left: 0;
+}
+.form_input_group > .form_input:not(:last-child) {
+	border-top-right-radius: 0;
+	border-bottom-right-radius: 0;
+	border-right: 0;
+	padding-right: 0;
+}
+
+.form_input_group_after,
+.form_input_group_before {
+	display: flex;
+	align-items: center;
+	padding: 0 4px;
+	font-size: 1em;
+	background-color: #fff;
+	border: 1px solid #4a4a4a;
+	transition: background_color .2s ease, border .2s ease, box-shadow .2s ease, height .2s ease;
+}
+
+select.form_input_group_after,
+select.form_input_group_before {cursor: pointer}
+.form_input_group_after {border-left: 0}
+.form_input_group_before {border-right: 0}
+.form_input_group_before:first-child {border-radius: 2px 0 0 2px}
+.form_input_group_after:last-child {border-radius: 0 2px 2px 0}
+
+:not(.form_input_group_before) + .form_input_group_before {order: 0}
+.form_input_group_before + .form_input_group_before {order: 1}
+:not(.form_input_group_after) + .form_input_group_after {order: 3}
+.form_input_group_after + .form_input_group_after {order: 4}
+
+:not(.-status_disabled) .form_input:not(:disabled):not(.-status_disabled):focus + .form_input_group_after {border-color: #00dc88}
+
+
+	/* Form DatePicker */
 
 
 .form_datepicker {
-	display: flex;
+	display: inline-flex;
 	align-items: center;
-	flex-grow: 0;
-	width: 200px;
+	min-width: 120px;
 	cursor: pointer;
 
-	padding: 0 24px 0 .6rem;
+	padding: 0 calc(.6rem * 2 + 13px) 0 .6rem;
 	font-size: .9rem;
 	line-height: normal;
 
@@ -3481,6 +3541,8 @@ fieldset:disabled .form_select {cursor: default}
 	margin: auto .5rem;
 	font-family: FontAwesome;
 }
+
+.form_datepicker.-size_wide {display: flex}
 
 /* /Form DatePicker */
 /* Form Select2 */
@@ -3614,8 +3676,8 @@ fieldset:disabled .form_select {cursor: default}
 .form_unit > input[type="radio"],
 .form_unit > input[type="checkbox"] {display: none}
 
-.form_radio + .form_label,
-.form_checkbox + .form_label {
+.form_radio_wrapper > .form_label,
+.form_checkbox_wrapper > .form_label {
 	line-height: 1;
 	margin-bottom: 0;
 	font-weight: normal;
@@ -3625,58 +3687,72 @@ fieldset:disabled .form_select {cursor: default}
 .form_radio:not(:disabled) + .form_label,
 .form_checkbox:not(:disabled) + .form_label {cursor: pointer}
 
-.form_radio + .form_label > span,
-.form_checkbox + .form_label > span {
+.form_radio_wrapper > .form_label > span,
+.form_checkbox_wrapper > .form_label > span {
 	display: inline-block;
 	vertical-align: middle;
 	width: calc(100% - 20px - 10px);
-	margin-left: 10px;
-	font-size: .9em;
 	line-height: 1;
 	text-align: left;
 	white-space: normal;
 }
 
-.form_radio + .form_label:before,
-.form_checkbox + .form_label:before {
+.form_radio_wrapper:not(.-reverse) > .form_label > span,
+.form_checkbox_wrapper:not(.-reverse) > .form_label > span {margin-left: 10px}
+.form_radio_wrapper.-reverse > .form_label > span,
+.form_checkbox_wrapper.-reverse > .form_label > span {margin-right: 10px}
+
+.form_radio_wrapper:not(.-reverse) > .form_label:before,
+.form_checkbox_wrapper:not(.-reverse) > .form_label:before,
+.form_radio_wrapper.-reverse > .form_label:after,
+.form_checkbox_wrapper.-reverse > .form_label:after {
 	content: "";
 	display: inline-block;
-	vertical-align: middle;
 	width: 20px;
 	height: 20px;
 	border: 1px solid;
 	border-radius: 2px;
 	box-sizing: border-box;
 }
-.form_radio + .form_label:before {border-radius: 1rem}
 
-.form_checkbox + .form_label:after {
+.form_radio_wrapper:not(.-reverse) > .form_label:before,
+.form_radio_wrapper.-reverse > .form_label:after {border-radius: 1rem}
+
+.form_radio_wrapper:not(.-reverse) > .form_label:after,
+.form_checkbox_wrapper:not(.-reverse) > .form_label:after,
+.form_radio_wrapper.-reverse > .form_label:before,
+.form_checkbox_wrapper.-reverse > .form_label:before {
 	content: "";
 	position: absolute;
 	top: 0;
-	left: 0;
 	bottom: 0;
 	display: inline-block;
+}
+
+.form_radio_wrapper.-reverse > .form_label:after,
+.form_checkbox_wrapper.-reverse > .form_label:after,
+.form_radio_wrapper:not(.-reverse) > .form_label:before,
+.form_checkbox_wrapper:not(.-reverse) > .form_label:before {vertical-align: middle}
+
+.form_radio_wrapper:not(.-reverse) > .form_label:after,
+.form_checkbox_wrapper:not(.-reverse) > .form_label:after {left: 0}
+
+.form_radio_wrapper.-reverse > .form_label:before {right: 0}
+.form_checkbox_wrapper.-reverse > .form_label:before {right: 3px}
+
+.form_checkbox_wrapper:not(.-reverse) > .form_label:after,
+.form_checkbox_wrapper.-reverse > .form_label:before {
 	width: 13px;
 	height: 6px;
 	margin: auto 2px;
 	border-left: 2px solid transparent;
 	border-bottom: 2px solid transparent;
-	-webkit-transform: rotate(-45deg);
-	-moz-transform: rotate(-45deg);
-	-ms-transform: rotate(-45deg);
-	-o-transform: rotate(-45deg);
 	transform: rotate(-45deg);
 	transform-origin: top center;
 	box-sizing: border-box;
 }
-.form_radio + .form_label:after {
-	content: "";
-	position: absolute;
-	top: 0;
-	left: 0;
-	bottom: 0;
-	display: inline-block;
+.form_radio_wrapper:not(.-reverse) > .form_label:after,
+.form_radio_wrapper.-reverse > .form_label:before {
 	width: 10px;
 	height: 10px;
 	border-radius: 50%;
@@ -3684,14 +3760,20 @@ fieldset:disabled .form_select {cursor: default}
 	background-color: transparent;
 }
 
-.form_radio:checked + .form_label:before,
-.form_radio:not(:disabled) + .form_label:hover:before,
-.form_checkbox:not(:disabled) + .form_label:hover:before {border: 2px solid}
+.form_radio_wrapper:not(.-reverse) > .form_radio:checked + .form_label:before,
+.form_radio_wrapper:not(.-reverse) > .form_radio:not(:disabled) + .form_label:hover:before,
+.form_checkbox_wrapper:not(.-reverse) > .form_checkbox:not(:disabled) + .form_label:hover:before,
+.form_radio_wrapper.-reverse > .form_radio:checked + .form_label:after,
+.form_radio_wrapper.-reverse > .form_radio:not(:disabled) + .form_label:hover:after,
+.form_checkbox_wrapper.-reverse > .form_checkbox:not(:disabled) + .form_label:hover:after {border: 2px solid}
 
-.form_unit > .form_checkbox:checked + .form_label:before {border: 0}
+.form_checkbox_wrapper:not(.-reverse) > .form_checkbox:checked + .form_label:before,
+.form_checkbox_wrapper.-reverse > .form_checkbox:checked + .form_label:after {border: 0}
 
-.form_unit > .form_radio:checked + .form_label:after,
-.form_unit > .form_checkbox:checked + .form_label:after {border-color: #fff}
+.form_radio_wrapper:not(.-reverse) > .form_radio:checked + .form_label:after,
+.form_checkbox_wrapper:not(.-reverse) > .form_checkbox:checked + .form_label:after,
+.form_radio_wrapper.-reverse > .form_radio:checked + .form_label:before,
+.form_checkbox_wrapper.-reverse > .form_checkbox:checked + .form_label:before {border-color: #fff}
 
 /* /Form Radio & Checkbox */
 /* Form Radio Group */
@@ -3840,6 +3922,7 @@ fieldset:disabled .form_select {cursor: default}
 .form_group > .form_unit {
 	display: inline-block;
 	vertical-align: top;
+	margin-top: 0;
 	margin-bottom: 0;
 }
 .form_group > .form_unit + .form_unit {margin-left: 16px}
@@ -4057,8 +4140,8 @@ fieldset:disabled .form_select {cursor: default}
 
 
 
-.form_group > .form_unit > .form_radio + .form_label,
-.form_group > .form_unit > .form_checkbox + .form_label {margin: 7px 0}
+.form_group > .form_radio_wrapper > .form_radio + .form_label,
+.form_group > .form_checkbox_wrapper > .form_checkbox + .form_label {margin: 7px 0}
 
 
 .form_group.-time_input > .form_unit {
@@ -4203,11 +4286,17 @@ fieldset:disabled .form_select {cursor: default}
 		border-color: var(--color_accent);
 	}
 
-	.form_unit > .form_radio:checked + .form_label:after,
-	.form_unit > .form_checkbox:checked + .form_label:before {background-color: var(--color_accent)}
-	.form_unit > .form_radio:checked + .form_label:before,
-	.form_unit:not(.-status_disabled) > .form_radio:not(:disabled) + .form_label:hover:before,
-	.form_unit:not(.-status_disabled) > .form_checkbox:not(:disabled) + .form_label:hover:before {border-color: var(--color_accent)}
+	.form_radio_wrapper:not(.-reverse) > .form_radio:checked + .form_label:after,
+	.form_checkbox_wrapper:not(.-reverse) > .form_checkbox:checked + .form_label:before,
+	.form_radio_wrapper.-reverse > .form_radio:checked + .form_label:before,
+	.form_checkbox_wrapper.-reverse > .form_checkbox:checked + .form_label:after {background-color: var(--color_accent)}
+
+	.form_radio_wrapper:not(.-reverse) > .form_radio:checked + .form_label:before,
+	.form_radio_wrapper.-reverse > .form_radio:checked + .form_label:after,
+	.form_radio_wrapper:not(.-reverse):not(.-status_disabled) > .form_radio:not(:disabled) + .form_label:hover:before,
+	.form_checkbox_wrapper:not(.-reverse):not(.-status_disabled) > .form_checkbox:not(:disabled) + .form_label:hover:before,
+	.form_radio_wrapper.-reverse:not(.-status_disabled) > .form_radio:not(:disabled) + .form_label:hover:after,
+	.form_checkbox_wrapper.-reverse:not(.-status_disabled) > .form_checkbox:not(:disabled) + .form_label:hover:after {border-color: var(--color_accent)}
 
 
 	.radio_group > .form_unit > .form_label {border-color: var(--color_primary_30)}
@@ -4242,17 +4331,29 @@ fieldset:disabled .form_select {cursor: default}
 @supports not (--custom_properties: 0) {
 
 
-	.form_unit > .form_radio:checked + .form_label:after,
-	.form_unit > .form_checkbox:checked + .form_label:before {background-color: #f82969}
-	.form_unit > .form_radio:checked + .form_label:before,
-	.form_unit:not(.-status_disabled) > .form_radio:not(:disabled) + .form_label:hover:before,
-	.form_unit:not(.-status_disabled) > .form_checkbox:not(:disabled) + .form_label:hover:before {border-color: #f82969}
+	.form_radio_wrapper:not(.-reverse) > .form_radio:checked + .form_label:after,
+	.form_checkbox_wrapper:not(.-reverse) > .form_checkbox:checked + .form_label:before,
+	.form_radio_wrapper.-reverse > .form_radio:checked + .form_label:before,
+	.form_checkbox_wrapper.-reverse > .form_checkbox:checked + .form_label:after {background-color: #f82969}
 
-	.-state_admin .form_unit > .form_radio:checked + .form_label:after,
-	.-state_admin .form_unit > .form_checkbox:checked + .form_label:before {background-color: #00dc88}
-	.-state_admin .form_unit > .form_radio:checked + .form_label:before,
-	.-state_admin .form_unit:not(.-status_disabled) > .form_radio:not(:disabled) + .form_label:hover:before,
-	.-state_admin .form_unit:not(.-status_disabled) > .form_checkbox:not(:disabled) + .form_label:hover:before {border-color: #00dc88}
+	.form_radio_wrapper:not(.-reverse) > .form_radio:checked + .form_label:before,
+	.form_radio_wrapper.-reverse > .form_radio:checked + .form_label:after,
+	.form_radio_wrapper:not(.-reverse):not(.-status_disabled) > .form_radio:not(:disabled) + .form_label:hover:before,
+	.form_checkbox_wrapper:not(.-reverse):not(.-status_disabled) > .form_checkbox:not(:disabled) + .form_label:hover:before,
+	.form_radio_wrapper.-reverse:not(.-status_disabled) > .form_radio:not(:disabled) + .form_label:hover:after,
+	.form_checkbox_wrapper.-reverse:not(.-status_disabled) > .form_checkbox:not(:disabled) + .form_label:hover:after {border-color: #f82969}
+
+	.-state_admin .form_radio_wrapper:not(.-reverse) > .form_radio:checked + .form_label:after,
+	.-state_admin .form_checkbox_wrapper:not(.-reverse) > .form_checkbox:checked + .form_label:before,
+	.-state_admin .form_radio_wrapper.-reverse > .form_radio:checked + .form_label:before,
+	.-state_admin .form_checkbox_wrapper.-reverse > .form_checkbox:checked + .form_label:after {background-color: #00dc88}
+
+	.-state_admin .form_radio_wrapper:not(.-reverse) > .form_radio:checked + .form_label:before,
+	.-state_admin .form_radio_wrapper.-reverse > .form_radio:checked + .form_label:after,
+	.-state_admin .form_radio_wrapper:not(.-reverse):not(.-status_disabled) > .form_radio:not(:disabled) + .form_label:hover:before,
+	.-state_admin .form_checkbox_wrapper:not(.-reverse):not(.-status_disabled) > .form_checkbox:not(:disabled) + .form_label:hover:before,
+	.-state_admin .form_radio_wrapper.-reverse:not(.-status_disabled) > .form_radio:not(:disabled) + .form_label:hover:after,
+	.-state_admin .form_checkbox_wrapper.-reverse:not(.-status_disabled) > .form_checkbox:not(:disabled) + .form_label:hover:after {border-color: #00dc88}
 
 	.form_switch > input:checked ~ .form_switch_road,
 	.form_switch > input:checked ~ .form_switch_runner {background-color: #f82969}
@@ -5122,6 +5223,7 @@ body.-open_modal .modal_wrapper {
 .event_edit_ticket_type_expand_button {}
 
 .event_edit_row_delete_button {
+	top: -2px;
 	font-size: 2em;
 	line-height: 1;
 	font-weight: 100;
@@ -5137,12 +5239,55 @@ body.-open_modal .modal_wrapper {
 	margin-top: 36px;
 }
 
+.event_edit_dynamic_pricing_row {
+	display: flex;
+	justify-content: space-between;
+	align-items: center;
+	height: 64px;
+	border-bottom: 1px solid #c5c9d1;
+}
+
+.event_edit_dynamic_pricing_condition_name {
+	font-weight: 500;
+	margin-bottom: 3px;
+}
+
+.event_edit_dynamic_pricing_condition_text {
+	margin: 0;
+	padding-left: 16px;
+	font-size: .875em;
+	font-weight: 500;
+	color: #657184;
+}
+
+.event_edit_dynamic_pricing_buttons {
+	display: flex;
+	align-items: center;
+}
+
+.event_edit_dynamic_pricing_options {
+	flex: none;
+	width: 50px;
+	height: 50px;
+}
+
+.event_edit_dynamic_pricing_add_row {
+	padding: 24px;
+	background-color: #f9f9fa;
+}
+
+.event_edit_pricing_rule_text_row {
+	font-size: .8125em;
+}
+
 @supports (--custom_properties: 1) {
 	.event_edit_navigation_item.-active {background-color: var(--color_accent)}
 	.event_datepicker_calendar .calendar_wrapper:after {border-right-color: 1px solid var(--color_primary_30)}
 	.edit_event_registration_field_draggable {color: var(--color_primary_50)}
 	.edit_event_registration_custom_field_remove_button {color: var(--color_primary_30)}
 	.edit_event_registration_custom_field_remove_button:hover {color: var(--color_primary_50)}
+	.event_edit_dynamic_pricing_add_row {background-color: var(--color_background_gray)}
+	.event_edit_dynamic_pricing_condition_text {color: var(--color_primary_80)}
 }
 .event_admin_orders_page {
 	margin: 18px 0;
@@ -5986,7 +6131,6 @@ fieldset + .org_admin_settings_wrapper,
 	margin: 0 0 .4em;
 }
 
-.event_additional_field > .button {margin-right: 1em}
 .event_additional_field .avatars_collection {cursor: pointer}
 
 .event_additional_field > .external_link {

@@ -58,7 +58,7 @@ WithdrawModelsCollection = extending(EntitiesCollection, (function() {
 			self.setData(data['withdraws']);
 			
 			if (isFunction(success)) {
-				success.call(self, self.last_pushed);
+				success.call(self, self.__last_pushed);
 			}
 		});
 	};

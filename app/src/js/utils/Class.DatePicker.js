@@ -8,8 +8,21 @@ DatePicker = (function() {
 	 * @param {object} [options]
 	 * @constructor
 	 * @construct DatePicker
+	 *
+	 * @property {jQuery} $datepicker
+	 * @property {jQuery} $datepicker_modal
+	 * @property {jQuery} $input
+	 * @property {Calendar} calendar
+	 * @property {string} selected_day
+	 * @property {string} prev_selected_day
+	 * @property {(string|function)} format
+	 * @property {?Moment} m_prev_selected_day
+	 * @property {?Moment} m_selected_day
+	 * @property {string} formated_selected_day
 	 */
 	function DatePicker($datepicker, options){
+		var self = this;
+		
 		this.options = {
 			classes: {
 			},
@@ -19,28 +32,62 @@ DatePicker = (function() {
 			labels: {}
 		};
 		
-		if ($datepicker instanceof Element || typeof $datepicker == 'string') {
+		if ($datepicker instanceof Element || typeof $datepicker === 'string') {
 			$datepicker = $($datepicker);
-			if($datepicker.length === 0)
-				throw new Error('Такого элемента не существует');
-			else if($datepicker.length > 1)
-				throw new Error('Элементов с заданным аргументов найдено несколько');
 		}
-		if ($datepicker instanceof jQuery) {
-			$.extend(true, this.options, options, $datepicker.data());
-			this.$datepicker = $datepicker;
-			this.$datepicker_modal = tmpl('datepicker', {});
-			this.$input = $datepicker.is('input') ? $datepicker : $datepicker.find('input');
-			this.calendar = new Calendar(this.$datepicker_modal.children('.DatePickerCalendar'), {
-				min_date: this.options.min_date,
-				max_date: this.options.max_date
-			});
-			this.prev_selected_day = (typeof this.options.selected_day !== 'undefined') ? this.options.selected_day : this.$input.val() || '';
-			this.selected_day = (typeof this.options.selected_day !== 'undefined') ? this.options.selected_day : this.$input.val() || '';
-			this.formated_selected_day = this.selected_day.toString().split('-').reverse().join('.');
-		} else {
-			throw new TypeError('Аргумент должен быть экземпляром jQuery, элементом DOM, либо CSS селектором');
+		if (!($datepicker instanceof jQuery)) {
+			
+			throw new TypeError('Аргументом конструктора DatePicker должен быть экземпляром jQuery, элементом DOM, либо CSS селектором');
 		}
+		if ($datepicker.length === 0) {
+			
+			throw new Error('Такого элемента не существует');
+		} else if ($datepicker.length > 1) {
+			
+			throw new Error('Элементов с заданным аргументов найдено несколько');
+		}
+		
+		$.extend(true, this.options, options, $datepicker.data());
+		this.$datepicker = $datepicker;
+		this.$datepicker_modal = tmpl('datepicker', {});
+		this.$input = $datepicker.is('input') ? $datepicker : $datepicker.find('input');
+		this.calendar = new Calendar(this.$datepicker_modal.children('.DatePickerCalendar'), {
+			min_date: this.options.min_date,
+			max_date: this.options.max_date
+		});
+		this.selected_day = !empty(this.options.selected_day) ? this.options.selected_day : this.$input.val() || '';
+		this.prev_selected_day = this.selected_day;
+		this.format = !empty(this.options.format) ? this.options.format : __LOCALE.DATE.DATE_FORMAT;
+		
+		Object.defineProperties(this, {
+			m_prev_selected_day: {
+				get: function() {
+				
+					return self.prev_selected_day ? moment(self.prev_selected_day) : null;
+				}
+			},
+			m_selected_day: {
+				get: function() {
+					
+					return self.selected_day ? moment(self.selected_day) : null;
+				}
+			},
+			formated_selected_day: {
+				get: function() {
+					if (empty(self.selected_day)) {
+						
+						return null;
+					}
+					
+					if (isFunction(self.format)) {
+						
+						return self.format.call(self, self.m_selected_day, self.m_prev_selected_day);
+					}
+				
+					return self.m_selected_day.format(self.format);
+				}
+			}
+		});
 	}
 	/**
 	 *

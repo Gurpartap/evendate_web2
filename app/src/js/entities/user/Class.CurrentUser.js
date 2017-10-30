@@ -127,7 +127,7 @@ CurrentUser = extending(OneUser, (function() {
 		return CurrentUser.fetchFriends(ajax_data, function(data) {
 			self.friends.setData(data);
 			if (success && typeof success == 'function') {
-				success.call(self, self.friends.last_pushed);
+				success.call(self, self.friends.__last_pushed);
 			}
 		});
 	};

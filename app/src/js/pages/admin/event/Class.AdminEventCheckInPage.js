@@ -24,7 +24,7 @@ AdminEventCheckInPage = extending(AdminEventPage, (function() {
 		 * @property {Array<OneTicket>} checked
 		 * @property {Array<OneTicket>} new_awaiting
 		 * @property {Array<OneTicket>} new_checked
-		 * @property {Array<OneTicket>} last_pushed
+		 * @property {Array<OneTicket>} __last_pushed
 		 */
 		function CheckInTicketsCollection(event_id) {
 			var self = this;
@@ -41,7 +41,7 @@ AdminEventCheckInPage = extending(AdminEventPage, (function() {
 				},
 				new_awaiting: {
 					get: function() {
-						return self.last_pushed.filter(function(ticket) {
+						return self.__last_pushed.filter(function(ticket) {
 							return !ticket.checkout;
 						});
 					}
@@ -55,7 +55,7 @@ AdminEventCheckInPage = extending(AdminEventPage, (function() {
 				},
 				new_checked: {
 					get: function() {
-						return self.last_pushed.filter(function(ticket) {
+						return self.__last_pushed.filter(function(ticket) {
 							return ticket.checkout;
 						});
 					}
