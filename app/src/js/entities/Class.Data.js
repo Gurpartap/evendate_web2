@@ -24,7 +24,7 @@ Data = (function() {
 		}
 		for (field in data) {
 			if (data.hasOwnProperty(field) && this.hasOwnProperty(field)) {
-				if ((this[field] instanceof Data || this[field] instanceof DataSet) && !empty(data[field])) {
+				if (this[field] instanceof Data || this[field] instanceof DataSet) {
 					this[field].setData(data[field]);
 				} else {
 					this[field] = data[field];
