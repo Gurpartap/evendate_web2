@@ -28,6 +28,7 @@ MyOrdersPage = extending(Page, (function() {
 		);
 		
 		this.fetch_order_fields = new Fields(
+			'payment_type',
 			'registration_fields', {
 				event: {
 					fields: new Fields(

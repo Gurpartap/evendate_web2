@@ -21,16 +21,16 @@ final class RuleTicketsCountBetween extends AbstractPricingRule implements Prici
 	function verify()
 	{
 		parent::verify();
-		if (!isset($this->data['min_count']) || filter_var(($this->data['min_count']), FILTER_VALIDATE_FLOAT, FILTER_NULL_ON_FAILURE) == null)
+		if (!isset($this->data['min_count']) || filter_var(($this->data['min_count']), FILTER_VALIDATE_FLOAT, FILTER_NULL_ON_FAILURE) === null)
 			throw new InvalidArgumentException('BAD_PRICING_RULE_MIN_COUNT');
-		if (!isset($this->data['max_count']) || filter_var(($this->data['max_count']), FILTER_VALIDATE_FLOAT, FILTER_NULL_ON_FAILURE) == null)
+		if (!isset($this->data['max_count']) || filter_var(($this->data['max_count']), FILTER_VALIDATE_FLOAT, FILTER_NULL_ON_FAILURE) === null)
 			throw new InvalidArgumentException('BAD_PRICING_RULE_MAX_COUNT');
 	}
 
 	function isApplicable(Preorder $preorder): bool
 	{
-		if ($preorder->getTicketsCount() > $this->data['min_count']
-			&& $preorder->getTicketsCount() < $this->data['max_count']) {
+		if ($preorder->getTicketsCount() >= $this->data['min_count']
+			&& $preorder->getTicketsCount() <= $this->data['max_count']) {
 			return true;
 		}
 		return false;

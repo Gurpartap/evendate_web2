@@ -20,6 +20,7 @@ PricingRuleModel = extending(AbstractDataModel, (function() {
 	 * @property {?number} max_count
 	 * @property {?boolean} is_percentage
 	 * @property {?boolean} is_fixed
+	 * @property {?boolean} enabled
 	 */
 	function PricingRuleModel() {
 		OneEntity.call(this);
@@ -32,6 +33,7 @@ PricingRuleModel = extending(AbstractDataModel, (function() {
 		this.max_count = null;
 		this.is_percentage = null;
 		this.is_fixed = null;
+		this.enabled = null;
 	}
 	
 	PricingRuleModel.prototype.ID_PROP_NAME = 'uuid';

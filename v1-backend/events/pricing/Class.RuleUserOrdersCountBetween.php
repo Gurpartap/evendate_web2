@@ -21,9 +21,9 @@ final class RuleUserOrdersCountBetween extends AbstractPricingRule implements Pr
 	function verify()
 	{
 		parent::verify();
-		if (!isset($this->data['min_count']) || filter_var(($this->data['min_count']), FILTER_VALIDATE_FLOAT, FILTER_NULL_ON_FAILURE) == null)
+		if (!isset($this->data['min_count']) || filter_var(($this->data['min_count']), FILTER_VALIDATE_FLOAT, FILTER_NULL_ON_FAILURE) === null)
 			throw new InvalidArgumentException('BAD_PRICING_RULE_MIN_COUNT');
-		if (!isset($this->data['max_count']) || filter_var(($this->data['max_count']), FILTER_VALIDATE_FLOAT, FILTER_NULL_ON_FAILURE) == null)
+		if (!isset($this->data['max_count']) || filter_var(($this->data['max_count']), FILTER_VALIDATE_FLOAT, FILTER_NULL_ON_FAILURE) === null)
 			throw new InvalidArgumentException('BAD_PRICING_RULE_MAX_COUNT');
 	}
 
@@ -32,7 +32,7 @@ final class RuleUserOrdersCountBetween extends AbstractPricingRule implements Pr
 		$user = App::getCurrentUser();
 		if ($user instanceof User == false) return false;
 		$orders = $user->getOrdersInOrganization($preorder->getEvent());
-		if (count($orders) > $this->data['min_count'] && count($orders) < $this->data['max_count']) {
+		if (count($orders) >= $this->data['min_count'] && count($orders) <= $this->data['max_count']) {
 			return true;
 		}
 		return false;

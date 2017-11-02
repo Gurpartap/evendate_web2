@@ -60,7 +60,8 @@ __C = {
 			SHADOWED: '-shadowed',
 			BORDERED: '-bordered',
 			UPPERCASE: '-transform_uppercase',
-			NO_UPPERCASE: '-no_uppercase'
+			NO_UPPERCASE: '-no_uppercase',
+			LINE_THROUGH: '-line_through'
 		},
 		STATUS: {
 			SUCCESS: '-status_success',
@@ -760,6 +761,9 @@ $.fn.extend({
 							break;
 						}
 						default: {
+							if (c === null) {
+								break;
+							}
 							std = c.replace(xb, "\r\n");
 						}
 					}

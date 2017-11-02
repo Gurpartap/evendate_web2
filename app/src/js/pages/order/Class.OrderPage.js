@@ -50,6 +50,7 @@ OrderPage = extending(Page, (function() {
 		this.is_promocode_active = false;
 		
 		this.overall_sum = 0;
+		this.total_sum = 0;
 		
 		this.render_vars = {
 			event_id: event_id,
@@ -69,23 +70,6 @@ OrderPage = extending(Page, (function() {
 				get: function() {
 					
 					return (self.event.ticketing_locally ? 'Заказ билетов на событие ' : 'Регистрация на событие ') + self.event.title;
-				}
-			},
-			total_sum: {
-				get: function() {
-					var total_sum = 0;
-					
-					if (self.is_promocode_active) {
-						if (self.promocode.is_fixed) {
-							total_sum = self.overall_sum - self.promocode.effort;
-						} else {
-							total_sum = self.overall_sum - (self.overall_sum * self.promocode.effort / 100);
-						}
-						
-						return total_sum <= 0 ? 0 : total_sum;
-					}
-					
-					return self.overall_sum;
 				}
 			}
 		});
@@ -229,7 +213,7 @@ OrderPage = extending(Page, (function() {
 	 *
 	 * @returns {jqPromise}
 	 */
-	OrderPage.prototype.makeOrder = function(send_request) {
+	OrderPage.prototype.commitOrder = function(send_request) {
 		var self = this,
 			$form = this.$wrapper.find('.OrderForm'),
 			send_data;
@@ -280,7 +264,9 @@ OrderPage = extending(Page, (function() {
 			$footer = this.$wrapper.find('.OrderFormFooter'),
 			ticket_selected = parsed_uri.queryKey['ticket_selected'],
 			$payload,
-			$selected_type;
+			$selected_type,
+			is_timeout_enabled = false,
+			timeout;
 		
 		this.$main_action_buttton = this.render_vars.register_button;
 		
@@ -325,25 +311,42 @@ OrderPage = extending(Page, (function() {
 			} else {
 				$footer.attr('disabled', true);
 			}
-			
-			if (self.is_promocode_active) {
-				self.$wrapper.find('.TicketsTotalSum').text(formatCurrency(self.total_sum));
-			}
-			
-			if (self.total_sum === 0) {
-				if ($.contains(self.$wrapper[0], self.render_vars.pay_button[0])) {
-					self.render_vars.pay_button.after(self.render_vars.register_button);
-					self.render_vars.pay_button.detach();
-					self.$main_action_buttton = self.render_vars.register_button;
-					$pay_buttons.addClass(__C.CLASSES.HIDDEN);
-				}
-			} else {
-				if ($.contains(self.$wrapper[0], self.render_vars.register_button[0])) {
-					self.render_vars.register_button.after(self.render_vars.pay_button);
-					self.render_vars.register_button.detach();
-					self.$main_action_buttton = self.render_vars.pay_button;
-					$pay_buttons.removeClass(__C.CLASSES.HIDDEN);
-				}
+		}
+		
+		function preOrder() {
+			if (!is_timeout_enabled) {
+				is_timeout_enabled = true;
+				timeout = window.setTimeout(function() {
+					is_timeout_enabled = false;
+					self.event.preOrder(self.gatherSendData()).done(function(data) {
+						self.total_sum = data.price.final_sum;
+						
+						if (data.pricing_rule || data.promocode) {
+							self.$wrapper.find('.TicketsOverallSum').addClass(__C.CLASSES.UNIVERSAL_STATES.LINE_THROUGH);
+							self.$wrapper.find('.TicketsDiscountedWrapper').removeClass(__C.CLASSES.HIDDEN);
+							self.$wrapper.find('.TicketsTotalSum').text(formatCurrency(self.total_sum));
+						} else {
+							self.$wrapper.find('.TicketsOverallSum').removeClass(__C.CLASSES.UNIVERSAL_STATES.LINE_THROUGH);
+							self.$wrapper.find('.TicketsDiscountedWrapper').addClass(__C.CLASSES.HIDDEN);
+						}
+						
+						if (self.total_sum === 0) {
+							if ($.contains(self.$wrapper[0], self.render_vars.pay_button[0])) {
+								self.render_vars.pay_button.after(self.render_vars.register_button);
+								self.render_vars.pay_button.detach();
+								self.$main_action_buttton = self.render_vars.register_button;
+								$pay_buttons.addClass(__C.CLASSES.HIDDEN);
+							}
+						} else {
+							if ($.contains(self.$wrapper[0], self.render_vars.register_button[0])) {
+								self.render_vars.register_button.after(self.render_vars.pay_button);
+								self.render_vars.register_button.detach();
+								self.$main_action_buttton = self.render_vars.pay_button;
+								$pay_buttons.removeClass(__C.CLASSES.HIDDEN);
+							}
+						}
+					});
+				}, 500);
 			}
 		}
 		
@@ -370,13 +373,15 @@ OrderPage = extending(Page, (function() {
 					
 					$wrapper.removeAttr('disabled');
 					
-					$promocode_wrapper.after(tmpl('order-tickets-selling-promocode', {
-						effort: self.promocode.effort + (self.promocode.is_fixed ? ' ₽' : '%')
+					$promocode_wrapper.after(__APP.BUILD.text({
+						classes: [__C.CLASSES.TEXT_COLORS.MUTED_80, __C.CLASSES.TEXT_WEIGHT.BOLDER],
+						content: 'Промокод активирован'
 					}));
 					$promocode_wrapper.addClass(__C.CLASSES.HIDDEN);
 					
 					self.is_promocode_active = true;
 					countTotalSum();
+					preOrder();
 				}, function() {
 					showNotifier({
 						status: false,
@@ -415,6 +420,12 @@ OrderPage = extending(Page, (function() {
 			$quantity_inputs.on('QuantityInput::change', function() {
 				countTicketTypeSum($(this).closest('.TicketType'));
 				countTotalSum();
+				if (isTicketTypeSelected()) {
+					preOrder();
+				} else {
+					self.$wrapper.find('.TicketsOverallSum').removeClass(__C.CLASSES.UNIVERSAL_STATES.LINE_THROUGH);
+					self.$wrapper.find('.TicketsDiscountedWrapper').addClass(__C.CLASSES.HIDDEN);
+				}
 			});
 			
 			this.$wrapper.find('.TicketType').each(function() {
@@ -424,7 +435,7 @@ OrderPage = extending(Page, (function() {
 			countTotalSum();
 			
 			this.render_vars.legal_entity_payment_button.on('click.LegalEntityPayment', function() {
-				self.makeOrder().done(function(data) {
+				self.commitOrder().done(function(data) {
 					var parsed_uri = parseUri(location);
 					
 					__APP.changeState(parsed_uri.path + '/' + data.order.uuid + '/from_legal_entity');
@@ -443,7 +454,7 @@ OrderPage = extending(Page, (function() {
 			
 			if (is_type_selected) {
 				if (__APP.IS_WIDGET) {
-					self.makeOrder(false).done(function(send_data) {
+					self.commitOrder(false).done(function(send_data) {
 						$payload = self.$wrapper.find('.OrderFormPayload');
 						$payload.val(JSON.stringify(mergeObjects({
 							redirect_to_payment: true,
@@ -453,7 +464,7 @@ OrderPage = extending(Page, (function() {
 						self.$wrapper.find('.OrderForm').submit();
 					});
 				} else {
-					self.makeOrder().done(function(data) {
+					self.commitOrder().done(function(data) {
 						
 						Payment.doPayment('order-' + data.order.uuid, data.order.final_sum, callback_url);
 					})
@@ -467,7 +478,7 @@ OrderPage = extending(Page, (function() {
 		});
 		
 		this.render_vars.register_button.on('click.Register', function() {
-			self.makeOrder().done(function(data) {
+			self.commitOrder().done(function(data) {
 				var callback_url,
 					parsed_callback;
 				
@@ -499,7 +510,7 @@ OrderPage = extending(Page, (function() {
 					modal;
 				
 				if (!$this.data('modal')) {
-					self.makeOrder().done(function(data) {
+					self.commitOrder().done(function(data) {
 						modal = new BitcoinModal(self.event, data.order.uuid);
 						$this.data('modal', modal);
 						
