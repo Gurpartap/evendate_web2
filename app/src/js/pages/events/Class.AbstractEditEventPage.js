@@ -1484,6 +1484,8 @@ AbstractEditEventPage = extending(Page, (function() {
 		//TODO: perepilit' placepicker
 		PAGE.$wrapper.find('.Placepicker').placepicker();
 		
+		PAGE.$wrapper.find('.Wysiwyg').trumbowyg();
+		
 		PAGE.$wrapper.find('.EditEventDefaultAddress').off('click.defaultAddress').on('click.defaultAddress', function() {
 			PAGE.$wrapper.find('.Placepicker').val(PAGE.my_organizations.getByID(PAGE.organization_id).default_address).trigger('input').trigger('change');
 		});
@@ -1808,6 +1810,7 @@ AbstractEditEventPage = extending(Page, (function() {
 			id: 'edit_event_email_payed_form_unit',
 			name: 'email_payed_text',
 			type: 'textarea',
+			classes: ['Wysiwyg'],
 			value: this.event.email_texts.payed
 		});
 		
@@ -1816,6 +1819,7 @@ AbstractEditEventPage = extending(Page, (function() {
 			id: 'edit_event_email_approved_form_unit',
 			name: 'email_approved_text',
 			type: 'textarea',
+			classes: ['Wysiwyg'],
 			value: this.event.email_texts.approved
 		});
 		
@@ -1824,6 +1828,7 @@ AbstractEditEventPage = extending(Page, (function() {
 			id: 'edit_event_email_not_approved_form_unit',
 			name: 'email_not_approved_text',
 			type: 'textarea',
+			classes: ['Wysiwyg'],
 			value: this.event.email_texts.not_approved
 		});
 		
@@ -1832,6 +1837,7 @@ AbstractEditEventPage = extending(Page, (function() {
 			id: 'edit_event_email_after_event_form_unit',
 			name: 'email_after_event_text',
 			type: 'textarea',
+			classes: ['Wysiwyg'],
 			value: this.event.email_texts.after_event
 		});
 		

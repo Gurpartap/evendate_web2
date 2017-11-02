@@ -1,4 +1,7 @@
 /**
+ * @requires Class.AbstractAppInspector.js
+ */
+/**
  *
  * @class HelpAppInspector
  * @extends AbstractAppInspector
