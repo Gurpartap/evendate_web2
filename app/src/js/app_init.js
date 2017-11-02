@@ -55,92 +55,120 @@ if (checkRedirect()) {
 			}
 		})
 		.ready(function() {
-			var OneSignal = window.OneSignal || [],
-				user_jqhxr,
+			var user_jqhxr,
 				auth_urls_jqxhr,
 				cities_jqxhr;
 			
-			OneSignal.push(["init", {
-				appId: "7471a586-01f3-4eef-b989-c809700a8658",
-				autoRegister: false,
-				notifyButton: {
-					enable: false /* Set to false to hide */
-				}
-			}]);
-			OneSignal.push(function () {
-				// If we're on an unsupported browser, do nothing
-				if (!OneSignal.isPushNotificationsSupported()) {
-					return;
-				}
-				OneSignal.isPushNotificationsEnabled(function (isEnabled) {
-					if (isEnabled) {
-						// The user is subscribed to notifications
-						// Don't show anything
-					} else {
-						window.askToSubscribe = function subscribe() {
-							OneSignal.push(function () {
-								OneSignal.on('subscriptionChange', function (isSubscribed) {
-									if (isSubscribed) {
-										// The user is subscribed
-										//   Either the user subscribed for the first time
-										//   Or the user was subscribed -> unsubscribed -> subscribed
-										
-										OneSignal.getUserId(function (userId) {
-											$.ajax({
-												url: 'api/v1/users/me/devices',
-												type: 'PUT',
-												data: {
-													'device_token': userId,
-													'client_type': 'browser',
-													'model': navigator.appVersion ? navigator.appVersion : null,
-													'os_version': navigator.platform ? navigator.platform : null
-												},
-												global: false
+			+function configOneSignal() {
+				var OneSignal = window.OneSignal || [];
+				
+				OneSignal.push(["init", {
+					appId: "7471a586-01f3-4eef-b989-c809700a8658",
+					autoRegister: false,
+					notifyButton: {
+						enable: false /* Set to false to hide */
+					}
+				}]);
+				OneSignal.push(function () {
+					// If we're on an unsupported browser, do nothing
+					if (!OneSignal.isPushNotificationsSupported()) {
+						return;
+					}
+					OneSignal.isPushNotificationsEnabled(function (isEnabled) {
+						if (isEnabled) {
+							// The user is subscribed to notifications
+							// Don't show anything
+						} else {
+							window.askToSubscribe = function subscribe() {
+								OneSignal.push(function () {
+									OneSignal.on('subscriptionChange', function (isSubscribed) {
+										if (isSubscribed) {
+											// The user is subscribed
+											//   Either the user subscribed for the first time
+											//   Or the user was subscribed -> unsubscribed -> subscribed
+											
+											OneSignal.getUserId(function (userId) {
+												$.ajax({
+													url: 'api/v1/users/me/devices',
+													type: 'PUT',
+													data: {
+														'device_token': userId,
+														'client_type': 'browser',
+														'model': navigator.appVersion ? navigator.appVersion : null,
+														'os_version': navigator.platform ? navigator.platform : null
+													},
+													global: false
+												});
 											});
-										});
-									}
+										}
+									});
 								});
-							});
-							
-							OneSignal.push(["registerForPushNotifications"]);
-							event.preventDefault();
-						};
-					}
+								
+								OneSignal.push(["registerForPushNotifications"]);
+								event.preventDefault();
+							};
+						}
+					});
 				});
-			});
+			}();
 			
-			if (window.moment !== undefined) {
-				moment.locale(navigator.language);
-				//moment.tz.setDefault('Europe/Moscow');
-				moment.updateLocale('ru', {
-					monthsShort: __LOCALES.ru_RU.DATE.MONTH_SHORT_NAMES,
-					calendar: {
-						sameDay: '[Сегодня]',
-						nextDay: '[Завтра]',
-						lastDay: '[Вчера]',
-						nextWeek: 'D MMMM',
-						lastWeek: 'D MMMM',
-						sameElse: 'D MMMM'
-					}
-				})
-			}
-			
-			if (window.Highcharts !== undefined) {
-				Highcharts.setOptions({
-					lang: {
-						shortMonths: __LOCALES.ru_RU.DATE.MONTH_SHORT_NAMES
-					}
-				});
-			}
-			
-			/**
-			 * Bind only on 'back' action
-			 */
-			History.Adapter.bind(window, 'statechange', function() {
-				if (!History.stateChangeHandled) {
-					__APP.init();
+			+function configMoment() {
+				if (window.moment !== undefined) {
+					moment.locale(navigator.language);
+					//moment.tz.setDefault('Europe/Moscow');
+					moment.updateLocale('ru', {
+						monthsShort: __LOCALES.ru_RU.DATE.MONTH_SHORT_NAMES,
+						calendar: {
+							sameDay: '[Сегодня]',
+							nextDay: '[Завтра]',
+							lastDay: '[Вчера]',
+							nextWeek: 'D MMMM',
+							lastWeek: 'D MMMM',
+							sameElse: 'D MMMM'
+						}
+					})
 				}
-			});
+			}();
+			
+			+function configHighcharts() {
+				if (window.Highcharts !== undefined) {
+					Highcharts.setOptions({
+						lang: {
+							shortMonths: __LOCALES.ru_RU.DATE.MONTH_SHORT_NAMES
+						}
+					});
+				}
+			}();
+			
+			+function configHistory() {
+				/**
+				 * Bind only on 'back' action
+				 */
+				History.Adapter.bind(window, 'statechange', function() {
+					if (!History.stateChangeHandled) {
+						__APP.init();
+					}
+				});
+			}();
+			
+			+function configTrumbowyg() {
+				$.trumbowyg.svgPath = '/app/src/vendor/trumbowyg/icons.svg';
+				$.trumbowyg.defaultOptions.lang = 'ru';
+				$.trumbowyg.defaultOptions.autogrow = true;
+				$.trumbowyg.defaultOptions.autogrowOnEnter = true;
+				$.trumbowyg.defaultOptions.btns = [
+					['viewHTML'],
+					['undo', 'redo'],
+					['formatting'],
+					['strong', 'em'],
+					['link'],
+					['insertImage'],
+					['justifyLeft', 'justifyCenter', 'justifyRight', 'justifyFull'],
+					['unorderedList', 'orderedList'],
+					['horizontalRule'],
+					['removeformat']
+				];
+			}();
 			
 			if (isNotDesktop()) {
 				$('.DownloadAppBand').addClass('-open_band');

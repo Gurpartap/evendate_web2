@@ -4248,6 +4248,32 @@ select.form_input_group_before {cursor: pointer}
 	z-index: 1;
 }
 
+.trumbowyg-textarea {
+	border: 0;
+}
+
+.trumbowyg-editor blockquote {
+	position: relative;
+	padding: 20px;
+	background-color: #f6f6f6;
+}
+.trumbowyg-editor blockquote:before,
+.trumbowyg-editor blockquote:after {
+	position: absolute;
+	font-size: 24px;
+	font-weight: bold;
+}
+.trumbowyg-editor blockquote:before {
+	content: '„';
+	left: 8px;
+	bottom: 8px;
+}
+.trumbowyg-editor blockquote:after {
+	content: '”';
+	right: 8px;
+	top: 8px;
+}
+
 /* /Form -status */
 
 
@@ -5004,7 +5030,7 @@ body.-open_modal .modal_wrapper {
 }
 
 .edit_event_page_wrapper {
-	width: 700px;
+	width: 740px;
 }
 
 .event_edit_navigation {
