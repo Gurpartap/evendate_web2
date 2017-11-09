@@ -1,6 +1,7 @@
 {
     "require": {
         "guzzlehttp/guzzle": "~6.0",
-        "elasticsearch/elasticsearch": "~5.0"
+        "elasticsearch/elasticsearch": "~5.0",
+        "whichbrowser/parser": "^2.0"
     }
 }
