@@ -155,7 +155,7 @@ CREATE OR REPLACE VIEW view_tickets_orders AS
                                              THEN 9 :: INT -- should not pay for tickets
 
                                            WHEN COALESCE(ticket_orders.final_sum, money.sum) :: REAL > 0 :: REAL
-                                                AND st.payed > 0
+                                                AND st.payed > 0 AND (ticket_orders.order_status_id NOT IN (3,7))
                                              THEN 2 :: INT -- payed for tickets
 
                                            WHEN COALESCE(ticket_orders.final_sum, money.sum) :: REAL > 0 :: REAL
