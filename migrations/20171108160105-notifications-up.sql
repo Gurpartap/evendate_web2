@@ -1,8 +1,18 @@
+-- adds field for utm
 ALTER TABLE ticket_orders
   ADD COLUMN utm_fields JSONB DEFAULT NULL;
 
-ALTER TABLE ticket_orders
-  ADD COLUMN client_info JSONB DEFAULT NULL;
+-- adds field for utm
+ALTER TABLE stat_events
+  ADD COLUMN utm_fields JSONB DEFAULT NULL;
+
+-- adds field for user-agent info
+ALTER TABLE tokens
+  ADD COLUMN user_agent_info JSONB DEFAULT NULL;
+
+-- adds field for user-agent info
+ALTER TABLE tokens
+  ADD COLUMN user_agent TEXT DEFAULT NULL;
 
 CREATE TABLE broadcasts (
   id                SERIAL PRIMARY KEY,

@@ -149,6 +149,7 @@ class Order extends AbstractEntity
 				'user_id' => $user->getId(),
 				'order_content' => json_encode($data),
 				'sum' => 0,
+				'utm_fields' => App::$__REQUEST['utm'] ?? null,
 				'order_status_id' => $event->getTicketingLocally() ? self::STATUS_WAITING_PAYMENT_ID : self::STATUS_WITHOUT_PAYMENT_ID,
 				'promocode_id' => $promocode_id
 			))
@@ -254,7 +255,6 @@ class Order extends AbstractEntity
 		}
 		return new Result(true, '');
 	}
-
 
 	public function getUUID()
 	{
@@ -675,7 +675,6 @@ class Order extends AbstractEntity
 			'doc_url' => 'https://evendate.io/api/v1/events/' . $event->getId() . '/orders/' . $this->uuid . '/legal_entity/contract'
 		));
 	}
-
 
 	public function makeBitcoinPayment($fields, Event $event)
 	{
