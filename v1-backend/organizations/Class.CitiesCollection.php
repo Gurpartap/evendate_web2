@@ -157,7 +157,7 @@ class CitiesCollection extends AbstractCollection
 
 		if (count($cities) == 0) {
 			$q_ins_city = 'INSERT INTO cities(en_name, local_name, timediff_seconds, country_id, latitude, longitude)
-								VALUES(:name, :name, 0, 1, 0, 0) RETURNING id';
+								VALUES(:name, :name, 0, 1, 100500, 100500) RETURNING id';
 			$p_ins_city = $db->prepareExecuteRaw($q_ins_city, array(
 				':name' => $name
 			));
