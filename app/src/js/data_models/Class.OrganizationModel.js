@@ -26,6 +26,7 @@ OrganizationModel = extending(OneEntity, (function() {
 	 * @property {?string} logo
 	 * @property {?string} detail_info_url
 	 * @property {?string} email
+	 * @property {?string} city
 	 * @property {?string} city_id
 	 * @property {?string} country_id
 	 * @property {?boolean} is_private
@@ -48,6 +49,7 @@ OrganizationModel = extending(OneEntity, (function() {
 		this.logo_filename = null;
 		this.detail_info_url = null;
 		this.email = null;
+		this.city = null;
 		this.city_id = null;
 		this.country_id = null;
 		this.is_private = null;
