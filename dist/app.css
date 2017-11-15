@@ -3044,7 +3044,7 @@ a.social_link.-color_facebook {color: #3b5998}
 	font-weight: 500;
 	border-radius: 3px;
 	background-color: #fff;
-	box-shadow: 0 0 3px 0 rgba(0, 0, 0, 0.06);;
+	box-shadow: 0 0 3px 0 rgba(0, 0, 0, 0.06);
 }
 .tickets_wrapper {
 	display: flex;
@@ -3621,7 +3621,7 @@ select.form_input_group_before {cursor: pointer}
 	box-shadow: none;
 }
 .form_select2.form_input.select2-container-multi > .select2-choices,
-.form_select2.form_input.select2-container-multi > .select2-choices > .select2-search-field > input {min-height: 30px}
+.form_select2.form_input.select2-container-multi > .select2-choices > .select2-search-field > input {min-height: 28px}
 .form_select2.form_input.select2-container-multi > .select2-choices > .select2-search-field > input {
 	padding: 0;
 	margin: 0;
@@ -3637,7 +3637,7 @@ select.form_input_group_before {cursor: pointer}
 }
 
 .form_select2.form_input.select2-container-multi > .select2-choices > .select2-search-choice {
-	padding: 4px 6px 4px 19px;
+	padding: 4px 19px 4px 6px;
 	margin: 0 5px 0 0;
 	border: 0;
 	color: #fff;
@@ -3650,11 +3650,12 @@ select.form_input_group_before {cursor: pointer}
 
 .form_select2.form_input.select2-container-multi > .select2-choices > .select2-search-choice > .select2-search-choice-close {
 	position: absolute;
-	right: auto;
+	left: auto;
 	top: 0;
+	height: 15px;
 	bottom: 0;
 	margin: auto;
-	color: #fff;
+	color: inherit;
 }
 .form_select2.form_input.select2-container-multi > .select2-choices > .select2-search-choice > .select2-search-choice-close:before {
 	display: inline-block;
@@ -3666,8 +3667,18 @@ select.form_input_group_before {cursor: pointer}
 }
 
 .form_select2.form_input.select2-container-multi .select2-choices .select2-search-choice {
-	background-color: #f82969;
-	border: 1px solid #f82969;
+	background-color: #e2e4e8;
+	cursor: text;
+	color: inherit;
+	border: 0;
+}
+
+.form_select2.form_input.-select2_no_tags.select2-container-multi .select2-choices .select2-search-choice {
+	padding: 4px 6px;
+}
+
+.form_select2.form_input.-select2_no_tags.select2-container-multi .select2-choices .select2-search-choice .select2-search-choice-close {
+	display: none;
 }
 
 /* /Form Select2 */
@@ -4308,8 +4319,7 @@ select.form_input_group_before {cursor: pointer}
 	.form_select2_drop > .select2-results .select2-highlighted {background-color: var(--color_primary_30)}
 
 	.form_select2.form_input.select2-container-multi .select2-choices .select2-search-choice {
-		background-color: var(--color_accent);
-		border-color: var(--color_accent);
+		background-color: var(--color_marginal);
 	}
 
 	.form_radio_wrapper:not(.-reverse) > .form_radio:checked + .form_label:after,
@@ -4930,256 +4940,6 @@ body.-open_modal .modal_wrapper {
 
 @supports (--custom_properties: 1) {
 	.page {background-color: var(--color_page)}
-}
-.add_organization_page {
-	max-width: 700px;
-	margin: 40px 0;
-	padding: 15px 30px;
-}
-
-.add_organization_img_preview_background {
-	position: absolute;
-	top: 21px;
-}
-
-.add_organization_img_preview_logo {
-	width: 56px;
-	position: absolute;
-	left: 131px;
-	top: 84px;
-	z-index: 9;
-	border-radius: 100px;
-}
-.org_admin_crm_page {
-	margin: 18px 0;
-}
-
-.org_admin_crm_page_table_wrapper.-status_disabled {opacity: .3}
-
-.org_admin_crm_page_header {
-	display: flex;
-	justify-content: space-between;
-	padding: 16px 24px;
-}
-
-.org_admin_crm_page_header_wrapper {
-	display: flex;
-	align-items: center;
-}
-
-.org_admin_crm_page_title {
-	margin: 0;
-}
-
-.org_admin_crm_page_table_search_block {
-	margin-left: 36px;
-	width: 250px;
-}
-.orgstat_events_page {
-	margin-top: 18px;
-}
-
-.orgstat_events_page_header {
-	border-bottom: 1px solid rgba(62, 77, 101, 0.1);
-}
-
-.orgstat_events_title {
-	margin: 36px 18px 18px;
-	font-size: 1.5em;
-	font-weight: 500;
-	color: rgba(62, 77, 102, 0.8);
-}
-
-.orgstat_events_table td {font-weight: 500}
-
-.orgstat_events_no_events_wrapper {
-	padding: 18px;
-}
-.org_admin_finances_page {
-	margin: 18px 0;
-}
-
-.org_admin_finances_wrapper {
-	padding: 18px;
-}
-.orgstat_overview {
-	display: flex;
-	margin: 20px 0;
-}
-
-.orgstat_overview_sidebar {
-	flex: 0 0 300px;
-	width: 300px;
-	padding: 0 24px;
-	border-right: 1px solid #d6d6d6;
-	background-color: #fcfcfc;
-}
-
-.orgstat_overview_content {
-	width: -webkit-calc(100% - 300px);
-	width: calc(100% - 300px);
-	margin-left: -1px;
-	border-left: 1px solid #d6d6d6;
-}
-
-.orgstat_overview_sidebar_header {
-	padding: 12px 0;
-}
-
-.orgstat_overview_sidebar_header > .stamp {
-	position: absolute;
-	right: 0;
-}
-
-.orgstat_overview_sidebar_top > .avatar_block {margin-bottom: 12px}
-
-.orgstat_overview_sidebar_top > .avatar_block > .avatar_name {
-	margin-top: 24px;
-	font-size: 1.125em;
-	font-weight: bold;
-}
-
-.orgstat_overview_sidebar_wrapper {padding: 24px 0}
-.orgstat_overview_sidebar_wrapper + .orgstat_overview_sidebar_wrapper {border-top: 2px solid #d6d6d6}
-
-.orgstat_overview_sidebar_about .user_tombstone_title {
-	margin-top: 24px;
-	font-size: 18px;
-	font-weight: 700;
-}
-
-.orgstat_overview_sidebar_about > .user_tombstone {
-	margin-bottom: 0;
-}
-
-.orgstat_overview_sidebar_description,
-.orgstat_overview_sidebar_location {
-	margin: 24px 0;
-	font-size: 13px;
-	line-height: 1.4;
-	font-weight: 400;
-}
-
-.orgstat_overview_sidebar_wrapper > .staff_avatar_block {
-	padding: 6px 0;
-	font-weight: 400;
-}
-
-.orgstat_event_block {
-	display: flex;
-	margin: 24px 0;
-	font-size: 14px;
-}
-
-.orgstat_event_block_date {
-	width: 60px;
-	flex-shrink: 0;
-	font-size: 14px;
-	font-weight: 700;
-	color: #9fa6b3;
-	text-align: center;
-	text-transform: uppercase;
-}
-
-.orgstat_event_block_badge {
-	padding: 4px 12px;
-	font-size: 12px;
-	font-weight: 500;
-	color: #fff;
-	border-radius: 2px;
-	background-color: #9fa6b3;
-}
-
-.orgstat_overview_header {
-	display: flex;
-	align-items: center;
-	height: 145px;
-	border-bottom: 1px solid #d6d6d6;
-}
-
-.orgstat_overview_header > .scoreboard {
-	flex: 1 25%;
-	height: 100px;
-	text-align: center;
-}
-
-.orgstat_overview_header > .scoreboard + .scoreboard {margin-left: 12px}
-
-.orgstat_overview_charts {padding: 48px 24px}
-
-.orgstat_overview_chart {
-	height: 460px;
-	margin-bottom: 60px;
-}
-
-@supports (--custom_properties: 1) {
-	.orgstat_event_block_date {color: var(--color_primary_50)}
-	.orgstat_event_block_badge {background-color: var(--color_primary_50)}
-}
-.org_admin_requisites_page {
-	max-width: 800px;
-	margin: 24px 0;
-	padding: 24px;
-}
-.org_admin_settings_page {
-	margin: 18px 0;
-	padding: 42px 0;
-	width: 660px;
-}
-
-.org_admin_settings_wrapper {padding: 0 36px}
-
-fieldset + .org_admin_settings_wrapper,
-.org_admin_settings_wrapper + fieldset,
-.org_admin_settings_wrapper + .org_admin_settings_wrapper {margin-top: 42px}
-
-.org_admin_settings_staff {
-	display: flex;
-	justify-content: space-around;
-	align-items: stretch;
-}
-
-.org_admin_settings_staff_wrapper {
-	flex: none;
-	max-width: 45%;
-	margin-right: auto;
-}
-
-.org_admin_settings_admins_collection > .avatar_block,
-.org_admin_settings_admins_collection > .staff_avatar_block {
-	margin: 12px 0;
-	font-size: .875em;
-}
-
-.org_admin_settings_admins_collection .avatar_block {font-weight: normal}
-
-.org_admin_settings_domain_table {
-	width: 100%;
-}
-
-.org_admin_settings_domain_table td {
-	padding: 5px;
-}
-
-.org_admin_settings_tariff_head {
-	display: flex;
-	justify-content: space-between;
-	align-items: center;
-}
-
-.org_admin_settings_tariff_title,
-.org_admin_settings_tariff_price {
-	font-size: 16px;
-	font-weight: 500;
-	color: #657184;
-}
-
-.org_admin_settings_tariff_title {flex-grow: 1}
-.org_admin_settings_tariff_button {margin-left: 1em}
-
-@supports (--custom_properties: 1) {
-	.org_admin_settings_tariff_title,
-	.org_admin_settings_tariff_price {color: var(--color_primary_30)}
 }
 .event_admin_check_in {
 	margin: 18px 0;
@@ -5985,6 +5745,256 @@ fieldset + .org_admin_settings_wrapper,
 
 	.event_admin_sales_ticket_type_dates,
 	.event_admin_sales_ticket_type_price {color: var(--color_primary_80)}
+}
+.add_organization_page {
+	max-width: 700px;
+	margin: 40px 0;
+	padding: 15px 30px;
+}
+
+.add_organization_img_preview_background {
+	position: absolute;
+	top: 21px;
+}
+
+.add_organization_img_preview_logo {
+	width: 56px;
+	position: absolute;
+	left: 131px;
+	top: 84px;
+	z-index: 9;
+	border-radius: 100px;
+}
+.org_admin_crm_page {
+	margin: 18px 0;
+}
+
+.org_admin_crm_page_table_wrapper.-status_disabled {opacity: .3}
+
+.org_admin_crm_page_header {
+	display: flex;
+	justify-content: space-between;
+	padding: 16px 24px;
+}
+
+.org_admin_crm_page_header_wrapper {
+	display: flex;
+	align-items: center;
+}
+
+.org_admin_crm_page_title {
+	margin: 0;
+}
+
+.org_admin_crm_page_table_search_block {
+	margin-left: 36px;
+	width: 250px;
+}
+.orgstat_events_page {
+	margin-top: 18px;
+}
+
+.orgstat_events_page_header {
+	border-bottom: 1px solid rgba(62, 77, 101, 0.1);
+}
+
+.orgstat_events_title {
+	margin: 36px 18px 18px;
+	font-size: 1.5em;
+	font-weight: 500;
+	color: rgba(62, 77, 102, 0.8);
+}
+
+.orgstat_events_table td {font-weight: 500}
+
+.orgstat_events_no_events_wrapper {
+	padding: 18px;
+}
+.org_admin_finances_page {
+	margin: 18px 0;
+}
+
+.org_admin_finances_wrapper {
+	padding: 18px;
+}
+.orgstat_overview {
+	display: flex;
+	margin: 20px 0;
+}
+
+.orgstat_overview_sidebar {
+	flex: 0 0 300px;
+	width: 300px;
+	padding: 0 24px;
+	border-right: 1px solid #d6d6d6;
+	background-color: #fcfcfc;
+}
+
+.orgstat_overview_content {
+	width: -webkit-calc(100% - 300px);
+	width: calc(100% - 300px);
+	margin-left: -1px;
+	border-left: 1px solid #d6d6d6;
+}
+
+.orgstat_overview_sidebar_header {
+	padding: 12px 0;
+}
+
+.orgstat_overview_sidebar_header > .stamp {
+	position: absolute;
+	right: 0;
+}
+
+.orgstat_overview_sidebar_top > .avatar_block {margin-bottom: 12px}
+
+.orgstat_overview_sidebar_top > .avatar_block > .avatar_name {
+	margin-top: 24px;
+	font-size: 1.125em;
+	font-weight: bold;
+}
+
+.orgstat_overview_sidebar_wrapper {padding: 24px 0}
+.orgstat_overview_sidebar_wrapper + .orgstat_overview_sidebar_wrapper {border-top: 2px solid #d6d6d6}
+
+.orgstat_overview_sidebar_about .user_tombstone_title {
+	margin-top: 24px;
+	font-size: 18px;
+	font-weight: 700;
+}
+
+.orgstat_overview_sidebar_about > .user_tombstone {
+	margin-bottom: 0;
+}
+
+.orgstat_overview_sidebar_description,
+.orgstat_overview_sidebar_location {
+	margin: 24px 0;
+	font-size: 13px;
+	line-height: 1.4;
+	font-weight: 400;
+}
+
+.orgstat_overview_sidebar_wrapper > .staff_avatar_block {
+	padding: 6px 0;
+	font-weight: 400;
+}
+
+.orgstat_event_block {
+	display: flex;
+	margin: 24px 0;
+	font-size: 14px;
+}
+
+.orgstat_event_block_date {
+	width: 60px;
+	flex-shrink: 0;
+	font-size: 14px;
+	font-weight: 700;
+	color: #9fa6b3;
+	text-align: center;
+	text-transform: uppercase;
+}
+
+.orgstat_event_block_badge {
+	padding: 4px 12px;
+	font-size: 12px;
+	font-weight: 500;
+	color: #fff;
+	border-radius: 2px;
+	background-color: #9fa6b3;
+}
+
+.orgstat_overview_header {
+	display: flex;
+	align-items: center;
+	height: 145px;
+	border-bottom: 1px solid #d6d6d6;
+}
+
+.orgstat_overview_header > .scoreboard {
+	flex: 1 25%;
+	height: 100px;
+	text-align: center;
+}
+
+.orgstat_overview_header > .scoreboard + .scoreboard {margin-left: 12px}
+
+.orgstat_overview_charts {padding: 48px 24px}
+
+.orgstat_overview_chart {
+	height: 460px;
+	margin-bottom: 60px;
+}
+
+@supports (--custom_properties: 1) {
+	.orgstat_event_block_date {color: var(--color_primary_50)}
+	.orgstat_event_block_badge {background-color: var(--color_primary_50)}
+}
+.org_admin_requisites_page {
+	max-width: 800px;
+	margin: 24px 0;
+	padding: 24px;
+}
+.org_admin_settings_page {
+	margin: 18px 0;
+	padding: 42px 0;
+	width: 660px;
+}
+
+.org_admin_settings_wrapper {padding: 0 36px}
+
+fieldset + .org_admin_settings_wrapper,
+.org_admin_settings_wrapper + fieldset,
+.org_admin_settings_wrapper + .org_admin_settings_wrapper {margin-top: 42px}
+
+.org_admin_settings_staff {
+	display: flex;
+	justify-content: space-around;
+	align-items: stretch;
+}
+
+.org_admin_settings_staff_wrapper {
+	flex: none;
+	max-width: 45%;
+	margin-right: auto;
+}
+
+.org_admin_settings_admins_collection > .avatar_block,
+.org_admin_settings_admins_collection > .staff_avatar_block {
+	margin: 12px 0;
+	font-size: .875em;
+}
+
+.org_admin_settings_admins_collection .avatar_block {font-weight: normal}
+
+.org_admin_settings_domain_table {
+	width: 100%;
+}
+
+.org_admin_settings_domain_table td {
+	padding: 5px;
+}
+
+.org_admin_settings_tariff_head {
+	display: flex;
+	justify-content: space-between;
+	align-items: center;
+}
+
+.org_admin_settings_tariff_title,
+.org_admin_settings_tariff_price {
+	font-size: 16px;
+	font-weight: 500;
+	color: #657184;
+}
+
+.org_admin_settings_tariff_title {flex-grow: 1}
+.org_admin_settings_tariff_button {margin-left: 1em}
+
+@supports (--custom_properties: 1) {
+	.org_admin_settings_tariff_title,
+	.org_admin_settings_tariff_price {color: var(--color_primary_30)}
 }
 .statistics_overview_activity {
 	position: fixed;
