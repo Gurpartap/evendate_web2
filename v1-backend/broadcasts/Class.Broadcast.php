@@ -125,17 +125,22 @@ class Broadcast extends AbstractEntity
 	{
 		$result_data = parent::getParams($user, $fields)->getData();
 
-		if (isset($fields[self::EVENT_FIELD_NAME]) && is_int($this->event_id)) {
-			$_fields =
-				Fields::parseFields($fields[self::EVENT_FIELD_NAME]['fields'] ?? '');
-			$result_data[self::EVENT_FIELD_NAME] =
-				EventsCollection::one(
-					App::DB(),
-					$user,
-					$this->event_id,
-					$_fields,
-					array()
-				)->getParams($user, $_fields)->getData();
+		if (isset($fields[self::EVENT_FIELD_NAME])) {
+			if (is_int($this->event_id)){
+				$_fields =
+					Fields::parseFields($fields[self::EVENT_FIELD_NAME]['fields'] ?? '');
+				$result_data[self::EVENT_FIELD_NAME] =
+					EventsCollection::one(
+						App::DB(),
+						$user,
+						$this->event_id,
+						$_fields,
+						array()
+					)->getParams($user, $_fields)->getData();
+			}else{
+				$result_data[self::EVENT_FIELD_NAME] = null;
+			}
+
 		}
 
 		if (isset($fields[self::ORGANIZATION_FIELD_NAME])) {
