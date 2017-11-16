@@ -56,7 +56,8 @@ AS
     LEFT JOIN events ON broadcasts.event_id = events.id;
 
 
-ALTER TABLE broadcasts ADD COLUMN subject TEXT DEFAULT NULL;
+ALTER TABLE broadcasts
+  ADD COLUMN subject TEXT DEFAULT NULL;
 
 CREATE OR REPLACE VIEW view_broadcasts
 AS
@@ -80,4 +81,40 @@ AS
     subject
   FROM broadcasts
     LEFT JOIN events ON broadcasts.event_id = events.id;
+
+CREATE OR REPLACE VIEW view_stats_utm AS
+  SELECT
+    stat_events.utm_fields ->> 'utm_source'   AS utm_source,
+    stat_events.utm_fields ->> 'utm_medium'   AS utm_medium,
+    stat_events.utm_fields ->> 'utm_campaign' AS utm_campaign,
+    stat_events.utm_fields ->> 'utm_content'  AS utm_content,
+    stat_events.utm_fields ->> 'utm_term'     AS utm_term,
+    COUNT(*) AS open_count,
+    ((SELECT COUNT(*)
+     FROM view_tickets_orders
+       INNER JOIN ticket_orders ON ticket_orders.id = view_tickets_orders.id
+     WHERE view_tickets_orders.ticket_order_status_type = 'green'
+      AND stat_events.event_id = view_tickets_orders.event_id
+      AND ticket_orders.utm_fields = stat_events.utm_fields
+    ) / COUNT(*)) AS conversion,
+    (SELECT SUM(COALESCE(view_tickets_orders.final_sum, 0) )
+     FROM view_tickets_orders
+       INNER JOIN ticket_orders ON ticket_orders.id = view_tickets_orders.id
+     WHERE view_tickets_orders.ticket_order_status_type = 'green'
+      AND stat_events.event_id = view_tickets_orders.event_id
+      AND ticket_orders.utm_fields = stat_events.utm_fields
+    ) AS orders_sum,
+    event_id
+  FROM events
+    INNER JOIN stat_events ON stat_events.event_id = events.id
+  WHERE
+    stat_events.utm_fields IS NOT NULL
+    AND utm_fields :: TEXT <> '{}'
+GROUP BY utm_source,
+  utm_medium,
+  utm_campaign,
+  utm_content,
+  utm_term,
+event_id,
+utm_fields;
 

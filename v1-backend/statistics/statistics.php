@@ -70,6 +70,24 @@ $__modules['statistics'] = array(
 
 
 		},
+		'{/events/(id:[0-9]+)}/utm' => function ($id) use ($__db, $__request, $__user, $__fields, $__pagination) {
+
+			if ($__user instanceof User == false) throw new PrivilegesException('NOT_AUTHORIZED', $__db);
+			$__request['statistics_event'] = EventsCollection::one($__db, $__user, $id, array());
+
+			if (!$__user->isAdmin($__request['statistics_event']->getOrganization())) throw new PrivilegesException('NOT_ADMIN', $__db);
+
+			$event = EventsCollection::one(
+				$__db,
+				$__user,
+				intval($id),
+				$__fields);
+
+
+			return EventsStatistics::getUTMData(
+				$event,
+				$__db);
+		},
 		'{/organizations/(id:[0-9]+)/subscribers/(user_id:[0-9]+)/orders}' => function ($organization_id, $user_id) use ($__db, $__order_by, $__request, $__user, $__fields, $__pagination) {
 			$organization = OrganizationsCollection::one(
 				$__db,
