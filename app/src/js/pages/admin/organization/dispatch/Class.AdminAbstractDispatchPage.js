@@ -152,6 +152,7 @@ AdminAbstractDispatchPage = extending(AdminPage, (function() {
 				name: 'message_text',
 				required: true
 			}, ['form_textarea', 'Wysiwyg'], escapeHtml(this.dispatch.message_text) || ''),
+			email_help: __APP.BUILD.helpLink(HelpCenterConnection.ARTICLE.DISPATCHES, 'Как сделать рассылку для пользователей'),
 			dispatch_datepicker: __APP.BUILD.formUnit({
 				name: 'notification_date',
 				type: 'date',
