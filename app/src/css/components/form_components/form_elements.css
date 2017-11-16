@@ -135,6 +135,7 @@ span.form_unit {display: inline-block}
 .form_textarea[readonly] {
 	opacity: .5;
 	pointer-events: none;
+	background-color: initial;
 }
 
 .form_input,
@@ -239,7 +240,7 @@ select.form_input_group_before {cursor: pointer}
 .form_datepicker {
 	display: inline-flex;
 	align-items: center;
-	min-width: 120px;
+	min-width: 160px;
 	cursor: pointer;
 
 	padding: 0 calc(.6rem * 2 + 13px) 0 .6rem;
@@ -507,6 +508,9 @@ select.form_input_group_before {cursor: pointer}
 .form_checkbox_wrapper:not(.-reverse) > .form_checkbox:checked + .form_label:after,
 .form_radio_wrapper.-reverse > .form_radio:checked + .form_label:before,
 .form_checkbox_wrapper.-reverse > .form_checkbox:checked + .form_label:before {border-color: #fff}
+
+.form_radio_wrapper > .form_helptext,
+.form_checkbox_wrapper > .form_helptext {margin-left: 30px}
 
 /* /Form Radio & Checkbox */
 /* Form Radio Group */

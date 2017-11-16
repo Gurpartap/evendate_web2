@@ -151,7 +151,7 @@ AdminOrganizationOverviewPage = extending(AdminOrganizationPage, (function() {
 			}];
 		}
 		
-		$container.highcharts($.extend(true, {}, this.highchart_defaults, pie_chart_options, {series: pieChartSeriesNormalize(data)}));
+		$container.highcharts($.extend(true, {}, AdminPage.HIGHCHART_DEFAULT_OPTIONS, pie_chart_options, {series: pieChartSeriesNormalize(data)}));
 	};
 	
 	AdminOrganizationOverviewPage.prototype.render = function() {

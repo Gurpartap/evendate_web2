@@ -79,7 +79,15 @@ DataSet = extending(Array, (function() {
 				
 				for (var i = 0, entity = entities[i]; i < entities.length; entity = entities[++i]) {
 					if (empty(entity[ID_PROP_NAME]) || (!empty(entity[ID_PROP_NAME]) && !this.has(entity[ID_PROP_NAME]))) {
-						item = (entity instanceof this.collection_of) ? entity : (new this.collection_of()).setData(entity);
+						if (entity instanceof this.collection_of) {
+							item = entity;
+						} else {
+							if (typeof this.collection_of.factory === 'function') {
+								item = this.collection_of.factory(entity);
+							} else {
+								item = (new this.collection_of()).setData(entity);
+							}
+						}
 						this.__last_pushed.push(item);
 						this[this.length++] = item;
 						if (!empty(item[ID_PROP_NAME])) {
@@ -120,6 +128,14 @@ DataSet = extending(Array, (function() {
 				return this.map(function(el) {
 					return el;
 				})
+			},
+			/**
+			 *
+			 * @return {PlainArray}
+			 */
+			toPlainArray: function() {
+				
+				return toPlainArray(this);
 			},
 			/**
 			 *

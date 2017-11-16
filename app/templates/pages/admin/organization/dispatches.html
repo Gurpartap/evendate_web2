@@ -1,0 +1,63 @@
+<script type="javascript/template" id="tmpl-admin-dispatches-page">
+	<div class="org_admin_dispatches_page material -level_2_material">
+		<header class="org_admin_dispatches_page_header flex_grid -align_space_between -valign_center">
+			<div class="grid_box">
+				<h2 class="org_admin_dispatches_page_title">Рассылки</h2>
+			</div>
+			<div class="grid_box -align_right">
+				{add_dispatch_button}
+			</div>
+		</header>
+		<div class="org_admin_dispatches_wrapper DispatchesWrapper">
+			{dispatches_list}
+		</div>
+	</div>
+</script>
+
+<script type="javascript/template" id="tmpl-admin-dispatch-item">
+	<div class="org_admin_dispatch_item DispatchItem">
+		<aside class="org_admin_dispatch_item_side">
+			<button class="org_admin_dispatch_item_opener fa_icon fa-chevron-right"></button>
+		</aside>
+		<div class="org_admin_dispatch_item_body flex_grid -align_space_between">
+			<div class="org_admin_dispatch_content grid_box DispatchContent">
+				<div class="DispatchWholeContent">
+					<div class="org_admin_dispatch_main_content DispatchMainContent">
+						<h4 class="org_admin_dispatch_title">{name}</h4>
+						{done_text}
+						<div class="pair_list -align_left">
+							<div class="pair">
+								<span class="pair_key -text_color_primary_50">Дата отправки</span>
+								<span class="pair_value -font_weight_bolder">{date}</span>
+							</div>
+							<div class="pair">
+								<span class="pair_key -text_color_primary_50">Тип рассылки</span>
+								<span class="pair_value -font_weight_bolder">{type}</span>
+							</div>
+							<div class="pair">
+								<span class="pair_key -text_color_primary_50">Событие</span>
+								<span class="pair_value -font_weight_bolder">{event_link}</span>
+							</div>
+						</div>
+					</div>
+					<div class="org_admin_dispatch_additional_content">
+						{additional_content}
+					</div>
+				</div>
+			</div>
+			<aside class="org_admin_dispatch_item_service grid_box -align_right">
+				{service_action_buttons}
+			</aside>
+		</div>
+	</div>
+</script>
+
+<script type="javascript/template" id="tmpl-admin-dispatch-progress-bar">
+	<div class="org_admin_dispatch_progress_bar">
+		<div class="org_admin_dispatch_progress_bar_heading flex_grid -align_space_between">
+			<div class="grid_box">{name}</div>
+			<div class="grid_box">{percentage}</div>
+		</div>
+		{progress_bar}
+	</div>
+</script>

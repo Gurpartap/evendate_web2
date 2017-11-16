@@ -6,7 +6,14 @@ require_once $BACKEND_FULL_PATH . '/broadcasts/Class.BroadcastsCollection.php';
 
 $__modules['broadcasts'] = array(
 	'GET' => array(
+		'{/(uuid:\w+-\w+-\w+-\w+-\w+)}' => function ($uuid) use ($__db, $__user, $__length, $__page, $__request, $__fields, $__pagination, $__order_by) {
+			$__request['uuid'] = $uuid;
+			return BroadcastsCollection::filter($__db, $__user, $__request, $__fields, $__pagination, $__order_by ?? array('uuid'));
+		},
 		'' => function () use ($__db, $__user, $__length, $__page, $__request, $__fields, $__pagination, $__order_by) {
+			if (isset($__request['organization_id'])){
+				$__request['organization'] = OrganizationsCollection::one( $__db, $__user, $__request['organization_id'], array());
+			}
 			return BroadcastsCollection::filter($__db, $__user, $__request, $__fields, $__pagination, $__order_by ?? array('uuid'));
 		}
 	),
