@@ -668,8 +668,8 @@ class Organization extends AbstractEntity
 			$data['default_address'] = null;
 		}
 
-		if (isset($data['city_id'])) {
-			$data['city_id'] = filter_var($data['city_id'], FILTER_VALIDATE_INT);
+		if (isset($data['city']) || isset($data['city_id'])) {
+			$data['city_id'] = CitiesCollection::create(App::DB(), $data['city'] ?? $data['city_id'])->getId();
 		} else {
 			$data['city_id'] = 1;
 		}
