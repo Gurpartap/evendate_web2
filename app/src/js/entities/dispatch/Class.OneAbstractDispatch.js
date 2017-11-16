@@ -66,12 +66,12 @@ OneAbstractDispatch = extending(OneEntity, (function() {
 		var dispatch = new OneAbstractDispatch();
 		
 		switch (true) {
-			case !isVoid(data.organization_id): {
-				dispatch = new OneOrganizationDispatch();
-				break;
-			}
 			case !isVoid(data.event_id): {
 				dispatch = new OneEventDispatch();
+				break;
+			}
+			case !isVoid(data.organization_id): {
+				dispatch = new OneOrganizationDispatch();
 				break;
 			}
 		}

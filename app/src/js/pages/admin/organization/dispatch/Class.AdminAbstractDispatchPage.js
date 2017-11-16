@@ -31,13 +31,9 @@ AdminAbstractDispatchPage = extending(AdminPage, (function() {
 	AdminAbstractDispatchPage.prototype.gatherSendData = function() {
 		var form_data = this.$wrapper.serializeForm();
 		
-		if (+form_data.event_id === 0 || isNaN(form_data.event_id)) {
-			form_data.event_id = null;
-		}
-		
-		
 		return {
 			uuid: form_data.uuid,
+			event_id: +form_data.event_id === 0 || isNaN(+form_data.event_id) ? null : form_data.event_id,
 			organization_id: form_data.organization_id,
 			is_email: form_data.dispatch_type === 'is_email',
 			is_push: form_data.dispatch_type === 'is_push',

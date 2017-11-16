@@ -61,7 +61,10 @@ AdminOrganizationDispatchesPage = extending(AdminOrganizationPage, (function() {
 				event_link: dispatch instanceof OneEventDispatch ? __APP.BUILD.actionLink({
 					title: dispatch.event.title,
 					page: '/event/{id}'.format({id: dispatch.event.id}),
-					classes: [__C.CLASSES.COLORS.ACCENT]
+					classes: [
+						__C.CLASSES.COLORS.ACCENT,
+						__C.CLASSES.UNIVERSAL_STATES.NO_UPPERCASE
+					]
 				}) : '-',
 				service_action_buttons: __APP.BUILD.actionLink({
 					page: '/admin/organization/{organization_id}/dispatch/{uuid}'.format({

@@ -46,12 +46,12 @@ AdminEditDispatchPage = extending(AdminAbstractDispatchPage, (function() {
 	AdminEditDispatchPage.prototype.fetchEvents = function() {
 		var self = this;
 		
-		if (!this.is_disabled) {
+		if (!this.dispatch.done) {
 			this.events_defer = this.events.fetchOrganizationsEvents(this.organization_id, {
 				future: true,
 				order_by: 'nearest_event_date'
 			}, ServerConnection.MAX_ENTITIES_LENGTH);
-		} else if (this.is_disabled && this.dispatch instanceof OneEventDispatch) {
+		} else if (this.dispatch.done && this.dispatch instanceof OneEventDispatch) {
 			this.events_defer = (new OneEvent(this.dispatch.event_id)).fetchEvent().then(function(event) {
 				self.events.setData([event]);
 			});
@@ -66,13 +66,13 @@ AdminEditDispatchPage = extending(AdminAbstractDispatchPage, (function() {
 	 * @param {jQuery} $event_select
 	 */
 	AdminEditDispatchPage.prototype.initEventSelect = function($event_select) {
-		if (!this.events.length || this.is_disabled) {
+		if (!this.events.length || this.dispatch.done) {
 			$event_select.prop('disabled', true);
 		}
 		initSelect2($event_select);
 		
 		if (this.dispatch instanceof OneEventDispatch) {
-			$event_select.select2('val', this.event_id);
+			$event_select.select2('val', this.dispatch.event_id);
 		}
 	};
 	
