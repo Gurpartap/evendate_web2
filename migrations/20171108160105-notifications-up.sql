@@ -55,3 +55,29 @@ AS
   FROM broadcasts
     LEFT JOIN events ON broadcasts.event_id = events.id;
 
+
+ALTER TABLE broadcasts ADD COLUMN subject TEXT DEFAULT NULL;
+
+CREATE OR REPLACE VIEW view_broadcasts
+AS
+  SELECT
+    broadcasts.id,
+    uuid,
+    event_id,
+    broadcasts.organization_id,
+    COALESCE(broadcasts.organization_id, events.organization_id) AS owner_organization_id,
+    is_email,
+    is_push,
+    is_sms,
+    broadcasts.title,
+    message_text,
+    url,
+    notification_time,
+    is_active,
+    done,
+    DATE_PART('epoch', broadcasts.created_at) :: INT             AS created_at,
+    DATE_PART('epoch', broadcasts.updated_at) :: INT             AS updated_at,
+    subject
+  FROM broadcasts
+    LEFT JOIN events ON broadcasts.event_id = events.id;
+

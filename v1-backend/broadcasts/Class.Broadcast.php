@@ -13,6 +13,7 @@ class Broadcast extends AbstractEntity
 	protected $is_sms;
 	protected $title;
 	protected $message_text;
+	protected $subject;
 	protected $url;
 	protected $notification_time;
 	protected $is_active;
@@ -20,6 +21,9 @@ class Broadcast extends AbstractEntity
 	protected $created_at;
 	protected $updated_at;
 	protected $db;
+
+	const EVENT_FIELD_NAME = 'event';
+	const ORGANIZATION_FIELD_NAME = 'organization';
 
 	protected static $DEFAULT_COLS = array(
 		'uuid',
@@ -30,6 +34,7 @@ class Broadcast extends AbstractEntity
 		'is_sms',
 		'is_active',
 		'done',
+		'subject',
 		'title'
 	);
 
@@ -66,6 +71,7 @@ class Broadcast extends AbstractEntity
 		$this->url = $data['url'] ?? null;
 		$this->uuid = $data['uuid'] ?? null;
 		$this->is_active = $data['is_active'] ?? true;
+		$this->subject = $data['subject'] ?? null;
 		$this->creator_id = $current_user->getId();
 
 		if (isset($data['notification_time'])) {
@@ -98,8 +104,9 @@ class Broadcast extends AbstractEntity
 			'is_push' => filter_var($this->is_push, FILTER_VALIDATE_BOOLEAN) ? 'true' : 'false',
 			'is_sms' => filter_var($this->is_sms, FILTER_VALIDATE_BOOLEAN) ? 'true' : 'false',
 			'title' => $this->title,
-			'is_active' => filter_var($this->is_active) ? 'true' : 'false',
+			'is_active' => filter_var($this->is_active, FILTER_VALIDATE_BOOLEAN) ? 'true' : 'false',
 			'message_text' => $this->message_text,
+			'subject' => $this->subject,
 			'url' => $this->url,
 			'notification_time' => $this->notification_time instanceof DateTime ? $this->notification_time->format(App::DB_DATETIME_FORMAT) : null
 		);
@@ -113,5 +120,38 @@ class Broadcast extends AbstractEntity
 		$res = $this->db->prepareExecute($q, 'CANT_INSERT_BROADCAST')->fetch();
 		return new Result(true, '', $res);
 	}
+
+	public function getParams(AbstractUser $user = null, array $fields = null): Result
+	{
+		$result_data = parent::getParams($user, $fields)->getData();
+
+		if (isset($fields[self::EVENT_FIELD_NAME]) && is_int($this->event_id)) {
+			$_fields =
+				Fields::parseFields($fields[self::EVENT_FIELD_NAME]['fields'] ?? '');
+			$result_data[self::EVENT_FIELD_NAME] =
+				EventsCollection::one(
+					App::DB(),
+					$user,
+					$this->event_id,
+					$_fields,
+					array()
+				)->getParams($user, $_fields)->getData();
+		}
+
+		if (isset($fields[self::ORGANIZATION_FIELD_NAME])) {
+			$_fields =
+				Fields::parseFields($fields[self::ORGANIZATION_FIELD_NAME]['fields'] ?? '');
+			$result_data[self::ORGANIZATION_FIELD_NAME] =
+				OrganizationsCollection::one(
+					App::DB(),
+					$user,
+					$this->organization_id,
+					$_fields,
+					array()
+				)->getParams($user, $_fields)->getData();
+		}
+		return new Result(true, '', $result_data);
+	}
+
 
 }
