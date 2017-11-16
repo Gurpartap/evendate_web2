@@ -43,8 +43,10 @@ AdminAbstractDispatchPage = extending(AdminPage, (function() {
 			is_push: form_data.dispatch_type === 'is_push',
 			is_sms: form_data.is_sms === true,
 			title: form_data.title,
+			subject: form_data.subject,
 			message_text: form_data.message_text,
 			url: form_data.url,
+			is_active: true,
 			notification_time: (function() {
 				if (form_data.notification_send_now) {
 					
@@ -138,6 +140,12 @@ AdminAbstractDispatchPage = extending(AdminPage, (function() {
 				placeholder: 'Например: Спонсорская кампания',
 				name: 'title',
 				value: this.dispatch.title || '',
+				required: true
+			}, ['form_input']),
+			dispatch_subject_input: __APP.BUILD.input({
+				name: 'subject',
+				placeholder: 'Тема для письма',
+				value: this.dispatch.subject || '',
 				required: true
 			}, ['form_input']),
 			dispatch_content_input: __APP.BUILD.textarea({

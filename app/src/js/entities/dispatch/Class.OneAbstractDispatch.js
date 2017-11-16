@@ -22,6 +22,7 @@ OneAbstractDispatch = extending(OneEntity, (function() {
 	 * @property {?boolean} is_push
 	 * @property {?boolean} is_sms
 	 * @property {?string} title
+	 * @property {?string} subject
 	 * @property {?string} message_text
 	 * @property {?string} url
 	 * @property {?string} notification_time
@@ -40,6 +41,7 @@ OneAbstractDispatch = extending(OneEntity, (function() {
 		this.is_push = null;
 		this.is_sms = null;
 		this.title = null;
+		this.subject = null;
 		this.message_text = null;
 		this.url = null;
 		this.notification_time = null;
@@ -87,6 +89,7 @@ OneAbstractDispatch = extending(OneEntity, (function() {
 			is_sms: data.is_sms,
 			is_active: data.is_active,
 			title: data.title,
+			subject: data.subject,
 			message_text: data.message_text,
 			notification_time: data.notification_time
 		};
