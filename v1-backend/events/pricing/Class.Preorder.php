@@ -39,10 +39,13 @@ class Preorder
 			$this->tickets_count = 0;
 			$this->sum = 0;
 			foreach ($this->tickets as $ticket) {
-				$ticket_type = TicketTypesCollection::oneByUUID($this->db, $this->user, $ticket['uuid'], array());
-				if ($ticket_type->getPrice() > 0) {
-					$this->tickets_count += $ticket['count'];
-					$this->sum = $this->sum + intval($ticket['count']) * $ticket_type->getPrice();
+				if (!isset($ticket['uuid'])){
+				}else{
+					$ticket_type = TicketTypesCollection::oneByUUID($this->db, $this->user, $ticket['uuid'], array());
+					if ($ticket_type->getPrice() > 0) {
+						$this->tickets_count += $ticket['count'];
+						$this->sum = $this->sum + intval($ticket['count']) * $ticket_type->getPrice();
+					}
 				}
 			}
 		}
@@ -56,8 +59,6 @@ class Preorder
 	{
 		return $this->event;
 	}
-
-
 
 	public function getTicketsCount()
 	{

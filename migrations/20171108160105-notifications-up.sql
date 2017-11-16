@@ -1,8 +1,18 @@
+-- adds field for utm
 ALTER TABLE ticket_orders
   ADD COLUMN utm_fields JSONB DEFAULT NULL;
 
-ALTER TABLE ticket_orders
-  ADD COLUMN client_info JSONB DEFAULT NULL;
+-- adds field for utm
+ALTER TABLE stat_events
+  ADD COLUMN utm_fields JSONB DEFAULT NULL;
+
+-- adds field for user-agent info
+ALTER TABLE tokens
+  ADD COLUMN user_agent_info JSONB DEFAULT NULL;
+
+-- adds field for user-agent info
+ALTER TABLE tokens
+  ADD COLUMN user_agent TEXT DEFAULT NULL;
 
 CREATE TABLE broadcasts (
   id                SERIAL PRIMARY KEY,
@@ -42,6 +52,32 @@ AS
     done,
     DATE_PART('epoch', broadcasts.created_at) :: INT             AS created_at,
     DATE_PART('epoch', broadcasts.updated_at) :: INT             AS updated_at
+  FROM broadcasts
+    LEFT JOIN events ON broadcasts.event_id = events.id;
+
+
+ALTER TABLE broadcasts ADD COLUMN subject TEXT DEFAULT NULL;
+
+CREATE OR REPLACE VIEW view_broadcasts
+AS
+  SELECT
+    broadcasts.id,
+    uuid,
+    event_id,
+    broadcasts.organization_id,
+    COALESCE(broadcasts.organization_id, events.organization_id) AS owner_organization_id,
+    is_email,
+    is_push,
+    is_sms,
+    broadcasts.title,
+    message_text,
+    url,
+    notification_time,
+    is_active,
+    done,
+    DATE_PART('epoch', broadcasts.created_at) :: INT             AS created_at,
+    DATE_PART('epoch', broadcasts.updated_at) :: INT             AS updated_at,
+    subject
   FROM broadcasts
     LEFT JOIN events ON broadcasts.event_id = events.id;
 
