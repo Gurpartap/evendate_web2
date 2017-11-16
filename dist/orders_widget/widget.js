@@ -39825,7 +39825,7 @@ Data = (function() {
 		}
 		for (field in data) {
 			if (data.hasOwnProperty(field) && this.hasOwnProperty(field)) {
-				if ((this[field] instanceof Data || this[field] instanceof DataSet) && !empty(data[field])) {
+				if (this[field] instanceof Data || this[field] instanceof DataSet) {
 					this[field].setData(data[field]);
 				} else {
 					this[field] = data[field];
@@ -49195,7 +49195,7 @@ LegalEntityPayment = extending(Page, (function() {
 	 * @constructor
 	 * @constructs LegalEntityPayment
 	 *
-	 * @property {OneExtendedOrder} order
+	 * @property {OneOrder} order
 	 * @property {OneEvent} event
 	 */
 	function LegalEntityPayment(event_id, uuid) {
@@ -49203,8 +49203,11 @@ LegalEntityPayment = extending(Page, (function() {
 		
 		Page.call(this);
 		
-		this.order = new OneExtendedOrder(event_id, uuid);
-		this.order_fields = new Fields('sum');
+		this.order = new OneOrder(uuid, event_id);
+		this.order_fields = new Fields(
+			'sum',
+			'event'
+		);
 		
 		this.render_vars = {
 			event_id: event_id,
