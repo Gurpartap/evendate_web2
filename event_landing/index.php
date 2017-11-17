@@ -196,7 +196,7 @@ if (isset($_REQUEST['edit']) && $_REQUEST['edit'] == true) {
     <span class="board-header-btn-text u-text-underline">Настройки</span></div>
   <div class="container">
     <div class="row">
-      <div class="col-lg-8 col-md-10 col-lg-offset-2 col-md-offset-1 text-center">
+      <div class="col-lg-10 col-md-10 col-lg-offset-1 col-md-offset-1 text-center">
         <div class="logo-home">
           <!-- REPLACE WITH YOUR LOGO -->
           <!--          <img src="" alt="">-->

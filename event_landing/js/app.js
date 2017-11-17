@@ -106,7 +106,7 @@ var backgrounds = [
     }
 ];
 
-__app.controller('WholeWorldController', ['$scope', 'Upload', '$timeout', function ($scope, Upload, $timeout) {
+__app.controller('WholeWorldController', ['$scope', 'Upload', '$timeout', '$sce', function ($scope, Upload, $timeout, $sce) {
 
     $scope.edit_mode = search_data.edit;
     $scope.hide_loader = false;
@@ -880,6 +880,7 @@ __app.controller('WholeWorldController', ['$scope', 'Upload', '$timeout', functi
                 if ($scope.data.gallery_background) {
                     $scope.setGalleryImage($scope.data.gallery_background);
                 }
+                $scope.data.custom.html = $sce.trustAsHtml($scope.data.custom.html);
                 $scope.$apply();
             }
 
