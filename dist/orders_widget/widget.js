@@ -46930,7 +46930,6 @@ AuthModal = extending(AbstractModal, (function() {
 		AbstractModal.call(this);
 		this.options = options || {};
 		this.redirect_to = redirect_to;
-		this.title = 'Вход в профиль';
 	}
 	/**
 	 *

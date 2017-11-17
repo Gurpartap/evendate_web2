@@ -252,7 +252,7 @@ switch ($_REQUEST['type']) {
 	iframe.style.display = 'block';
 	iframe.style.border = '0';
 	iframe.setAttribute('width', props['width'] || '100%');
-	iframe.setAttribute('height', props['height'] || '500');
+	iframe.setAttribute('height', props['height'] || '660');
 
 	document.currentScript.parentElement.insertBefore(iframe, document.currentScript);
 
