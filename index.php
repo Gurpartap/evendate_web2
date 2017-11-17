@@ -303,7 +303,6 @@ require_once( 'parts/sidebar.php' );
       <div class="page_wrapper Content -fadeable"></div>
     </div>
 		<div id="main_section_cap" class="MainSectionCap"></div>
-
   </div>
 </div>
 

@@ -86,6 +86,7 @@ var gulp = require('gulp'),
 			css_path + 'common.css',
 			
 			css_path + 'components/button.css',
+			css_path + 'components/action.css',
 			css_path + 'components/form_components/*.css',
 			css_path + 'components/fields.css',
 			css_path + 'components/link.css',

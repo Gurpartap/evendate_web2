@@ -21,14 +21,13 @@ OrganizationModel = extending(OneEntity, (function() {
 	 * @property {?string} default_address
 	 * @property {?string} vk_url
 	 * @property {?string} facebook_url
-	 * @property {?string} type_id
+	 * @property {?number} type_id
 	 * @property {?string} background
 	 * @property {?string} logo
 	 * @property {?string} detail_info_url
 	 * @property {?string} email
-	 * @property {?string} city
-	 * @property {?string} city_id
-	 * @property {?string} country_id
+	 * @property {?number} city_id
+	 * @property {?number} country_id
 	 * @property {?boolean} is_private
 	 * @property {?string} brand_color
 	 * @property {?string} brand_color_accent
@@ -49,7 +48,6 @@ OrganizationModel = extending(OneEntity, (function() {
 		this.logo_filename = null;
 		this.detail_info_url = null;
 		this.email = null;
-		this.city = null;
 		this.city_id = null;
 		this.country_id = null;
 		this.is_private = null;
@@ -93,7 +91,13 @@ OrganizationModel = extending(OneEntity, (function() {
 							break;
 						}
 						case 'country': {
-							obj.country_id = data[field].id;
+							if (data[field] instanceof OneEntity) {
+								obj.country_id = data[field].id;
+							} else if (data.city instanceof OneCity) {
+								obj.country_id = data.city.country_id;
+							} else {
+								obj.country_id = data[field];
+							}
 							break;
 						}
 					}
