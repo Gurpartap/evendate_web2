@@ -35,8 +35,8 @@ if (App::$ENV == 'prod' || App::$ENV == 'test') {
 	<div class="page_wrapper Content -fadeable"></div>
 </div>
 
-<div class="modal_wrapper">
-	<div class="modal_destroyer"></div>
+<div class="modal_wrapper ModalsWrapper">
+	<div class="modal_destroyer ModalDestroyer"></div>
 </div>
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/1.3.6/socket.io.min.js" type="text/javascript"></script>

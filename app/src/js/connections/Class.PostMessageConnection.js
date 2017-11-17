@@ -43,7 +43,8 @@ PostMessageConnection = (function() {
 		SET_COLOR: 'setColor',
 		GET_HEIGHT: 'getHeight',
 		REDIRECT: 'redirect',
-		FETCH_REDIRECT_PARAM: 'fetchRedirectToParam'
+		FETCH_REDIRECT_PARAM: 'fetchRedirectToParam',
+		OPEN_NEW_TAB: 'openNewTab'
 	};
 	/**
 	 * @callback postMessageListenerCallback
