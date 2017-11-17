@@ -44,6 +44,7 @@ var gulp = require('gulp'),
 			
 			js_path + 'server/*.js',
 			
+			js_path + 'entities/*.js',
 			js_path + 'entities/city/*.js',
 			js_path + 'entities/category/*.js',
 			js_path + 'entities/promocode/*.js',
@@ -52,6 +53,7 @@ var gulp = require('gulp'),
 			js_path + 'entities/event/Class.FavoredEventsCollection.js',
 			js_path + 'entities/user/*.js',
 			js_path + 'entities/organization/*.js',
+			js_path + 'entities/order/*.js',
 			js_path + 'entities/order_extended/Class.OneExtendedOrder.js',
 			
 			js_path + 'utils/Class.QuantityInput.js',

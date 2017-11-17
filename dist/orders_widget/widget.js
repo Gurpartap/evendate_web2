@@ -39600,6 +39600,45 @@ socket.on('image.getFromURLDone', function (response) {
 
 /**
  *
+ * @class Data
+ */
+Data = (function() {
+	/**
+	 *
+	 * @constructor
+	 * @constructs Data
+	 */
+	function Data() {}
+	
+	Data.prototype.ID_PROP_NAME = 'id';
+	/**
+	 *
+	 * @param {(Array|object)} data
+	 * @returns {Data}
+	 */
+	Data.prototype.setData = function(data) {
+		var field;
+		
+		if (data instanceof Array) {
+			data = data[0];
+		}
+		for (field in data) {
+			if (data.hasOwnProperty(field) && this.hasOwnProperty(field)) {
+				if (this[field] instanceof Data || this[field] instanceof DataSet) {
+					this[field].setData(data[field]);
+				} else {
+					this[field] = data[field];
+				}
+			}
+		}
+		
+		return this;
+	};
+	
+	return Data;
+}());
+/**
+ *
  * @class DataSet
  * @extends Array
  */
@@ -39799,45 +39838,6 @@ DataSet = extending(Array, (function() {
 	
 	return DataSet;
 }()));
-/**
- *
- * @class Data
- */
-Data = (function() {
-	/**
-	 *
-	 * @constructor
-	 * @constructs Data
-	 */
-	function Data() {}
-	
-	Data.prototype.ID_PROP_NAME = 'id';
-	/**
-	 *
-	 * @param {(Array|object)} data
-	 * @returns {Data}
-	 */
-	Data.prototype.setData = function(data) {
-		var field;
-		
-		if (data instanceof Array) {
-			data = data[0];
-		}
-		for (field in data) {
-			if (data.hasOwnProperty(field) && this.hasOwnProperty(field)) {
-				if (this[field] instanceof Data || this[field] instanceof DataSet) {
-					this[field].setData(data[field]);
-				} else {
-					this[field] = data[field];
-				}
-			}
-		}
-		
-		return this;
-	};
-	
-	return Data;
-}());
 /**
  * @class Fields
  */
@@ -40158,6 +40158,37 @@ EntitiesCollection = extending(DataSet, (function() {
 	
 	return EntitiesCollection;
 }()));
+/**
+ * @typedef {object} AJAXData
+ * @property {(Fields|Array|string|undefined)} [fields]
+ * @property {(string|undefined)} [format=json] Sets the response format. Can be xml or json. Default: json
+ * @property {(boolean|undefined)} [download=false] If flag is TRUE server will set additional headers to make response downloadble in browser. Default: false
+ * @property {(boolean|undefined)} [nude_data=false] If nude_data is TRUE server response with only data, without status code and description. Default: false
+ * @property {(number|undefined)} [offset] Use offset to set how many elements you want to skip. Default: 0
+ * @property {(number|undefined)} [length] Sets the items count server will return in response. Default: 100
+ * @property {(string|undefined)} [order_by]
+ */
+/**
+ * @typedef {function((object|Array<object>))} AJAXCallback
+ */
+/**
+ * @interface
+ */
+EntityInterface = (function() {
+	/**
+	 *
+	 * @interface
+	 */
+	function EntityInterface() {}
+	/**
+	 *
+	 * @param {(Array|object)} data
+	 * @returns {EntityInterface}
+	 */
+	EntityInterface.prototype.setData = function(data) {};
+	
+	return EntityInterface;
+}());
 /**
  * @requires ../Class.OneEntity.js
  */
@@ -45601,6 +45632,165 @@ OrganizationSubscribersCollection = extending(UsersCollection, (function() {
 	return OrganizationSubscribersCollection;
 }()));
 /**
+ * @requires Class.AbstractEventOrdersCollection.js
+ */
+/**
+ *
+ * @class EventAllOrdersCollection
+ * @extends AbstractEventOrdersCollection
+ */
+EventAllOrdersCollection = extending(AbstractEventOrdersCollection, (function() {
+	/**
+	 *
+	 * @param {(string|number)} [event_id=0]
+	 *
+	 * @constructor
+	 * @constructs EventAllOrdersCollection
+	 *
+	 * @property {(string|number)} event_id
+	 */
+	function EventAllOrdersCollection(event_id) {
+		AbstractEventOrdersCollection.call(this, event_id);
+	}
+	
+	/**
+	 *
+	 * @param {(string|number)} event_id
+	 * @param {AJAXData} [ajax_data]
+	 * @param {AJAXCallback} [success]
+	 *
+	 * @return {jqPromise}
+	 */
+	EventAllOrdersCollection.fetchOrders = function(event_id, ajax_data, success) {
+		return __APP.SERVER.getData('/api/v1/statistics/events/' + event_id + '/orders', ajax_data, success);
+	};
+	/**
+	 *
+	 * @param {ServerExports.EXPORT_EXTENSION} [format=xlsx]
+	 *
+	 * @return {jqPromise}
+	 */
+	EventAllOrdersCollection.prototype.export = function(format) {
+		
+		return (new ServerExports()).eventOrders(this.event_id, format);
+	};
+	
+	
+	return EventAllOrdersCollection;
+}()));
+/**
+ * @requires Class.AbstractEventOrdersCollection.js
+ */
+/**
+ *
+ * @class EventMyOrdersCollection
+ * @extends AbstractEventOrdersCollection
+ */
+EventMyOrdersCollection = extending(AbstractEventOrdersCollection, (function() {
+	/**
+	 *
+	 * @param {(string|number)} [event_id=0]
+	 *
+	 * @constructor
+	 * @constructs EventMyOrdersCollection
+	 *
+	 * @property {(string|number)} event_id
+	 */
+	function EventMyOrdersCollection(event_id) {
+		AbstractEventOrdersCollection.call(this, event_id);
+	}
+	
+	/**
+	 *
+	 * @param {(string|number)} event_id
+	 * @param {AJAXData} [ajax_data]
+	 * @param {AJAXCallback} [success]
+	 *
+	 * @return {jqPromise}
+	 */
+	EventMyOrdersCollection.fetchOrders = function(event_id, ajax_data, success) {
+		
+		return __APP.SERVER.getData('/api/v1/events/' + event_id + '/orders', ajax_data, success);
+	};
+	
+	return EventMyOrdersCollection;
+}()));
+/**
+ * @requires Class.OrdersCollection.js
+ */
+/**
+ *
+ * @class MyOrdersCollection
+ * @extends OrdersCollection
+ */
+MyOrdersCollection = extending(OrdersCollection, (function() {
+	/**
+	 *
+	 * @constructor
+	 * @constructs MyOrdersCollection
+	 */
+	function MyOrdersCollection() {
+		ExtendedOrdersCollection.call(this);
+	}
+	
+	/**
+	 *
+	 * @param {AJAXData} ajax_data
+	 *
+	 * @return {jqPromise}
+	 */
+	MyOrdersCollection.fetchOrders = function(ajax_data) {
+		
+		return __APP.SERVER.getData(OrdersCollection.ENDPOINT.ORDER, ajax_data);
+	};
+	/**
+	 *
+	 * @param {Fields} [fields]
+	 * @param {number} [length]
+	 * @param {(Array<string>|string)} [order_by]
+	 *
+	 * @return {jqPromise}
+	 */
+	MyOrdersCollection.prototype.fetch = function(fields, length, order_by) {
+		var self = this;
+		
+		return MyOrdersCollection.fetchOrders({
+			fields: fields || undefined,
+			offset: this.length || undefined,
+			length: length || undefined,
+			order_by: order_by || undefined
+		}).then(function(orders) {
+			self.setData(orders);
+			
+			return self.__last_pushed;
+		});
+	};
+	/**
+	 *
+	 * @param {Fields} [fields]
+	 * @param {(Array<string>|string)} [order_by]
+	 *
+	 * @return {jqPromise}
+	 */
+	MyOrdersCollection.prototype.fetchAll = function(fields, order_by) {
+		var self = this;
+		
+		return MyOrdersCollection.fetchOrders({
+			fields: fields || undefined,
+			offset: 0,
+			length: ServerConnection.MAX_ENTITIES_LENGTH,
+			order_by: order_by || undefined
+		}).then(function(orders) {
+			self.setData(orders);
+			
+			return self.__last_pushed;
+		});
+	};
+	
+	
+	return MyOrdersCollection;
+}()));
+/**
  * @requires ../order/Class.OneOrder.js
  */
 /**
@@ -48689,7 +48879,7 @@ OrderPage = extending(Page, (function() {
 							case RegistrationFieldModel.TYPES.FIRST_NAME:
 								return 'Используйте настоящее имя для регистрации';
 							case RegistrationFieldModel.TYPES.LAST_NAME:
-								return 'Используйте настоящюю фамилию для регистрации';
+								return 'Используйте настоящую фамилию для регистрации';
 							default:
 								return '';
 						}
