@@ -54,6 +54,10 @@ function wrongInitError() { ?>
 
 		EvendateWidgetBuilder.prototype.postMessageHandler = function(command, data) {
 			switch (command) {
+				case 'openNewTab': {
+
+					return window.open(data, '_blank').focus();
+				}
 				case 'redirect': {
 
 					return window.location = data;
