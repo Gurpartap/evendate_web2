@@ -34,6 +34,14 @@ Data = (function() {
 		
 		return this;
 	};
+	/**
+	 *
+	 * @return {PlainObject}
+	 */
+	Data.prototype.toPlainObject = function() {
+		
+		return toPlainObject(this);
+	};
 	
 	return Data;
 }());

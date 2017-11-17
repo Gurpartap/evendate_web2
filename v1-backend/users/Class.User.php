@@ -17,6 +17,10 @@ class User extends AbstractUser
 	private $editor_instance;
 	protected $db;
 
+	private $cached_admin = array();
+	private $cached_event_admin = array();
+	private $cached_moderator = array();
+
 	const SETTINGS = array(
 		'send_notifications' => 'boolean',
 		'send_notifications_for_favored' => 'boolean',
@@ -91,12 +95,12 @@ class User extends AbstractUser
 		return $this->id;
 	}
 
-
 	public function isAdmin(Organization $organization): bool
 	{
-		$q_get_is_admin = App::queryFactory()
-			->newSelect()
-			->from('users_organizations')
+		if (isset($this->cached_admin[$organization->getId()]))
+			return $this->cached_admin[$organization->getId()];
+		$q_get_is_admin = App::queryFactory()->newSelect();
+		$q_get_is_admin->from('users_organizations')
 			->cols(array('user_id'))
 			->join('inner', 'users_roles', 'users_organizations.role_id = users_roles.id')
 			->where('organization_id = ?', $organization->getId())
@@ -104,11 +108,19 @@ class User extends AbstractUser
 			->where('status = TRUE')
 			->where('users_roles.name = ?', Roles::ROLE_ADMIN);
 		$p_get = $this->db->prepareExecute($q_get_is_admin, 'CANT_GET_ADMIN_STATUS');
-		return $p_get->rowCount() > 0;
+		$return = $p_get->rowCount() > 0;
+		$this->cached_admin[$organization->getId()] = $return;
+		return $return;
 	}
 
 	public function isModerator(Organization $organization): bool
 	{
+		if (isset($this->cached_moderator[$organization->getId()])
+			&& $this->cached_moderator[$organization->getId()]
+		) {
+			return $this->cached_moderator[$organization->getId()];
+		}
+
 		$q_get_is_admin = App::queryFactory()
 			->newSelect()
 			->from('users_organizations')
@@ -157,6 +169,12 @@ class User extends AbstractUser
 
 	public function isEventAdmin(Event $event): bool
 	{
+
+		if (isset($this->cached_event_admin[$event->getId()])
+			&& $this->cached_event_admin[$event->getId()]
+		) {
+			return $this->cached_event_admin[$event->getId()];
+		}
 		$q_get_is_admin = App::queryFactory()
 			->newSelect()
 			->from('users_organizations')
@@ -369,7 +387,8 @@ class User extends AbstractUser
 		return $res->fetch();
 	}
 
-	public function getOrdersInOrganization(Event $event){
+	public function getOrdersInOrganization(Event $event)
+	{
 		$q_get_count = App::queryFactory()->newSelect();
 		$q_get_count->from('view_tickets_orders')
 			->cols(array('final_sum'))

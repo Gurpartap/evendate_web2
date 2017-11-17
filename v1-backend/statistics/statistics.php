@@ -201,7 +201,7 @@ $__modules['statistics'] = array(
 	),
 	'POST' => array(
 		'batch' => function () use ($__db, $__request, $__user) {
-			return Statistics::storeBatch($__request['payload'], $__user, $__db);
+			return Statistics::storeBatch($__request['payload'], $__user, $__db, $__request['utm'] ?? null);
 		}
 	),
 	'PUT' => array(

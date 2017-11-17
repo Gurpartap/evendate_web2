@@ -57,7 +57,6 @@ abstract class AbstractPricingRule implements PricingRuleInterface
 			throw new InvalidArgumentException('BAD_PRICING_RULE_TYPE');
 	}
 
-
 	function getDiscount(Preorder $preorder)
 	{
 		if ($this->isApplicable($preorder)) {
