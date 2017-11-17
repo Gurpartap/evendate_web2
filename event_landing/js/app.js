@@ -831,14 +831,6 @@ __app.controller('WholeWorldController', ['$scope', 'Upload', '$timeout', functi
                 $scope.data.header.title = event.organization_name;
                 $scope.data.header.location_addresses = event.location;
                 $scope.data.main_description = event.description;
-
-                if (event.ticketing_available) {
-                    $scope.data.tickets.title = 'Купить билеты';
-                } else if (event.registration_available) {
-                    $scope.data.tickets.title = 'Регистрация'
-                } else {
-                    $scope.data.tickets.enabled = false;
-                }
                 $scope.$apply();
                 if ($scope.edit_mode) {
                     $scope.intro_instance = introJs();
@@ -889,6 +881,14 @@ __app.controller('WholeWorldController', ['$scope', 'Upload', '$timeout', functi
                     $scope.setGalleryImage($scope.data.gallery_background);
                 }
                 $scope.$apply();
+            }
+
+            if (event.ticketing_available) {
+                $scope.data.tickets.title = 'Купить билеты';
+            } else if (event.registration_available) {
+                $scope.data.tickets.title = 'Регистрация'
+            } else {
+                $scope.data.tickets.enabled = false;
             }
             if (!$scope.edit_mode) {
                 $('[contenteditable]').prop('contenteditable', 'false');
