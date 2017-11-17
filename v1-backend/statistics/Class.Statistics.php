@@ -115,13 +115,14 @@ class Statistics
 			$no_update_badges = true;
 		}
 
-		$q_ins_event = 'INSERT INTO stat_events(event_id, token_id, stat_type_id, created_at)
-				VALUES (:event_id, :token_id, :stat_type_id, NOW())';
+		$q_ins_event = 'INSERT INTO stat_events(event_id, token_id, stat_type_id, created_at, utm_fields)
+				VALUES (:event_id, :token_id, :stat_type_id, NOW(), :utm_fields)';
 
 		$db->prepareExecuteRaw($q_ins_event, array(
 			':event_id' => $event->getId(),
 			':token_id' => $user ? $user->getTokenId() : null,
-			':stat_type_id' => $type_id
+			':stat_type_id' => $type_id,
+			':utm_fields' => App::$__REQUEST['utm'] ?? null
 		), 'CANT_INSERT_EVENT_STATS');
 		if ($no_update_badges !== true) {
 			self::updateIOsBadges($db, $user, $type, $event);
@@ -173,7 +174,7 @@ class Statistics
 		$p_ins = $db->prepareExecute($q_ins_event, 'CANT_SAVE_FRIEND_STATS');
 	}
 
-	public static function StoreBatch(array $events, AbstractUser $user = null, ExtendedPDO $db)
+	public static function StoreBatch(array $events, AbstractUser $user = null, ExtendedPDO $db, array $__request = null)
 	{
 		$organization_events = 0;
 		$organization = null;

@@ -1,0 +1,66 @@
+<script type="javascript/template" id="tmpl-admin-dispatch-page">
+	<div class="admin_dispatch_page material -level_2_material">
+		<header class="admin_dispatch_page_header">
+			<h2 class="admin_dispatch_page_title">{page_title}</h2>
+		</header>
+		<form class="admin_dispatch_body">
+			<input name="uuid" type="hidden" value="{uuid}">
+			<input name="organization_id" type="hidden" value="{organization_id}">
+			<div class="admin_dispatch_body_group">
+				<h5 class="admin_dispatch_body_group_title">Событие</h5>
+				<select id="admin_dispatch_event_select" name="event_id" class="EventsSelect" style="width: 360px">
+					<option value="0">-</option>
+					{events_options}
+				</select>
+				<p>Сообщение получат все клиенты, добавившие событие в избранное и купившие билет на событие</p>
+			</div>
+			<div class="admin_dispatch_body_group">
+				<h5 class="admin_dispatch_body_group_title">Тип рассылки</h5>
+				<div class="form_unit form_radio_wrapper">
+					<input id="dispatch_type_email" type="radio" class="form_radio" name="dispatch_type" value="is_email" checked>
+					<label for="dispatch_type_email" class="form_label"><span class="-font_weight_bolder">Email - рассылка</span></label>
+					<p class="form_helptext">Информируйте своих клиентов об акциях, интересных предложениях, анонсах</p>
+				</div>
+				<div class="form_unit form_radio_wrapper -status_disabled">
+					<input id="dispatch_type_push" type="radio" class="form_radio DispatchTypePushInput" name="dispatch_type" value="is_push" disabled>
+					<label for="dispatch_type_push" class="form_label"><span class="-font_weight_bolder">Push - уведомление</span></label>
+					<p class="form_helptext">Подходит для быстрого оповещения пользователей коротким сообщением</p>
+				</div>
+			</div>
+			<div class="admin_dispatch_body_group">
+				<h5 class="admin_dispatch_body_group_title">Название рассылки</h5>
+				{dispatch_title_input}
+				<p>Задайте уникальное наименование рассылки (используется внутри сервиса)</p>
+			</div>
+			<div class="admin_dispatch_body_group">
+				<h5 class="admin_dispatch_body_group_title">Тема письма</h5>
+				{dispatch_subject_input}
+			</div>
+			<div class="admin_dispatch_body_group">
+				<h5 class="admin_dispatch_body_group_title">Текст</h5>
+				{dispatch_content_input}
+				{email_help}
+				{get_test_dispatch_link}
+			</div>
+			<div class="admin_dispatch_body_group">
+				<h5 class="admin_dispatch_body_group_title">Время отправки</h5>
+				<div class="admin_dispatch_dispatch_time_wrapper flex_grid -valign_center">
+					<div class="grid_box">
+						<fieldset class="Switching" data-switch_id="notification_time">
+							<div class="form_group -align_left">
+								{dispatch_datepicker}
+								{dispatch_timepicker}
+							</div>
+						</fieldset>
+					</div>
+					<div class="grid_box">
+						{notification_send_now_checkbox}
+					</div>
+				</div>
+			</div>
+			<div class="-align_center">
+				{submit_button}
+			</div>
+		</form>
+	</div>
+</script>

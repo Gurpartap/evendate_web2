@@ -157,7 +157,7 @@ OrderPage = extending(Page, (function() {
 							case RegistrationFieldModel.TYPES.FIRST_NAME:
 								return 'Используйте настоящее имя для регистрации';
 							case RegistrationFieldModel.TYPES.LAST_NAME:
-								return 'Используйте настоящюю фамилию для регистрации';
+								return 'Используйте настоящую фамилию для регистрации';
 							default:
 								return '';
 						}

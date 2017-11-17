@@ -17,6 +17,7 @@ class CitiesCollection extends AbstractCollection
 
 		$statement_array = array();
 		$_friend = null;
+		$getting_distance = isset($fields['distance']);
 		$return_one = isset($filters['id']);
 		$cols = Fields::mergeFields(City::getAdditionalCols(), $fields, City::getDefaultCols());
 		$q_get_cities = App::queryFactory()->newSelect();
@@ -32,6 +33,11 @@ class CitiesCollection extends AbstractCollection
 					$statement_array[':local_name'] = $value . '%';
 					break;
 				}
+				case 'local_name_strict': {
+					$q_get_cities->orWhere('LOWER(view_cities.local_name) = LOWER(:local_name_strict)');
+					$statement_array[':local_name_strict'] = $value;
+					break;
+				}
 				case 'en_name': {
 					$q_get_cities->orWhere('LOWER(view_cities.en_name) LIKE LOWER(:en_name)');
 					$statement_array[':en_name'] = $value . '%';
@@ -43,7 +49,7 @@ class CitiesCollection extends AbstractCollection
 					break;
 				}
 				case 'organization': {
-					if ($value instanceof Organization){
+					if ($value instanceof Organization) {
 						$q_get_cities->where('view_cities.id = (SELECT city_id FROM organizations WHERE organizations.id = :organization_id)');
 						$statement_array[':organization_id'] = $value->getId();
 					}
@@ -57,6 +63,7 @@ class CitiesCollection extends AbstractCollection
 							$cols[] = $val;
 						}
 					}
+					$getting_distance = true;
 					$q_get_cities->where('view_cities.id = :id');
 					$statement_array[':id'] = $value;
 					break;
@@ -65,9 +72,9 @@ class CitiesCollection extends AbstractCollection
 		}
 
 
-		if (isset($fields['distance'])){
-			$statement_array[':latitude'] = $filters['latitude'];
-			$statement_array[':longitude'] = $filters['longitude'];
+		if ($getting_distance) {
+			$statement_array[':latitude'] = $filters['latitude'] ?? 0;
+			$statement_array[':longitude'] = $filters['longitude'] ?? 0;
 		}
 
 		$q_get_cities
@@ -83,7 +90,7 @@ class CitiesCollection extends AbstractCollection
 		}
 
 
-		$cities = $p_search = $db
+		$cities = $db
 			->prepareExecute($q_get_cities, '', $statement_array)
 			->fetchAll(PDO::FETCH_CLASS, 'City');
 
@@ -112,5 +119,54 @@ class CitiesCollection extends AbstractCollection
 			array_merge($filters ?? array(), array('id' => $id)),
 			$fields
 		);
+	}
+
+
+	private static function mb_ucfirst($str)
+	{
+		$str = mb_strtolower($str);
+		$fc = mb_strtoupper(mb_substr($str, 0, 1));
+		return $fc . mb_substr($str, 1);
+	}
+
+	public static function create(ExtendedPDO $db, string $name): City
+	{
+		if (is_numeric($name)) {
+			$filters = array('id' => $name);
+			$cities = array(self::filter($db,
+				App::getCurrentUser(),
+				$filters,
+				array(),
+				array(),
+				array())->getParams(App::getCurrentUser(), City::getDefaultCols())->getData());
+		} else {
+			$name = preg_replace('/\s+/', ' ', $name);
+			$parts = explode(' ', $name);
+			foreach ($parts as &$part) {
+				$part = self::mb_ucfirst($part);
+			}
+			$name = implode(' ', $parts);
+			$filters = array('local_name_strict' => $name);
+			$cities = self::filter($db,
+				App::getCurrentUser(),
+				$filters,
+				array(),
+				array(),
+				array())->getData();
+		}
+
+		if (count($cities) == 0) {
+			$q_ins_city = 'INSERT INTO cities(en_name, local_name, timediff_seconds, country_id, latitude, longitude)
+								VALUES(:name, :name, 0, 1, 100500, 100500) RETURNING id';
+			$p_ins_city = $db->prepareExecuteRaw($q_ins_city, array(
+				':name' => $name
+			));
+
+			$result = $p_ins_city->fetch(PDO::FETCH_ASSOC);
+			$city_id = $result['id'];
+		} else {
+			$city_id = intval($cities[0]['id']);
+		}
+		return self::one($db, App::getCurrentUser(), $city_id, array());
 	}
 }

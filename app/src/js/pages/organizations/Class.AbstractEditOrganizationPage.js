@@ -22,6 +22,7 @@ AbstractEditOrganizationPage = extending(Page, (function() {
 		
 		this.fields = new Fields(
 			'description',
+			'city',
 			'site_url',
 			'default_address',
 			'vk_url',
@@ -34,7 +35,7 @@ AbstractEditOrganizationPage = extending(Page, (function() {
 	}
 	
 	AbstractEditOrganizationPage.prototype.init = function() {
-		var PAGE = this;
+		var self = this;
 		
 		function initEditEventPage($view) {
 			
@@ -52,33 +53,42 @@ AbstractEditOrganizationPage = extending(Page, (function() {
 		}
 		
 		function initCities(selected_id) {
-			var $select = PAGE.$wrapper.find('#add_organization_city');
+			var $select = self.$wrapper.find('.OrganizationCity');
 			
-			PAGE.cities.fetchCities(null, 0, 'local_name', function() {
-				$select.append(tmpl('option', PAGE.cities.map(function(city) {
+			self.cities.fetchCities(null, 0, 'local_name', function() {
+				
+				initSelect2($select, {
+					tags: self.cities.map(function(city) {
+						
 						return {
-							val: city.id,
-							display_name: city.local_name
+							text: city.local_name,
+							id: city.id
 						};
-					})));
-				initSelect2($select);
+					}),
+					width: '100%',
+					placeholder: 'Выберите или введите город',
+					maximumSelectionLength: 1,
+					maximumSelectionSize: 1,
+					tokenSeparators: [',', ';'],
+					containerCssClass: 'form_select2 -select2_no_tags',
+					multiple: false
+				});
 				
 				if (selected_id) {
-					$select.select2('val', selected_id);
+					$select.select2('val', [selected_id]);
 				}
 			});
 		}
 		
 		function initOrganizationTypes(selected_id) {
-			PAGE.categories.fetchCategories({}, 0, function(categories) {
-				var $select = PAGE.$wrapper.find('#add_organization_type');
+			self.categories.fetchCategories({}, 0, function(categories) {
+				var $select = self.$wrapper.find('#add_organization_type');
 				
 				$select.html(tmpl('option', categories.map(function(category) {
-						return {
-							val: category.id,
-							display_name: category.name
-						};
-					})));
+					return {
+						val: category.id, display_name: category.name
+					};
+				})));
 				initSelect2($select);
 				
 				if (selected_id) {
@@ -88,38 +98,25 @@ AbstractEditOrganizationPage = extending(Page, (function() {
 		}
 		
 		function submitEditOrganization() {
-			var $form = PAGE.$wrapper.find("#add-organization-form"),
+			var $form = self.$wrapper.find('#add-organization-form'),
 				org_model = new OrganizationModel(),
 				form_data = $form.serializeForm(),
 				valid_form = formValidation($form, !!(form_data.organization_id)),
-				method_name = PAGE.organization.id ? 'updateOrganization' : 'createOrganization',
+				method_name = self.organization.id ? 'updateOrganization' : 'createOrganization',
 				$loader;
 			
 			function formValidation($form, for_edit) {
-				var is_valid = true,
-					$times = $form.find('#edit_event_different_time').prop('checked') ? $form.find('[class^="TableDay_"]') : $form.find('.MainTime');
+				var is_valid = true;
 				
 				$form.find(':required').not(':disabled').each(function() {
 					var $this = $(this),
 						max_length = $this.data('maxlength');
-					if ($this.val() === "" || (max_length && $this.val().length > max_length)) {
+					
+					if ($this.val() === '' || (max_length && $this.val().length > max_length)) {
 						if (is_valid) {
-							$('body').stop().animate({scrollTop: Math.ceil($this.offset().top - 150)}, 1000, 'swing');
+							scrollTo($this, 400);
 						}
 						handleErrorField($this);
-						is_valid = false;
-					}
-				});
-				
-				$times.each(function() {
-					var $row = $(this),
-						start = $row.find('.StartHours').val() + $row.find('.StartMinutes').val(),
-						end = $row.find('.EndHours').val() + $row.find('.EndMinutes').val();
-					if (start > end) {
-						if (is_valid) {
-							$('body').stop().animate({scrollTop: Math.ceil($row.offset().top - 150)}, 1000, 'swing');
-						}
-						showNotifier({text: 'Начальное время не может быть меньше конечного', status: false});
 						is_valid = false;
 					}
 				});
@@ -127,10 +124,11 @@ AbstractEditOrganizationPage = extending(Page, (function() {
 				if (!for_edit) {
 					$form.find('.DataUrl').each(function() {
 						var $this = $(this);
-						if ($this.val() === "") {
+						
+						if ($this.val() === '') {
 							if (is_valid) {
-								$('body').stop().animate({scrollTop: Math.ceil($this.closest('.EditEventImgLoadWrap').offset().top - 150)}, 1000, 'swing', function() {
-									showNotifier({text: 'Пожалуйста, добавьте обложку организации', status: false})
+								scrollTo($this, 400, function() {
+									showNotifier({text: 'Пожалуйста, добавьте обложку организации', status: false});
 								});
 							}
 							is_valid = false;
@@ -141,25 +139,26 @@ AbstractEditOrganizationPage = extending(Page, (function() {
 			}
 			
 			if (valid_form) {
-				PAGE.$wrapper.addClass(__C.CLASSES.STATUS.DISABLED);
-				$loader = __APP.BUILD.overlayLoader(PAGE.$view);
+				self.$wrapper.addClass(__C.CLASSES.STATUS.DISABLED);
+				$loader = __APP.BUILD.overlayLoader(self.$view);
 				org_model.setData(form_data);
 				
-				PAGE.organization[method_name](org_model, function() {
-					PAGE.adding_is_over = true;
+				self.organization[method_name](org_model, function() {
+					self.adding_is_over = true;
 					try {
 						sessionStorage.removeItem('organization_info');
-					} catch (e) {}
+					} catch (e) {
+					}
 					$('.SidebarNav').find('.ContinueRegistration').remove();
 					
 					socket.emit('utils.registrationFinished', {
-						uuid: PAGE.$wrapper.find('#add_organization_organization_registration_uuid').val()
+						uuid: self.$wrapper.find('#add_organization_organization_registration_uuid').val()
 					});
 					socket.emit('utils.updateImages');
 					
-					__APP.changeState('/organization/' + PAGE.organization.id);
+					__APP.changeState('/organization/' + self.organization.id);
 				}).always(function() {
-					PAGE.$wrapper.removeClass(__C.CLASSES.STATUS.DISABLED);
+					self.$wrapper.removeClass(__C.CLASSES.STATUS.DISABLED);
 					$loader.remove();
 				});
 			}
@@ -168,7 +167,7 @@ AbstractEditOrganizationPage = extending(Page, (function() {
 		initEditEventPage(this.$wrapper);
 		bindCallModal(this.$wrapper);
 		initOrganizationTypes(this.organization.type_id);
-		initCities(this.organization.city_id || __APP.USER.selected_city.id);
+		initCities(this.organization.city.id || __APP.USER.selected_city.id);
 	};
 	
 	AbstractEditOrganizationPage.prototype.render = function() {

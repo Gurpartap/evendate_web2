@@ -73,7 +73,7 @@ a.-odd:focus {text-decoration: none}
 .-align_center {text-align: center !important}
 
 .-centering:before,
-.-valign_center:before {
+:not(.flex_grid).-valign_center:before {
 	content: '';
 	display: inline-block;
 	height: 100%;
@@ -81,7 +81,7 @@ a.-odd:focus {text-decoration: none}
 }
 
 .-centering > *,
-.-valign_center > * {
+:not(.flex_grid).-valign_center > * {
 	display: inline-block !important;
 	vertical-align: middle !important;
 }
@@ -211,6 +211,11 @@ table {
 }
 
 .pair_key:after {content: ':'}
+
+.pair_list.-align_left {
+	display: block;
+	text-align: left;
+}
 
 .flex_grid {
 	display: flex;

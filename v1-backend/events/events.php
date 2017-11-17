@@ -303,7 +303,7 @@ $__modules['events'] = array(
 		},
 		'tickets' => function ($uuid = null) use ($__db, $__request, $__fields, $__user, $__order_by, $__offset, $__length) { /*MY EVENTS!*/
 			if ($__user instanceof User == false) throw new PrivilegesException('NOT_AUTHORIZED', $__db);
-			if (isset( $uuid )) {
+			if (isset($uuid)) {
 				return TicketsCollection::oneByUUID($__db,
 					$__user,
 					$uuid,
@@ -359,7 +359,7 @@ $__modules['events'] = array(
 		},
 		'orders' => function ($uuid = null) use ($__db, $__request, $__fields, $__user, $__order_by, $__offset, $__length, $__pagination) {
 			if ($__user instanceof User == false) throw new PrivilegesException('NOT_AUTHORIZED', $__db);
-			if (isset( $uuid )) {
+			if (isset($uuid)) {
 				return OrdersCollection::oneByUUID($__db,
 					$__user,
 					$uuid,

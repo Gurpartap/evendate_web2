@@ -16,16 +16,6 @@ AdminPage = extending(Page, (function() {
 	function AdminPage() {
 		Page.apply(this);
 		this.state_name = 'admin';
-		this.SCALES = {
-			MINUTE: 'minute',
-			HOUR: 'hour',
-			DAY: 'day',
-			WEEK: 'week',
-			MONTH: 'month',
-			YEAR: 'year',
-			OVERALL: 'overall'
-		};
-		this.highchart_defaults = AdminPage.HIGHCHART_DEFAULT_OPTIONS;
 	}
 	
 	/**
@@ -392,7 +382,7 @@ AdminPage = extending(Page, (function() {
 				['rgba(35, 215, 146, 0.18)', 'rgba(101, 101, 101, 0.6)', 'rgba(101, 101, 101, 0.6)'],
 				['rgba(35, 215, 146, 0.09)', 'rgba(101, 101, 101, 0.6)', 'rgba(101, 101, 101, 0.6)']
 			],
-			area_chart_options = $.extend(true, {}, self.highchart_defaults, {
+			area_chart_options = $.extend(true, {}, AdminPage.HIGHCHART_DEFAULT_OPTIONS, {
 				chart: {
 					type: 'areaspline',
 					plotBackgroundColor: '#fcfcfc',
