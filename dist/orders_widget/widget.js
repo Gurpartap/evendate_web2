@@ -40190,6 +40190,205 @@ EntityInterface = (function() {
 	return EntityInterface;
 }());
 /**
+ * @requires ../entities/Class.Data.js
+ */
+/**
+ *
+ * @class AbstractDataModel
+ * @extends Data
+ */
+AbstractDataModel = extending(Data, (function() {
+	/**
+	 *
+	 * @constructor
+	 * @constructs AbstractDataModel
+	 */
+	function AbstractDataModel() {
+		Data.call(this);
+	}
+	
+	return AbstractDataModel;
+}()));
+/**
+ * @requires ../Class.AbstractDataModel.js
+ */
+/**
+ *
+ * @class PricingRuleModel
+ * @extends AbstractDataModel
+ */
+PricingRuleModel = extending(AbstractDataModel, (function() {
+	/**
+	 *
+	 * @constructor
+	 * @constructs PricingRuleModel
+	 *
+	 * @property {?string} uuid
+	 * @property {?string} name
+	 * @property {?PricingRuleModel.TYPE} type_code
+	 * @property {?number} effort
+	 * @property {?number} min_count
+	 * @property {?number} max_count
+	 * @property {?boolean} is_percentage
+	 * @property {?boolean} is_fixed
+	 * @property {?boolean} enabled
+	 */
+	function PricingRuleModel() {
+		OneEntity.call(this);
+		
+		this.uuid = null;
+		this.name = null;
+		this.type_code = null;
+		this.effort = null;
+		this.min_count = null;
+		this.max_count = null;
+		this.is_percentage = null;
+		this.is_fixed = null;
+		this.enabled = null;
+	}
+	
+	PricingRuleModel.prototype.ID_PROP_NAME = 'uuid';
+	/**
+	 *
+	 * @enum {string}
+	 */
+	PricingRuleModel.TYPE = Object.freeze({
+		ORDER_SUM_BETWEEN: 'order_sum_between',
+		TICKETS_COUNT_BETWEEN: 'tickets_count_between',
+		USER_ORDER_SUM_BETWEEN: 'user_orders_sum_between',
+		USER_ORDER_COUNT_BETWEEN: 'user_orders_count_between'
+	});
+	
+	return PricingRuleModel;
+}()));
+/**
+ * @requires ../entities/Class.DataSet.js
+ */
+/**
+ *
+ * @class AbstractDataModelsCollection
+ * @extends DataSet
+ */
+AbstractDataModelsCollection = extending(DataSet, (function() {
+	/**
+	 *
+	 * @constructor
+	 * @constructs AbstractDataModelsCollection
+	 */
+	function AbstractDataModelsCollection() {
+		DataSet.call(this);
+	}
+	AbstractDataModelsCollection.prototype.collection_of = AbstractDataModel;
+	
+	return AbstractDataModelsCollection;
+}()));
+/**
+ * @requires ../Class.AbstractDataModelsCollection.js
+ */
+/**
+ *
+ * @class PricingRuleModelsCollection
+ * @extends AbstractDataModelsCollection
+ */
+PricingRuleModelsCollection = extending(AbstractDataModelsCollection, (function() {
+	/**
+	 *
+	 * @constructor
+	 * @constructs PricingRuleModelsCollection
+	 *
+	 * @property {Array<PricingRuleModel>}
+	 */
+	function PricingRuleModelsCollection() {
+		AbstractDataModelsCollection.call(this);
+		
+		Object.defineProperty(this, 'enabled_rules', {
+			get: function() {
+				
+				return this.filter(function(rule) {
+					
+					return rule.enabled;
+				});
+			}
+		});
+	}
+	PricingRuleModelsCollection.prototype.collection_of = PricingRuleModel;
+	
+	return PricingRuleModelsCollection;
+}()));
+/**
+ * @requires ../../entities/Class.OneEntity.js
+ */
+/**
+ *
+ * @class PromocodeModel
+ * @extends OneEntity
+ */
+PromocodeModel = extending(OneEntity, (function() {
+	/**
+	 *
+	 * @constructor
+	 * @constructs PromocodeModel
+	 *
+	 * @property {?string} uuid
+	 * @property {?number} event_id
+	 * @property {?string} code
+	 * @property {?boolean} is_fixed
+	 * @property {?boolean} is_percentage
+	 * @property {?number} effort
+	 * @property {?number} total_effort
+	 * @property {?number} use_limit
+	 * @property {?number} use_count
+	 * @property {?timestamp} start_date
+	 * @property {?timestamp} end_date
+	 * @property {?boolean} enabled
+	 *
+	 * @property {?timestamp} created_at
+	 * @property {?timestamp} updated_at
+	 */
+	function PromocodeModel() {
+		this.uuid = null;
+		this.event_id = null;
+		this.code = null;
+		this.is_fixed = null;
+		this.is_percentage = null;
+		this.effort = null;
+		this.total_effort = null;
+		this.use_limit = null;
+		this.use_count = null;
+		this.start_date = null;
+		this.end_date = null;
+		this.enabled = null;
+		
+		this.created_at = null;
+		this.updated_at = null;
+	}
+	PromocodeModel.prototype.ID_PROP_NAME = 'uuid';
+	
+	return PromocodeModel;
+}()));
+/**
+ * @requires ../../entities/Class.EntitiesCollection.js
+ * @requires Class.PromocodeModel.js
+ */
+/**
+ *
+ * @class PromocodeModelsCollection
+ * @extends EntitiesCollection
+ */
+PromocodeModelsCollection = extending(EntitiesCollection, (function() {
+	/**
+	 *
+	 * @constructor
+	 * @constructs PromocodeModelsCollection
+	 */
+	function PromocodeModelsCollection() {
+		EntitiesCollection.call(this);
+	}
+	PromocodeModelsCollection.prototype.collection_of = PromocodeModel;
+	
+	return PromocodeModelsCollection;
+}()));
+/**
  * @requires ../Class.OneEntity.js
  */
 /**
@@ -40438,57 +40637,6 @@ CategoriesCollection = extending(EntitiesCollection, (function() {
 	};
 	
 	return CategoriesCollection;
-}()));
-/**
- * @requires ../../entities/Class.OneEntity.js
- */
-/**
- *
- * @class PromocodeModel
- * @extends OneEntity
- */
-PromocodeModel = extending(OneEntity, (function() {
-	/**
-	 *
-	 * @constructor
-	 * @constructs PromocodeModel
-	 *
-	 * @property {?string} uuid
-	 * @property {?number} event_id
-	 * @property {?string} code
-	 * @property {?boolean} is_fixed
-	 * @property {?boolean} is_percentage
-	 * @property {?number} effort
-	 * @property {?number} total_effort
-	 * @property {?number} use_limit
-	 * @property {?number} use_count
-	 * @property {?timestamp} start_date
-	 * @property {?timestamp} end_date
-	 * @property {?boolean} enabled
-	 *
-	 * @property {?timestamp} created_at
-	 * @property {?timestamp} updated_at
-	 */
-	function PromocodeModel() {
-		this.uuid = null;
-		this.event_id = null;
-		this.code = null;
-		this.is_fixed = null;
-		this.is_percentage = null;
-		this.effort = null;
-		this.total_effort = null;
-		this.use_limit = null;
-		this.use_count = null;
-		this.start_date = null;
-		this.end_date = null;
-		this.enabled = null;
-		
-		this.created_at = null;
-		this.updated_at = null;
-	}
-	PromocodeModel.prototype.ID_PROP_NAME = 'uuid';
-	
-	return PromocodeModel;
 }()));
 /**
  * @requires ../../data_models/promocode/Class.PromocodeModel.js
@@ -44283,28 +44431,6 @@ EventEmailTextsModel = extending(OneEntity, (function() {
 	}
 	
 	return EventEmailTextsModel;
-}()));
-/**
- * @requires ../../entities/Class.EntitiesCollection.js
- * @requires Class.PromocodeModel.js
- */
-/**
- *
- * @class PromocodeModelsCollection
- * @extends EntitiesCollection
- */
-PromocodeModelsCollection = extending(EntitiesCollection, (function() {
-	/**
-	 *
-	 * @constructor
-	 * @constructs PromocodeModelsCollection
-	 */
-	function PromocodeModelsCollection() {
-		EntitiesCollection.call(this);
-	}
-	PromocodeModelsCollection.prototype.collection_of = PromocodeModel;
-	
-	return PromocodeModelsCollection;
 }()));
 /**
  * @requires ../Class.OneEntity.js
