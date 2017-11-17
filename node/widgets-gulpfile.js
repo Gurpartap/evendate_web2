@@ -45,6 +45,10 @@ var gulp = require('gulp'),
 			js_path + 'server/*.js',
 			
 			js_path + 'entities/*.js',
+			
+			js_path + 'data_models/pricing_rule/*.js',
+			js_path + 'data_models/promocode/*.js',
+			
 			js_path + 'entities/city/*.js',
 			js_path + 'entities/category/*.js',
 			js_path + 'entities/promocode/*.js',
