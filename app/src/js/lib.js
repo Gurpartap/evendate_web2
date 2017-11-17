@@ -2292,6 +2292,11 @@ function bindHelpLink($parent) {
 		$this.on('click.openHelpAppInspector', function() {
 			var inspector = $this.data('inspector');
 			
+			if (__APP.IS_WIDGET) {
+				
+				return __APP.POST_MESSAGE.openNewTab('https://evendate.io/help?p=' + $this.data('article_id'));
+			}
+			
 			if (!(inspector instanceof HelpAppInspector)) {
 				inspector = new HelpAppInspector($this.data('article_id'));
 				$this.data('inspector', inspector);

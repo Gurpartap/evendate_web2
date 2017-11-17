@@ -77,23 +77,25 @@ DataSet = extending(Array, (function() {
 				
 				this.__last_pushed.splice(0);
 				
-				for (var i = 0, entity = entities[i]; i < entities.length; entity = entities[++i]) {
-					if (empty(entity[ID_PROP_NAME]) || (!empty(entity[ID_PROP_NAME]) && !this.has(entity[ID_PROP_NAME]))) {
-						if (entity instanceof this.collection_of) {
-							item = entity;
-						} else {
-							if (typeof this.collection_of.factory === 'function') {
-								item = this.collection_of.factory(entity);
+				if (!empty(element)) {
+					for (var i = 0, entity = entities[i]; i < entities.length; entity = entities[++i]) {
+						if (empty(entity[ID_PROP_NAME]) || (!empty(entity[ID_PROP_NAME]) && !this.has(entity[ID_PROP_NAME]))) {
+							if (entity instanceof this.collection_of) {
+								item = entity;
 							} else {
-								item = (new this.collection_of()).setData(entity);
+								if (typeof this.collection_of.factory === 'function') {
+									item = this.collection_of.factory(entity);
+								} else {
+									item = (new this.collection_of()).setData(entity);
+								}
 							}
+							this.__last_pushed.push(item);
+							this[this.length++] = item;
+							if (!empty(item[ID_PROP_NAME])) {
+								this.__lookup[item[ID_PROP_NAME]] = item;
+							}
+							this.createAdditionalLookup(item);
 						}
-						this.__last_pushed.push(item);
-						this[this.length++] = item;
-						if (!empty(item[ID_PROP_NAME])) {
-							this.__lookup[item[ID_PROP_NAME]] = item;
-						}
-						this.createAdditionalLookup(item);
 					}
 				}
 				

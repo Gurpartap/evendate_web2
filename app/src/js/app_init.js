@@ -45,6 +45,11 @@ if (checkRedirect()) {
 		return this.location.href = redirect_uri;
 	});
 	
+	__APP.POST_MESSAGE.listen(PostMessageConnection.AVAILABLE_COMMANDS.OPEN_NEW_TAB, function(uri) {
+		
+		return window.open(uri, '_blank').focus();
+	});
+	
 	$(document)
 		.ajaxStart(function() {
 			Pace.restart()
