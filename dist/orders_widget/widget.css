@@ -2381,7 +2381,7 @@ select.form_input_group_before {cursor: pointer}
 	box-shadow: none;
 }
 .form_select2.form_input.select2-container-multi > .select2-choices,
-.form_select2.form_input.select2-container-multi > .select2-choices > .select2-search-field > input {min-height: 30px}
+.form_select2.form_input.select2-container-multi > .select2-choices > .select2-search-field > input {min-height: 28px}
 .form_select2.form_input.select2-container-multi > .select2-choices > .select2-search-field > input {
 	padding: 0;
 	margin: 0;
@@ -2397,7 +2397,7 @@ select.form_input_group_before {cursor: pointer}
 }
 
 .form_select2.form_input.select2-container-multi > .select2-choices > .select2-search-choice {
-	padding: 4px 6px 4px 19px;
+	padding: 4px 19px 4px 6px;
 	margin: 0 5px 0 0;
 	border: 0;
 	color: #fff;
@@ -2410,11 +2410,12 @@ select.form_input_group_before {cursor: pointer}
 
 .form_select2.form_input.select2-container-multi > .select2-choices > .select2-search-choice > .select2-search-choice-close {
 	position: absolute;
-	right: auto;
+	left: auto;
 	top: 0;
+	height: 15px;
 	bottom: 0;
 	margin: auto;
-	color: #fff;
+	color: inherit;
 }
 .form_select2.form_input.select2-container-multi > .select2-choices > .select2-search-choice > .select2-search-choice-close:before {
 	display: inline-block;
@@ -2426,8 +2427,18 @@ select.form_input_group_before {cursor: pointer}
 }
 
 .form_select2.form_input.select2-container-multi .select2-choices .select2-search-choice {
-	background-color: #f82969;
-	border: 1px solid #f82969;
+	background-color: #e2e4e8;
+	cursor: text;
+	color: inherit;
+	border: 0;
+}
+
+.form_select2.form_input.-select2_no_tags.select2-container-multi .select2-choices .select2-search-choice {
+	padding: 4px 6px;
+}
+
+.form_select2.form_input.-select2_no_tags.select2-container-multi .select2-choices .select2-search-choice .select2-search-choice-close {
+	display: none;
 }
 
 /* /Form Select2 */
@@ -3068,8 +3079,7 @@ select.form_input_group_before {cursor: pointer}
 	.form_select2_drop > .select2-results .select2-highlighted {background-color: var(--color_primary_30)}
 
 	.form_select2.form_input.select2-container-multi .select2-choices .select2-search-choice {
-		background-color: var(--color_accent);
-		border-color: var(--color_accent);
+		background-color: var(--color_marginal);
 	}
 
 	.form_radio_wrapper:not(.-reverse) > .form_radio:checked + .form_label:after,
