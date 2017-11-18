@@ -1957,6 +1957,73 @@ function mergeObjects(objects, recursive, deep) {
 	return res;
 }
 /**
+ * @typedef {Object<(number|string|boolean), (number|string|boolean|PlainObject|PlainArray)>} PlainObject
+ */
+/**
+ * @typedef {Array<(number|string|boolean|PlainObject|PlainArray)>} PlainArray
+ */
+/**
+ *
+ * @param {Object} object
+ *
+ * @return {PlainObject}
+ */
+function toPlainObject(object) {
+	var plain_object = {};
+	
+	Object.props(object).map(function(field) {
+		var value = object[field];
+		
+		if (isSimpleType(value)) {
+			plain_object[field] = value;
+		} else if (!isVoid(value) && typeof value === 'object') {
+			plain_object[field] = toPlainObject(value);
+		} else if (value instanceof Array) {
+			plain_object[field] = toPlainArray(value);
+		}
+	});
+	
+	return plain_object;
+}
+
+/**
+ *
+ * @param {Array} collection
+ *
+ * @return {PlainArray}
+ */
+function toPlainArray(collection) {
+	
+	return Array.prototype.filter.call(collection, function(item) {
+		if (typeof item === 'function') {
+			
+			return false;
+		}
+	}).map(function(item) {
+		if (isSimpleType(item)) {
+			
+			return item;
+		} else if (item instanceof Array) {
+			
+			return toPlainArray(item);
+		} else if (!isVoid(item) && typeof item === 'object') {
+			
+			return toPlainObject(item);
+		}
+	});
+}
+
+/**
+ *
+ * @param {*} variable
+ *
+ * @return {boolean}
+ */
+function isSimpleType(variable) {
+	
+	return typeof variable === 'number' || typeof variable === 'string' || isVoid(variable);
+}
+/**
  *
  * @param {?string} string
  * @return {?string}
@@ -2123,6 +2190,22 @@ function initSelect2($element, options) {
 }
 /**
  *
+ * @param {jQuery} $element
+ * @param {object} [options]
+ *
+ * @return {jQuery}
+ */
+function initWysiwyg($element, options) {
+	var $wysiwyg = $element.is('.Wysiwyg') ? $element : $element.find('.Wysiwyg');
+	
+	$wysiwyg.not('.-Handled_Wysiwyg').each(function(i, el) {
+		$(el).trumbowyg(empty(options) ? {} : options);
+	}).addClass('-Handled_Wysiwyg');
+	
+	return $element;
+}
+/**
+ *
  * @param {string} url
  * @param {(AJAXData|string)} [data]
  * @param {string} [content_type='application/x-www-form-urlencoded; charset=UTF-8']
@@ -2208,6 +2291,11 @@ function bindHelpLink($parent) {
 		
 		$this.on('click.openHelpAppInspector', function() {
 			var inspector = $this.data('inspector');
+			
+			if (__APP.IS_WIDGET) {
+				
+				return __APP.POST_MESSAGE.openNewTab('https://evendate.io/help?p=' + $this.data('article_id'));
+			}
 			
 			if (!(inspector instanceof HelpAppInspector)) {
 				inspector = new HelpAppInspector($this.data('article_id'));

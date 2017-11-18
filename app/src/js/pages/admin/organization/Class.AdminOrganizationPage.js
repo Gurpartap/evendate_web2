@@ -29,6 +29,7 @@ AdminOrganizationPage = extending(AdminPage, (function() {
 	}
 	
 	AdminOrganizationPage.prototype.fetchData = function() {
+		
 		return this.fetching_data_defer = this.organization.fetchOrganization(this.organization_fields);
 	};
 	
@@ -39,6 +40,7 @@ AdminOrganizationPage = extending(AdminPage, (function() {
 			{title: 'События', page: '/admin/organization/'+this.id+'/events'},
 			{title: 'Финансы', page: '/admin/organization/'+this.id+'/finances'},
 			{title: 'CRM', page: '/admin/organization/'+this.id+'/crm'},
+			{title: 'Рассылки', page: '/admin/organization/'+this.id+'/dispatches'},
 			{title: 'Реквизиты', page: '/admin/organization/'+this.id+'/requisites'},
 			{title: 'Настройки', page: '/admin/organization/'+this.id+'/settings'},
 			{title: 'Редактирование', page: '/admin/organization/'+this.id+'/edit'}

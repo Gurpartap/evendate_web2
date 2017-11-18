@@ -37819,6 +37819,73 @@ function mergeObjects(objects, recursive, deep) {
 	return res;
 }
 /**
+ * @typedef {Object<(number|string|boolean), (number|string|boolean|PlainObject|PlainArray)>} PlainObject
+ */
+/**
+ * @typedef {Array<(number|string|boolean|PlainObject|PlainArray)>} PlainArray
+ */
+/**
+ *
+ * @param {Object} object
+ *
+ * @return {PlainObject}
+ */
+function toPlainObject(object) {
+	var plain_object = {};
+	
+	Object.props(object).map(function(field) {
+		var value = object[field];
+		
+		if (isSimpleType(value)) {
+			plain_object[field] = value;
+		} else if (!isVoid(value) && typeof value === 'object') {
+			plain_object[field] = toPlainObject(value);
+		} else if (value instanceof Array) {
+			plain_object[field] = toPlainArray(value);
+		}
+	});
+	
+	return plain_object;
+}
+
+/**
+ *
+ * @param {Array} collection
+ *
+ * @return {PlainArray}
+ */
+function toPlainArray(collection) {
+	
+	return Array.prototype.filter.call(collection, function(item) {
+		if (typeof item === 'function') {
+			
+			return false;
+		}
+	}).map(function(item) {
+		if (isSimpleType(item)) {
+			
+			return item;
+		} else if (item instanceof Array) {
+			
+			return toPlainArray(item);
+		} else if (!isVoid(item) && typeof item === 'object') {
+			
+			return toPlainObject(item);
+		}
+	});
+}
+
+/**
+ *
+ * @param {*} variable
+ *
+ * @return {boolean}
+ */
+function isSimpleType(variable) {
+	
+	return typeof variable === 'number' || typeof variable === 'string' || isVoid(variable);
+}
+/**
  *
  * @param {?string} string
  * @return {?string}
@@ -37985,6 +38052,22 @@ function initSelect2($element, options) {
 }
 /**
  *
+ * @param {jQuery} $element
+ * @param {object} [options]
+ *
+ * @return {jQuery}
+ */
+function initWysiwyg($element, options) {
+	var $wysiwyg = $element.is('.Wysiwyg') ? $element : $element.find('.Wysiwyg');
+	
+	$wysiwyg.not('.-Handled_Wysiwyg').each(function(i, el) {
+		$(el).trumbowyg(empty(options) ? {} : options);
+	}).addClass('-Handled_Wysiwyg');
+	
+	return $element;
+}
+/**
+ *
  * @param {string} url
  * @param {(AJAXData|string)} [data]
  * @param {string} [content_type='application/x-www-form-urlencoded; charset=UTF-8']
@@ -38070,6 +38153,11 @@ function bindHelpLink($parent) {
 		
 		$this.on('click.openHelpAppInspector', function() {
 			var inspector = $this.data('inspector');
+			
+			if (__APP.IS_WIDGET) {
+				
+				return __APP.POST_MESSAGE.openNewTab('https://evendate.io/help?p=' + $this.data('article_id'));
+			}
 			
 			if (!(inspector instanceof HelpAppInspector)) {
 				inspector = new HelpAppInspector($this.data('article_id'));
@@ -38850,7 +38938,8 @@ PostMessageConnection = (function() {
 		SET_COLOR: 'setColor',
 		GET_HEIGHT: 'getHeight',
 		REDIRECT: 'redirect',
-		FETCH_REDIRECT_PARAM: 'fetchRedirectToParam'
+		FETCH_REDIRECT_PARAM: 'fetchRedirectToParam',
+		OPEN_NEW_TAB: 'openNewTab'
 	};
 	/**
 	 * @callback postMessageListenerCallback
@@ -38969,6 +39058,17 @@ WidgetPostMessageConnection = extending(PostMessageConnection, (function() {
 	WidgetPostMessageConnection.prototype.passRedirectToParam = function(redirect_uri, send_to_window) {
 		
 		return this.postMessageFactory('passRedirectToParam', redirect_uri, send_to_window);
+	};
+	/**
+	 *
+	 * @param {string} uri
+	 * @param {Window} [send_to_window]
+	 *
+	 * @return void
+	 */
+	WidgetPostMessageConnection.prototype.openNewTab = function(uri, send_to_window) {
+		
+		return this.postMessageFactory('openNewTab', uri, send_to_window);
 	};
 	
 	return WidgetPostMessageConnection;
@@ -39090,7 +39190,8 @@ HelpCenterConnection = extending(AsynchronousConnection, (function() {
 		REQUEST_APPROVAL: 127,
 		DYNAMIC_PRICING: 138,
 		ORDER_STATUSES: 170,
-		WHY_AUTH_BY_SOC_NETWORK: 471
+		WHY_AUTH_BY_SOC_NETWORK: 471,
+		DISPATCHES: 497
 	});
 	
 	HelpCenterConnection.prototype.fetchArticle = function(id) {
@@ -39600,6 +39701,53 @@ socket.on('image.getFromURLDone', function (response) {
 
 /**
  *
+ * @class Data
+ */
+Data = (function() {
+	/**
+	 *
+	 * @constructor
+	 * @constructs Data
+	 */
+	function Data() {}
+	
+	Data.prototype.ID_PROP_NAME = 'id';
+	/**
+	 *
+	 * @param {(Array|object)} data
+	 * @returns {Data}
+	 */
+	Data.prototype.setData = function(data) {
+		var field;
+		
+		if (data instanceof Array) {
+			data = data[0];
+		}
+		for (field in data) {
+			if (data.hasOwnProperty(field) && this.hasOwnProperty(field)) {
+				if (this[field] instanceof Data || this[field] instanceof DataSet) {
+					this[field].setData(data[field]);
+				} else {
+					this[field] = data[field];
+				}
+			}
+		}
+		
+		return this;
+	};
+	/**
+	 *
+	 * @return {PlainObject}
+	 */
+	Data.prototype.toPlainObject = function() {
+		
+		return toPlainObject(this);
+	};
+	
+	return Data;
+}());
+/**
+ *
  * @class DataSet
  * @extends Array
  */
@@ -39677,15 +39825,25 @@ DataSet = extending(Array, (function() {
 				
 				this.__last_pushed.splice(0);
 				
-				for (var i = 0, entity = entities[i]; i < entities.length; entity = entities[++i]) {
-					if (empty(entity[ID_PROP_NAME]) || (!empty(entity[ID_PROP_NAME]) && !this.has(entity[ID_PROP_NAME]))) {
-						item = (entity instanceof this.collection_of) ? entity : (new this.collection_of()).setData(entity);
-						this.__last_pushed.push(item);
-						this[this.length++] = item;
-						if (!empty(item[ID_PROP_NAME])) {
-							this.__lookup[item[ID_PROP_NAME]] = item;
+				if (!empty(element)) {
+					for (var i = 0, entity = entities[i]; i < entities.length; entity = entities[++i]) {
+						if (empty(entity[ID_PROP_NAME]) || (!empty(entity[ID_PROP_NAME]) && !this.has(entity[ID_PROP_NAME]))) {
+							if (entity instanceof this.collection_of) {
+								item = entity;
+							} else {
+								if (typeof this.collection_of.factory === 'function') {
+									item = this.collection_of.factory(entity);
+								} else {
+									item = (new this.collection_of()).setData(entity);
+								}
+							}
+							this.__last_pushed.push(item);
+							this[this.length++] = item;
+							if (!empty(item[ID_PROP_NAME])) {
+								this.__lookup[item[ID_PROP_NAME]] = item;
+							}
+							this.createAdditionalLookup(item);
 						}
-						this.createAdditionalLookup(item);
 					}
 				}
 				
@@ -39720,6 +39878,14 @@ DataSet = extending(Array, (function() {
 				return this.map(function(el) {
 					return el;
 				})
+			},
+			/**
+			 *
+			 * @return {PlainArray}
+			 */
+			toPlainArray: function() {
+				
+				return toPlainArray(this);
 			},
 			/**
 			 *
@@ -39799,45 +39965,6 @@ DataSet = extending(Array, (function() {
 	
 	return DataSet;
 }()));
-/**
- *
- * @class Data
- */
-Data = (function() {
-	/**
-	 *
-	 * @constructor
-	 * @constructs Data
-	 */
-	function Data() {}
-	
-	Data.prototype.ID_PROP_NAME = 'id';
-	/**
-	 *
-	 * @param {(Array|object)} data
-	 * @returns {Data}
-	 */
-	Data.prototype.setData = function(data) {
-		var field;
-		
-		if (data instanceof Array) {
-			data = data[0];
-		}
-		for (field in data) {
-			if (data.hasOwnProperty(field) && this.hasOwnProperty(field)) {
-				if (this[field] instanceof Data || this[field] instanceof DataSet) {
-					this[field].setData(data[field]);
-				} else {
-					this[field] = data[field];
-				}
-			}
-		}
-		
-		return this;
-	};
-	
-	return Data;
-}());
 /**
  * @class Fields
  */
@@ -40159,6 +40286,236 @@ EntitiesCollection = extending(DataSet, (function() {
 	return EntitiesCollection;
 }()));
 /**
+ * @typedef {object} AJAXData
+ * @property {(Fields|Array|string|undefined)} [fields]
+ * @property {(string|undefined)} [format=json] Sets the response format. Can be xml or json. Default: json
+ * @property {(boolean|undefined)} [download=false] If flag is TRUE server will set additional headers to make response downloadble in browser. Default: false
+ * @property {(boolean|undefined)} [nude_data=false] If nude_data is TRUE server response with only data, without status code and description. Default: false
+ * @property {(number|undefined)} [offset] Use offset to set how many elements you want to skip. Default: 0
+ * @property {(number|undefined)} [length] Sets the items count server will return in response. Default: 100
+ * @property {(string|undefined)} [order_by]
+ */
+/**
+ * @typedef {function((object|Array<object>))} AJAXCallback
+ */
+/**
+ * @interface
+ */
+EntityInterface = (function() {
+	/**
+	 *
+	 * @interface
+	 */
+	function EntityInterface() {}
+	/**
+	 *
+	 * @param {(Array|object)} data
+	 * @returns {EntityInterface}
+	 */
+	EntityInterface.prototype.setData = function(data) {};
+	
+	return EntityInterface;
+}());
+/**
+ * @requires ../entities/Class.Data.js
+ */
+/**
+ *
+ * @class AbstractDataModel
+ * @extends Data
+ */
+AbstractDataModel = extending(Data, (function() {
+	/**
+	 *
+	 * @constructor
+	 * @constructs AbstractDataModel
+	 */
+	function AbstractDataModel() {
+		Data.call(this);
+	}
+	
+	return AbstractDataModel;
+}()));
+/**
+ * @requires ../Class.AbstractDataModel.js
+ */
+/**
+ *
+ * @class PricingRuleModel
+ * @extends AbstractDataModel
+ */
+PricingRuleModel = extending(AbstractDataModel, (function() {
+	/**
+	 *
+	 * @constructor
+	 * @constructs PricingRuleModel
+	 *
+	 * @property {?string} uuid
+	 * @property {?string} name
+	 * @property {?PricingRuleModel.TYPE} type_code
+	 * @property {?number} effort
+	 * @property {?number} min_count
+	 * @property {?number} max_count
+	 * @property {?boolean} is_percentage
+	 * @property {?boolean} is_fixed
+	 * @property {?boolean} enabled
+	 */
+	function PricingRuleModel() {
+		OneEntity.call(this);
+		
+		this.uuid = null;
+		this.name = null;
+		this.type_code = null;
+		this.effort = null;
+		this.min_count = null;
+		this.max_count = null;
+		this.is_percentage = null;
+		this.is_fixed = null;
+		this.enabled = null;
+	}
+	
+	PricingRuleModel.prototype.ID_PROP_NAME = 'uuid';
+	/**
+	 *
+	 * @enum {string}
+	 */
+	PricingRuleModel.TYPE = Object.freeze({
+		ORDER_SUM_BETWEEN: 'order_sum_between',
+		TICKETS_COUNT_BETWEEN: 'tickets_count_between',
+		USER_ORDER_SUM_BETWEEN: 'user_orders_sum_between',
+		USER_ORDER_COUNT_BETWEEN: 'user_orders_count_between'
+	});
+	
+	return PricingRuleModel;
+}()));
+/**
+ * @requires ../entities/Class.DataSet.js
+ */
+/**
+ *
+ * @class AbstractDataModelsCollection
+ * @extends DataSet
+ */
+AbstractDataModelsCollection = extending(DataSet, (function() {
+	/**
+	 *
+	 * @constructor
+	 * @constructs AbstractDataModelsCollection
+	 */
+	function AbstractDataModelsCollection() {
+		DataSet.call(this);
+	}
+	AbstractDataModelsCollection.prototype.collection_of = AbstractDataModel;
+	
+	return AbstractDataModelsCollection;
+}()));
+/**
+ * @requires ../Class.AbstractDataModelsCollection.js
+ */
+/**
+ *
+ * @class PricingRuleModelsCollection
+ * @extends AbstractDataModelsCollection
+ */
+PricingRuleModelsCollection = extending(AbstractDataModelsCollection, (function() {
+	/**
+	 *
+	 * @constructor
+	 * @constructs PricingRuleModelsCollection
+	 *
+	 * @property {Array<PricingRuleModel>}
+	 */
+	function PricingRuleModelsCollection() {
+		AbstractDataModelsCollection.call(this);
+		
+		Object.defineProperty(this, 'enabled_rules', {
+			get: function() {
+				
+				return this.filter(function(rule) {
+					
+					return rule.enabled;
+				});
+			}
+		});
+	}
+	PricingRuleModelsCollection.prototype.collection_of = PricingRuleModel;
+	
+	return PricingRuleModelsCollection;
+}()));
+/**
+ * @requires ../../entities/Class.OneEntity.js
+ */
+/**
+ *
+ * @class PromocodeModel
+ * @extends OneEntity
+ */
+PromocodeModel = extending(OneEntity, (function() {
+	/**
+	 *
+	 * @constructor
+	 * @constructs PromocodeModel
+	 *
+	 * @property {?string} uuid
+	 * @property {?number} event_id
+	 * @property {?string} code
+	 * @property {?boolean} is_fixed
+	 * @property {?boolean} is_percentage
+	 * @property {?number} effort
+	 * @property {?number} total_effort
+	 * @property {?number} use_limit
+	 * @property {?number} use_count
+	 * @property {?timestamp} start_date
+	 * @property {?timestamp} end_date
+	 * @property {?boolean} enabled
+	 *
+	 * @property {?timestamp} created_at
+	 * @property {?timestamp} updated_at
+	 */
+	function PromocodeModel() {
+		this.uuid = null;
+		this.event_id = null;
+		this.code = null;
+		this.is_fixed = null;
+		this.is_percentage = null;
+		this.effort = null;
+		this.total_effort = null;
+		this.use_limit = null;
+		this.use_count = null;
+		this.start_date = null;
+		this.end_date = null;
+		this.enabled = null;
+		
+		this.created_at = null;
+		this.updated_at = null;
+	}
+	PromocodeModel.prototype.ID_PROP_NAME = 'uuid';
+	
+	return PromocodeModel;
+}()));
+/**
+ * @requires ../../entities/Class.EntitiesCollection.js
+ * @requires Class.PromocodeModel.js
+ */
+/**
+ *
+ * @class PromocodeModelsCollection
+ * @extends EntitiesCollection
+ */
+PromocodeModelsCollection = extending(EntitiesCollection, (function() {
+	/**
+	 *
+	 * @constructor
+	 * @constructs PromocodeModelsCollection
+	 */
+	function PromocodeModelsCollection() {
+		EntitiesCollection.call(this);
+	}
+	PromocodeModelsCollection.prototype.collection_of = PromocodeModel;
+	
+	return PromocodeModelsCollection;
+}()));
+/**
  * @requires ../Class.OneEntity.js
  */
 /**
@@ -40407,57 +40764,6 @@ CategoriesCollection = extending(EntitiesCollection, (function() {
 	};
 	
 	return CategoriesCollection;
-}()));
-/**
- * @requires ../../entities/Class.OneEntity.js
- */
-/**
- *
- * @class PromocodeModel
- * @extends OneEntity
- */
-PromocodeModel = extending(OneEntity, (function() {
-	/**
-	 *
-	 * @constructor
-	 * @constructs PromocodeModel
-	 *
-	 * @property {?string} uuid
-	 * @property {?number} event_id
-	 * @property {?string} code
-	 * @property {?boolean} is_fixed
-	 * @property {?boolean} is_percentage
-	 * @property {?number} effort
-	 * @property {?number} total_effort
-	 * @property {?number} use_limit
-	 * @property {?number} use_count
-	 * @property {?timestamp} start_date
-	 * @property {?timestamp} end_date
-	 * @property {?boolean} enabled
-	 *
-	 * @property {?timestamp} created_at
-	 * @property {?timestamp} updated_at
-	 */
-	function PromocodeModel() {
-		this.uuid = null;
-		this.event_id = null;
-		this.code = null;
-		this.is_fixed = null;
-		this.is_percentage = null;
-		this.effort = null;
-		this.total_effort = null;
-		this.use_limit = null;
-		this.use_count = null;
-		this.start_date = null;
-		this.end_date = null;
-		this.enabled = null;
-		
-		this.created_at = null;
-		this.updated_at = null;
-	}
-	PromocodeModel.prototype.ID_PROP_NAME = 'uuid';
-	
-	return PromocodeModel;
 }()));
 /**
  * @requires ../../data_models/promocode/Class.PromocodeModel.js
@@ -44254,28 +44560,6 @@ EventEmailTextsModel = extending(OneEntity, (function() {
 	return EventEmailTextsModel;
 }()));
 /**
- * @requires ../../entities/Class.EntitiesCollection.js
- * @requires Class.PromocodeModel.js
- */
-/**
- *
- * @class PromocodeModelsCollection
- * @extends EntitiesCollection
- */
-PromocodeModelsCollection = extending(EntitiesCollection, (function() {
-	/**
-	 *
-	 * @constructor
-	 * @constructs PromocodeModelsCollection
-	 */
-	function PromocodeModelsCollection() {
-		EntitiesCollection.call(this);
-	}
-	PromocodeModelsCollection.prototype.collection_of = PromocodeModel;
-	
-	return PromocodeModelsCollection;
-}()));
-/**
  * @requires ../Class.OneEntity.js
  * @requires ../date/Class.DatesCollection.js
  * @requires ../tag/Class.TagsCollection.js
@@ -45601,6 +45885,165 @@ OrganizationSubscribersCollection = extending(UsersCollection, (function() {
 	return OrganizationSubscribersCollection;
 }()));
 /**
+ * @requires Class.AbstractEventOrdersCollection.js
+ */
+/**
+ *
+ * @class EventAllOrdersCollection
+ * @extends AbstractEventOrdersCollection
+ */
+EventAllOrdersCollection = extending(AbstractEventOrdersCollection, (function() {
+	/**
+	 *
+	 * @param {(string|number)} [event_id=0]
+	 *
+	 * @constructor
+	 * @constructs EventAllOrdersCollection
+	 *
+	 * @property {(string|number)} event_id
+	 */
+	function EventAllOrdersCollection(event_id) {
+		AbstractEventOrdersCollection.call(this, event_id);
+	}
+	
+	/**
+	 *
+	 * @param {(string|number)} event_id
+	 * @param {AJAXData} [ajax_data]
+	 * @param {AJAXCallback} [success]
+	 *
+	 * @return {jqPromise}
+	 */
+	EventAllOrdersCollection.fetchOrders = function(event_id, ajax_data, success) {
+		return __APP.SERVER.getData('/api/v1/statistics/events/' + event_id + '/orders', ajax_data, success);
+	};
+	/**
+	 *
+	 * @param {ServerExports.EXPORT_EXTENSION} [format=xlsx]
+	 *
+	 * @return {jqPromise}
+	 */
+	EventAllOrdersCollection.prototype.export = function(format) {
+		
+		return (new ServerExports()).eventOrders(this.event_id, format);
+	};
+	
+	
+	return EventAllOrdersCollection;
+}()));
+/**
+ * @requires Class.AbstractEventOrdersCollection.js
+ */
+/**
+ *
+ * @class EventMyOrdersCollection
+ * @extends AbstractEventOrdersCollection
+ */
+EventMyOrdersCollection = extending(AbstractEventOrdersCollection, (function() {
+	/**
+	 *
+	 * @param {(string|number)} [event_id=0]
+	 *
+	 * @constructor
+	 * @constructs EventMyOrdersCollection
+	 *
+	 * @property {(string|number)} event_id
+	 */
+	function EventMyOrdersCollection(event_id) {
+		AbstractEventOrdersCollection.call(this, event_id);
+	}
+	
+	/**
+	 *
+	 * @param {(string|number)} event_id
+	 * @param {AJAXData} [ajax_data]
+	 * @param {AJAXCallback} [success]
+	 *
+	 * @return {jqPromise}
+	 */
+	EventMyOrdersCollection.fetchOrders = function(event_id, ajax_data, success) {
+		
+		return __APP.SERVER.getData('/api/v1/events/' + event_id + '/orders', ajax_data, success);
+	};
+	
+	return EventMyOrdersCollection;
+}()));
+/**
+ * @requires Class.OrdersCollection.js
+ */
+/**
+ *
+ * @class MyOrdersCollection
+ * @extends OrdersCollection
+ */
+MyOrdersCollection = extending(OrdersCollection, (function() {
+	/**
+	 *
+	 * @constructor
+	 * @constructs MyOrdersCollection
+	 */
+	function MyOrdersCollection() {
+		ExtendedOrdersCollection.call(this);
+	}
+	
+	/**
+	 *
+	 * @param {AJAXData} ajax_data
+	 *
+	 * @return {jqPromise}
+	 */
+	MyOrdersCollection.fetchOrders = function(ajax_data) {
+		
+		return __APP.SERVER.getData(OrdersCollection.ENDPOINT.ORDER, ajax_data);
+	};
+	/**
+	 *
+	 * @param {Fields} [fields]
+	 * @param {number} [length]
+	 * @param {(Array<string>|string)} [order_by]
+	 *
+	 * @return {jqPromise}
+	 */
+	MyOrdersCollection.prototype.fetch = function(fields, length, order_by) {
+		var self = this;
+		
+		return MyOrdersCollection.fetchOrders({
+			fields: fields || undefined,
+			offset: this.length || undefined,
+			length: length || undefined,
+			order_by: order_by || undefined
+		}).then(function(orders) {
+			self.setData(orders);
+			
+			return self.__last_pushed;
+		});
+	};
+	/**
+	 *
+	 * @param {Fields} [fields]
+	 * @param {(Array<string>|string)} [order_by]
+	 *
+	 * @return {jqPromise}
+	 */
+	MyOrdersCollection.prototype.fetchAll = function(fields, order_by) {
+		var self = this;
+		
+		return MyOrdersCollection.fetchOrders({
+			fields: fields || undefined,
+			offset: 0,
+			length: ServerConnection.MAX_ENTITIES_LENGTH,
+			order_by: order_by || undefined
+		}).then(function(orders) {
+			self.setData(orders);
+			
+			return self.__last_pushed;
+		});
+	};
+	
+	
+	return MyOrdersCollection;
+}()));
+/**
  * @requires ../order/Class.OneOrder.js
  */
 /**
@@ -46487,7 +46930,6 @@ AuthModal = extending(AbstractModal, (function() {
 		AbstractModal.call(this);
 		this.options = options || {};
 		this.redirect_to = redirect_to;
-		this.title = 'Вход в профиль';
 	}
 	/**
 	 *
@@ -48689,7 +49131,7 @@ OrderPage = extending(Page, (function() {
 							case RegistrationFieldModel.TYPES.FIRST_NAME:
 								return 'Используйте настоящее имя для регистрации';
 							case RegistrationFieldModel.TYPES.LAST_NAME:
-								return 'Используйте настоящюю фамилию для регистрации';
+								return 'Используйте настоящую фамилию для регистрации';
 							default:
 								return '';
 						}

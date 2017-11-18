@@ -35,7 +35,8 @@ HelpCenterConnection = extending(AsynchronousConnection, (function() {
 		REQUEST_APPROVAL: 127,
 		DYNAMIC_PRICING: 138,
 		ORDER_STATUSES: 170,
-		WHY_AUTH_BY_SOC_NETWORK: 471
+		WHY_AUTH_BY_SOC_NETWORK: 471,
+		DISPATCHES: 497
 	});
 	
 	HelpCenterConnection.prototype.fetchArticle = function(id) {

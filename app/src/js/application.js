@@ -21,8 +21,18 @@ __APP = {
 			'organization': {
 				'^([0-9]+)': {
 					'add': {
+						'dispatch': AdminAddDispatchPage,
 						'event': AddEventPage,
 						'': AddEventPage
+					},
+					'dispatches': AdminOrganizationDispatchesPage,
+					'dispatch': {
+						'^([0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12})': {
+							'edit': AdminEditDispatchPage,
+							'': AdminEditDispatchPage
+						},
+						'add': AdminAddDispatchPage,
+						'': AdminAddDispatchPage
 					},
 					'edit': AdminOrganizationEditPage,
 					'overview': AdminOrganizationOverviewPage,

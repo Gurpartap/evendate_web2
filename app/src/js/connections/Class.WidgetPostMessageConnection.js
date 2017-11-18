@@ -62,6 +62,17 @@ WidgetPostMessageConnection = extending(PostMessageConnection, (function() {
 		
 		return this.postMessageFactory('passRedirectToParam', redirect_uri, send_to_window);
 	};
+	/**
+	 *
+	 * @param {string} uri
+	 * @param {Window} [send_to_window]
+	 *
+	 * @return void
+	 */
+	WidgetPostMessageConnection.prototype.openNewTab = function(uri, send_to_window) {
+		
+		return this.postMessageFactory('openNewTab', uri, send_to_window);
+	};
 	
 	return WidgetPostMessageConnection;
 }()));
