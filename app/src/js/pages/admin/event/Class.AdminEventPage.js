@@ -47,11 +47,16 @@ AdminEventPage = extending(AdminPage, (function() {
 			tabs.push({title: 'Заявки', page: '/admin/event/'+this.id+'/requests'});
 		}
 		if (this.event.registration_locally || this.event.ticketing_locally) {
-			tabs.push({title: 'Продажи', page: '/admin/event/'+this.id+'/sales'});
-			tabs.push({title: 'Заказы', page: '/admin/event/'+this.id+'/orders'});
-			tabs.push({title: 'Контроль входа', page: '/admin/event/'+this.id+'/check_in'});
+			tabs.push(
+				{title: 'Продажи', page: '/admin/event/'+this.id+'/sales'},
+				{title: 'Заказы', page: '/admin/event/'+this.id+'/orders'},
+				{title: 'Контроль входа', page: '/admin/event/'+this.id+'/check_in'}
+			);
 		}
-		tabs.push({title: 'Редактирование', page: '/admin/event/'+this.id+'/edit'});
+		tabs.push(
+			{title: 'Метки UTM', page: '/admin/event/'+this.id+'/utm_stats'},
+			{title: 'Редактирование', page: '/admin/event/'+this.id+'/edit'}
+		);
 		
 		return tabs;
 	};
