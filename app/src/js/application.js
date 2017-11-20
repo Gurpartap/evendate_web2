@@ -51,6 +51,7 @@ __APP = {
 					'orders': AdminEventOrdersPage,
 					'requests': AdminEventRequestsPage,
 					'check_in': AdminEventCheckInPage,
+					'utm_stats': AdminEventUTMTagsPage,
 					'edit': AdminEventEditPage,
 					'': AdminEventOverviewPage
 				}
