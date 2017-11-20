@@ -5755,6 +5755,12 @@ body.-open_modal .modal_wrapper {
 	.event_admin_sales_ticket_type_dates,
 	.event_admin_sales_ticket_type_price {color: var(--color_primary_80)}
 }
+.event_admin_utm_page {margin: 18px 0}
+
+.event_admin_utm_title {
+	margin: 0;
+	padding: 12px 18px;
+}
 .add_organization_page {
 	max-width: 700px;
 	margin: 40px 0;
