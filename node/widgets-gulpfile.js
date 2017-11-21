@@ -8,6 +8,7 @@ var gulp = require('gulp'),
 	csso = require('gulp-csso'),
 	rename = require('gulp-rename'),
 	runSequence = require('run-sequence').use(gulp),
+	babel = require('gulp-babel'),
 	
 	templates_path = '../app/templates/',
 	js_path = '../app/src/js/',
@@ -114,6 +115,7 @@ gulp.task('js', function() {
 	
 	return gulp.src(srcs.vendor_js.concat(srcs.app_js))
 	           .pipe(resolveDependencies())
+	           .pipe(babel())
 	           .pipe(concat('widget.js'))
 	           .pipe(gulp.dest(dest_path));
 });

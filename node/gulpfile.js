@@ -12,6 +12,8 @@ var gulp = require('gulp'),
 	clean = require('gulp-clean'),
 	runSequence = require('run-sequence').use(gulp),
 	console = require('console'),
+	sourcemaps = require('gulp-sourcemaps'),
+	babel = require('gulp-babel'),
 	
 	js_path = '../app/src/js/',
 	css_path = '../app/src/css/',
@@ -78,7 +80,10 @@ gulp.task('js', function() {
 		
 		gulp.src(srcs.app_js)
 		    .pipe(resolveDependencies())
+		    .pipe(sourcemaps.init())
+		    .pipe(babel())
 		    .pipe(concat('app.js'))
+		    .pipe(sourcemaps.write('.'))
 		    .pipe(gulp.dest(dest_path))
 	);
 });
