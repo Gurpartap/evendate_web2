@@ -84,9 +84,7 @@ $__modules['statistics'] = array(
 				$__fields);
 
 
-			return EventsStatistics::getUTMData(
-				$event,
-				$__db);
+			return EventsStatistics::getUTMData($event, $__db);
 		},
 		'{/organizations/(id:[0-9]+)/subscribers/(user_id:[0-9]+)/orders}' => function ($organization_id, $user_id) use ($__db, $__order_by, $__request, $__user, $__fields, $__pagination) {
 			$organization = OrganizationsCollection::one(
@@ -215,6 +213,18 @@ $__modules['statistics'] = array(
 				new DateTime($__request['since'] ?? null),
 				new DateTime($__request['till'] ?? null)
 			);
+		},
+		'{/emails/(uuid:\w+-\w+-\w+-\w+-\w+)/open}' => function ($uuid) use ($__db, $__request, $__user, $__fields) {
+			Statistics::Email($uuid, $__user, $__db, Statistics::EMAIL_OPEN);
+			header('Content-Type: image/gif');
+			echo base64_decode('R0lGODlhAQABAJAAAP8AAAAAACH5BAUQAAAALAAAAAABAAEAAAICBAEAOw==');
+			die();
+		},
+		'{/emails/(uuid:\w+-\w+-\w+-\w+-\w+)/open_link/(link_uuid:\w+-\w+-\w+-\w+-\w+)}' => function ($uuid, $link_uuid) use ($__db, $__request, $__user, $__fields) {
+			Statistics::Email($uuid, $__user, $__db, Statistics::EMAIL_OPEN);
+			Statistics::Email($link_uuid, $__user, $__db, Statistics::EMAIL_OPEN_LINK);
+			header("Location: {$_REQUEST['url']}");
+			die();
 		},
 	),
 	'POST' => array(

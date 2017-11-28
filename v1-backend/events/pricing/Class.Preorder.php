@@ -39,7 +39,7 @@ class Preorder
 			$this->tickets_count = 0;
 			$this->sum = 0;
 			foreach ($this->tickets as $ticket) {
-				if (!isset($ticket['uuid'])){
+				if (!isset($ticket['uuid']) || empty($ticket['uuid'])){
 				}else{
 					$ticket_type = TicketTypesCollection::oneByUUID($this->db, $this->user, $ticket['uuid'], array());
 					if ($ticket_type->getPrice() > 0) {
