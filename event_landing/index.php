@@ -405,7 +405,7 @@ if (isset($_REQUEST['edit']) && $_REQUEST['edit'] == true) {
             </div> <!-- /END OBJECTIVE -->
 
             <div class="schedule-items-wrapper" gridster="data.schedule.itemsGridOptions">
-              <div class="row" ng-repeat="(objective_uuid, objective) in _day.items" gridster-item="objective">
+              <div class="row" ng-repeat="(objective_uuid, objective) in _day.items | orderObjectBy:'row'" gridster-item="objective">
                 <!-- OBJECTIVE -->
                 <div class="item-remover" ng-show="edit_mode">
                   <span class="fa fa-bars drag-icon"></span>

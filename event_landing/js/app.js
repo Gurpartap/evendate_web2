@@ -880,6 +880,8 @@ __app.controller('WholeWorldController', ['$scope', 'Upload', '$timeout', '$sce'
                 if ($scope.data.gallery_background) {
                     $scope.setGalleryImage($scope.data.gallery_background);
                 }
+
+                //reorder schedule items by rows, not uuid keys
                 $scope.data.custom.html = $sce.trustAsHtml($scope.data.custom.html);
                 $scope.$apply();
             }
@@ -963,6 +965,21 @@ __app.directive("contenteditable", function () {
         }
     };
 });
+
+__app.filter('orderObjectBy', function() {
+    return function(items, field, reverse) {
+        var filtered = [];
+        angular.forEach(items, function(item) {
+            filtered.push(item);
+        });
+        filtered.sort(function (a, b) {
+            return (a[field] > b[field] ? 1 : -1);
+        });
+        if(reverse) filtered.reverse();
+        return filtered;
+    };
+});
+
 
 $("#html5colorpicker").spectrum({
     allowEmpty: true,
