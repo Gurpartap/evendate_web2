@@ -109,7 +109,7 @@ Applications::$BOTS = [
     [ 'name' => 'Google Adsense Snapshot',      'id'    => 'google',      'regexp' => '/Adsense-Snapshot-Google/u' ],
     [ 'name' => 'Google App Engine',            'id'    => 'google',      'regexp' => '/AppEngine-Google/u' ],
     [ 'name' => 'Google Web Preview',           'id'    => 'google',      'regexp' => '/Google Web Preview/u' ],
-    [ 'name' => 'Google Page Speed',            'id'    => 'google',      'regexp' => '/Google Page Speed Insights/u' ],
+    [ 'name' => 'Google Page Speed',            'id'    => 'google',      'regexp' => '/Google OldPage Speed Insights/u' ],
     [ 'name' => 'Google FeedBurner',            'id'    => 'feed',      'regexp' => '/FeedBurner\/([0-9.]*)/u' ],
     [ 'name' => 'Google Feedfetcher',           'id'    => 'google',      'regexp' => '/Feedfetcher-Google/iu' ],
     [ 'name' => 'Google Font Analysis',         'id'    => 'google',      'regexp' => '/Google-FontAnalysis\/([0-9.]*)/u' ],

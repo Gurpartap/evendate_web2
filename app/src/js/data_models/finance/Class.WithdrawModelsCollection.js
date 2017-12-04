@@ -32,7 +32,7 @@ WithdrawModelsCollection = extending(EntitiesCollection, (function() {
 	 * @param {Fields} [fields]
 	 * @param {AJAXCallback} [success]
 	 *
-	 * @returns jqPromise
+	 * @returns Promise
 	 */
 	WithdrawModelsCollection.fetchWithdraws = function(organization_id, fields, success) {
 		
@@ -49,7 +49,7 @@ WithdrawModelsCollection = extending(EntitiesCollection, (function() {
 	 * @param {Fields} [fields]
 	 * @param {AJAXCallback} [success]
 	 *
-	 * @returns jqPromise
+	 * @returns Promise
 	 */
 	WithdrawModelsCollection.prototype.fetch = function(fields, success) {
 		var self = this;

@@ -36,7 +36,7 @@ NotAvailableOrderPage = extending(AbstractFeedbackPage, (function() {
 	}
 	/**
 	 *
-	 * @return {jqPromise}
+	 * @return {Promise}
 	 */
 	NotAvailableOrderPage.prototype.fetchData = Page.prototype.fetchData;
 	

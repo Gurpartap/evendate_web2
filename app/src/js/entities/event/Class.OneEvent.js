@@ -248,7 +248,7 @@ OneEvent = extending(OneEntity, (function() {
 	 * @param {(string|number)} event_id
 	 * @param {(Fields|string|Array)} [fields]
 	 * @param {AJAXCallback} [success]
-	 * @returns {jqPromise}
+	 * @returns {Promise}
 	 */
 	OneEvent.fetchEvent = function(event_id, fields, success) {
 		var send_data = {
@@ -305,7 +305,7 @@ OneEvent = extending(OneEntity, (function() {
 	 * @param {OneEventCreateEventData} new_event_data
 	 * @param {OneEventCreateEventCallback} [success]
 	 * @param {function} [error]
-	 * @returns {jqPromise}
+	 * @returns {Promise}
 	 */
 	OneEvent.createEvent = function(new_event_data, success, error) {
 		return __APP.SERVER.addData('/api/v1/events/', new_event_data, true, success, error);
@@ -316,7 +316,7 @@ OneEvent = extending(OneEntity, (function() {
 	 * @param {OneEventCreateEventData} data
 	 * @param {OneEventCreateEventCallback} [success]
 	 * @param {function} [error]
-	 * @returns {jqPromise}
+	 * @returns {Promise}
 	 */
 	OneEvent.updateEvent = function(event_id, data, success, error) {
 		return __APP.SERVER.updateData('/api/v1/events/' + event_id, data, true, success, error);
@@ -326,7 +326,7 @@ OneEvent = extending(OneEntity, (function() {
 	 * @param {(string|number)} event_id
 	 * @param {(OneEvent.STATUS|Array<OneEvent.STATUS>)} status
 	 *
-	 * @returns {jqPromise}
+	 * @returns {Promise}
 	 */
 	OneEvent.changeEventStatus = function(event_id, status) {
 		var data = {};
@@ -364,7 +364,7 @@ OneEvent = extending(OneEntity, (function() {
 	 *
 	 * @param {(string|number)} event_id
 	 *
-	 * @returns {jqPromise}
+	 * @returns {Promise}
 	 */
 	OneEvent.addFavored = function(event_id) {
 		
@@ -376,7 +376,7 @@ OneEvent = extending(OneEntity, (function() {
 	 *
 	 * @param {(string|number)} event_id
 	 *
-	 * @returns {jqPromise}
+	 * @returns {Promise}
 	 */
 	OneEvent.deleteFavored = function(event_id) {
 		
@@ -389,7 +389,7 @@ OneEvent = extending(OneEntity, (function() {
 	 * @param {(string|number)} event_id
 	 * @param {string} notification_type
 	 *
-	 * @returns {jqPromise}
+	 * @returns {Promise}
 	 */
 	OneEvent.addEventNotification = function(event_id, notification_type) {
 		
@@ -404,7 +404,7 @@ OneEvent = extending(OneEntity, (function() {
 	 * @param {(string|number)} event_id
 	 * @param {string} notification_uuid
 	 *
-	 * @returns {jqPromise}
+	 * @returns {Promise}
 	 */
 	OneEvent.deleteEventNotification = function(event_id, notification_uuid) {
 		
@@ -425,7 +425,7 @@ OneEvent = extending(OneEntity, (function() {
 	 * @param {Object<string, string>} [utm]
 	 * @param {AJAXCallback} [success]
 	 *
-	 * @return {jqPromise}
+	 * @return {Promise}
 	 */
 	OneEvent.registerToEvent = function(event_id, registration_fields, utm, success) {
 		
@@ -451,7 +451,7 @@ OneEvent = extending(OneEntity, (function() {
 	 * @param {Object<string, string>} [utm]
 	 * @param {AJAXCallback} [success]
 	 *
-	 * @return {jqPromise}
+	 * @return {Promise}
 	 */
 	OneEvent.buyTickets = function(event_id, tickets, promocode, utm, success) {
 		
@@ -475,7 +475,7 @@ OneEvent = extending(OneEntity, (function() {
 	 * @param {OrderCreateData} order_data
 	 * @param {AJAXCallback} [success]
 	 *
-	 * @return {jqPromise}
+	 * @return {Promise}
 	 */
 	OneEvent.makeOrder = function(event_id, order_data, success) {
 		if (empty(order_data.tickets)) {
@@ -500,7 +500,7 @@ OneEvent = extending(OneEntity, (function() {
 	 * @param {(string|number)} event_id
 	 * @param {OrderCreateData} order_data
 	 *
-	 * @return {jqPromise}
+	 * @return {Promise}
 	 */
 	OneEvent.preOrder = function(event_id, order_data) {
 		
@@ -515,7 +515,7 @@ OneEvent = extending(OneEntity, (function() {
 	 *
 	 * @param {(Fields|string|Array)} [fields]
 	 * @param {AJAXCallback} [success]
-	 * @returns {jqPromise}
+	 * @returns {Promise}
 	 */
 	OneEvent.prototype.fetchEvent = function(fields, success) {
 		var self = this;
@@ -534,7 +534,7 @@ OneEvent = extending(OneEntity, (function() {
 	 * @param {OneEventCreateEventData} data
 	 * @param {OneEventCreateEventCallback} [success]
 	 * @param {function} [error]
-	 * @returns {jqPromise}
+	 * @returns {Promise}
 	 */
 	OneEvent.prototype.createEvent = function(data, success, error) {
 		var self = this;
@@ -552,7 +552,7 @@ OneEvent = extending(OneEntity, (function() {
 	 * @param {OneEventCreateEventData} data
 	 * @param {OneEventCreateEventCallback} [success]
 	 * @param {function} [error]
-	 * @returns {jqPromise}
+	 * @returns {Promise}
 	 */
 	OneEvent.prototype.updateEvent = function(data, success, error) {
 		var self = this;
@@ -566,7 +566,7 @@ OneEvent = extending(OneEntity, (function() {
 	};
 	/**
 	 *
-	 * @return {jqPromise}
+	 * @return {Promise}
 	 */
 	OneEvent.prototype.favour = function() {
 		var self = this;
@@ -579,7 +579,7 @@ OneEvent = extending(OneEntity, (function() {
 	};
 	/**
 	 *
-	 * @return {jqPromise}
+	 * @return {Promise}
 	 */
 	OneEvent.prototype.unfavour = function() {
 		var self = this;
@@ -592,7 +592,7 @@ OneEvent = extending(OneEntity, (function() {
 	};
 	/**
 	 *
-	 * @return {jqPromise}
+	 * @return {Promise}
 	 */
 	OneEvent.prototype.cancel = function() {
 		var self = this;
@@ -605,7 +605,7 @@ OneEvent = extending(OneEntity, (function() {
 	};
 	/**
 	 *
-	 * @return {jqPromise}
+	 * @return {Promise}
 	 */
 	OneEvent.prototype.restore = function() {
 		var self = this;
@@ -618,7 +618,7 @@ OneEvent = extending(OneEntity, (function() {
 	};
 	/**
 	 *
-	 * @return {jqPromise}
+	 * @return {Promise}
 	 */
 	OneEvent.prototype.hide = function() {
 		var self = this;
@@ -631,9 +631,9 @@ OneEvent = extending(OneEntity, (function() {
 	};
 	/**
 	 *
-	 * @return {jqPromise}
+	 * @return {Promise}
 	 */
-	OneEvent.prototype.bringBach = function() {
+	OneEvent.prototype.bringBack = function() {
 		var self = this;
 		
 		return OneEvent.changeEventStatus(this.id, OneEvent.STATUS.SHOW).then(function() {
@@ -646,7 +646,7 @@ OneEvent = extending(OneEntity, (function() {
 	 *
 	 * @param {string} notification_type
 	 *
-	 * @returns {jqPromise}
+	 * @returns {Promise}
 	 */
 	OneEvent.prototype.addNotification = function(notification_type) {
 		var self = this;
@@ -672,7 +672,7 @@ OneEvent = extending(OneEntity, (function() {
 	 *
 	 * @param {string} notification_uuid
 	 *
-	 * @returns {jqPromise}
+	 * @returns {Promise}
 	 */
 	OneEvent.prototype.deleteNotification = function(notification_uuid) {
 		var self = this;
@@ -687,7 +687,7 @@ OneEvent = extending(OneEntity, (function() {
 	 * @param {Object<string, string>} [utm]
 	 * @param {AJAXCallback} [success]
 	 *
-	 * @return {jqPromise}
+	 * @return {Promise}
 	 */
 	OneEvent.prototype.registerToEvent = function(registration_fields, utm, success) {
 		var self = this;
@@ -707,7 +707,7 @@ OneEvent = extending(OneEntity, (function() {
 	 * @param {Object<string, string>} [utm]
 	 * @param {AJAXCallback} [success]
 	 *
-	 * @return {jqPromise}
+	 * @return {Promise}
 	 */
 	OneEvent.prototype.buyTickets = function(tickets, promocode, utm, success) {
 		
@@ -718,7 +718,7 @@ OneEvent = extending(OneEntity, (function() {
 	 * @param {OrderCreateData} order_data
 	 * @param {AJAXCallback} [success]
 	 *
-	 * @return {jqPromise}
+	 * @return {Promise}
 	 */
 	OneEvent.prototype.makeOrder = function(order_data, success) {
 		var self = this;
@@ -746,7 +746,7 @@ OneEvent = extending(OneEntity, (function() {
 	 *
 	 * @param {OrderCreateData} order_data
 	 *
-	 * @return {jqPromise}
+	 * @return {Promise}
 	 */
 	OneEvent.prototype.preOrder = function(order_data) {
 		

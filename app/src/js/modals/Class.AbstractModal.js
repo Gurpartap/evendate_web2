@@ -313,7 +313,7 @@ AbstractModal = (function() {
 				$loader = __APP.BUILD.overlayLoader(this.modal_wrapper);
 				this.adjustDestroyerHeight();
 				this.modal.trigger('modal:fetch/start');
-				this.fetchData().done(function() {
+				this.fetchData().then(function() {
 					$loader.remove();
 					self.is_fetched = true;
 					self.modal.trigger('modal:fetch/done');
@@ -395,11 +395,11 @@ AbstractModal = (function() {
 	};
 	/**
 	 *
-	 * @return {jqPromise}
+	 * @return {Promise}
 	 */
 	AbstractModal.prototype.fetchData = function() {
 		
-		return $.Deferred().resolve().promise();
+		return Promise.resolve();
 	};
 	/**
 	 * @return {AbstractModal}

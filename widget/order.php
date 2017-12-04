@@ -31,9 +31,7 @@ if (App::$ENV == 'prod' || App::$ENV == 'test') {
 
 <body class="widget_view">
 
-<div class="app_view PageView">
-	<div class="page_wrapper Content -fadeable"></div>
-</div>
+<div id="app_page_root" class="app_view PageView"></div>
 
 <div class="modal_wrapper ModalsWrapper">
 	<div class="modal_destroyer ModalDestroyer"></div>

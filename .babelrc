@@ -1,0 +1,10 @@
+{
+	"compact": false,
+	"presets": [
+		"./node/node_modules/babel-preset-react",
+		["./node/node_modules/babel-preset-env", {
+			"modules": false
+		}]
+	],
+	"plugins": ["./node/node_modules/babel-plugin-transform-object-rest-spread"]
+}

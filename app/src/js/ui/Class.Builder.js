@@ -82,6 +82,7 @@ Builder = (function() {
 	};
 	/**
 	 *
+	 * @deprecated
 	 * @param {...buildProps} props
 	 * @param {string} props.title
 	 *
@@ -840,6 +841,7 @@ Builder = (function() {
 	};
 	/**
 	 *
+	 * @deprecated
 	 * @param {Object<OneUser.ACCOUNTS, string>} [accounts_links]
 	 * @param {buildProps} [props]
 	 * @returns {jQuery}
@@ -906,6 +908,7 @@ Builder = (function() {
 	};
 	/**
 	 *
+	 * @deprecated
 	 * @param users
 	 * @param {buildProps} [props]
 	 * @param {(Array<string>|string)} [props.avatar_classes]
@@ -940,6 +943,7 @@ Builder = (function() {
 	};
 	/**
 	 *
+	 * @deprecated
 	 * @param {(OneUser|UsersCollection|OneOrganization|OrganizationsCollection|Array)} entities
 	 * @param {buildProps} [props]
 	 * @param {boolean} [props.is_link]
@@ -1018,12 +1022,12 @@ Builder = (function() {
 					username: [user.first_name, user.last_name].join(' ')
 				});
 			
-			OneOrganization.removeStaff(organization_id, user.id, user.role).done(function() {
+			OneOrganization.removeStaff(organization_id, user.id, user.role).then(function() {
 				$avatar_block.after($removing);
 				$avatar_block.detach();
 				
 				$removing.find('.ReturnStaff').on('click', function() {
-					OneOrganization.addStaff(organization_id, user.id, user.role).done(function() {
+					OneOrganization.addStaff(organization_id, user.id, user.role).then(function() {
 						$removing.after($avatar_block);
 						$removing.remove();
 					});
@@ -1070,6 +1074,7 @@ Builder = (function() {
 	};
 	/**
 	 *
+	 * @deprecated
 	 * @param {(OneUser|UsersCollection|OneOrganization|OrganizationsCollection|Array)} entities
 	 * @param {buildProps} [props]
 	 * @returns {jQuery|undefined}
@@ -1120,6 +1125,7 @@ Builder = (function() {
 	};
 	/**
 	 *
+	 * @deprecated
 	 * @param {Array} entities
 	 * @param {number} max_count
 	 * @param {buildProps} [props]
@@ -1150,6 +1156,7 @@ Builder = (function() {
 	};
 	/**
 	 *
+	 * @deprecated
 	 * @param {(OneAbstractActivity|Array<OneAbstractActivity>|UsersActivitiesCollection)} activities
 	 * @param {buildProps} [props]
 	 * @return {jQuery}
@@ -1278,6 +1285,7 @@ Builder = (function() {
 	};
 	/**
 	 *
+	 * @deprecated
 	 * @param {Array<OneEvent>} events
 	 * @param {OrganizationPage~EventType} type
 	 * @returns {jQuery}

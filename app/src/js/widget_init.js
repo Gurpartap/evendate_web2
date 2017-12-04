@@ -1,3 +1,8 @@
+/**
+ * @requires EvendateWidget.js
+ */
+__APP = new EvendateWidget();
+
 function calcHeight() {
 	var $content = $('.Content');
 	
@@ -97,7 +102,7 @@ $(document)
 			__APP.USER.selected_city.setData(cities[0]);
 			__APP.AUTH_URLS = auth_urls;
 			
-			__APP.init();
+			__APP.renderReact();
 			bindPageLinks();
 		});
 	});

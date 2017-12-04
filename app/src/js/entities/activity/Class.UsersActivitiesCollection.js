@@ -36,28 +36,10 @@ UsersActivitiesCollection = extending(EntitiesCollection, (function() {
 	};
 	/**
 	 *
-	 * @param {...object} element
-	 * @returns {number}
-	 */
-	UsersActivitiesCollection.prototype.push = function(element) {
-		for (var i = 0; i < arguments.length; i++) {
-			if(arguments[i] instanceof this.collection_of){
-				this[this.length] = arguments[i];
-			} else if (arguments[i].event_id != undefined) {
-				this[this.length] = (new OneEventActivity()).setData(arguments[i]);
-			} else if (arguments[i].organization_id != undefined) {
-				this[this.length] = (new OneOrganizationActivity()).setData(arguments[i]);
-			}
-			this.length++;
-		}
-		return this.length;
-	};
-	/**
-	 *
 	 * @param {(string|number)} user_id
 	 * @param {AJAXData} data
 	 * @param {AJAXCallback} [success]
-	 * @returns {jqPromise}
+	 * @returns {Promise}
 	 */
 	UsersActivitiesCollection.fetch = function(user_id, data, success) {
 		data = UsersActivitiesCollection.setDefaultData(data);
@@ -65,25 +47,26 @@ UsersActivitiesCollection = extending(EntitiesCollection, (function() {
 	};
 	/**
 	 *
-	 * @param {(Array|string)} [fields]
+	 * @param {(Fields|Array|string)} [fields]
 	 * @param {(number|string)} [length]
 	 * @param {string} [order_by]
 	 * @param {AJAXCallback} [success]
-	 * @returns {jqPromise}
+	 * @returns {Promise}
 	 */
 	UsersActivitiesCollection.prototype.fetch = function(fields, length, order_by, success) {
-		var self = this,
-			ajax_data = {
+		var ajax_data = {
 				fields: fields,
 				offset: this.length,
 				length: length
 			};
+		
 		if (order_by) {
 			ajax_data.order_by = order_by;
 		}
-		return this.constructor.fetch(this.user_id, ajax_data).then(function(data) {
-			self.setData(data);
-			return (new self.constructor()).setData(data);
+		return this.constructor.fetch(this.user_id, ajax_data).then(data => {
+			this.setData(data);
+			
+			return (new this.constructor()).setData(data);
 		});
 	};
 	

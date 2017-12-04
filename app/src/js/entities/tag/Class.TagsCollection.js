@@ -29,7 +29,7 @@ TagsCollection = extending(EntitiesCollection, (function() {
 	 *
 	 * @param {AJAXData} data
 	 * @param {AJAXCallback} [success]
-	 * @returns {jqPromise}
+	 * @returns {Promise}
 	 */
 	TagsCollection.fetchTags = function(data, success) {
 		return __APP.SERVER.getData('/api/v1/tags/', data, success);
@@ -38,7 +38,7 @@ TagsCollection = extending(EntitiesCollection, (function() {
 	 *
 	 * @param {TagsCollectionAJAXData} data
 	 * @param {AJAXCallback} [success]
-	 * @returns {jqPromise}
+	 * @returns {Promise}
 	 */
 	TagsCollection.prototype.fetchTags = function(data, success) {
 		var self = this;

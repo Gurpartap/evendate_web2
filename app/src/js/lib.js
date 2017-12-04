@@ -7,7 +7,7 @@
  * @property {Object<string, string[]>} ACTION_NAMES
  * @property {Object<string, string>} ENTITIES
  */
-__C = {
+const __C = {
 	API_TOKENS: {
 		DADATA: '7f2a3dad57bdaefebcb6e26ef7600b62b9658467'
 	},
@@ -226,7 +226,6 @@ __C = {
 		HOURS_AND_MINUTES: 'HH:mm'
 	}
 };
-Object.freeze(__C);
 /**
  * Extending class
  *
@@ -299,6 +298,18 @@ function isDirectInstance(instance, Class) {
 	
 	return instance.constructor === Class;
 }
+
+Function.getStaticMethods = function(Class) {
+	
+	return Object.getOwnPropertyNames(Class).reduce((methods, prop_name) => {
+		if (typeof Class[prop_name] === 'function' && prop_name !== prop_name.capitalize()) {
+			
+			return methods.concat({[prop_name]: Class[prop_name]})
+		}
+		
+		return methods;
+	}, []);
+};
 /**
  * Returns capitalized string
  *
@@ -391,6 +402,23 @@ Object.getProps = function(obj) {
 	return props;
 };
 /**
+ * Returns objects` own methods
+ *
+ * @param {object} obj
+ * @return {object}
+ */
+Object.getMethods = function(obj) {
+	var methods = {};
+	
+	$.each(obj, function(key, value) {
+		if (typeof value === 'function') {
+			methods[key] = value;
+		}
+	});
+	
+	return methods;
+};
+/**
  * Returns array of objects` own methods
  *
  * @param {object} obj
@@ -435,6 +463,17 @@ Object.toHtmlDataSet = function() {
 	});
 	return dataset.join(' ');
 };
+
+function objectToHTMLDataAttr(obj) {
+	
+	return Object.props(obj).reduce(function(new_obj, key) {
+		
+		return {
+			...new_obj,
+			[`data-${key}`]: obj[key]
+		};
+	}, {});
+}
 /**
  * Converts object into string of html attributes
  *
@@ -490,6 +529,49 @@ Array.newFrom = function(original, additional_values) {
 Array.toSpaceSeparatedString = function() {
 	return this.join(' ');
 };
+
+class HtmlClassesArray extends Array {
+	constructor(arg) {
+		super();
+		
+		if (arguments.length > 1) {
+			this.push(...arguments);
+		} else if (arg instanceof Array) {
+			this.push(...arg);
+		} else if (typeof arg === 'string') {
+			this.push(...(arg.split(' ')));
+		}
+		this.__proto__ = HtmlClassesArray.prototype;
+		this.__proto__.name = 'HtmlClassesArray';
+		
+		return this;
+	}
+	
+	toString() {
+		
+		return this.unique().join(' ');
+	}
+}
+
+
++function(PropTypes) {
+	const momentChecker = (isRequired, props, propName, componentName) => {
+		if (props[propName].constructor && props[propName].constructor.name !== 'Moment') {
+			const err = `Invalid prop '${propName}' supplied to '${componentName}'. Validation failed.`;
+			
+			if (isRequired) {
+				
+				return new Error(err);
+			} {
+				console.warn(err);
+			}
+		}
+	};
+	
+	
+	PropTypes.moment = momentChecker.bind(null, false);
+	PropTypes.moment.isRequired = momentChecker.bind(null, true);
+}(PropTypes);
 
 classEscalation(Array, function() {
 	/**
@@ -573,6 +655,13 @@ classEscalation(Array, function() {
 				k++;
 			}
 			return false;
+		};
+	}
+	
+	if (![].unique) {
+		methods.unique = function() {
+			
+			return Array.from(new Set(this));
 		};
 	}
 	
@@ -1851,8 +1940,8 @@ function isFormValid($form) {
 				active_count = $elements.filter(function(i, el) {
 					
 					return !$(el).is(':disabled')
-					   && ((el.checked && el.value !== 'on') || el.type !== 'radio')
-					   && ((el.checked && el.value !== 'on') || el.value === 'on' || el.type !== 'checkbox');
+					       && ((el.checked && el.value !== 'on') || el.type !== 'radio')
+					       && ((el.checked && el.value !== 'on') || el.value === 'on' || el.type !== 'checkbox');
 				}).length;
 				
 				if (!active_count) {
@@ -2037,7 +2126,7 @@ function escapeHtml(string) {
 		"'": '&#x27;',
 		'/': '&#x2F;'
 	};
-
+	
 	// Regex containing the keys listed immediately above.
 	var html_escaper = /[&<>"'\/]/g;
 	
@@ -2045,7 +2134,7 @@ function escapeHtml(string) {
 		
 		return string;
 	}
-
+	
 	// Escape a string for HTML interpolation.
 	return ('' + string).replace(html_escaper, function(match) {
 		
@@ -2224,7 +2313,7 @@ function outerAjax(url, data, content_type) {
 	});
 	return jqXHR.then(function(response, status_text, jqXHR) {
 		return response;
-	}).promise();
+	});
 }
 
 
@@ -2442,41 +2531,7 @@ function bindRippleEffect($parent) {
 	$parent = $parent ? $parent : $('body');
 	var $buttons = $parent.is('.RippleEffect') ? $parent : $parent.find('.RippleEffect');
 	
-	$buttons.not('.-Handled_RippleEffect').on('click.RippleEffect', function(e) {
-		var $this = $(this),
-			$ripple = $(),
-			timeout,
-			size,
-			x,
-			y;
-		
-		if ($this.children('.Ripple').length === 0)
-			$this.prepend('<span class="ripple Ripple"></span>');
-		
-		$ripple = $this.children('.Ripple');
-		$ripple.removeClass('animate');
-		
-		if (!$ripple.height() && !$ripple.width()) {
-			size = Math.max($this.outerWidth(), $this.outerHeight());
-			$ripple.css({height: size, width: size});
-		}
-		
-		x = e.pageX - $this.offset().left - ($ripple.width() / 2);
-		y = e.pageY - $this.offset().top - ($ripple.height() / 2);
-		
-		$ripple.css({top: y + 'px', left: x + 'px'}).addClass('animate');
-		
-		timeout = $ripple.data('timeout');
-		if (!empty(timeout)) {
-			clearTimeout(timeout);
-		}
-		
-		timeout = setTimeout(function() {
-			$ripple.removeClass('animate');
-		}, 650);
-		
-		$ripple.data('timeout', timeout);
-	}).addClass('-Handled_RippleEffect');
+	$buttons.not('.-Handled_RippleEffect').on('click.RippleEffect', rippleEffectHandler).addClass('-Handled_RippleEffect');
 	
 	return $buttons;
 }
@@ -2833,18 +2888,7 @@ function bindPageLinks($parent) {
 	$parent = $parent ? $parent : $('body');
 	var $links = $parent.is('.Link') ? $parent : $parent.find('.Link');
 	
-	return $links.not('.-Handled_Link').on('click.pageRender', function(e) {
-		var $this = $(this);
-		
-		if ($this.hasClass(__C.CLASSES.DISABLED)) {
-			
-			return false;
-		}
-		if (e.which === 1) {
-			e.preventDefault();
-			__APP.changeState($this.attr('href'));
-		}
-	}).addClass('-Handled_Link');
+	return $links.not('.-Handled_Link').on('click.pageRender', pageLinkClickHandler).addClass('-Handled_Link');
 }
 
 /**
@@ -3030,4 +3074,59 @@ function hashToObject() {
 		}
 	}
 	return obj;
+}
+
+
+
+
+
+
+function pageLinkClickHandler(e) {
+	const $this = $(e.currentTarget),
+		which = e.which || e.nativeEvent.which;
+	
+	if ($this.hasClass(__C.CLASSES.DISABLED)) {
+		e.preventDefault();
+	}
+	
+	if (which === 1) {
+		e.preventDefault();
+		__APP.changeState($this.attr('href'));
+	}
+}
+
+function rippleEffectHandler(e) {
+	var $this = $(e.currentTarget),
+		$ripple = $(),
+		timeout,
+		size,
+		x,
+		y;
+	
+	if ($this.children('.Ripple').length === 0)
+		$this.prepend('<span class="ripple Ripple"></span>');
+	
+	$ripple = $this.children('.Ripple');
+	$ripple.removeClass('animate');
+	
+	if (!$ripple.height() && !$ripple.width()) {
+		size = Math.max($this.outerWidth(), $this.outerHeight());
+		$ripple.css({height: size, width: size});
+	}
+	
+	x = e.pageX - $this.offset().left - ($ripple.width() / 2);
+	y = e.pageY - $this.offset().top - ($ripple.height() / 2);
+	
+	$ripple.css({top: y + 'px', left: x + 'px'}).addClass('animate');
+	
+	timeout = $ripple.data('timeout');
+	if (!empty(timeout)) {
+		clearTimeout(timeout);
+	}
+	
+	timeout = setTimeout(function() {
+		$ripple.removeClass('animate');
+	}, 650);
+	
+	$ripple.data('timeout', timeout);
 }

@@ -26,7 +26,7 @@ SearchEventTicketsCollection = extending(EventAllTicketsCollection, (function() 
 	 * @param {AJAXData} [ajax_data]
 	 * @param {AJAXCallback} [success]
 	 *
-	 * @return {jqPromise}
+	 * @return {Promise}
 	 */
 	SearchEventTicketsCollection.fetchTickets = function(query_string, event_id, ajax_data, success) {
 		ajax_data = ajax_data ? ajax_data : {};
@@ -46,7 +46,7 @@ SearchEventTicketsCollection = extending(EventAllTicketsCollection, (function() 
 	 * @param {(string|Array)} [order_by]
 	 * @param {AJAXCallback} [success]
 	 *
-	 * @return {jqPromise}
+	 * @return {Promise}
 	 */
 	SearchEventTicketsCollection.prototype.fetchTickets = function(fields, length, order_by, success) {
 		var self = this;

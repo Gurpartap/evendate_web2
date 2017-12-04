@@ -84,7 +84,7 @@ OneTicket = extending(OneEntity, (function() {
 	 * @param {(string|number)} uuid
 	 * @param {(Fields|string)} [fields]
 	 *
-	 * @return {jqPromise}
+	 * @return {Promise}
 	 */
 	OneTicket.fetchTicket = function(event_id, uuid, fields) {
 		
@@ -99,7 +99,7 @@ OneTicket = extending(OneEntity, (function() {
 	 * @param {(string|number)} event_id
 	 * @param {(string|number)} uuid
 	 *
-	 * @return {jqPromise}
+	 * @return {Promise}
 	 */
 	OneTicket.check = function(event_id, uuid) {
 		
@@ -114,7 +114,7 @@ OneTicket = extending(OneEntity, (function() {
 	 * @param {(string|number)} event_id
 	 * @param {(string|number)} uuid
 	 *
-	 * @return {jqPromise}
+	 * @return {Promise}
 	 */
 	OneTicket.uncheck = function(event_id, uuid) {
 		
@@ -129,7 +129,7 @@ OneTicket = extending(OneEntity, (function() {
 	 * @param {(string|number)} event_id
 	 * @param {(string|number)} uuid
 	 *
-	 * @return {jqPromise}
+	 * @return {Promise}
 	 */
 	OneTicket.exportTicket = function(event_id, uuid) {
 		
@@ -149,7 +149,7 @@ OneTicket = extending(OneEntity, (function() {
 	 *
 	 * @param {(Fields|string)} [fields]
 	 *
-	 * @return {jqPromise}
+	 * @return {Promise}
 	 */
 	OneTicket.prototype.fetch = function(fields) {
 		var self = this;
@@ -162,7 +162,7 @@ OneTicket = extending(OneEntity, (function() {
 	};
 	/**
 	 *
-	 * @return {jqPromise}
+	 * @return {Promise}
 	 */
 	OneTicket.prototype.check = function() {
 		var self = this;
@@ -175,7 +175,7 @@ OneTicket = extending(OneEntity, (function() {
 	};
 	/**
 	 *
-	 * @return {jqPromise}
+	 * @return {Promise}
 	 */
 	OneTicket.prototype.uncheck = function() {
 		var self = this;
@@ -188,7 +188,7 @@ OneTicket = extending(OneEntity, (function() {
 	};
 	/**
 	 *
-	 * @return {jqPromise}
+	 * @return {Promise}
 	 */
 	OneTicket.prototype.export = function() {
 		

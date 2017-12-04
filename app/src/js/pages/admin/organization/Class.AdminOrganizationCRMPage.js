@@ -171,7 +171,7 @@ AdminOrganizationCRMPage = extending(AdminOrganizationPage, (function() {
 		
 		this.init();
 		
-		this.organization_subscribers.fetchAllSubscribers(this.subscribers_fields).done(function(subscribers) {
+		this.organization_subscribers.fetchAllSubscribers(this.subscribers_fields).then(function(subscribers) {
 			var $rows = tmpl('admin-organization-crm-page-tr', subscribers.map(function(subscriber) {
 				
 				return {

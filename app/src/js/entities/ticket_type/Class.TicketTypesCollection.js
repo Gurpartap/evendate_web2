@@ -31,7 +31,7 @@ TicketTypesCollection = extending(EntitiesCollection, (function() {
 	 * @param {AJAXData} [ajax_data]
 	 * @param {AJAXCallback} [success]
 	 *
-	 * @return {jqPromise}
+	 * @return {Promise}
 	 */
 	TicketTypesCollection.fetchTicketTypes = function(event_id, ajax_data, success) {
 		return __APP.SERVER.getData('/api/v1/events/' + event_id + '/ticket_types', ajax_data, success);
@@ -43,7 +43,7 @@ TicketTypesCollection = extending(EntitiesCollection, (function() {
 	 * @param {(string|Array)} [order_by]
 	 * @param {AJAXCallback} [success]
 	 *
-	 * @return {jqPromise}
+	 * @return {Promise}
 	 */
 	TicketTypesCollection.prototype.fetchTicketTypes = function(fields, length, order_by, success) {
 		var self = this;

@@ -186,27 +186,27 @@ AdminOrganizationFinancesPage = extending(AdminOrganizationPage, (function() {
 		
 		this.eventsTable = this.$wrapper.find('.EventsFinancesTable').eq(0).DataTable(data_tables_opts);
 		
-		this.organization.finance.withdraws.fetch(this.withdraw_fields).done(function() {
+		this.organization.finance.withdraws.fetch(this.withdraw_fields).then(function() {
 			self.appendWithdraw(self.organization.finance.withdraws);
 			
 			self.render_vars.transactions_loader.remove();
 		});
 		
-		this.organization.finance.income_dynamics.fetch(dynamics_filters.scale, dynamics_filters.since, dynamics_filters.till).done(function() {
+		this.organization.finance.income_dynamics.fetch(dynamics_filters.scale, dynamics_filters.since, dynamics_filters.till).then(function() {
 			AdminPage.buildStockChart($chars.filter('.TicketsSellingChart'), 'Выручка', [{
 				name: 'Выручка',
 				data: AdminPage.areaChartSeriesNormalize(self.organization.finance.income_dynamics)
 			}], additional_chart_options);
 		});
 		
-		this.organization.finance.ticket_dynamics.fetch(dynamics_filters.scale, dynamics_filters.since, dynamics_filters.till).done(function() {
+		this.organization.finance.ticket_dynamics.fetch(dynamics_filters.scale, dynamics_filters.since, dynamics_filters.till).then(function() {
 			AdminPage.buildStockChart($chars.filter('.OrdersChart'), 'Динамика продаж', [{
 				name: 'Количество заказов',
 				data: AdminPage.areaChartSeriesNormalize(self.organization.finance.ticket_dynamics)
 			}], additional_chart_options);
 		});
 		
-		this.organization.events.fetchOrganizationsFeed(this.organization.id, this.events_fields, ServerConnection.MAX_ENTITIES_LENGTH).done(function() {
+		this.organization.events.fetchOrganizationsFeed(this.organization.id, this.events_fields, ServerConnection.MAX_ENTITIES_LENGTH).then(function() {
 			self.eventsTable.rows.add(tmpl('admin-organization-finances-event-row', self.organization.events.map(function(event) {
 				
 				return {

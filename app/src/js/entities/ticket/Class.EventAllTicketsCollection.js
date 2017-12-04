@@ -23,7 +23,7 @@ EventAllTicketsCollection = extending(AbstractEventTicketsCollection, (function(
 	 * @param {AJAXData} [ajax_data]
 	 * @param {AJAXCallback} [success]
 	 *
-	 * @return {jqPromise}
+	 * @return {Promise}
 	 */
 	EventAllTicketsCollection.fetchTickets = function(event_id, ajax_data, success) {
 		ajax_data = ajax_data ? ajax_data : {};
@@ -34,7 +34,7 @@ EventAllTicketsCollection = extending(AbstractEventTicketsCollection, (function(
 	 *
 	 * @param {ServerExports.EXPORT_EXTENSION} [format=xlsx]
 	 *
-	 * @return {jqPromise}
+	 * @return {Promise}
 	 */
 	EventAllTicketsCollection.prototype.export = function(format) {
 		

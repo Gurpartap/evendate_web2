@@ -20,18 +20,17 @@ SubscriptionsListModal = extending(AbstractListModal, (function() {
 	}
 	/**
 	 *
-	 * @return {jqPromise}
+	 * @return {Promise}
 	 */
 	SubscriptionsListModal.prototype.uploadEntities = function() {
-		var self = this;
 		
-		return this.entity.fetchSubscriptions({length: 20}).done(function(organizations) {
-			if(organizations.length) {
-				self.content.append(self.buildEntities(organizations));
+		return this.entity.fetchSubscriptions({length: 20}).then(organizations => {
+			if (organizations.length) {
+				this.content.append(this.buildEntities(organizations));
 			} else {
-				self.is_upload_disabled = true;
+				this.is_upload_disabled = true;
 			}
-		}).promise();
+		});
 	};
 	/**
 	 *

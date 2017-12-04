@@ -29,7 +29,7 @@ OrganizationSubscribersCollection = extending(UsersCollection, (function() {
 	 * @param {(string|number)} organization_id
 	 * @param {UsersCollectionAJAXData} ajax_data
 	 * @param {AJAXCallback} [success]
-	 * @returns {jqPromise}
+	 * @returns {Promise}
 	 */
 	OrganizationSubscribersCollection.fetchSubscribers = function(organization_id, ajax_data, success) {
 		ajax_data = ajax_data ? ajax_data : {};
@@ -50,7 +50,7 @@ OrganizationSubscribersCollection = extending(UsersCollection, (function() {
 	 * @param {(Array<string>|string)} [order_by]
 	 * @param {AJAXCallback} [success]
 	 *
-	 * @returns {jqPromise}
+	 * @returns {Promise}
 	 */
 	OrganizationSubscribersCollection.prototype.fetchSubscribers = function(fields, length, order_by, success) {
 		var self = this;
@@ -77,7 +77,7 @@ OrganizationSubscribersCollection = extending(UsersCollection, (function() {
 	 * @param {(Array<string>|string)} [order_by]
 	 * @param {AJAXCallback} [success]
 	 *
-	 * @returns {jqPromise}
+	 * @returns {Promise}
 	 */
 	OrganizationSubscribersCollection.prototype.fetchAllSubscribers = function(fields, order_by, success) {
 		var self = this;
@@ -102,7 +102,7 @@ OrganizationSubscribersCollection = extending(UsersCollection, (function() {
 	 *
 	 * @param {ServerExports.EXPORT_EXTENSION} [format=xlsx]
 	 *
-	 * @return {jqPromise}
+	 * @return {Promise}
 	 */
 	OrganizationSubscribersCollection.prototype.export = function(format) {
 		

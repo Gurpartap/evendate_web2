@@ -82,7 +82,6 @@ ServerConnection = extending(AsynchronousConnection, (function() {
 					debug[fields[i]] = arg;
 				});
 				
-				
 				break;
 			}
 			case 1: {
@@ -98,7 +97,7 @@ ServerConnection = extending(AsynchronousConnection, (function() {
 				break;
 			}
 		}
-		
+		debugger;
 		console.groupCollapsed('AJAX error');
 		if (debug.thrownError)
 			console.log('Thrown error:', debug.thrownError);
@@ -145,36 +144,28 @@ ServerConnection = extending(AsynchronousConnection, (function() {
 	 * @param {AJAXCallback} [success]
 	 * @param {function} [error]
 	 *
-	 * @returns {jqPromise}
+	 * @returns {Promise}
 	 */
 	ServerConnection.prototype.dealAjax = ServerConnection.dealAjax = function(http_method, url, ajax_data, content_type, success, error) {
 		ajax_data = ajax_data || {};
-		var self = this,
-			jqXHR;
+		var self = this;
 		
 		if (ajax_data.fields instanceof Fields){
 			ajax_data.fields = ajax_data.fields.toString();
 		}
 		
-		url = url.contains('/api/v1') ? url : '/api/v1' + url;
+		url = url.contains('/api/v1') ? url : `/api/v1${url}`;
 		
-		jqXHR = $.ajax({
-			url: url,
-			data: ajax_data,
-			method: http_method,
-			contentType: content_type || 'application/x-www-form-urlencoded; charset=UTF-8'
-		});
-		this.current_connections.push(jqXHR);
-		
-		return jqXHR.fail(function(jqXHR, status_text, thrownError) {
-			if (thrownError !== 'abort') {
-				if (isFunction(error)) {
-					error(null, jqXHR, this, thrownError);
-				} else {
-					self.ajaxErrorHandler(null, jqXHR, this, thrownError);
-				}
-			}
-		}).then(function(response, status_text, jqXHR) {
+		return (new Promise(function(resolve, reject) {
+			self.current_connections.push($.ajax({
+				url: url,
+				data: ajax_data,
+				method: http_method,
+				contentType: content_type || 'application/x-www-form-urlencoded; charset=UTF-8',
+				success: (data, textStatus, jqXHR) => resolve(data),
+				error: (jqXHR, textStatus, errorThrown) => reject({jqXHR, textStatus, errorThrown})
+			}));
+		})).then(function(response) {
 			ajaxHandler(response, function(data, text) {
 				if (isFunction(success)) {
 					success(data);
@@ -182,7 +173,15 @@ ServerConnection = extending(AsynchronousConnection, (function() {
 			});
 			
 			return response.data;
-		}).promise();
+		}).catch(function({jqXHR, textStatus, errorThrown}) {
+			if (errorThrown !== 'abort') {
+				if (isFunction(error)) {
+					error(jqXHR, textStatus, errorThrown);
+				} else {
+					self.ajaxErrorHandler(jqXHR, textStatus, errorThrown);
+				}
+			}
+		});
 	};
 	/**
 	 *
@@ -190,7 +189,7 @@ ServerConnection = extending(AsynchronousConnection, (function() {
 	 * @param {(object|string)} ajax_data
 	 * @param {AJAXCallback} [success]
 	 * @param {function} [error]
-	 * @returns {jqPromise}
+	 * @returns {Promise}
 	 */
 	ServerConnection.prototype.getData = function(url, ajax_data, success, error) {
 		return this.dealAjax(AsynchronousConnection.HTTP_METHODS.GET, url, this.validateData(ajax_data), 'application/json', function(data) {
@@ -209,7 +208,7 @@ ServerConnection = extending(AsynchronousConnection, (function() {
 	 * @param {boolean} [is_payload=false]
 	 * @param {AJAXCallback} [success]
 	 * @param {function} [error]
-	 * @returns {jqPromise}
+	 * @returns {Promise}
 	 */
 	ServerConnection.prototype.updateData = function(url, ajax_data, is_payload, success, error) {
 		if (is_payload) {
@@ -226,7 +225,7 @@ ServerConnection = extending(AsynchronousConnection, (function() {
 	 * @param {boolean} [is_payload=false]
 	 * @param {AJAXCallback} [success]
 	 * @param {function} [error]
-	 * @returns {jqPromise}
+	 * @returns {Promise}
 	 */
 	ServerConnection.prototype.addData = function(url, ajax_data, is_payload, success, error) {
 		if (is_payload) {
@@ -242,7 +241,7 @@ ServerConnection = extending(AsynchronousConnection, (function() {
 	 * @param {AJAXData} [ajax_data]
 	 * @param {AJAXCallback} [success]
 	 * @param {function} [error]
-	 * @returns {jqPromise}
+	 * @returns {Promise}
 	 */
 	ServerConnection.prototype.deleteData = function(url, ajax_data, success, error) {
 		if (!empty(ajax_data)) {

@@ -139,7 +139,7 @@ EventPage = extending(Page, (function() {
 		
 		
 		this.$wrapper.find('.CancelEvent').on('click.CancelEvent', function() {
-			PAGE.event.cancel().done(function() {
+			PAGE.event.cancel().then(function() {
 				PAGE.$wrapper.find('.EventPage').append(PAGE.$overlay_cap);
 			});
 		});
@@ -231,7 +231,7 @@ EventPage = extending(Page, (function() {
 					__C.CLASSES.HOOKS.RIPPLE
 				]
 			}).on('click.CancelCancellation', function() {
-				self.event.restore().done(function() {
+				self.event.restore().then(function() {
 					self.$overlay_cap.detach();
 				});
 			})));
@@ -558,13 +558,13 @@ EventPage = extending(Page, (function() {
 								$this.prop('disabled', true);
 								
 								if ($this.prop('checked')) {
-									event.addNotification($this.val()).done(function(notification) {
+									event.addNotification($this.val()).then(function(notification) {
 										$this.data('uuid', notification.uuid);
 										$this.prop('disabled', false);
 										self.$wrapper.trigger('notifications:change', ['add', notification]);
 									});
 								} else {
-									event.deleteNotification($this.data('uuid')).done(function() {
+									event.deleteNotification($this.data('uuid')).then(function() {
 										var notification = self.event.notifications.pull($this.data('uuid'));
 										
 										$this.data('uuid', undefined);

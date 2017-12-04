@@ -56,7 +56,7 @@ TicketsModal = extending(AbstractModal, (function() {
 		if (this.fetch_ticket_data) {
 			ticket = new OneTicket(this.fetch_ticket_data.event_id, this.fetch_ticket_data.uuid);
 			
-			return ticket.fetch(TicketsModal.NECESSARY_FIELDS).done(function() {
+			return ticket.fetch(TicketsModal.NECESSARY_FIELDS).then(function() {
 				self.tickets.push(ticket);
 			});
 		}

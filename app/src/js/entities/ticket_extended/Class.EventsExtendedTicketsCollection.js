@@ -31,7 +31,7 @@ EventsExtendedTicketsCollection = extending(ExtendedTicketsCollection, (function
 	 * @param {(Fields|string|Array)} [fields]
 	 * @param {AJAXCallback} [success]
 	 *
-	 * @return {jqPromise}
+	 * @return {Promise}
 	 */
 	EventsExtendedTicketsCollection.fetchTickets = function(event_id, fields, success){
 		
@@ -44,7 +44,7 @@ EventsExtendedTicketsCollection = extending(ExtendedTicketsCollection, (function
 	 * @param {(string|Array)} [order_by]
 	 * @param {AJAXCallback} [success]
 	 *
-	 * @return {jqPromise}
+	 * @return {Promise}
 	 */
 	EventsExtendedTicketsCollection.prototype.fetchTickets = function(fields, length, order_by, success) {
 		var self = this;

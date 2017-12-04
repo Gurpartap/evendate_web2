@@ -34,7 +34,7 @@ AbstractFeedbackPage = extending(Page, (function() {
 	}
 	/**
 	 *
-	 * @return {jqPromise}
+	 * @return {Promise}
 	 */
 	AbstractFeedbackPage.prototype.fetchData = function() {
 		
@@ -54,13 +54,12 @@ AbstractFeedbackPage = extending(Page, (function() {
 				$form_wrapper.addClass(__C.CLASSES.HIDDEN);
 				$loader = __APP.BUILD.loaderBlock();
 				$form_wrapper.after($loader);
-				self.organization.sendFeedback($form.serializeForm()).always(function() {
-					$loader.remove();
-				}).done(function() {
+				self.organization.sendFeedback($form.serializeForm()).then(function() {
 					showNotifier({text: 'Сообщение успешно отправлено', status: true});
 					self.afterFormSend();
 					$form_wrapper.removeClass(__C.CLASSES.HIDDEN);
 				});
+				$loader.remove();
 			}
 		});
 	};

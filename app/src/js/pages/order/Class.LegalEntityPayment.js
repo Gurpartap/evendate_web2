@@ -135,9 +135,7 @@ LegalEntityPayment = extending(Page, (function() {
 			if (isFormValid($form)) {
 				$loader = __APP.BUILD.overlayLoader(self.$wrapper);
 				
-				self.order.makeLegalEntityPayment($form.serializeForm()).always(function() {
-					$loader.remove();
-				}).done(function() {
+				self.order.makeLegalEntityPayment($form.serializeForm()).then(function() {
 					var $contract_wrapper = self.$wrapper.find('.LegalEntityPaymentContract');
 					
 					try {
@@ -151,6 +149,7 @@ LegalEntityPayment = extending(Page, (function() {
 					$contract_wrapper.removeClass(__C.CLASSES.HIDDEN);
 					scrollTo($contract_wrapper, 400);
 				});
+				$loader.remove();
 			}
 			
 		});

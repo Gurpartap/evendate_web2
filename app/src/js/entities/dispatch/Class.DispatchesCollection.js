@@ -22,7 +22,7 @@ DispatchesCollection = extending(EntitiesCollection, (function() {
 	 *
 	 * @param {AJAXData} [ajax_data]
 	 *
-	 * @return {jqPromise}
+	 * @return {Promise}
 	 */
 	DispatchesCollection.fetchDispatches = function(ajax_data) {
 		

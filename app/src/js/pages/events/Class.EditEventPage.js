@@ -142,14 +142,14 @@ EditEventPage = extending(AbstractEditEventPage, (function() {
 			}
 			
 			self.$wrapper.find('.RemoveEvent').on('click.RemoveEvent', function() {
-				self.event.cancel().done(function() {
+				self.event.cancel().then(function() {
 					$restore_wrapper.removeClass(__C.CLASSES.HIDDEN);
 					$cancel_wrapper.addClass(__C.CLASSES.HIDDEN);
 				});
 			});
 			
 			self.$wrapper.find('.ReturnEvent').on('click.ReturnEvent', function() {
-				self.event.restore().done(function() {
+				self.event.restore().then(function() {
 					$cancel_wrapper.removeClass(__C.CLASSES.HIDDEN);
 					$restore_wrapper.addClass(__C.CLASSES.HIDDEN);
 				});

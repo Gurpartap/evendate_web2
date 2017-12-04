@@ -44,7 +44,7 @@ OnePromocode = extending(PromocodeModel, (function() {
 	 * @param {AJAXCallback} [success]
 	 * @param {function} [error]
 	 *
-	 * @return {jqPromise}
+	 * @return {Promise}
 	 */
 	OnePromocode.fetchPromocodebyCodeName = function(event_id, code, fields, success, error) {
 		
@@ -60,7 +60,7 @@ OnePromocode = extending(PromocodeModel, (function() {
 	 * @param {AJAXCallback} [success]
 	 * @param {function} [error]
 	 *
-	 * @return {jqPromise}
+	 * @return {Promise}
 	 */
 	OnePromocode.prototype.fetchPromocodebyCodeName = function(code, fields, success, error) {
 		var self = this;

@@ -37,16 +37,12 @@ RegistrationModal = extending(PreviewRegistrationModal, (function() {
 						value: field.value
 					};
 				}))
-					.always(function() {
-						$register_button.removeAttr('disabled');
-					})
-					.done(function() {
+					.then(function() {
 						self.modal.trigger('registration:success');
 						self.hide();
 					});
-			} else {
-				$register_button.removeAttr('disabled');
 			}
+			$register_button.removeAttr('disabled');
 		});
 		this.content.find('.RegistrationFirstNameField').val(__APP.USER.first_name);
 		this.content.find('.RegistrationLastNameField').val(__APP.USER.last_name);

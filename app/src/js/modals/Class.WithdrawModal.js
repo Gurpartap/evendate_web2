@@ -37,7 +37,7 @@ WithdrawModal = extending(AbstractModal, (function() {
 					user: __APP.USER
 				}, self.content.serializeForm()));
 				
-				self.organization.requestWithdrawFunds(self.withdraw.sum, self.withdraw.comment).done(function() {
+				self.organization.requestWithdrawFunds(self.withdraw.sum, self.withdraw.comment).then(function() {
 					if (__APP.CURRENT_PAGE instanceof AdminOrganizationFinancesPage) {
 						__APP.CURRENT_PAGE.appendWithdraw(self.withdraw);
 					}

@@ -16,7 +16,7 @@ AdminAbstractDispatchPage = extending(AdminPage, (function() {
 	 *
 	 * @property {OneAbstractDispatch} dispatch
 	 * @property {EventsCollection} events
-	 * @property {jqPromise} events_defer
+	 * @property {Promise} events_defer
 	 */
 	function AdminAbstractDispatchPage(organization_id) {
 		AdminPage.call(this);
@@ -24,7 +24,7 @@ AdminAbstractDispatchPage = extending(AdminPage, (function() {
 		this.organization_id = organization_id;
 		this.dispatch = new OneAbstractDispatch();
 		this.events = new EventsCollection();
-		this.events_defer = $.Deferred();
+		this.events_defer = Promise;
 		this.is_disabled = !this.dispatch.is_active || this.dispatch.done;
 	}
 	
@@ -72,7 +72,7 @@ AdminAbstractDispatchPage = extending(AdminPage, (function() {
 	AdminAbstractDispatchPage.prototype.init = function() {
 		var self = this;
 		
-		this.events_defer.done(function() {
+		this.events_defer.then(function() {
 			self.initEventSelect(self.$wrapper.find('.EventsSelect').append(__APP.BUILD.option(self.events.map(function(event) {
 				
 				return {
@@ -109,7 +109,7 @@ AdminAbstractDispatchPage = extending(AdminPage, (function() {
 			})(self.$wrapper.find('form'));
 			
 			if (is_form_valid) {
-				OneAbstractDispatch.factory(send_data).save().done(function() {
+				OneAbstractDispatch.factory(send_data).save().then(function() {
 					showNotifier({
 						text: 'Рассылка успешно создана',
 						status: true

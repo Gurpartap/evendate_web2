@@ -97,7 +97,7 @@ Statistics = (function() {
 	 * @param {?StatisticsStdData} [dynamics_ajax_data]
 	 * @param {(Array<string>|string)} [dynamics_ajax_data.fields]
 	 * @param {function} [success]
-	 * @return {jqPromise}
+	 * @return {Promise}
 	 */
 	Statistics.fetchStatistics = function(entity, id, scale, range, statistics_fields, dynamics_ajax_data, success) {
 		var data = {
@@ -147,7 +147,7 @@ Statistics = (function() {
 	 * @param {string} [dynamics_ajax_data.since]
 	 * @param {string} [dynamics_ajax_data.till]
 	 * @param {function} [success]
-	 * @return {jqPromise}
+	 * @return {Promise}
 	 */
 	Statistics.prototype.fetchStatistics = function(scale, range, statistics_fields, dynamics_ajax_data, success) {
 		var self = this;

@@ -91,7 +91,7 @@ OneTicketType = extending(OneEntity, (function() {
 	 * @param {(Fields|string)} [fields]
 	 * @param {AJAXCallback} [success]
 	 *
-	 * @return {jqPromise}
+	 * @return {Promise}
 	 */
 	OneTicketType.fetchTicketType = function(event_id, uuid, fields, success) {
 		return __APP.SERVER.getData('/api/v1/events/' + event_id + '/ticket_types/' + uuid, {
@@ -103,7 +103,7 @@ OneTicketType = extending(OneEntity, (function() {
 	 * @param {(Fields|string)} [fields]
 	 * @param {AJAXCallback} [success]
 	 *
-	 * @return {jqPromise}
+	 * @return {Promise}
 	 */
 	OneTicketType.prototype.fetchOrder = function(fields, success) {
 		var self = this;

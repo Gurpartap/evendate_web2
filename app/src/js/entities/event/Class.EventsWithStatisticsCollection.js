@@ -21,7 +21,7 @@ EventsWithStatisticsCollection = extending(EventsCollection, (function() {
 	 *
 	 * @param {EventsCollectionAJAXData} data
 	 * @param {EventsCollectionAJAXCallback} [success]
-	 * @returns {jqPromise}
+	 * @returns {Promise}
 	 */
 	EventsWithStatisticsCollection.fetchEvents = function(data, success) {
 		data.statistics = true;
@@ -31,7 +31,7 @@ EventsWithStatisticsCollection = extending(EventsCollection, (function() {
 	 *
 	 * @param {EventsCollectionAJAXData} data
 	 * @param {EventsCollectionAJAXCallback} [success]
-	 * @returns {jqPromise}
+	 * @returns {Promise}
 	 */
 	EventsWithStatisticsCollection.fetchMyEvents = function(data, success) {
 		data.statistics = true;
@@ -41,7 +41,7 @@ EventsWithStatisticsCollection = extending(EventsCollection, (function() {
 	 *
 	 * @param {EventsCollectionAJAXData} data
 	 * @param {EventsCollectionAJAXCallback} [success]
-	 * @returns {jqPromise}
+	 * @returns {Promise}
 	 */
 	EventsWithStatisticsCollection.fetchFavoredEvents = function(data, success) {
 		data.statistics = true;
@@ -51,7 +51,7 @@ EventsWithStatisticsCollection = extending(EventsCollection, (function() {
 	 *
 	 * @param {EventsCollectionAJAXData} data
 	 * @param {EventsCollectionAJAXCallback} [success]
-	 * @returns {jqPromise}
+	 * @returns {Promise}
 	 */
 	EventsWithStatisticsCollection.fetchRecommendedEvents = function(data, success) {
 		data.statistics = true;
@@ -62,7 +62,7 @@ EventsWithStatisticsCollection = extending(EventsCollection, (function() {
 	 * @param {(number|string)} organization_id
 	 * @param {EventsCollectionAJAXData} data
 	 * @param {EventsCollectionAJAXCallback} [success]
-	 * @returns {jqPromise}
+	 * @returns {Promise}
 	 */
 	EventsWithStatisticsCollection.fetchOrganizationsEvents = function(organization_id, data, success) {
 		data.statistics = true;

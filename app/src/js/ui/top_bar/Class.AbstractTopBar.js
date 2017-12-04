@@ -14,6 +14,7 @@ AbstractTopBar = (function () {
 		this.$main_header = $('#main_header');
 		this.$page_title = this.$main_header.find('#page_title');
 		this.$tabs_wrapper = this.$main_header.find('.HeaderTabsWrapper');
+		this.is_tabs_rendered = false;
 	}
 	
 	AbstractTopBar.prototype.init = function () {
@@ -58,10 +59,12 @@ AbstractTopBar = (function () {
 	};
 	
 	AbstractTopBar.prototype.showTabs = function() {
+		this.is_tabs_rendered = true;
 		this.$main_header.addClass('-with_tabs');
 	};
 	
 	AbstractTopBar.prototype.hideTabs = function() {
+		this.is_tabs_rendered = false;
 		this.$main_header.removeClass('-with_tabs');
 	};
 	
