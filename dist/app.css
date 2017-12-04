@@ -548,6 +548,7 @@ hr[title] {
 	margin-top: 20px;
 	margin-bottom: 20px;
 	border: 1px solid #e4eaec;
+	overflow: visible;
 }
 
 hr[title]:before {
@@ -6509,8 +6510,8 @@ fieldset + .org_admin_settings_wrapper,
 .feed_calendar_td.-active > .day_num,
 .feed_calendar_td.-active > .day_num:hover,
 .feed_calendar_td.-active > .day_num:focus {
+	width: 100%;
 	color: #fff;
-	border-radius: 50%;
 	background-color: #f82969;
 }
 .-state_admin .feed_calendar_td.-active > .day_num {background-color: #00dc88}
