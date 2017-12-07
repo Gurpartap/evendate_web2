@@ -136,7 +136,9 @@ $__modules['users'] = array(
 				return $__user->getSettings();
 			}
 		},
+		'{me/contacts}' => function () use ($__user, $__request) {
 
+		},
 		'{me/actions}' => function () use ($__request, $__user, $__fields, $__db, $__pagination, $__order_by) {
 			return ActionsCollection::filter(
 				$__db,
