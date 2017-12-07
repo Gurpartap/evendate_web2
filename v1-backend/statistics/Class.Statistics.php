@@ -51,6 +51,11 @@ class Statistics
 	const SHARE_VK = 'share_vk';
 	const SHARE_TWITTER = 'share_tw';
 
+	const EMAIL_OPEN = 'open';
+	const EMAIL_OPEN_LINK = 'open_link';
+
+	const PUSH_OPEN = 'open';
+
 	const FRIEND_VIEW_SUBSCRIPTIONS = 'view_subscriptions';
 	const FRIEND_VIEW_ACTIONS = 'view_actions';
 	const FRIEND_VIEW_EVENT_FROM_USER = 'view_event_from_user';
@@ -129,6 +134,31 @@ class Statistics
 		}
 		return true;
 	}
+
+	public static function Email($uuid, AbstractUser $user = null, ExtendedPDO $db, $type)
+	{
+		try {
+			$type_id = self::getTypeId(self::ENTITY_EVENT, $type, $db);
+		} catch (Exception $e) {
+			return FALSE;
+		}
+
+
+		$q_ins_event = 'INSERT INTO stat_events(event_id, token_id, stat_type_id, created_at, utm_fields)
+				VALUES (:event_id, :token_id, :stat_type_id, NOW(), :utm_fields)';
+
+		$db->prepareExecuteRaw($q_ins_event, array(
+			':event_id' => $event->getId(),
+			':token_id' => $user ? $user->getTokenId() : null,
+			':stat_type_id' => $type_id,
+			':utm_fields' => App::$__REQUEST['utm'] ?? null
+		), 'CANT_INSERT_EVENT_STATS');
+		if ($no_update_badges !== true) {
+			self::updateIOsBadges($db, $user, $type, $event);
+		}
+		return true;
+	}
+
 
 	public static function Organization(Organization $organization, AbstractUser $user = null, ExtendedPDO $db, $type, $no_update_badges = false)
 	{
