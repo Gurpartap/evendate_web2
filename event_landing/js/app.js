@@ -106,7 +106,7 @@ var backgrounds = [
     }
 ];
 
-__app.controller('WholeWorldController', ['$scope', 'Upload', '$timeout', function ($scope, Upload, $timeout) {
+__app.controller('WholeWorldController', ['$scope', 'Upload', '$timeout', '$sce', function ($scope, Upload, $timeout, $sce) {
 
     $scope.edit_mode = search_data.edit;
     $scope.hide_loader = false;
@@ -831,14 +831,6 @@ __app.controller('WholeWorldController', ['$scope', 'Upload', '$timeout', functi
                 $scope.data.header.title = event.organization_name;
                 $scope.data.header.location_addresses = event.location;
                 $scope.data.main_description = event.description;
-
-                if (event.ticketing_available) {
-                    $scope.data.tickets.title = 'Купить билеты';
-                } else if (event.registration_available) {
-                    $scope.data.tickets.title = 'Регистрация'
-                } else {
-                    $scope.data.tickets.enabled = false;
-                }
                 $scope.$apply();
                 if ($scope.edit_mode) {
                     $scope.intro_instance = introJs();
@@ -888,7 +880,18 @@ __app.controller('WholeWorldController', ['$scope', 'Upload', '$timeout', functi
                 if ($scope.data.gallery_background) {
                     $scope.setGalleryImage($scope.data.gallery_background);
                 }
+
+                //reorder schedule items by rows, not uuid keys
+                $scope.data.custom.html = $sce.trustAsHtml($scope.data.custom.html);
                 $scope.$apply();
+            }
+
+            if (event.ticketing_available) {
+                $scope.data.tickets.title = 'Купить билеты';
+            } else if (event.registration_available) {
+                $scope.data.tickets.title = 'Регистрация'
+            } else {
+                $scope.data.tickets.enabled = false;
             }
             if (!$scope.edit_mode) {
                 $('[contenteditable]').prop('contenteditable', 'false');
@@ -962,6 +965,21 @@ __app.directive("contenteditable", function () {
         }
     };
 });
+
+__app.filter('orderObjectBy', function() {
+    return function(items, field, reverse) {
+        var filtered = [];
+        angular.forEach(items, function(item) {
+            filtered.push(item);
+        });
+        filtered.sort(function (a, b) {
+            return (a[field] > b[field] ? 1 : -1);
+        });
+        if(reverse) filtered.reverse();
+        return filtered;
+    };
+});
+
 
 $("#html5colorpicker").spectrum({
     allowEmpty: true,

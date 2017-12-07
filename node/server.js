@@ -28,6 +28,7 @@ var
     BTCCheker = require('./check_bitcoin_payments'),
     crypto = require('crypto'),
     bodyParser = require('body-parser'),
+    Broadcast = require('./broadcast'),
     UpdateQueries = require('./UpdateQueries'),
     __rooms = {},
     pdf_render = require('chrome-headless-render-pdf'),
@@ -1032,6 +1033,17 @@ pg.connect(pg_conn_string, function (err, client, done) {
         res.setHeader("content-type", headers[format]);
         qr_svg.pipe(res);
     });
+
+
+    app.get('/schedule-broadcasts/:id', function (req, res) {
+        res.json({status: true});
+        let broadcast = new Broadcast(req.id);
+        broadcast
+            .then((broadcast) => {
+
+            })
+    });
+
 
 
     app.get('/log', function (req, res) {
