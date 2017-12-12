@@ -8,6 +8,11 @@ class NetworkingProfile extends AbstractEntity
 	private $nm;
 	protected $db;
 
+	protected $event_id;
+	protected $request_uuid;
+
+	const REQUEST_FIELD_NAME = 'request';
+
 	protected static $DEFAULT_COLS = array(
 		'first_name',
 		'last_name',
@@ -25,6 +30,7 @@ class NetworkingProfile extends AbstractEntity
 		'github_url',
 		'email',
 		'signed_up',
+		'request_uuid',
 		'company_name'
 	);
 
@@ -81,5 +87,27 @@ class NetworkingProfile extends AbstractEntity
 		return new Result(true, '');
 	}
 
+	public function getParams(AbstractUser $user = null, array $fields = null): Result
+	{
+		$result_data = parent::getParams($user, $fields)->getData();
+
+		if (isset($fields[self::REQUEST_FIELD_NAME])) {
+			$event = EventsCollection::one(
+				App::DB(),
+				$user,
+				$this->event_id,
+				array()
+			);
+			$_fields = Fields::parseFields($fields[self::REQUEST_FIELD_NAME]['fields'] ?? '');
+			$result_data[self::REQUEST_FIELD_NAME] = NetworkingRequestsCollection::filter(
+				App::DB(),
+				$user,
+				array('event' => $event, 'user' => $user, 'uuid' => $this->request_uuid),
+				$_fields
+			)->getParams($user, $fields)->getData();
+
+		}
+		return new Result(true, '', $result_data);
+	}
 
 }

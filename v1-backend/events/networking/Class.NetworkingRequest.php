@@ -1,11 +1,17 @@
 <?php
 
+
+
 class NetworkingRequest extends AbstractEntity
 {
 
 
+	protected $sender_user_id;
+	protected $event_id;
 	private $nm;
 	protected $db;
+
+	const PROFILE_FIELD_NAME = 'profile';
 
 	public function setNetworkingManager(NetworkingManager $nm)
 	{
@@ -33,6 +39,29 @@ class NetworkingRequest extends AbstractEntity
 		'created_at',
 		'updated_at'
 	);
+
+	public function getParams(AbstractUser $user = null, array $fields = null): Result
+	{
+		$result_data = parent::getParams($user, $fields)->getData();
+
+		if (isset($fields[self::PROFILE_FIELD_NAME])) {
+			$event = EventsCollection::one(
+				App::DB(),
+				$user,
+				$this->event_id,
+				array()
+			);
+			$_fields = Fields::parseFields($fields[self::PROFILE_FIELD_NAME]['fields'] ?? '');
+			$result_data[self::PROFILE_FIELD_NAME] = NetworkingProfilesCollection::filter(
+				App::DB(),
+				$user,
+				array('event' => $event, 'user' => $user, 'user_id' => $this->sender_user_id),
+				$_fields
+			)->getParams($user, $fields)->getData();
+
+		}
+		return new Result(true, '', $result_data);
+	}
 
 
 	public static function save(NetworkingManager $nm, ExtendedPDO $db, array $request)
