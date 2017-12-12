@@ -376,7 +376,7 @@ class Event extends AbstractEntity
 			return ($datea < $dateb) ? -1 : 1;
 		}
 
-		usort($dates, "sortFunc");
+			usort($dates, "sortFunc");
 		return $dates;
 	}
 

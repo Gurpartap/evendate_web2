@@ -487,5 +487,27 @@ module.exports = {
             'location_updates',
             'is_free'
         ]
+    }),
+    view_broadcasts: sql.define({
+        name: 'view_broadcasts',
+        columns: [
+            'id',
+            'uuid',
+            'event_id',
+            'organization_id',
+            'owner_organization_id',
+            'is_email',
+            'is_push',
+            'is_sms',
+            'title',
+            'message_text',
+            'url',
+            'notification_time',
+            'is_active',
+            'done',
+            'created_at',
+            'updated_at',
+            'subject'
+        ]
     })
 };

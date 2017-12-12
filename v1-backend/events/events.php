@@ -11,6 +11,7 @@ require_once $BACKEND_FULL_PATH . '/events/Class.NotificationsCollection.php';
 require_once $BACKEND_FULL_PATH . '/events/Class.OrdersCollection.php';
 require_once $BACKEND_FULL_PATH . '/events/Class.Order.php';
 require_once $BACKEND_FULL_PATH . '/search/Class.ElasticUpdater.php';
+require_once $BACKEND_FULL_PATH . '/events/networking/Class.NetworkingManager.php';
 
 
 $__modules['events'] = array(
@@ -99,6 +100,31 @@ $__modules['events'] = array(
 			} catch (Exception $e) {
 				return new Result(false, 'CANT_FIND_PROMOCODE', null);
 			}
+		},
+		'{/(id:[0-9]+)/networking/profiles/(user_id:[0-9]+)}' => function ($event_id, $user_id) use ($__db, $__request, $__offset, $__pagination, $__length, $__user, $__fields, $__order_by) {
+			$event = EventsCollection::one($__db, $__user, $event_id, array());
+			$net_man = new NetworkingManager($event, $__user, $__db, $__request['code'] ?? null);
+			return $net_man->getProfile($user_id, $__fields);
+		},
+		'{/(id:[0-9]+)/networking/profiles/me}' => function ($event_id) use ($__db, $__request, $__offset, $__pagination, $__length, $__user, $__fields, $__order_by) {
+			$event = EventsCollection::one($__db, $__user, $event_id, array());
+			$net_man = new NetworkingManager($event, $__user, $__db, $__request['code'] ?? null);
+			return $net_man->getMyProfile($__fields);
+		},
+		'{/(id:[0-9]+)/networking/profiles}' => function ($event_id) use ($__db, $__request, $__offset, $__pagination, $__length, $__user, $__fields, $__order_by) {
+			$event = EventsCollection::one($__db, $__user, $event_id, array());
+			$net_man = new NetworkingManager($event, $__user, $__db);
+			return $net_man->getProfilesList($__request, $__fields, $__pagination, $__order_by ?? array());
+		},
+		'{/(id:[0-9]+)/networking/requests/(uuid:\w+-\w+-\w+-\w+-\w+)}' => function ($event_id, $uuid) use ($__db, $__request, $__offset, $__pagination, $__length, $__user, $__fields, $__order_by) {
+			$event = EventsCollection::one($__db, $__user, $event_id, array());
+			$net_man = new NetworkingManager($event, $__user, $__db);
+			return $net_man->getRequest($uuid, $__fields);
+		},
+		'{/(id:[0-9]+)/networking/requests}' => function ($event_id) use ($__db, $__request, $__offset, $__pagination, $__length, $__user, $__fields, $__order_by) {
+			$event = EventsCollection::one($__db, $__user, $event_id, array());
+			$net_man = new NetworkingManager($event, $__user, $__db);
+			return $net_man->getRequestsList($__fields, $__pagination, $__order_by ?? array());
 		},
 		'{/(id:[0-9]+)/orders/(uuid:\w+-\w+-\w+-\w+-\w+)/legal_entity/contract}' => function ($id, $uuid) use ($__db, $__request, $__offset, $__length, $__user, $__fields) {
 			$event = EventsCollection::one(
@@ -426,6 +452,16 @@ $__modules['events'] = array(
 			$order = OrdersCollection::oneByUUID($__db, $__user, $uuid, $fields);
 			return $order->makeBitcoinPayment($fields, $event);
 		},
+		'{/(id:[0-9]+)/networking/profiles/me}' => function ($event_id) use ($__db, $__request, $__offset, $__pagination, $__length, $__user, $__fields, $__order_by) {
+			$event = EventsCollection::one($__db, $__user, $event_id, array());
+			$net_man = new NetworkingManager($event, $__user, $__db, $__request['code'] ?? null);
+			return $net_man->saveMyProfile($__request);
+		},
+		'{/(id:[0-9]+)/networking/requests}' => function ($event_id) use ($__db, $__request, $__offset, $__pagination, $__length, $__user, $__fields, $__order_by) {
+			$event = EventsCollection::one($__db, $__user, $event_id, array());
+			$net_man = new NetworkingManager($event, $__user, $__db, $__request['code'] ?? null);
+			return $net_man->saveMyRequest($__request);
+		},
 		'{{/(id:[0-9]+)}/preorder}' => function ($id) use ($__db, $__request, $__pagination, $__user, $__fields) {
 			$event = EventsCollection::one(
 				$__db,
@@ -526,6 +562,11 @@ $__modules['events'] = array(
 			} else {
 				return new Result(false, 'Не указаны поля для обновления');
 			}
+		},
+		'{/(id:[0-9]+)/networking/requests/(uuid:\w+-\w+-\w+-\w+-\w+)}' => function ($event_id, $uuid) use ($__db, $__request, $__offset, $__pagination, $__length, $__user, $__fields, $__order_by) {
+			$event = EventsCollection::one($__db, $__user, $event_id, array());
+			$net_man = new NetworkingManager($event, $__user, $__db);
+			return $net_man->updateRequest($uuid, $__request);
 		},
 		'{/(id:[0-9]+)}' => function ($id) use ($__db, $__request, $__user) {
 			$event = EventsCollection::one($__db, $__user, intval($id), array());
