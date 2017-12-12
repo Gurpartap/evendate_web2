@@ -1,6 +1,6 @@
 var _slicedToArray = function () { function sliceIterator(arr, i) { var _arr = []; var _n = true; var _d = false; var _e = undefined; try { for (var _i = arr[Symbol.iterator](), _s; !(_n = (_s = _i.next()).done); _n = true) { _arr.push(_s.value); if (i && _arr.length === i) break; } } catch (err) { _d = true; _e = err; } finally { try { if (!_n && _i["return"]) _i["return"](); } finally { if (_d) throw _e; } } return _arr; } return function (arr, i) { if (Array.isArray(arr)) { return arr; } else if (Symbol.iterator in Object(arr)) { return sliceIterator(arr, i); } else { throw new TypeError("Invalid attempt to destructure non-iterable instance"); } }; }();
 
-var _values2, _values3, _values4, _values5, _values6, _labels, _colors, _icons, _labels2, _colors2, _icons2, _UserActivity$AVATAR_, _UserActivity$ACTION_;
+var _values2, _values3, _values4, _values5, _values6, _UserActivity$AVATAR_, _UserActivity$ACTION_, _labels, _colors, _icons, _labels2, _colors2, _icons2;
 
 var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 
@@ -5119,6 +5119,57 @@ DateModelsCollection = extending(EntitiesCollection, function () {
  */
 /**
  *
+ * @class InterestModel
+ * @extends OneEntity
+ */
+InterestModel = extending(OneEntity, function () {
+	/**
+  *
+  * @constructor
+  * @constructs InterestModel
+  *
+  * @property {?number} topic_id
+  * @property {?string} topic_name
+  * @property {?float} value
+  * @property {?timestamp} updated_at
+  */
+	function InterestModel() {
+		this.topic_id = setDefaultValue(this.topic_id, 0);
+		this.topic_name = null;
+		this.value = null;
+		this.updated_at = null;
+	}
+	InterestModel.prototype.ID_PROP_NAME = 'topic_id';
+
+	return InterestModel;
+}());
+/**
+ * @requires ../../entities/Class.EntitiesCollection.js
+ * @requires Class.InterestModel.js
+ */
+/**
+ *
+ * @class InterestModelsCollection
+ * @extends EntitiesCollection
+ */
+InterestModelsCollection = extending(EntitiesCollection, function () {
+	/**
+  *
+  * @constructor
+  * @constructs InterestModelsCollection
+  */
+	function InterestModelsCollection() {
+		EntitiesCollection.call(this);
+	}
+	InterestModelsCollection.prototype.collection_of = InterestModel;
+
+	return InterestModelsCollection;
+}());
+/**
+ * @requires ../../entities/Class.OneEntity.js
+ */
+/**
+ *
  * @abstract
  * @class AbstractFinanceModel
  * @extends OneEntity
@@ -5753,57 +5804,6 @@ OrganizationFinanceModel = extending(AbstractFinanceModel, function () {
 	return OrganizationFinanceModel;
 }());
 /**
- * @requires ../../entities/Class.OneEntity.js
- */
-/**
- *
- * @class InterestModel
- * @extends OneEntity
- */
-InterestModel = extending(OneEntity, function () {
-	/**
-  *
-  * @constructor
-  * @constructs InterestModel
-  *
-  * @property {?number} topic_id
-  * @property {?string} topic_name
-  * @property {?float} value
-  * @property {?timestamp} updated_at
-  */
-	function InterestModel() {
-		this.topic_id = setDefaultValue(this.topic_id, 0);
-		this.topic_name = null;
-		this.value = null;
-		this.updated_at = null;
-	}
-	InterestModel.prototype.ID_PROP_NAME = 'topic_id';
-
-	return InterestModel;
-}());
-/**
- * @requires ../../entities/Class.EntitiesCollection.js
- * @requires Class.InterestModel.js
- */
-/**
- *
- * @class InterestModelsCollection
- * @extends EntitiesCollection
- */
-InterestModelsCollection = extending(EntitiesCollection, function () {
-	/**
-  *
-  * @constructor
-  * @constructs InterestModelsCollection
-  */
-	function InterestModelsCollection() {
-		EntitiesCollection.call(this);
-	}
-	InterestModelsCollection.prototype.collection_of = InterestModel;
-
-	return InterestModelsCollection;
-}());
-/**
  * @requires ../Class.AbstractDataModel.js
  */
 /**
@@ -5887,6 +5887,79 @@ PricingRuleModelsCollection = extending(AbstractDataModelsCollection, function (
 	PricingRuleModelsCollection.prototype.collection_of = PricingRuleModel;
 
 	return PricingRuleModelsCollection;
+}());
+/**
+ * @requires ../../entities/Class.OneEntity.js
+ */
+/**
+ *
+ * @class PromocodeModel
+ * @extends OneEntity
+ */
+PromocodeModel = extending(OneEntity, function () {
+	/**
+  *
+  * @constructor
+  * @constructs PromocodeModel
+  *
+  * @property {?string} uuid
+  * @property {?number} event_id
+  * @property {?string} code
+  * @property {?boolean} is_fixed
+  * @property {?boolean} is_percentage
+  * @property {?number} effort
+  * @property {?number} total_effort
+  * @property {?number} use_limit
+  * @property {?number} use_count
+  * @property {?timestamp} start_date
+  * @property {?timestamp} end_date
+  * @property {?boolean} enabled
+  *
+  * @property {?timestamp} created_at
+  * @property {?timestamp} updated_at
+  */
+	function PromocodeModel() {
+		this.uuid = null;
+		this.event_id = null;
+		this.code = null;
+		this.is_fixed = null;
+		this.is_percentage = null;
+		this.effort = null;
+		this.total_effort = null;
+		this.use_limit = null;
+		this.use_count = null;
+		this.start_date = null;
+		this.end_date = null;
+		this.enabled = null;
+
+		this.created_at = null;
+		this.updated_at = null;
+	}
+	PromocodeModel.prototype.ID_PROP_NAME = 'uuid';
+
+	return PromocodeModel;
+}());
+/**
+ * @requires ../../entities/Class.EntitiesCollection.js
+ * @requires Class.PromocodeModel.js
+ */
+/**
+ *
+ * @class PromocodeModelsCollection
+ * @extends EntitiesCollection
+ */
+PromocodeModelsCollection = extending(EntitiesCollection, function () {
+	/**
+  *
+  * @constructor
+  * @constructs PromocodeModelsCollection
+  */
+	function PromocodeModelsCollection() {
+		EntitiesCollection.call(this);
+	}
+	PromocodeModelsCollection.prototype.collection_of = PromocodeModel;
+
+	return PromocodeModelsCollection;
 }());
 /**
  * @requires ../../entities/Class.OneEntity.js
@@ -6099,79 +6172,6 @@ RegistrationSelectFieldValue = function () {
 
 	return RegistrationSelectFieldValue;
 }();
-/**
- * @requires ../../entities/Class.OneEntity.js
- */
-/**
- *
- * @class PromocodeModel
- * @extends OneEntity
- */
-PromocodeModel = extending(OneEntity, function () {
-	/**
-  *
-  * @constructor
-  * @constructs PromocodeModel
-  *
-  * @property {?string} uuid
-  * @property {?number} event_id
-  * @property {?string} code
-  * @property {?boolean} is_fixed
-  * @property {?boolean} is_percentage
-  * @property {?number} effort
-  * @property {?number} total_effort
-  * @property {?number} use_limit
-  * @property {?number} use_count
-  * @property {?timestamp} start_date
-  * @property {?timestamp} end_date
-  * @property {?boolean} enabled
-  *
-  * @property {?timestamp} created_at
-  * @property {?timestamp} updated_at
-  */
-	function PromocodeModel() {
-		this.uuid = null;
-		this.event_id = null;
-		this.code = null;
-		this.is_fixed = null;
-		this.is_percentage = null;
-		this.effort = null;
-		this.total_effort = null;
-		this.use_limit = null;
-		this.use_count = null;
-		this.start_date = null;
-		this.end_date = null;
-		this.enabled = null;
-
-		this.created_at = null;
-		this.updated_at = null;
-	}
-	PromocodeModel.prototype.ID_PROP_NAME = 'uuid';
-
-	return PromocodeModel;
-}());
-/**
- * @requires ../../entities/Class.EntitiesCollection.js
- * @requires Class.PromocodeModel.js
- */
-/**
- *
- * @class PromocodeModelsCollection
- * @extends EntitiesCollection
- */
-PromocodeModelsCollection = extending(EntitiesCollection, function () {
-	/**
-  *
-  * @constructor
-  * @constructs PromocodeModelsCollection
-  */
-	function PromocodeModelsCollection() {
-		EntitiesCollection.call(this);
-	}
-	PromocodeModelsCollection.prototype.collection_of = PromocodeModel;
-
-	return PromocodeModelsCollection;
-}());
 /**
  * @requires ../Class.OneEntity.js
  */
@@ -7017,6 +7017,113 @@ OrganizationDispatchesCollection = extending(DispatchesCollection, function () {
 	};
 
 	return OrganizationDispatchesCollection;
+}());
+/**
+ * @requires ../Class.OneEntity.js
+ */
+/**
+ *
+ * @class OneNotification
+ * @extends OneEntity
+ */
+OneNotification = extending(OneEntity, function () {
+	/**
+  *
+  * @constructor
+  * @constructs OneNotification
+  *
+  * @property {?string} guid
+  * @property {?string} uuid
+  * @property {?(string|number)} event_id
+  * @property {?timestamp} notification_time
+  *
+  * @property {?string} notification_type
+  * @property {?timestamp} sent_time
+  * @property {?boolean} done
+  * @property {?timestamp} created_at
+  * @property {?timestamp} updated_at
+  */
+	function OneNotification() {
+		var self = this;
+
+		this.uuid = null;
+		this.event_id = null;
+		this.notification_time = null;
+		this.notification_type = null;
+
+		this.sent_time = null;
+		this.done = null;
+		this.created_at = null;
+		this.updated_at = null;
+
+		Object.defineProperty(this, OneNotification.prototype.ID_PROP_NAME, {
+			get: function get() {
+				return self.uuid || self.notification_type;
+			}
+		});
+	}
+
+	OneNotification.prototype.ID_PROP_NAME = 'guid';
+
+	OneNotification.NOTIFICATIN_TYPES = {
+		NOW: 'notification-now',
+		CANCELED: 'notification-event-canceled',
+		CHANGED_DATES: 'notification-event-changed-dates',
+		CHANGED_LOCATION: 'notification-event-changed-location',
+		CHANGED_PRICE: 'notification-event-changed-price',
+		CHANGED_REGISTRATION: 'notification-event-changed-registration',
+		ONE_DAY_REGISTRATION_CLOSE: 'notification-one-day-registration-close',
+		BEFORE_THREE_HOURS: 'notification-before-three-hours',
+		BEFORE_DAY: 'notification-before-day',
+		BEFORE_THREE_DAYS: 'notification-before-three-days',
+		BEFORE_WEEK: 'notification-before-week',
+		BEFORE_QUARTER_OF_HOUR: 'notification-before-quarter-of-hour',
+		CUSTOM: 'notification-custom',
+		REGISTRATION_APPROVED: 'notification-registration-approved',
+		REGISTRATION_CHECKED_OUT: 'notification-registration-checked-out',
+		REGISTRATION_NOT_CHECKED_OUT: 'notification-registration-not-checked-out',
+		REGISTRATION_NOT_APPROVED: 'notification-registration-not-approved',
+		USERS: 'users-notification',
+		ADDITIONAL_FOR_ORGANIZATION: 'notification-additional-for-organization'
+	};
+
+	return OneNotification;
+}());
+/**
+ * @requires ../Class.EntitiesCollection.js
+ * @requires Class.OneNotification.js
+ */
+/**
+ *
+ * @class NotificationsCollection
+ * @extends EntitiesCollection
+ */
+NotificationsCollection = extending(EntitiesCollection, function () {
+	/**
+  *
+  * @constructor
+  * @constructs NotificationsCollection
+  *
+  * @property {Array<OneNotification>} future
+  */
+	function NotificationsCollection() {
+		EntitiesCollection.call(this);
+
+		Object.defineProperties(this, {
+			future: {
+				get: function get() {
+
+					return this.filter(function (notification) {
+
+						return !notification.done;
+					});
+				}
+			}
+		});
+	}
+	NotificationsCollection.prototype.collection_of = OneNotification;
+
+	return NotificationsCollection;
 }());
 /**
  * @requires ../Class.OneEntity.js
@@ -9211,113 +9318,6 @@ UsersCollection = extending(EntitiesCollection, function () {
 
 /**
  * @requires ../Class.OneEntity.js
- */
-/**
- *
- * @class OneNotification
- * @extends OneEntity
- */
-OneNotification = extending(OneEntity, function () {
-	/**
-  *
-  * @constructor
-  * @constructs OneNotification
-  *
-  * @property {?string} guid
-  * @property {?string} uuid
-  * @property {?(string|number)} event_id
-  * @property {?timestamp} notification_time
-  *
-  * @property {?string} notification_type
-  * @property {?timestamp} sent_time
-  * @property {?boolean} done
-  * @property {?timestamp} created_at
-  * @property {?timestamp} updated_at
-  */
-	function OneNotification() {
-		var self = this;
-
-		this.uuid = null;
-		this.event_id = null;
-		this.notification_time = null;
-		this.notification_type = null;
-
-		this.sent_time = null;
-		this.done = null;
-		this.created_at = null;
-		this.updated_at = null;
-
-		Object.defineProperty(this, OneNotification.prototype.ID_PROP_NAME, {
-			get: function get() {
-				return self.uuid || self.notification_type;
-			}
-		});
-	}
-
-	OneNotification.prototype.ID_PROP_NAME = 'guid';
-
-	OneNotification.NOTIFICATIN_TYPES = {
-		NOW: 'notification-now',
-		CANCELED: 'notification-event-canceled',
-		CHANGED_DATES: 'notification-event-changed-dates',
-		CHANGED_LOCATION: 'notification-event-changed-location',
-		CHANGED_PRICE: 'notification-event-changed-price',
-		CHANGED_REGISTRATION: 'notification-event-changed-registration',
-		ONE_DAY_REGISTRATION_CLOSE: 'notification-one-day-registration-close',
-		BEFORE_THREE_HOURS: 'notification-before-three-hours',
-		BEFORE_DAY: 'notification-before-day',
-		BEFORE_THREE_DAYS: 'notification-before-three-days',
-		BEFORE_WEEK: 'notification-before-week',
-		BEFORE_QUARTER_OF_HOUR: 'notification-before-quarter-of-hour',
-		CUSTOM: 'notification-custom',
-		REGISTRATION_APPROVED: 'notification-registration-approved',
-		REGISTRATION_CHECKED_OUT: 'notification-registration-checked-out',
-		REGISTRATION_NOT_CHECKED_OUT: 'notification-registration-not-checked-out',
-		REGISTRATION_NOT_APPROVED: 'notification-registration-not-approved',
-		USERS: 'users-notification',
-		ADDITIONAL_FOR_ORGANIZATION: 'notification-additional-for-organization'
-	};
-
-	return OneNotification;
-}());
-/**
- * @requires ../Class.EntitiesCollection.js
- * @requires Class.OneNotification.js
- */
-/**
- *
- * @class NotificationsCollection
- * @extends EntitiesCollection
- */
-NotificationsCollection = extending(EntitiesCollection, function () {
-	/**
-  *
-  * @constructor
-  * @constructs NotificationsCollection
-  *
-  * @property {Array<OneNotification>} future
-  */
-	function NotificationsCollection() {
-		EntitiesCollection.call(this);
-
-		Object.defineProperties(this, {
-			future: {
-				get: function get() {
-
-					return this.filter(function (notification) {
-
-						return !notification.done;
-					});
-				}
-			}
-		});
-	}
-	NotificationsCollection.prototype.collection_of = OneNotification;
-
-	return NotificationsCollection;
-}());
-/**
- * @requires ../Class.OneEntity.js
  * @requires ../date/Class.DatesCollection.js
  * @requires ../tag/Class.TagsCollection.js
  * @requires ../order/Class.AbstractEventOrdersCollection.js
@@ -11479,155 +11479,6 @@ SearchResults = extending(OneEntity, function () {
 	return SearchResults;
 }());
 /**
- * @requires Class.AbstractEventTicketsCollection.js
- */
-/**
- *
- * @class EventAllTicketsCollection
- * @extends AbstractEventTicketsCollection
- */
-EventAllTicketsCollection = extending(AbstractEventTicketsCollection, function () {
-	/**
-  * @param {(string|number)} event_id
-  *
-  * @constructor
-  * @constructs EventAllTicketsCollection
-  */
-	function EventAllTicketsCollection(event_id) {
-		AbstractEventTicketsCollection.call(this, event_id);
-	}
-
-	/**
-  *
-  * @param {(string|number)} event_id
-  * @param {AJAXData} [ajax_data]
-  * @param {AJAXCallback} [success]
-  *
-  * @return {Promise}
-  */
-	EventAllTicketsCollection.fetchTickets = function (event_id, ajax_data, success) {
-		ajax_data = ajax_data ? ajax_data : {};
-
-		return __APP.SERVER.getData('/api/v1/statistics/events/' + event_id + '/tickets', ajax_data, success);
-	};
-	/**
-  *
-  * @param {ServerExports.EXPORT_EXTENSION} [format=xlsx]
-  *
-  * @return {Promise}
-  */
-	EventAllTicketsCollection.prototype.export = function (format) {
-
-		return new ServerExports().eventTickets(this.event_id, format);
-	};
-
-	return EventAllTicketsCollection;
-}());
-/**
- * @requires Class.AbstractEventTicketsCollection.js
- */
-/**
- *
- * @class EventMyTicketsCollection
- * @extends AbstractEventTicketsCollection
- */
-EventMyTicketsCollection = extending(AbstractEventTicketsCollection, function () {
-	/**
-  *
-  * @param {(string|number)} [event_id=0]
-  *
-  * @constructor
-  * @constructs EventMyTicketsCollection
-  *
-  * @property {(string|number)} event_id
-  */
-	function EventMyTicketsCollection(event_id) {
-		AbstractEventTicketsCollection.call(this, event_id);
-	}
-	/**
-  *
-  * @param {(string|number)} event_id
-  * @param {AJAXData} [ajax_data]
-  * @param {AJAXCallback} [success]
-  *
-  * @return {Promise}
-  */
-	EventMyTicketsCollection.fetchTickets = function (event_id, ajax_data, success) {
-
-		return __APP.SERVER.getData('/api/v1/events/' + event_id + '/tickets', ajax_data, success);
-	};
-
-	return EventMyTicketsCollection;
-}());
-/**
- * @requires Class.EventAllTicketsCollection.js
- */
-/**
- *
- * @class SearchEventTicketsCollection
- * @extends EventAllTicketsCollection
- */
-SearchEventTicketsCollection = extending(EventAllTicketsCollection, function () {
-	/**
-  * @param {(string|number)} query_string
-  * @param {(string|number)} event_id
-  *
-  * @constructor
-  * @constructs SearchEventTicketsCollection
-  */
-	function SearchEventTicketsCollection(query_string, event_id) {
-		EventAllTicketsCollection.call(this, event_id);
-		this.query_string = query_string;
-	}
-
-	/**
-  *
-  * @param {(string|number)} query_string
-  * @param {(string|number)} event_id
-  * @param {AJAXData} [ajax_data]
-  * @param {AJAXCallback} [success]
-  *
-  * @return {Promise}
-  */
-	SearchEventTicketsCollection.fetchTickets = function (query_string, event_id, ajax_data, success) {
-		ajax_data = ajax_data ? ajax_data : {};
-
-		if ($.isNumeric(query_string)) {
-			ajax_data.number = query_string;
-		} else {
-			ajax_data.user_name = query_string;
-		}
-
-		return EventAllTicketsCollection.fetchTickets(event_id, ajax_data, success);
-	};
-	/**
-  *
-  * @param {(Fields|string)} [fields]
-  * @param {number} [length]
-  * @param {(string|Array)} [order_by]
-  * @param {AJAXCallback} [success]
-  *
-  * @return {Promise}
-  */
-	SearchEventTicketsCollection.prototype.fetchTickets = function (fields, length, order_by, success) {
-		var self = this;
-
-		return SearchEventTicketsCollection.fetchTickets(this.query_string, this.event_id, {
-			fields: fields || undefined,
-			offset: this.length,
-			length: length || undefined,
-			order_by: order_by || undefined
-		}, function (data) {
-			self.setData(data);
-			if (isFunction(success)) {
-				success.call(self, self.__last_pushed);
-			}
-		});
-	};
-
-	return SearchEventTicketsCollection;
-}());
-/**
  *
  * @abstract
  * @class OneConversionStatistic
@@ -11932,6 +11783,155 @@ OrganizationsStatistics = extending(Statistics, function () {
 	}
 
 	return OrganizationsStatistics;
+}());
+/**
+ * @requires Class.AbstractEventTicketsCollection.js
+ */
+/**
+ *
+ * @class EventAllTicketsCollection
+ * @extends AbstractEventTicketsCollection
+ */
+EventAllTicketsCollection = extending(AbstractEventTicketsCollection, function () {
+	/**
+  * @param {(string|number)} event_id
+  *
+  * @constructor
+  * @constructs EventAllTicketsCollection
+  */
+	function EventAllTicketsCollection(event_id) {
+		AbstractEventTicketsCollection.call(this, event_id);
+	}
+
+	/**
+  *
+  * @param {(string|number)} event_id
+  * @param {AJAXData} [ajax_data]
+  * @param {AJAXCallback} [success]
+  *
+  * @return {Promise}
+  */
+	EventAllTicketsCollection.fetchTickets = function (event_id, ajax_data, success) {
+		ajax_data = ajax_data ? ajax_data : {};
+
+		return __APP.SERVER.getData('/api/v1/statistics/events/' + event_id + '/tickets', ajax_data, success);
+	};
+	/**
+  *
+  * @param {ServerExports.EXPORT_EXTENSION} [format=xlsx]
+  *
+  * @return {Promise}
+  */
+	EventAllTicketsCollection.prototype.export = function (format) {
+
+		return new ServerExports().eventTickets(this.event_id, format);
+	};
+
+	return EventAllTicketsCollection;
+}());
+/**
+ * @requires Class.AbstractEventTicketsCollection.js
+ */
+/**
+ *
+ * @class EventMyTicketsCollection
+ * @extends AbstractEventTicketsCollection
+ */
+EventMyTicketsCollection = extending(AbstractEventTicketsCollection, function () {
+	/**
+  *
+  * @param {(string|number)} [event_id=0]
+  *
+  * @constructor
+  * @constructs EventMyTicketsCollection
+  *
+  * @property {(string|number)} event_id
+  */
+	function EventMyTicketsCollection(event_id) {
+		AbstractEventTicketsCollection.call(this, event_id);
+	}
+	/**
+  *
+  * @param {(string|number)} event_id
+  * @param {AJAXData} [ajax_data]
+  * @param {AJAXCallback} [success]
+  *
+  * @return {Promise}
+  */
+	EventMyTicketsCollection.fetchTickets = function (event_id, ajax_data, success) {
+
+		return __APP.SERVER.getData('/api/v1/events/' + event_id + '/tickets', ajax_data, success);
+	};
+
+	return EventMyTicketsCollection;
+}());
+/**
+ * @requires Class.EventAllTicketsCollection.js
+ */
+/**
+ *
+ * @class SearchEventTicketsCollection
+ * @extends EventAllTicketsCollection
+ */
+SearchEventTicketsCollection = extending(EventAllTicketsCollection, function () {
+	/**
+  * @param {(string|number)} query_string
+  * @param {(string|number)} event_id
+  *
+  * @constructor
+  * @constructs SearchEventTicketsCollection
+  */
+	function SearchEventTicketsCollection(query_string, event_id) {
+		EventAllTicketsCollection.call(this, event_id);
+		this.query_string = query_string;
+	}
+
+	/**
+  *
+  * @param {(string|number)} query_string
+  * @param {(string|number)} event_id
+  * @param {AJAXData} [ajax_data]
+  * @param {AJAXCallback} [success]
+  *
+  * @return {Promise}
+  */
+	SearchEventTicketsCollection.fetchTickets = function (query_string, event_id, ajax_data, success) {
+		ajax_data = ajax_data ? ajax_data : {};
+
+		if ($.isNumeric(query_string)) {
+			ajax_data.number = query_string;
+		} else {
+			ajax_data.user_name = query_string;
+		}
+
+		return EventAllTicketsCollection.fetchTickets(event_id, ajax_data, success);
+	};
+	/**
+  *
+  * @param {(Fields|string)} [fields]
+  * @param {number} [length]
+  * @param {(string|Array)} [order_by]
+  * @param {AJAXCallback} [success]
+  *
+  * @return {Promise}
+  */
+	SearchEventTicketsCollection.prototype.fetchTickets = function (fields, length, order_by, success) {
+		var self = this;
+
+		return SearchEventTicketsCollection.fetchTickets(this.query_string, this.event_id, {
+			fields: fields || undefined,
+			offset: this.length,
+			length: length || undefined,
+			order_by: order_by || undefined
+		}, function (data) {
+			self.setData(data);
+			if (isFunction(success)) {
+				success.call(self, self.__last_pushed);
+			}
+		});
+	};
+
+	return SearchEventTicketsCollection;
 }());
 /**
  * @requires ../ticket/Class.OneTicket.js
@@ -12302,6 +12302,145 @@ MyTicketsCollection = extending(ExtendedTicketsCollection, function () {
 	return MyTicketsCollection;
 }());
 /**
+ * @requires ../Class.OneEntity.js
+ */
+/**
+ *
+ * @class OneUTMStat
+ * @extends OneEntity
+ */
+OneUTMStat = extending(OneEntity, function () {
+	/**
+  *
+  * @constructor
+  * @constructs OneUTMStat
+  *
+  * @property {?string} uuid
+  * @property {?string} utm_source
+  * @property {?string} utm_medium
+  * @property {?string} utm_campaign
+  * @property {?string} utm_content
+  * @property {?string} utm_term
+  * @property {?number} open_count
+  * @property {?number} conversion
+  * @property {?number} orders_sum
+  */
+	function OneUTMStat() {
+		var self = this;
+
+		OneEntity.call(this);
+
+		this.utm_source = null;
+		this.utm_medium = null;
+		this.utm_campaign = null;
+		this.utm_content = null;
+		this.utm_term = null;
+		this.open_count = null;
+		this.conversion = null;
+		this.orders_sum = null;
+
+		Object.defineProperty(this, 'uuid', {
+			get: function get() {
+
+				return CryptoJS.MD5([self.utm_source, self.utm_medium, self.utm_campaign, self.utm_content, self.utm_term].clean().join('-')).toString();
+			}
+		});
+	}
+
+	OneUTMStat.prototype.ID_PROP_NAME = 'uuid';
+
+	return OneUTMStat;
+}());
+/**
+ * @requires ../Class.EntitiesCollection.js
+ * @requires Class.OneUTMStat.js
+ */
+/**
+ *
+ * @class UTMStatsCollection
+ * @extends EntitiesCollection
+ */
+UTMStatsCollection = extending(EntitiesCollection, function () {
+	/**
+  *
+  * @constructor
+  * @constructs UTMStatsCollection
+  */
+	function UTMStatsCollection() {
+		EntitiesCollection.call(this);
+	}
+
+	UTMStatsCollection.prototype.collection_of = OneUTMStat;
+
+	UTMStatsCollection.ENDPOINT = Object.freeze({
+		UTM: '/statistics/events/{event_id}/utm'
+	});
+
+	/**
+  *
+  * @param {number} event_id
+  * @param {AJAXData} [ajax_data]
+  *
+  * @return {Promise}
+  */
+	UTMStatsCollection.fetchEventUTMStats = function (event_id, ajax_data) {
+
+		return __APP.SERVER.getData(UTMStatsCollection.ENDPOINT.UTM.format({ event_id: event_id }), ajax_data);
+	};
+
+	return UTMStatsCollection;
+}());
+/**
+ * @requires Class.UTMStatsCollection.js
+ */
+/**
+ *
+ * @class EventUTMStatsCollection
+ * @extends UTMStatsCollection
+ */
+EventUTMStatsCollection = extending(UTMStatsCollection, function () {
+	/**
+  *
+  * @param {number} event_id
+  *
+  * @constructor
+  * @constructs EventUTMStatsCollection
+  *
+  * @property {number} event_id
+  */
+	function EventUTMStatsCollection(event_id) {
+		UTMStatsCollection.call(this);
+
+		Object.defineProperty(this, 'event_id', {
+			value: event_id
+		});
+	}
+	/**
+  *
+  * @param {(Fields|string)} [fields]
+  * @param {number} [length]
+  * @param {(string|Array)} [order_by]
+  *
+  * @return {Promise}
+  */
+	EventUTMStatsCollection.prototype.fetch = function (fields, length, order_by) {
+		var self = this;
+
+		return UTMStatsCollection.fetchEventUTMStats(this.event_id, {
+			fields: fields || undefined,
+			offset: this.length,
+			length: length || undefined,
+			order_by: order_by || undefined
+		}).then(function (data) {
+			self.setData(data);
+
+			return self.__last_pushed;
+		});
+	};
+
+	return EventUTMStatsCollection;
+}());
+/**
  * @requires Class.OneUser.js
  */
 /**
@@ -12642,145 +12781,6 @@ OrganizationSubscribersCollection = extending(UsersCollection, function () {
 	};
 
 	return OrganizationSubscribersCollection;
-}());
-/**
- * @requires ../Class.OneEntity.js
- */
-/**
- *
- * @class OneUTMStat
- * @extends OneEntity
- */
-OneUTMStat = extending(OneEntity, function () {
-	/**
-  *
-  * @constructor
-  * @constructs OneUTMStat
-  *
-  * @property {?string} uuid
-  * @property {?string} utm_source
-  * @property {?string} utm_medium
-  * @property {?string} utm_campaign
-  * @property {?string} utm_content
-  * @property {?string} utm_term
-  * @property {?number} open_count
-  * @property {?number} conversion
-  * @property {?number} orders_sum
-  */
-	function OneUTMStat() {
-		var self = this;
-
-		OneEntity.call(this);
-
-		this.utm_source = null;
-		this.utm_medium = null;
-		this.utm_campaign = null;
-		this.utm_content = null;
-		this.utm_term = null;
-		this.open_count = null;
-		this.conversion = null;
-		this.orders_sum = null;
-
-		Object.defineProperty(this, 'uuid', {
-			get: function get() {
-
-				return CryptoJS.MD5([self.utm_source, self.utm_medium, self.utm_campaign, self.utm_content, self.utm_term].clean().join('-')).toString();
-			}
-		});
-	}
-
-	OneUTMStat.prototype.ID_PROP_NAME = 'uuid';
-
-	return OneUTMStat;
-}());
-/**
- * @requires ../Class.EntitiesCollection.js
- * @requires Class.OneUTMStat.js
- */
-/**
- *
- * @class UTMStatsCollection
- * @extends EntitiesCollection
- */
-UTMStatsCollection = extending(EntitiesCollection, function () {
-	/**
-  *
-  * @constructor
-  * @constructs UTMStatsCollection
-  */
-	function UTMStatsCollection() {
-		EntitiesCollection.call(this);
-	}
-
-	UTMStatsCollection.prototype.collection_of = OneUTMStat;
-
-	UTMStatsCollection.ENDPOINT = Object.freeze({
-		UTM: '/statistics/events/{event_id}/utm'
-	});
-
-	/**
-  *
-  * @param {number} event_id
-  * @param {AJAXData} [ajax_data]
-  *
-  * @return {Promise}
-  */
-	UTMStatsCollection.fetchEventUTMStats = function (event_id, ajax_data) {
-
-		return __APP.SERVER.getData(UTMStatsCollection.ENDPOINT.UTM.format({ event_id: event_id }), ajax_data);
-	};
-
-	return UTMStatsCollection;
-}());
-/**
- * @requires Class.UTMStatsCollection.js
- */
-/**
- *
- * @class EventUTMStatsCollection
- * @extends UTMStatsCollection
- */
-EventUTMStatsCollection = extending(UTMStatsCollection, function () {
-	/**
-  *
-  * @param {number} event_id
-  *
-  * @constructor
-  * @constructs EventUTMStatsCollection
-  *
-  * @property {number} event_id
-  */
-	function EventUTMStatsCollection(event_id) {
-		UTMStatsCollection.call(this);
-
-		Object.defineProperty(this, 'event_id', {
-			value: event_id
-		});
-	}
-	/**
-  *
-  * @param {(Fields|string)} [fields]
-  * @param {number} [length]
-  * @param {(string|Array)} [order_by]
-  *
-  * @return {Promise}
-  */
-	EventUTMStatsCollection.prototype.fetch = function (fields, length, order_by) {
-		var self = this;
-
-		return UTMStatsCollection.fetchEventUTMStats(this.event_id, {
-			fields: fields || undefined,
-			offset: this.length,
-			length: length || undefined,
-			order_by: order_by || undefined
-		}).then(function (data) {
-			self.setData(data);
-
-			return self.__last_pushed;
-		});
-	};
-
-	return EventUTMStatsCollection;
 }());
 /**
  * @singleton
@@ -14398,1187 +14398,6 @@ Builder = function () {
 	return Builder;
 }();
 /**
- * @class ReactActionButton
- * @extends React.Component
- *
- * @static {Object<string, string>} STATES
- * @static {Object<string, Object<STATES, ?string>>} DEFAULTS
- * @static {function} addAvatar
- *
- * @property {Object<STATES, ?string>} labels
- * @property {Object<STATES, ?string>} colors
- * @property {Object<STATES, ?string>} icons
- * @property {STATES} current_state
- * @property {HtmlClassesArray} classes
- * @property {object} state
- * @property {boolean} state.is_checked
- * @property {boolean} state.is_hovered
- */
-
-var ReactActionButton = function (_React$Component) {
-	_inherits(ReactActionButton, _React$Component);
-
-	_createClass(ReactActionButton, null, [{
-		key: 'addAvatar',
-		value: function addAvatar($context) {
-			var $wrapper = ($context instanceof jQuery ? $context : $($context)).closest('.' + __C.CLASSES.HOOKS.ADD_AVATAR.ANCESTOR),
-			    $collection = $wrapper.find('.' + __C.CLASSES.HOOKS.ADD_AVATAR.COLLECTION),
-			    $favored_count = $wrapper.find('.' + __C.CLASSES.HOOKS.ADD_AVATAR.QUANTITY),
-			    $avatars = $collection.find('.avatar'),
-			    amount = $avatars.length;
-
-			if ($collection.data('max_amount') >= amount) {
-				if ($collection.hasClass(__C.CLASSES.HOOKS.ADD_AVATAR.STATES.SHIFTED)) {
-					$collection.removeClass(__C.CLASSES.HOOKS.ADD_AVATAR.STATES.SHIFTED);
-					$collection.width(amount == 1 ? 0 : $avatars.outerWidth() * (amount - 1) - 6 * (amount - 2));
-				} else {
-					$collection.addClass(__C.CLASSES.HOOKS.ADD_AVATAR.STATES.SHIFTED);
-					$collection.width($avatars.outerWidth() * amount - 6 * (amount - 1));
-				}
-			} else {
-				if ($favored_count.length) {
-					var current_count = parseInt($favored_count.text());
-					if ($collection.hasClass(__C.CLASSES.HOOKS.ADD_AVATAR.STATES.SHIFTED)) {
-						$favored_count.text(current_count - 1);
-						if (current_count - 1 <= 0) {
-							$favored_count.parent().addClass(__C.CLASSES.HOOKS.ADD_AVATAR.STATES.CAST);
-						}
-					} else {
-						$favored_count.text(current_count + 1);
-						$favored_count.parent().removeClass(__C.CLASSES.HOOKS.ADD_AVATAR.STATES.CAST);
-					}
-				}
-				$collection.toggleClass(__C.CLASSES.HOOKS.ADD_AVATAR.STATES.SHIFT + ' ' + __C.CLASSES.HOOKS.ADD_AVATAR.STATES.SHIFTED);
-			}
-		}
-
-		/**
-   *
-   * @param {object} props
-   * @param {boolean} [props.isChecked = false]
-   * @param {boolean} [props.isAddAvatar = false]
-   * @param {(string|Array)} [props.className]
-   * @param {Object<STATES, ?string>} [props.labels]
-   * @param {Object<STATES, ?string>} [props.colors]
-   * @param {Object<STATES, ?string>} [props.icons]
-   * @param {function} [props.onClick]
-   */
-
-	}]);
-
-	function ReactActionButton(props) {
-		_classCallCheck(this, ReactActionButton);
-
-		var _this5 = _possibleConstructorReturn(this, (ReactActionButton.__proto__ || Object.getPrototypeOf(ReactActionButton)).call(this, props));
-
-		_this5.state = {
-			is_checked: props.isChecked,
-			is_hovered: false
-		};
-
-		_this5.labels = props.labels === null ? ReactActionButton.DEFAULTS.labels : _extends({}, _this5.constructor.DEFAULTS.labels, props.labels);
-		_this5.colors = props.colors === null ? ReactActionButton.DEFAULTS.colors : _extends({}, _this5.constructor.DEFAULTS.colors, props.colors);
-		_this5.icons = props.icons === null ? ReactActionButton.DEFAULTS.icons : _extends({}, _this5.constructor.DEFAULTS.icons, props.icons);
-
-		_this5.mouseHoverHandler = _this5.mouseHoverHandler.bind(_this5);
-		_this5.mouseLeaveHandler = _this5.mouseLeaveHandler.bind(_this5);
-		_this5.checkedStateChange = _this5.checkedStateChange.bind(_this5);
-		_this5.onClickHandler = _this5.onClickHandler.bind(_this5);
-		_this5.clickAction = _this5.clickAction.bind(_this5);
-
-		Object.defineProperties(_this5, {
-			classes: {
-				get: function get() {
-					var classes = new HtmlClassesArray(this.props.className);
-
-					if (!empty(this.icons[this.current_state])) {
-						classes.push(__C.CLASSES.ICON_CLASS, this.icons[this.current_state]);
-					}
-
-					if (!empty(this.colors[this.current_state])) {
-						classes.push(this.colors[this.current_state]);
-					}
-
-					return classes;
-				}
-			},
-			current_state: {
-				get: function get() {
-
-					switch (true) {
-						case this.state.is_checked && this.state.is_hovered:
-							{
-
-								return ReactActionButton.STATES.CHECKED_HOVER;
-							}
-						case this.state.is_checked && !this.state.is_hovered:
-							{
-
-								return ReactActionButton.STATES.CHECKED;
-							}
-						case !this.state.is_checked && this.state.is_hovered:
-							{
-
-								return ReactActionButton.STATES.UNCHECKED_HOVER;
-							}
-						case !this.state.is_checked && !this.state.is_hovered:
-							{
-
-								return ReactActionButton.STATES.UNCHECKED;
-							}
-					}
-				}
-			}
-		});
-		return _this5;
-	}
-
-	_createClass(ReactActionButton, [{
-		key: 'showAuthModal',
-		value: function showAuthModal() {
-			var modal = this.modal;
-
-
-			if (!modal) {
-				modal = new AuthModal(null, {
-					note: 'Для выполнения этого действия, нужно войти через социальную сеть'
-				});
-				this.modal = modal;
-			}
-
-			return modal.show();
-		}
-	}, {
-		key: 'clickAction',
-		value: function clickAction() {
-
-			return Promise.resolve();
-		}
-	}, {
-		key: 'onClickHandler',
-		value: function onClickHandler(e) {
-			var _props2 = this.props,
-			    onClick = _props2.onClick,
-			    isAddAvatar = _props2.isAddAvatar;
-
-
-			if (__APP.USER.isLoggedOut()) {
-
-				return this.showAuthModal();
-			}
-
-			this.clickAction();
-			this.checkedStateChange();
-			if (isFunction(onClick)) {
-				onClick(e);
-			}
-			if (isAddAvatar) {
-				ReactActionButton.addAvatar(this.button);
-			}
-
-			if (isFunction(window.askToSubscribe)) {
-				window.askToSubscribe();
-			}
-		}
-	}, {
-		key: 'checkedStateChange',
-		value: function checkedStateChange() {
-			if (this.state.is_checked) {
-				this.setState({
-					is_checked: false
-				});
-			} else {
-				this.setState({
-					is_checked: true
-				});
-			}
-		}
-	}, {
-		key: 'mouseHoverHandler',
-		value: function mouseHoverHandler() {
-			this.setState({
-				is_hovered: true
-			});
-		}
-	}, {
-		key: 'mouseLeaveHandler',
-		value: function mouseLeaveHandler() {
-			this.setState({
-				is_hovered: false
-			});
-		}
-	}, {
-		key: 'render',
-		value: function render() {
-
-			return React.createElement(
-				Button,
-				{
-					className: this.classes,
-					onClick: this.onClickHandler,
-					onMouseEnter: this.mouseHoverHandler,
-					onMouseLeave: this.mouseLeaveHandler
-				},
-				this.labels[this.current_state]
-			);
-		}
-	}]);
-
-	return ReactActionButton;
-}(React.Component);
-
-ReactActionButton.STATES = {
-	CHECKED: 'CHECKED',
-	UNCHECKED: 'UNCHECKED',
-	CHECKED_HOVER: 'CHECKED_HOVER',
-	UNCHECKED_HOVER: 'UNCHECKED_HOVER'
-};
-
-ReactActionButton.DEFAULTS = {
-	labels: (_labels = {}, _defineProperty(_labels, ReactActionButton.STATES.CHECKED, null), _defineProperty(_labels, ReactActionButton.STATES.UNCHECKED, null), _defineProperty(_labels, ReactActionButton.STATES.CHECKED_HOVER, null), _defineProperty(_labels, ReactActionButton.STATES.UNCHECKED_HOVER, null), _labels),
-	colors: (_colors = {}, _defineProperty(_colors, ReactActionButton.STATES.CHECKED, null), _defineProperty(_colors, ReactActionButton.STATES.UNCHECKED, null), _defineProperty(_colors, ReactActionButton.STATES.CHECKED_HOVER, null), _defineProperty(_colors, ReactActionButton.STATES.UNCHECKED_HOVER, null), _colors),
-	icons: (_icons = {}, _defineProperty(_icons, ReactActionButton.STATES.CHECKED, null), _defineProperty(_icons, ReactActionButton.STATES.UNCHECKED, null), _defineProperty(_icons, ReactActionButton.STATES.CHECKED_HOVER, null), _defineProperty(_icons, ReactActionButton.STATES.UNCHECKED_HOVER, null), _icons)
-};
-/**
- * @class ReactAddToFavoriteButton
- * @extends ReactActionButton
- *
- * @static {Object<string, Object<STATES, ?string>>} DEFAULTS
- *
- * @property {OneEvent} event
- * @property {Object<STATES, ?string>} labels
- * @property {Object<STATES, ?string>} colors
- * @property {Object<STATES, ?string>} icons
- * @property {HtmlClassesArray} classes
- * @property {object} state
- * @property {STATES} state.current_state
- * @property {boolean} state.is_checked
- * @property {boolean} state.is_hovered
- */
-
-var ReactAddToFavoriteButton = function (_ReactActionButton) {
-	_inherits(ReactAddToFavoriteButton, _ReactActionButton);
-
-	/**
-  * @inheritDoc
-  * @param {OneEvent} props.event
-  */
-	function ReactAddToFavoriteButton(props) {
-		_classCallCheck(this, ReactAddToFavoriteButton);
-
-		var _this6 = _possibleConstructorReturn(this, (ReactAddToFavoriteButton.__proto__ || Object.getPrototypeOf(ReactAddToFavoriteButton)).call(this, props));
-
-		_this6.event = props.event;
-		return _this6;
-	}
-
-	_createClass(ReactAddToFavoriteButton, [{
-		key: 'showAuthModal',
-		value: function showAuthModal() {
-			var modal = this.modal;
-
-
-			if (!modal) {
-				modal = new AuthModal(location.origin + '/event/' + this.event.id, {
-					note: 'Чтобы добавить событие в избранное, необходимо войти через социальную сеть'
-				});
-				this.modal = modal;
-			}
-
-			cookies.setItem('auth_command', 'add_to_favorite');
-			cookies.setItem('auth_entity_id', this.event.id);
-
-			return modal.show();
-		}
-	}, {
-		key: 'clickAction',
-		value: function clickAction() {
-			if (this.state.is_checked) {
-
-				return this.event.unfavour();
-			} else {
-
-				return this.event.favour();
-			}
-		}
-	}]);
-
-	return ReactAddToFavoriteButton;
-}(ReactActionButton);
-
-ReactAddToFavoriteButton.DEFAULTS = {
-	labels: (_labels2 = {}, _defineProperty(_labels2, ReactActionButton.STATES.CHECKED, __LOCALES.ru_RU.TEXTS.BUTTON.FAVORED), _defineProperty(_labels2, ReactActionButton.STATES.UNCHECKED, __LOCALES.ru_RU.TEXTS.BUTTON.ADD_FAVORITE), _defineProperty(_labels2, ReactActionButton.STATES.CHECKED_HOVER, __LOCALES.ru_RU.TEXTS.BUTTON.REMOVE_FAVORITE), _defineProperty(_labels2, ReactActionButton.STATES.UNCHECKED_HOVER, __LOCALES.ru_RU.TEXTS.BUTTON.ADD_FAVORITE), _labels2),
-	colors: (_colors2 = {}, _defineProperty(_colors2, ReactActionButton.STATES.CHECKED, __C.CLASSES.COLORS.ACCENT), _defineProperty(_colors2, ReactActionButton.STATES.UNCHECKED, __C.CLASSES.COLORS.DEFAULT), _defineProperty(_colors2, ReactActionButton.STATES.CHECKED_HOVER, __C.CLASSES.COLORS.ACCENT), _defineProperty(_colors2, ReactActionButton.STATES.UNCHECKED_HOVER, __C.CLASSES.COLORS.NEUTRAL_ACCENT), _colors2),
-	icons: (_icons2 = {}, _defineProperty(_icons2, ReactActionButton.STATES.CHECKED, __C.CLASSES.ICONS.STAR), _defineProperty(_icons2, ReactActionButton.STATES.UNCHECKED, __C.CLASSES.ICONS.STAR_O), _defineProperty(_icons2, ReactActionButton.STATES.CHECKED_HOVER, __C.CLASSES.ICONS.TIMES), _defineProperty(_icons2, ReactActionButton.STATES.UNCHECKED_HOVER, __C.CLASSES.ICONS.STAR_O), _icons2)
-};
-/**
- *
- * @param {buildProps} props
- * @param {(__C.ENTITIES.USER|__C.ENTITIES.ORGANIZATION)} props.entity
- * @param {(OneUser|UsersCollection|OneOrganization|OrganizationsCollection|Array)} props.entities
- * @param {boolean} [props.isLink = false]
- * @param {Array<string>} [props.avatarClasses = []]
- * @constructor
- */
-function AvatarBlocks(_ref6) {
-	var entity = _ref6.entity,
-	    _ref6$entities = _ref6.entities,
-	    entities = _ref6$entities === undefined ? new UsersCollection() : _ref6$entities,
-	    _ref6$isLink = _ref6.isLink,
-	    isLink = _ref6$isLink === undefined ? false : _ref6$isLink,
-	    className = _ref6.className,
-	    _ref6$avatarClasses = _ref6.avatarClasses,
-	    avatarClasses = _ref6$avatarClasses === undefined ? [] : _ref6$avatarClasses,
-	    rest_props = _objectWithoutProperties(_ref6, ['entity', 'entities', 'isLink', 'className', 'avatarClasses']);
-
-	var entity_name = entity,
-	    block_classes = new HtmlClassesArray(className);
-
-	return (entities instanceof Array ? entities : [entities]).map(function (entity) {
-		var name = void 0,
-		    href = void 0;
-
-		if (entity_name && entity_name === __C.ENTITIES.USER || entity instanceof OneUser || entity.first_name) {
-			name = entity.full_name || [entity.first_name, entity.last_name].join(' ');
-			href = '/user/' + entity.id;
-		} else {
-			name = entity.short_name || entity.name;
-			href = '/organization/' + entity.id;
-		}
-		var avatar = React.createElement(Avatar, { entity: entity, className: new HtmlClassesArray(avatarClasses) }),
-		    avatar_name = React.createElement(
-			'span',
-			{ className: 'avatar_name' },
-			name
-		),
-		    avatar_block_classes = new HtmlClassesArray(['avatar_block', 'User' + entity.id, 'link'].concat(_toConsumableArray(block_classes)));
-
-		if (isLink) {
-
-			return React.createElement(
-				PageLink,
-				_extends({
-					key: entity.id,
-					className: avatar_block_classes,
-					href: href
-				}, rest_props),
-				avatar,
-				avatar_name
-			);
-		} else {
-
-			return React.createElement(
-				'div',
-				_extends({
-					key: entity.id,
-					className: avatar_block_classes
-				}, rest_props),
-				avatar,
-				avatar_name
-			);
-		}
-	});
-}
-/**
- *
- * @param {object} props
- * @param {(UsersCollection|Array<OneUser>)} props.users
- * @param {(string|Array)} props.className
- * @param {(string|Array)} props.counterClasses
- * @param {number} props.maxCount
- * @param {number} [props.overallAvatarsCount]
- * @constructor
- */
-function AvatarCollection(_ref7) {
-	var users = _ref7.users,
-	    className = _ref7.className,
-	    counterClasses = _ref7.counterClasses,
-	    maxCount = _ref7.maxCount,
-	    _ref7$overallAvatarsC = _ref7.overallAvatarsCount,
-	    overallAvatarsCount = _ref7$overallAvatarsC === undefined ? users.length : _ref7$overallAvatarsC,
-	    rest_props = _objectWithoutProperties(_ref7, ['users', 'className', 'counterClasses', 'maxCount', 'overallAvatarsCount']);
-
-	var moreAvatarsCount = overallAvatarsCount - maxCount,
-	    counter_classes = new HtmlClassesArray(counterClasses);
-	var left = maxCount;
-
-	if (moreAvatarsCount <= 0) {
-		counter_classes.push('-cast');
-	}
-
-	return React.createElement(
-		React.Fragment,
-		null,
-		React.createElement(
-			'div',
-			_extends({ className: 'avatars_collection -max_' + maxCount + ' AvatarsCollection ' + new HtmlClassesArray(className), 'data-max_count': maxCount }, rest_props),
-			React.createElement(Avatars, { entities: [__APP.USER].concat(_toConsumableArray(users.filter(function (user) {
-					if (__APP.USER.id === parseInt(user.id)) {
-
-						return false;
-					}
-
-					return !(left-- <= 0);
-				}))) })
-		),
-		React.createElement(
-			'span',
-			{ className: 'counter ' + counter_classes },
-			'+',
-			React.createElement(
-				'span',
-				{ className: 'FavoredCount' },
-				moreAvatarsCount
-			)
-		)
-	);
-}
-function Avatars(_ref8) {
-	var entities = _ref8.entities,
-	    className = _ref8.className,
-	    rest_props = _objectWithoutProperties(_ref8, ['entities', 'className']);
-
-	var classes = new HtmlClassesArray(className);
-
-	return (entities instanceof Array ? entities : [entities]).map(function (entity) {
-		return React.createElement(Avatar, _extends({ key: entity.id, entity: entity, className: classes }, rest_props));
-	});
-}
-
-Avatars.propTypes = {
-	entities: PropTypes.oneOfType([PropTypes.instanceOf(UsersCollection), PropTypes.instanceOf(OrganizationsCollection), PropTypes.instanceOf(OneUser), PropTypes.instanceOf(OneOrganization), PropTypes.arrayOf(PropTypes.instanceOf(OneUser)), PropTypes.arrayOf(PropTypes.instanceOf(OneOrganization))]).isRequired,
-	className: PropTypes.oneOfType([PropTypes.string, PropTypes.instanceOf(HtmlClassesArray)])
-};
-
-function Avatar(_ref9) {
-	var entity = _ref9.entity,
-	    className = _ref9.className,
-	    badgeClass = _ref9.badgeClass,
-	    rest_props = _objectWithoutProperties(_ref9, ['entity', 'className', 'badgeClass']);
-
-	var classes = new HtmlClassesArray(className);
-
-	var avatar_url = void 0,
-	    name = void 0;
-
-	if (entity instanceof OneUser || entity.avatar_url) {
-		avatar_url = entity.avatar_url;
-		name = entity.full_name || [entity.first_name, entity.last_name].join(' ');
-	} else {
-		avatar_url = entity.img_small_url || entity.img_url;
-		name = entity.short_name || entity.name;
-	}
-
-	return React.createElement(
-		'div',
-		_extends({ className: 'avatar ' + classes, title: name }, rest_props),
-		React.createElement('img', { src: avatar_url, onError: function onError(e) {
-				return e.target.src = '/app/img/brand_logo.png';
-			} }),
-		badgeClass && React.createElement(
-			'span',
-			{ className: 'avatar_badge' },
-			React.createElement('i', { className: 'fa fa-' + badgeClass })
-		)
-	);
-}
-
-Avatar.propTypes = {
-	entity: PropTypes.oneOfType([PropTypes.instanceOf(OneUser), PropTypes.instanceOf(OneOrganization)]).isRequired,
-	className: PropTypes.oneOfType([PropTypes.string, PropTypes.instanceOf(HtmlClassesArray)]),
-	badgeClass: PropTypes.oneOf(['plus', 'minus', 'star'])
-};
-
-var Button = function (_React$Component2) {
-	_inherits(Button, _React$Component2);
-
-	function Button() {
-		_classCallCheck(this, Button);
-
-		return _possibleConstructorReturn(this, (Button.__proto__ || Object.getPrototypeOf(Button)).apply(this, arguments));
-	}
-
-	_createClass(Button, [{
-		key: 'render',
-		value: function render() {
-			var _this8 = this;
-
-			var _props3 = this.props,
-			    children = _props3.children,
-			    className = _props3.className,
-			    rest_props = _objectWithoutProperties(_props3, ['children', 'className']);
-
-			var methods = Object.getMethods(rest_props),
-			    props = Object.getProps(rest_props);
-
-			for (var method_name in methods) {
-				methods[method_name] = methods[method_name].bind(this);
-			}
-
-			return React.createElement(
-				'button',
-				_extends({
-					ref: function ref(node) {
-						return _this8.button = node;
-					},
-					className: __C.CLASSES.COMPONENT.BUTTON + ' ' + new HtmlClassesArray(className),
-					type: 'button'
-				}, methods, props),
-				React.createElement(
-					'span',
-					{ className: 'Text' },
-					children
-				)
-			);
-		}
-	}]);
-
-	return Button;
-}(React.Component);
-
-function Cap(_ref10) {
-	var className = _ref10.className,
-	    children = _ref10.children,
-	    rest_props = _objectWithoutProperties(_ref10, ['className', 'children']);
-
-	return React.createElement(
-		'div',
-		_extends({ className: 'cap ' + new HtmlClassesArray(className) }, rest_props),
-		React.createElement(
-			'span',
-			{ className: 'cap_message' },
-			children
-		)
-	);
-}
-/**
- *
- * @param {React.Component} Component
- * @param {object} configs
- * @param {string} configs.entity_name
- * @param {string} configs.entities_name
- * @param {EntitiesCollection} [configs.CollectionClass]
- * @param {function(): XML} [configs.noEntities]
- * @param {function(): {}} [configs.dynamicProps]
- * @param {function(): {}} [configs.renderEntities]
- * @return {React.Component}
- */
-function componentsContainer(Component, _ref11) {
-	var entity_name = _ref11.entity_name,
-	    entities_name = _ref11.entities_name,
-	    _ref11$CollectionClas = _ref11.CollectionClass,
-	    CollectionClass = _ref11$CollectionClas === undefined ? null : _ref11$CollectionClas,
-	    _ref11$noEntities = _ref11.noEntities,
-	    noEntities = _ref11$noEntities === undefined ? function () {
-		return React.createElement(
-			Cap,
-			null,
-			i18n(__S.NO_ELEMENTS)
-		);
-	} : _ref11$noEntities,
-	    _ref11$dynamicProps = _ref11.dynamicProps,
-	    dynamicProps = _ref11$dynamicProps === undefined ? function (entity) {
-		return {};
-	} : _ref11$dynamicProps,
-	    _ref11$renderEntities = _ref11.renderEntities,
-	    renderEntities = _ref11$renderEntities === undefined ? null : _ref11$renderEntities;
-
-	var ComponentsContainer = function (_React$Component3) {
-		_inherits(ComponentsContainer, _React$Component3);
-
-		_createClass(ComponentsContainer, null, [{
-			key: 'name',
-			get: function get() {
-
-				return 'CollectionOf' + Component.name;
-			}
-		}]);
-
-		function ComponentsContainer(props) {
-			_classCallCheck(this, ComponentsContainer);
-
-			var _this9 = _possibleConstructorReturn(this, (ComponentsContainer.__proto__ || Object.getPrototypeOf(ComponentsContainer)).call(this, props));
-
-			_this9.state = {
-				length: _this9.props[entities_name].length,
-				is_loading: false
-			};
-			return _this9;
-		}
-
-		_createClass(ComponentsContainer, [{
-			key: 'fetch',
-			value: function fetch() {
-				var _this10 = this;
-
-				if (!isVoid(CollectionClass) && this.props[entities_name] instanceof CollectionClass) {
-					var _props$entities_name;
-
-					this.setLoadingState();
-					return (_props$entities_name = this.props[entities_name]).fetch.apply(_props$entities_name, arguments).then(function (entities) {
-						_this10.unsetLoadingState().update();
-
-						return entities;
-					}).catch(function () {
-						_this10.unsetLoadingState();
-					});
-				}
-
-				return Promise.resolve();
-			}
-		}, {
-			key: 'update',
-			value: function update() {
-				if (this.props[entities_name].length !== this.state.length) {
-					this.setState({
-						length: this.props[entities_name].length
-					});
-				}
-
-				return this;
-			}
-		}, {
-			key: 'setLoadingState',
-			value: function setLoadingState() {
-				this.setState({
-					is_loading: true
-				});
-
-				return this;
-			}
-		}, {
-			key: 'unsetLoadingState',
-			value: function unsetLoadingState() {
-				this.setState({
-					is_loading: false
-				});
-
-				return this;
-			}
-		}, {
-			key: 'render',
-			value: function render() {
-				var _props4 = this.props,
-				    entities = _props4[entities_name],
-				    rest_props = _objectWithoutProperties(_props4, [entities_name]);
-
-				if (!entities.length && !this.state.is_loading) {
-
-					return noEntities();
-				}
-
-				return React.createElement(
-					React.Fragment,
-					null,
-					isFunction(renderEntities) ? renderEntities.call(this, entities) : entities.map(function (entity) {
-						return React.createElement(Component, _extends({ key: entity[entity.ID_PROP_NAME] }, _extends(_defineProperty({}, entity_name, entity), rest_props, dynamicProps(entity))));
-					}),
-					this.state.is_loading && React.createElement(LoaderBlock, null)
-				);
-			}
-		}]);
-
-		return ComponentsContainer;
-	}(React.Component);
-
-	ComponentsContainer.displayName = 'collectionOf(' + (Component.displayName || Component.name || 'Component') + ')';
-
-	return ComponentsContainer;
-}
-/**
- * @requires componentsContainer.js
- */
-function EventBlock(_ref12) {
-	var _this11 = this;
-
-	var event = _ref12.event,
-	    date = _ref12.date,
-	    _ref12$hasDivider = _ref12.hasDivider,
-	    hasDivider = _ref12$hasDivider === undefined ? false : _ref12$hasDivider,
-	    _ref12$coverWidth = _ref12.coverWidth,
-	    coverWidth = _ref12$coverWidth === undefined ? 550 : _ref12$coverWidth;
-
-	var event_id = event.id,
-	    avatars_collection_classes = new HtmlClassesArray(__C.CLASSES.UNIVERSAL_STATES.ROUNDED, __C.CLASSES.UNIVERSAL_STATES.BORDERED, __C.CLASSES.SIZES.SMALL, __C.CLASSES.HOOKS.ADD_AVATAR.COLLECTION),
-	    event_date = date.format(__C.DATE_FORMAT),
-	    time = event.dates.reduce(function (times, date) {
-		if (moment.unix(date.event_date).format(__C.DATE_FORMAT) === event_date) {
-
-			return [].concat(_toConsumableArray(times), [displayTimeRange(date.start_time, date.end_time)]);
-		}
-
-		return times;
-	}, []).join('; ');
-
-	if (event.is_favorite) {
-		avatars_collection_classes.push(__C.CLASSES.HOOKS.ADD_AVATAR.STATES.SHIFTED);
-	}
-
-	return React.createElement(
-		React.Fragment,
-		null,
-		hasDivider && React.createElement('hr', { title: date.calendar().capitalize() }),
-		React.createElement(
-			'div',
-			{ className: 'event_block', 'data-event-id': event_id, 'data-event_date': event_date },
-			React.createElement(
-				PageLink,
-				{ href: '/event/' + event_id, className: 'event_block_img img_holder link' },
-				React.createElement('img', { src: event.image_horizontal_url + '?width=' + coverWidth, title: event.title, width: coverWidth })
-			),
-			React.createElement(
-				'div',
-				{ className: 'event_block_info' },
-				React.createElement(
-					'header',
-					{ className: 'event_block_title' },
-					React.createElement(
-						PageLink,
-						{ href: '/event/' + event_id, className: 'link' },
-						event.title
-					)
-				),
-				React.createElement(
-					'div',
-					{ className: 'event_block_service' },
-					React.createElement(
-						'p',
-						null,
-						React.createElement(
-							'small',
-							null,
-							time
-						)
-					),
-					React.createElement(
-						'div',
-						{ className: 'event_block_action_buttons AddAvatarWrapper' },
-						React.createElement(
-							'div',
-							{ className: 'event_block_add_avatar_wrapper' },
-							React.createElement(AvatarCollection, {
-								users: event.favored,
-								maxCount: 3,
-								className: avatars_collection_classes,
-								counterClasses: [__C.CLASSES.SIZES.X30, __C.CLASSES.UNIVERSAL_STATES.BORDERED, __C.CLASSES.COLORS.MARGINAL, __C.CLASSES.HOOKS.ADD_AVATAR.STATES.CASTABLE],
-								overallAvatarsCount: event.favored_users_count,
-								onClick: function onClick() {
-									if (!_this11.favored_modal) {
-										_this11.favored_modal = new FavoredModal(event.id);
-									}
-									_this11.favored_modal.show();
-								}
-							})
-						),
-						React.createElement(
-							'div',
-							{ className: 'event_block_action_buttons_wrapper' },
-							React.createElement(ReactAddToFavoriteButton, {
-								event: event,
-								isAddAvatar: true,
-								isChecked: true,
-								className: new HtmlClassesArray(['event_block_main_action_button', __C.CLASSES.SIZES.LOW, __C.CLASSES.UNIVERSAL_STATES.ROUNDED, __C.CLASSES.HOOKS.ADD_TO_FAVORITES, __C.CLASSES.HOOKS.RIPPLE])
-							})
-						)
-					)
-				)
-			)
-		)
-	);
-}
-
-EventBlock.propTypes = {
-	event: PropTypes.instanceOf(OneEvent).isRequired,
-	date: PropTypes.moment.isRequired,
-	hasDivider: PropTypes.bool,
-	coverWidth: PropTypes.number
-};
-
-var EventBlocks = componentsContainer(EventBlock, {
-	entity_name: 'event',
-	entities_name: 'events',
-	CollectionClass: EventsCollection,
-	noEntities: function noEntities() {
-		return React.createElement(
-			Cap,
-			null,
-			i18n(__S.NO_EVENTS)
-		);
-	},
-	renderEntities: function renderEntities(events) {
-		var _props5 = this.props,
-		    coverWidth = _props5.coverWidth,
-		    _props5$sortDateType = _props5.sortDateType,
-		    sortDateType = _props5$sortDateType === undefined ? 'nearest_event_date' : _props5$sortDateType;
-
-
-		var last_date = void 0;
-
-		return events.map(function (event) {
-			var m_event_date = moment.unix(event[sortDateType] || event.first_event_date),
-			    event_date = m_event_date.format(__C.DATE_FORMAT),
-			    is_different_day = last_date !== event_date;
-
-			last_date = event_date;
-
-			return React.createElement(EventBlock, {
-				key: event.id,
-				event: event,
-				date: m_event_date,
-				coverWidth: coverWidth,
-				hasDivider: is_different_day
-			});
-		});
-	}
-});
-
-EventBlocks.propTypes = {
-	events: PropTypes.oneOfType([PropTypes.arrayOf(PropTypes.instanceOf(OneEvent)), PropTypes.instanceOf(EventsCollection)]).isRequired,
-	sortDateType: PropTypes.string,
-	coverWidth: PropTypes.number
-};
-PageLink.propTypes = {
-	href: PropTypes.string.isRequired,
-	children: PropTypes.oneOfType([PropTypes.string, PropTypes.node, PropTypes.element])
-};
-
-function PageLink(_ref13) {
-	var href = _ref13.href,
-	    children = _ref13.children,
-	    rest_props = _objectWithoutProperties(_ref13, ['href', 'children']);
-
-	return React.createElement(
-		ReactRouterDOM.Link,
-		_extends({ to: href }, rest_props),
-		children
-	);
-}
-/**
- *
- * @param {buildProps} props
- * @param {Object<OneUser.ACCOUNTS, string>} props.links
- * @constructor
- */
-function SocialLinks(_ref14) {
-	var _ref14$links = _ref14.links,
-	    links = _ref14$links === undefined ? {} : _ref14$links,
-	    className = _ref14.className,
-	    rest_props = _objectWithoutProperties(_ref14, ['links', 'className']);
-
-	var ICON_SLUGS = {
-		VK: 'vk',
-		GOOGLE: 'google-plus',
-		FACEBOOK: 'facebook-official'
-	};
-
-	return React.createElement(
-		'div',
-		{ className: 'social_link_wrapper' },
-		Object.keys(OneUser.ACCOUNTS).map(function (account_type) {
-			var parent_classes = 'social_link -color_' + OneUser.ACCOUNTS[account_type] + ' -valign_center ' + new HtmlClassesArray(className),
-			    icon_classes = 'fa_icon fa-' + ICON_SLUGS[account_type];
-
-			if (links.hasOwnProperty(OneUser.ACCOUNTS[account_type])) {
-
-				return React.createElement(
-					'a',
-					_extends({ key: account_type, className: parent_classes, href: links[OneUser.ACCOUNTS[account_type]], target: '_blank' }, rest_props),
-					React.createElement('i', { className: icon_classes })
-				);
-			} else {
-
-				return React.createElement(
-					'span',
-					_extends({ key: account_type, className: parent_classes }, rest_props),
-					React.createElement('i', { className: icon_classes })
-				);
-			}
-		})
-	);
-}
-
-var Tabs = function (_React$Component4) {
-	_inherits(Tabs, _React$Component4);
-
-	/**
-  *
-  * @param props
-  * @param props.selectedTab
-  * @param props.className
-  * @param props.headerClasses
-  * @param props.bodyWrapperClasses
-  */
-	function Tabs(props) {
-		_classCallCheck(this, Tabs);
-
-		var _this12 = _possibleConstructorReturn(this, (Tabs.__proto__ || Object.getPrototypeOf(Tabs)).call(this, props));
-
-		_this12.state = {
-			selected_tab: props.selectedTab || null
-		};
-
-		_this12.changeTab = _this12.changeTab.bind(_this12);
-		return _this12;
-	}
-
-	_createClass(Tabs, [{
-		key: 'changeTab',
-		value: function changeTab(new_state) {
-			this.setState(function (prev_state) {
-				if (prev_state.selected_tab !== new_state) {
-
-					return {
-						selected_tab: new_state
-					};
-				}
-
-				return null;
-			});
-		}
-	}, {
-		key: 'render',
-		value: function render() {
-			var _this13 = this;
-
-			var _props6 = this.props,
-			    className = _props6.className,
-			    headerClasses = _props6.headerClasses,
-			    bodyWrapperClasses = _props6.bodyWrapperClasses,
-			    selectedTab = _props6.selectedTab,
-			    rest_props = _objectWithoutProperties(_props6, ['className', 'headerClasses', 'bodyWrapperClasses', 'selectedTab']),
-			    children = React.Children.toArray(this.props.children);
-
-			return React.createElement(
-				'div',
-				_extends({ className: new HtmlClassesArray(className) + ' Tabs' }, rest_props),
-				React.createElement(
-					'header',
-					{ className: new HtmlClassesArray(headerClasses) + ' tabs_header HeaderTabs' },
-					children.map(function (child) {
-						return React.createElement(
-							'span',
-							{
-								key: child.props.name,
-								className: 'tab Tab ' + (child.props.name === _this13.state.selected_tab ? '-active' : ''),
-								onClick: function onClick() {
-									return _this13.changeTab(child.props.name);
-								}
-							},
-							child.props.title
-						);
-					})
-				),
-				React.createElement(
-					'div',
-					{ className: new HtmlClassesArray(bodyWrapperClasses) + ' tab_bodies_wrap TabsBodyWrapper' },
-					children.map(function (child) {
-						return React.createElement(
-							'div',
-							{ className: 'tab_body TabsBody ' + (child.props.name === _this13.state.selected_tab ? '-active' : ''), key: child.props.name },
-							child.props.children
-						);
-					})
-				)
-			);
-		}
-	}]);
-
-	return Tabs;
-}(React.Component);
-
-Tabs.propTypes = {
-	className: PropTypes.oneOfType([PropTypes.string, PropTypes.instanceOf(HtmlClassesArray)]),
-	headerClasses: PropTypes.oneOfType([PropTypes.string, PropTypes.arrayOf(PropTypes.string), PropTypes.instanceOf(HtmlClassesArray)]),
-	bodyWrapperClasses: PropTypes.oneOfType([PropTypes.string, PropTypes.arrayOf(PropTypes.string), PropTypes.instanceOf(HtmlClassesArray)]),
-	selectedTab: PropTypes.string
-};
-
-var Tab = function (_React$Component5) {
-	_inherits(Tab, _React$Component5);
-
-	function Tab() {
-		_classCallCheck(this, Tab);
-
-		return _possibleConstructorReturn(this, (Tab.__proto__ || Object.getPrototypeOf(Tab)).apply(this, arguments));
-	}
-
-	return Tab;
-}(React.Component);
-
-Tab.propTypes = {
-	title: PropTypes.string.isRequired,
-	name: PropTypes.string.isRequired
-};
-/**
- * @requires componentsContainer.js
- */
-function UserActivity(_ref15) {
-	var user = _ref15.user,
-	    activity = _ref15.activity,
-	    avatarClasses = _ref15.avatarClasses;
-
-	var classes = new HtmlClassesArray('activity_block'),
-	    avatar_classes = new HtmlClassesArray(avatarClasses),
-	    creator_name = user.full_name || user.first_name + ' ' + user.last_name,
-	    date = moment.unix(activity.created_at).calendar(null, __LOCALE.DATE.CALENDAR_DATE_TIME);
-
-	var img_url = void 0,
-	    entity_url = void 0,
-	    entity_title = void 0;
-
-	classes.push('-type_' + activity.type_code);
-	avatar_classes.push(__C.CLASSES.SIZES.X50, __C.CLASSES.UNIVERSAL_STATES.ROUNDED);
-
-	switch (true) {
-		case activity instanceof OneOrganizationActivity:
-			{
-				classes.push('-entity_organization');
-				img_url = activity.organization.img_small_url || activity.organization.img_url;
-				entity_url = '/organization/' + activity.organization.id;
-				entity_title = activity.organization.short_name;
-				break;
-			}
-		case activity instanceof OneEventActivity:
-			{
-				classes.push('-entity_event');
-				img_url = activity.event.image_horizontal_small_url || activity.event.image_horizontal_url;
-				entity_url = '/event/' + activity.event.id;
-				entity_title = activity.event.title;
-				break;
-			}
-	}
-
-	return React.createElement(
-		'div',
-		{ className: classes },
-		React.createElement(Avatar, { entity: user, className: avatar_classes, badgeClass: UserActivity.AVATAR_BADGE_ICON[activity.type_code] }),
-		React.createElement(
-			'div',
-			{ className: 'activity_block_content' },
-			React.createElement(
-				'p',
-				{ className: 'activity_block_top' },
-				React.createElement(
-					PageLink,
-					{ className: 'activity_block_creator link', href: '/user/' + user.id },
-					creator_name
-				),
-				' ' + i18n(UserActivity.ACTION_TEXT[activity.type_code], 1, {}, {
-					gender: user.gender
-				})
-			),
-			React.createElement(
-				'p',
-				{ className: 'activity_block_middle' },
-				React.createElement(
-					PageLink,
-					{ className: 'link', href: entity_url },
-					entity_title
-				)
-			),
-			React.createElement(
-				'p',
-				{ className: 'activity_block_bottom' },
-				date
-			)
-		),
-		React.createElement(
-			PageLink,
-			{ className: 'activity_block_image img_holder link', href: entity_url },
-			React.createElement('img', { src: img_url, height: '48', onClick: function onClick(e) {
-					return e.target.src = '/app/img/brand_logo.png';
-				} })
-		)
-	);
-}
-
-UserActivity.propTypes = {
-	user: PropTypes.instanceOf(OneUser).isRequired,
-	activity: PropTypes.instanceOf(OneAbstractActivity).isRequired,
-	avatarClasses: PropTypes.oneOfType([PropTypes.string, PropTypes.instanceOf(HtmlClassesArray)])
-};
-
-UserActivity.AVATAR_BADGE_ICON = (_UserActivity$AVATAR_ = {}, _defineProperty(_UserActivity$AVATAR_, OneAbstractActivity.TYPES.SUBSCRIBE, 'plus'), _defineProperty(_UserActivity$AVATAR_, OneAbstractActivity.TYPES.UNSUBSCRIBE, 'minus'), _defineProperty(_UserActivity$AVATAR_, OneAbstractActivity.TYPES.FAVE, 'star'), _defineProperty(_UserActivity$AVATAR_, OneAbstractActivity.TYPES.UNFAVE, 'minus'), _UserActivity$AVATAR_);
-
-UserActivity.ACTION_TEXT = (_UserActivity$ACTION_ = {}, _defineProperty(_UserActivity$ACTION_, OneAbstractActivity.TYPES.SUBSCRIBE, __S.USER_SUBSCRIBED_TO_ORG), _defineProperty(_UserActivity$ACTION_, OneAbstractActivity.TYPES.UNSUBSCRIBE, __S.USER_UNSUBSCRIBED_FROM_ORG), _defineProperty(_UserActivity$ACTION_, OneAbstractActivity.TYPES.FAVE, __S.USER_FAVORED_EVENT), _defineProperty(_UserActivity$ACTION_, OneAbstractActivity.TYPES.UNFAVE, __S.USER_UNFAVORED_EVENT), _defineProperty(_UserActivity$ACTION_, OneAbstractActivity.TYPES.SHARE_VK, __S.USER_SHARED_EVENT), _defineProperty(_UserActivity$ACTION_, OneAbstractActivity.TYPES.SHARE_FB, __S.USER_SHARED_EVENT), _defineProperty(_UserActivity$ACTION_, OneAbstractActivity.TYPES.SHARE_TW, __S.USER_SHARED_EVENT), _UserActivity$ACTION_);
-
-var UserActivities = componentsContainer(UserActivity, {
-	entity_name: 'activity',
-	entities_name: 'activities',
-	CollectionClass: UsersActivitiesCollection,
-	noEntities: function noEntities() {
-		return React.createElement(
-			Cap,
-			null,
-			i18n(__S.NO_ACTIVITIES)
-		);
-	}
-});
-
-UserActivities.propTypes = {
-	user: PropTypes.instanceOf(OneUser).isRequired,
-	activities: PropTypes.oneOfType([PropTypes.instanceOf(UsersActivitiesCollection), PropTypes.arrayOf(PropTypes.instanceOf(OneAbstractActivity))]).isRequired
-};
-/**
- *
- * @param {buildProps} props
- * @param {(UsersCollection|Array<OneUser>|OneUser)} props.users
- * @param {boolean} [props.isLink = false]
- * @param {Array<string>} [props.avatarClasses = []]
- * @param {string} [props.size = '70x70']
- * @constructor
- */
-function UserTombstones(_ref16) {
-	var _ref16$users = _ref16.users,
-	    users = _ref16$users === undefined ? new UsersCollection() : _ref16$users,
-	    _ref16$isLink = _ref16.isLink,
-	    isLink = _ref16$isLink === undefined ? false : _ref16$isLink,
-	    _ref16$avatarClasses = _ref16.avatarClasses,
-	    avatarClasses = _ref16$avatarClasses === undefined ? [] : _ref16$avatarClasses,
-	    className = _ref16.className,
-	    _ref16$size = _ref16.size,
-	    size = _ref16$size === undefined ? '70x70' : _ref16$size,
-	    rest_props = _objectWithoutProperties(_ref16, ['users', 'isLink', 'avatarClasses', 'className', 'size']);
-
-	var tombstone_classes = new HtmlClassesArray(className),
-	    avatar_component_classes = new HtmlClassesArray([].concat(_toConsumableArray(avatarClasses), ['-rounded', '-size_' + size]));
-
-	return (users instanceof Array ? users : [users]).map(function (user, id) {
-		var name = user.full_name || [user.first_name, user.last_name].join(' ');
-
-		if (isLink) {
-
-			return React.createElement(
-				PageLink,
-				_extends({
-					key: user.id,
-					className: 'user_tombstone link ' + tombstone_classes,
-					href: '/user/' + user.id
-				}, rest_props),
-				React.createElement(Avatars, { entities: users, className: avatar_component_classes }),
-				React.createElement(
-					'p',
-					{ className: 'user_tombstone_title' },
-					name
-				)
-			);
-		}
-		return React.createElement(
-			'div',
-			_extends({
-				key: user.id,
-				className: 'user_tombstone ' + tombstone_classes
-			}, rest_props),
-			React.createElement(Avatars, { entities: users, className: avatar_component_classes }),
-			React.createElement(
-				'p',
-				{ className: 'user_tombstone_title' },
-				name
-			)
-		);
-	});
-}
-/**
  *
  * @class AppInspectorComponents
  */
@@ -16131,6 +14950,1132 @@ OrderAppInspector = extending(AbstractAppInspector, function () {
 
 	return OrderAppInspector;
 }());
+function AvatarBlocks(_ref6) {
+	var entity_type = _ref6.entity,
+	    _ref6$entities = _ref6.entities,
+	    entities = _ref6$entities === undefined ? new UsersCollection() : _ref6$entities,
+	    _ref6$isLink = _ref6.isLink,
+	    isLink = _ref6$isLink === undefined ? false : _ref6$isLink,
+	    className = _ref6.className,
+	    _ref6$avatarClasses = _ref6.avatarClasses,
+	    avatarClasses = _ref6$avatarClasses === undefined ? [] : _ref6$avatarClasses,
+	    rest_props = _objectWithoutProperties(_ref6, ['entity', 'entities', 'isLink', 'className', 'avatarClasses']);
+
+	var block_classes = new HtmlClassesArray(className);
+
+	return (entities instanceof Array ? entities : [entities]).map(function (entity) {
+		return React.createElement(AvatarBlock, _extends({
+			key: entity.id,
+			entity: entity,
+			entityType: entity_type,
+			isLink: isLink,
+			className: block_classes,
+			avatarClasses: avatarClasses
+		}, rest_props));
+	});
+}
+
+AvatarBlocks.propTypes = {
+	entities: PropTypes.oneOfType([PropTypes.instanceOf(UsersCollection), PropTypes.instanceOf(OrganizationsCollection), PropTypes.arrayOf(PropTypes.instanceOf(OneUser)), PropTypes.arrayOf(PropTypes.instanceOf(OneOrganization)), PropTypes.instanceOf(OneUser), PropTypes.instanceOf(OneOrganization)]).isRequired,
+	entity: PropTypes.oneOf([__C.ENTITIES.USER, __C.ENTITIES.ORGANIZATION]),
+	avatarClasses: PropTypes.oneOfType([PropTypes.string, PropTypes.arrayOf(PropTypes.string), PropTypes.instanceOf(HtmlClassesArray)]),
+	className: PropTypes.oneOfType([PropTypes.string, PropTypes.instanceOf(HtmlClassesArray)]),
+	isLink: PropTypes.bool
+};
+
+function AvatarBlock(_ref7) {
+	var entity = _ref7.entity,
+	    entityType = _ref7.entityType,
+	    avatarClasses = _ref7.avatarClasses,
+	    className = _ref7.className,
+	    isLink = _ref7.isLink,
+	    rest_props = _objectWithoutProperties(_ref7, ['entity', 'entityType', 'avatarClasses', 'className', 'isLink']);
+
+	var name = void 0,
+	    href = void 0;
+
+	if (entityType && entityType === __C.ENTITIES.USER || entity instanceof OneUser || entity.first_name) {
+		name = entity.full_name || [entity.first_name, entity.last_name].join(' ');
+		href = '/user/' + entity.id;
+	} else {
+		name = entity.short_name || entity.name;
+		href = '/organization/' + entity.id;
+	}
+	var avatar = React.createElement(Avatar, { entity: entity, className: new HtmlClassesArray(avatarClasses) }),
+	    avatar_name = React.createElement(
+		'span',
+		{ className: 'avatar_name' },
+		name
+	),
+	    avatar_block_classes = new HtmlClassesArray(['avatar_block', 'User' + entity.id, 'link'].concat(_toConsumableArray(new HtmlClassesArray(className))));
+
+	if (isLink) {
+
+		return React.createElement(
+			PageLink,
+			_extends({ className: avatar_block_classes, href: href }, rest_props),
+			avatar,
+			avatar_name
+		);
+	}
+
+	return React.createElement(
+		'div',
+		_extends({ className: avatar_block_classes }, rest_props),
+		avatar,
+		avatar_name
+	);
+}
+
+AvatarBlock.propTypes = {
+	entity: PropTypes.oneOfType([PropTypes.instanceOf(OneUser), PropTypes.instanceOf(OneOrganization)]).isRequired,
+	entityType: PropTypes.oneOf([__C.ENTITIES.USER, __C.ENTITIES.ORGANIZATION]),
+	avatarClasses: PropTypes.oneOfType([PropTypes.string, PropTypes.arrayOf(PropTypes.string), PropTypes.instanceOf(HtmlClassesArray)]),
+	className: PropTypes.oneOfType([PropTypes.string, PropTypes.instanceOf(HtmlClassesArray)]),
+	isLink: PropTypes.bool
+};
+
+var AvatarCollectionContextProvider = function (_React$Component) {
+	_inherits(AvatarCollectionContextProvider, _React$Component);
+
+	function AvatarCollectionContextProvider(props) {
+		_classCallCheck(this, AvatarCollectionContextProvider);
+
+		var _this5 = _possibleConstructorReturn(this, (AvatarCollectionContextProvider.__proto__ || Object.getPrototypeOf(AvatarCollectionContextProvider)).call(this, props));
+
+		_this5.state = {
+			is_subscribed: props.isSubscribed
+		};
+		return _this5;
+	}
+
+	_createClass(AvatarCollectionContextProvider, [{
+		key: 'getChildContext',
+		value: function getChildContext() {
+			var _this6 = this;
+
+			return _defineProperty({}, AvatarCollectionContextProvider.CONTEXT_NAME, {
+				isSubscribed: this.state.is_subscribed,
+				subscribe: function subscribe() {
+					_this6.setState({
+						is_subscribed: true
+					});
+				},
+				unsubscribe: function unsubscribe() {
+					_this6.setState({
+						is_subscribed: false
+					});
+				}
+			});
+		}
+	}, {
+		key: 'render',
+		value: function render() {
+
+			return React.Children.map(this.props.children, function (child) {
+				return child;
+			});
+		}
+	}]);
+
+	return AvatarCollectionContextProvider;
+}(React.Component);
+
+AvatarCollectionContextProvider.CONTEXT_NAME = '__avatar_collection__';
+
+AvatarCollectionContextProvider.propTypes = {
+	isSubscribed: PropTypes.bool
+};
+
+AvatarCollectionContextProvider.childContextTypes = _defineProperty({}, AvatarCollectionContextProvider.CONTEXT_NAME, PropTypes.shape({
+	isSubscribed: PropTypes.bool,
+	subscribe: PropTypes.func,
+	unsubscribe: PropTypes.func
+}));
+/**
+ * @requires AvatarCollectionContextProvider.js
+ */
+
+var AvatarCollection = function (_React$Component2) {
+	_inherits(AvatarCollection, _React$Component2);
+
+	function AvatarCollection(props, context) {
+		_classCallCheck(this, AvatarCollection);
+
+		var left = props.maxCount;
+
+		var _this7 = _possibleConstructorReturn(this, (AvatarCollection.__proto__ || Object.getPrototypeOf(AvatarCollection)).call(this, props, context));
+
+		_this7.avatars = [__APP.USER].concat(_toConsumableArray(props.users.filter(function (user) {
+			return __APP.USER.id !== parseInt(user.id) && left-- > 0;
+		})));
+		return _this7;
+	}
+
+	_createClass(AvatarCollection, [{
+		key: 'getWidth',
+		value: function getWidth() {
+			var avatar_width = 30,
+			    amount = this.avatars.length,
+			    kink = 6;
+
+			if (this.context[AvatarCollectionContextProvider.CONTEXT_NAME].isSubscribed && amount < this.props.maxCount) {
+
+				return amount === 1 ? avatar_width * amount : avatar_width * amount - kink * (amount - 1);
+			}
+
+			return amount === 1 ? 0 : avatar_width * (amount - 1) - kink * (amount - 2);
+		}
+	}, {
+		key: 'render',
+		value: function render() {
+			var _props2 = this.props,
+			    users = _props2.users,
+			    overallAvatarsCount = _props2.overallAvatarsCount,
+			    className = _props2.className,
+			    counterClasses = _props2.counterClasses,
+			    maxCount = _props2.maxCount,
+			    rest_props = _objectWithoutProperties(_props2, ['users', 'overallAvatarsCount', 'className', 'counterClasses', 'maxCount']),
+			    classes = new HtmlClassesArray('avatars_collection', '-max_' + maxCount, '-trimmed'),
+			    more_avatars_count = (overallAvatarsCount || users.length) - maxCount,
+			    is_counter_hidden = more_avatars_count <= 0;
+
+			if (this.context[AvatarCollectionContextProvider.CONTEXT_NAME].isSubscribed) {
+				classes.push(__C.CLASSES.HOOKS.ADD_AVATAR.STATES.SHIFTED);
+			}
+
+			classes.push(className);
+
+			return React.createElement(
+				React.Fragment,
+				null,
+				React.createElement(
+					'div',
+					_extends({ className: classes, style: { width: this.getWidth() } }, rest_props),
+					React.createElement(Avatars, { entities: this.avatars })
+				),
+				React.createElement(
+					'span',
+					{ className: 'counter ' + new HtmlClassesArray(counterClasses) + ' ' + (is_counter_hidden ? '-cast' : '') },
+					'+',
+					more_avatars_count
+				)
+			);
+		}
+	}]);
+
+	return AvatarCollection;
+}(React.Component);
+
+AvatarCollection.propTypes = {
+	users: PropTypes.oneOfType([PropTypes.instanceOf(UsersCollection), PropTypes.arrayOf(PropTypes.instanceOf(OneUser))]).isRequired,
+	maxCount: PropTypes.number.isRequired,
+	overallAvatarsCount: PropTypes.number,
+	className: PropTypes.oneOfType([PropTypes.string, PropTypes.instanceOf(HtmlClassesArray)]),
+	counterClasses: PropTypes.oneOfType([PropTypes.string, PropTypes.arrayOf(PropTypes.string), PropTypes.instanceOf(HtmlClassesArray)])
+};
+
+AvatarCollection.contextTypes = AvatarCollectionContextProvider.childContextTypes;
+function Avatars(_ref9) {
+	var entities = _ref9.entities,
+	    className = _ref9.className,
+	    rest_props = _objectWithoutProperties(_ref9, ['entities', 'className']);
+
+	var classes = new HtmlClassesArray(className);
+
+	return (entities instanceof Array ? entities : [entities]).map(function (entity) {
+		return React.createElement(Avatar, _extends({ key: entity.id, entity: entity, className: classes }, rest_props));
+	});
+}
+
+Avatars.propTypes = {
+	entities: PropTypes.oneOfType([PropTypes.instanceOf(UsersCollection), PropTypes.instanceOf(OrganizationsCollection), PropTypes.instanceOf(OneUser), PropTypes.instanceOf(OneOrganization), PropTypes.arrayOf(PropTypes.instanceOf(OneUser)), PropTypes.arrayOf(PropTypes.instanceOf(OneOrganization))]).isRequired,
+	className: PropTypes.oneOfType([PropTypes.string, PropTypes.instanceOf(HtmlClassesArray)])
+};
+
+function Avatar(_ref10) {
+	var entity = _ref10.entity,
+	    className = _ref10.className,
+	    badgeClass = _ref10.badgeClass,
+	    rest_props = _objectWithoutProperties(_ref10, ['entity', 'className', 'badgeClass']);
+
+	var classes = new HtmlClassesArray(className);
+
+	var avatar_url = void 0,
+	    name = void 0;
+
+	if (entity instanceof OneUser || entity.avatar_url) {
+		avatar_url = entity.avatar_url;
+		name = entity.full_name || [entity.first_name, entity.last_name].join(' ');
+	} else {
+		avatar_url = entity.img_small_url || entity.img_url;
+		name = entity.short_name || entity.name;
+	}
+
+	return React.createElement(
+		'div',
+		_extends({ className: 'avatar ' + classes, title: name }, rest_props),
+		React.createElement('img', { src: avatar_url || '/app/img/brand_logo.png', onError: function onError(e) {
+				return e.target.src = '/app/img/brand_logo.png';
+			} }),
+		badgeClass && React.createElement(
+			'span',
+			{ className: 'avatar_badge' },
+			React.createElement('i', { className: 'fa fa-' + badgeClass })
+		)
+	);
+}
+
+Avatar.propTypes = {
+	entity: PropTypes.oneOfType([PropTypes.instanceOf(OneUser), PropTypes.instanceOf(OneOrganization)]).isRequired,
+	className: PropTypes.oneOfType([PropTypes.string, PropTypes.instanceOf(HtmlClassesArray)]),
+	badgeClass: PropTypes.oneOf(['plus', 'minus', 'star'])
+};
+function Button(_ref11) {
+	var children = _ref11.children,
+	    className = _ref11.className,
+	    rest_props = _objectWithoutProperties(_ref11, ['children', 'className']);
+
+	return React.createElement(
+		'button',
+		_extends({
+			className: __C.CLASSES.COMPONENT.BUTTON + ' ' + new HtmlClassesArray(className),
+			type: 'button'
+		}, rest_props),
+		React.createElement(
+			'span',
+			{ className: 'Text' },
+			children
+		)
+	);
+}
+
+function RippleButton(_ref12) {
+	var children = _ref12.children,
+	    className = _ref12.className,
+	    _onClick = _ref12.onClick,
+	    rest_props = _objectWithoutProperties(_ref12, ['children', 'className', 'onClick']);
+
+	return React.createElement(
+		'button',
+		_extends({
+			className: __C.CLASSES.COMPONENT.BUTTON + ' ' + new HtmlClassesArray(className),
+			type: 'button',
+			onClick: function onClick(e) {
+				rippleEffectHandler(e);
+				if (isFunction(_onClick)) {
+					_onClick(e);
+				}
+			}
+		}, rest_props),
+		React.createElement(
+			'span',
+			{ className: 'Text' },
+			children
+		)
+	);
+}
+
+function Action(_ref13) {
+	var children = _ref13.children,
+	    className = _ref13.className,
+	    rest_props = _objectWithoutProperties(_ref13, ['children', 'className']);
+
+	return React.createElement(
+		'button',
+		_extends({
+			className: __C.CLASSES.COMPONENT.ACTION + ' ' + new HtmlClassesArray(className),
+			type: 'button'
+		}, rest_props),
+		React.createElement(
+			'span',
+			{ className: 'Text' },
+			children
+		)
+	);
+}
+/**
+ *
+ * @param {React.Component} Component
+ * @param {object} configs
+ * @param {string} configs.entity_name
+ * @param {string} configs.entities_name
+ * @param {EntitiesCollection} [configs.CollectionClass]
+ * @param {function(): XML} [configs.noEntities]
+ * @param {function(): {}} [configs.dynamicProps]
+ * @param {function(): {}} [configs.renderEntities]
+ * @return {React.Component}
+ */
+function componentsContainer(Component, _ref14) {
+	var entity_name = _ref14.entity_name,
+	    entities_name = _ref14.entities_name,
+	    _ref14$CollectionClas = _ref14.CollectionClass,
+	    CollectionClass = _ref14$CollectionClas === undefined ? null : _ref14$CollectionClas,
+	    _ref14$noEntities = _ref14.noEntities,
+	    noEntities = _ref14$noEntities === undefined ? function () {
+		return React.createElement(
+			Cap,
+			null,
+			i18n(__S.NO_ELEMENTS)
+		);
+	} : _ref14$noEntities,
+	    _ref14$dynamicProps = _ref14.dynamicProps,
+	    dynamicProps = _ref14$dynamicProps === undefined ? function (entity) {
+		return {};
+	} : _ref14$dynamicProps,
+	    _ref14$renderEntities = _ref14.renderEntities,
+	    renderEntities = _ref14$renderEntities === undefined ? null : _ref14$renderEntities;
+
+	var ComponentsContainer = function (_React$Component3) {
+		_inherits(ComponentsContainer, _React$Component3);
+
+		_createClass(ComponentsContainer, null, [{
+			key: 'name',
+			get: function get() {
+
+				return 'CollectionOf' + Component.name;
+			}
+		}]);
+
+		function ComponentsContainer(props) {
+			_classCallCheck(this, ComponentsContainer);
+
+			var _this8 = _possibleConstructorReturn(this, (ComponentsContainer.__proto__ || Object.getPrototypeOf(ComponentsContainer)).call(this, props));
+
+			_this8.state = {
+				length: _this8.props[entities_name].length,
+				is_loading: false
+			};
+			return _this8;
+		}
+
+		_createClass(ComponentsContainer, [{
+			key: 'fetch',
+			value: function fetch() {
+				var _this9 = this;
+
+				if (!isVoid(CollectionClass) && this.props[entities_name] instanceof CollectionClass) {
+					var _props$entities_name;
+
+					this.setLoadingState();
+					return (_props$entities_name = this.props[entities_name]).fetch.apply(_props$entities_name, arguments).then(function (entities) {
+						_this9.unsetLoadingState().update();
+
+						return entities;
+					}).catch(function () {
+						_this9.unsetLoadingState();
+					});
+				}
+
+				return Promise.resolve();
+			}
+		}, {
+			key: 'update',
+			value: function update() {
+				if (this.props[entities_name].length !== this.state.length) {
+					this.setState({
+						length: this.props[entities_name].length
+					});
+				}
+
+				return this;
+			}
+		}, {
+			key: 'setLoadingState',
+			value: function setLoadingState() {
+				this.setState({
+					is_loading: true
+				});
+
+				return this;
+			}
+		}, {
+			key: 'unsetLoadingState',
+			value: function unsetLoadingState() {
+				this.setState({
+					is_loading: false
+				});
+
+				return this;
+			}
+		}, {
+			key: 'render',
+			value: function render() {
+				var _props3 = this.props,
+				    entities = _props3[entities_name],
+				    rest_props = _objectWithoutProperties(_props3, [entities_name]);
+
+				if (!entities.length && !this.state.is_loading) {
+
+					return noEntities();
+				}
+
+				return React.createElement(
+					React.Fragment,
+					null,
+					isFunction(renderEntities) ? renderEntities.call(this, entities) : entities.map(function (entity) {
+						return React.createElement(Component, _extends({ key: entity[entity.ID_PROP_NAME] }, _extends(_defineProperty({}, entity_name, entity), rest_props, dynamicProps(entity))));
+					}),
+					this.state.is_loading && React.createElement(LoaderBlock, null)
+				);
+			}
+		}]);
+
+		return ComponentsContainer;
+	}(React.Component);
+
+	ComponentsContainer.displayName = 'collectionOf(' + (Component.displayName || Component.name || 'Component') + ')';
+
+	return ComponentsContainer;
+}
+
+var Dropdown = function (_React$Component4) {
+	_inherits(Dropdown, _React$Component4);
+
+	function Dropdown(props) {
+		_classCallCheck(this, Dropdown);
+
+		var _this10 = _possibleConstructorReturn(this, (Dropdown.__proto__ || Object.getPrototypeOf(Dropdown)).call(this, props));
+
+		_this10.state = {
+			click_pos: {
+				X: 0,
+				Y: 0
+			},
+			opened: false
+		};
+
+		_this10.open = _this10.open.bind(_this10);
+		_this10.close = _this10.close.bind(_this10);
+		_this10.handleClickOutside = _this10.handleClickOutside.bind(_this10);
+		return _this10;
+	}
+
+	_createClass(Dropdown, [{
+		key: 'componentDidMount',
+		value: function componentDidMount() {
+			if (this.state.opened) {
+				this.bindClickOutside();
+			}
+		}
+	}, {
+		key: 'componentWillUnmount',
+		value: function componentWillUnmount() {
+			this.unbindClickOutside();
+		}
+	}, {
+		key: 'open',
+		value: function open(e) {
+			var _this11 = this;
+
+			this.setState({
+				opened: true,
+				click_pos: {
+					X: e.pageX,
+					Y: e.pageY
+				}
+			}, function () {
+				_this11.bindClickOutside();
+			});
+		}
+	}, {
+		key: 'close',
+		value: function close(e) {
+			var _this12 = this;
+
+			this.setState({
+				opened: false
+			}, function () {
+				_this12.unbindClickOutside();
+				_this12.setState({
+					click_pos: {
+						X: 0,
+						Y: 0
+					}
+				});
+			});
+		}
+	}, {
+		key: 'bindClickOutside',
+		value: function bindClickOutside() {
+			if (this.props.isDismissOnOuterClick) {
+				document.addEventListener('mousedown', this.handleClickOutside);
+			}
+		}
+	}, {
+		key: 'unbindClickOutside',
+		value: function unbindClickOutside() {
+			if (this.props.isDismissOnOuterClick) {
+				document.removeEventListener('mousedown', this.handleClickOutside);
+			}
+		}
+	}, {
+		key: 'handleClickOutside',
+		value: function handleClickOutside(event) {
+			if (this.dropdown && !this.dropdown.contains(event.target)) {
+				this.close();
+			}
+		}
+	}, {
+		key: 'getPos',
+		value: function getPos() {
+			var viewport_width = window.outerWidth,
+			    _state$click_pos = this.state.click_pos,
+			    click_X = _state$click_pos.X,
+			    click_Y = _state$click_pos.Y;
+
+
+			var left = void 0,
+			    dropdown_width = void 0;
+
+			if (!this.dropdown) {
+
+				return {};
+			}
+
+			dropdown_width = this.dropdown.offsetWidth;
+			if (viewport_width < click_X + dropdown_width / 2) {
+				left = viewport_width - dropdown_width;
+			} else {
+				left = click_X - dropdown_width / 2;
+			}
+
+			return {
+				left: left,
+				top: click_Y + 25
+			};
+		}
+	}, {
+		key: 'render',
+		value: function render() {
+			var _this13 = this;
+
+			var _props4 = this.props,
+			    renderControl = _props4.renderControl,
+			    renderDropdown = _props4.renderDropdown,
+			    children = _props4.children,
+			    opened = this.state.opened;
+
+
+			return React.createElement(
+				React.Fragment,
+				null,
+				renderControl(opened, this.open, this.close),
+				children,
+				ReactDOM.createPortal(React.createElement(
+					'div',
+					{
+						className: 'dropdown_box ' + (opened ? '-show' : ''),
+						ref: function ref(node) {
+							return _this13.dropdown = node;
+						},
+						style: this.getPos()
+					},
+					renderDropdown(this.close)
+				), document.body)
+			);
+		}
+	}]);
+
+	return Dropdown;
+}(React.Component);
+
+Dropdown.propTypes = {
+	renderControl: PropTypes.func.isRequired,
+	renderDropdown: PropTypes.func.isRequired,
+	isDismissOnOuterClick: PropTypes.bool
+};
+/**
+ * @requires componentsContainer.js
+ */
+function EventBlock(_ref15) {
+	var _this14 = this;
+
+	var event = _ref15.event,
+	    date = _ref15.date,
+	    _ref15$hasDivider = _ref15.hasDivider,
+	    hasDivider = _ref15$hasDivider === undefined ? false : _ref15$hasDivider,
+	    _ref15$coverWidth = _ref15.coverWidth,
+	    coverWidth = _ref15$coverWidth === undefined ? 550 : _ref15$coverWidth;
+
+	var event_id = event.id,
+	    avatars_collection_classes = new HtmlClassesArray(__C.CLASSES.UNIVERSAL_STATES.ROUNDED, __C.CLASSES.UNIVERSAL_STATES.BORDERED, __C.CLASSES.SIZES.SMALL),
+	    event_date = date.format(__C.DATE_FORMAT),
+	    time = event.dates.reduce(function (times, date) {
+		if (moment.unix(date.event_date).format(__C.DATE_FORMAT) === event_date) {
+
+			return [].concat(_toConsumableArray(times), [displayTimeRange(date.start_time, date.end_time)]);
+		}
+
+		return times;
+	}, []).join('; ');
+
+	return React.createElement(
+		React.Fragment,
+		null,
+		hasDivider && React.createElement('hr', { title: date.calendar().capitalize() }),
+		React.createElement(
+			'div',
+			{ className: 'event_block', 'data-event-id': event_id, 'data-event_date': event_date },
+			React.createElement(
+				PageLink,
+				{ href: '/event/' + event_id, className: 'event_block_img img_holder link' },
+				React.createElement('img', { src: event.image_horizontal_url + '?width=' + coverWidth, title: event.title, width: coverWidth })
+			),
+			React.createElement(
+				'div',
+				{ className: 'event_block_info' },
+				React.createElement(
+					'header',
+					{ className: 'event_block_title' },
+					React.createElement(
+						PageLink,
+						{ href: '/event/' + event_id, className: 'link' },
+						event.title
+					)
+				),
+				React.createElement(
+					'div',
+					{ className: 'event_block_service' },
+					React.createElement(
+						'p',
+						null,
+						React.createElement(
+							'small',
+							null,
+							time
+						)
+					),
+					React.createElement(
+						'div',
+						{ className: 'event_block_action_buttons' },
+						React.createElement(
+							AvatarCollectionContextProvider,
+							{ isSubscribed: event.is_favorite },
+							React.createElement(
+								'div',
+								{ className: 'event_block_add_avatar_wrapper' },
+								React.createElement(AvatarCollection, {
+									users: event.favored,
+									maxCount: 3,
+									className: avatars_collection_classes,
+									counterClasses: [__C.CLASSES.SIZES.X30, __C.CLASSES.UNIVERSAL_STATES.BORDERED, __C.CLASSES.COLORS.MARGINAL, __C.CLASSES.HOOKS.ADD_AVATAR.STATES.CASTABLE],
+									overallAvatarsCount: event.favored_users_count,
+									onClick: function onClick() {
+										if (!_this14.favored_modal) {
+											_this14.favored_modal = new FavoredModal(event.id);
+										}
+										_this14.favored_modal.show();
+									}
+								})
+							),
+							React.createElement(
+								'div',
+								{ className: 'event_block_action_buttons_wrapper' },
+								React.createElement(ReactAddToFavoriteButton, {
+									event: event,
+									className: new HtmlClassesArray(['event_block_main_action_button', __C.CLASSES.SIZES.LOW, __C.CLASSES.UNIVERSAL_STATES.ROUNDED])
+								})
+							)
+						)
+					)
+				)
+			)
+		)
+	);
+}
+
+EventBlock.propTypes = {
+	event: PropTypes.instanceOf(OneEvent).isRequired,
+	date: PropTypes.moment.isRequired,
+	hasDivider: PropTypes.bool,
+	coverWidth: PropTypes.number
+};
+
+var EventBlocks = componentsContainer(EventBlock, {
+	entity_name: 'event',
+	entities_name: 'events',
+	CollectionClass: EventsCollection,
+	noEntities: function noEntities() {
+		return React.createElement(
+			Cap,
+			null,
+			i18n(__S.NO_EVENTS)
+		);
+	},
+	renderEntities: function renderEntities(events) {
+		var _props5 = this.props,
+		    coverWidth = _props5.coverWidth,
+		    _props5$sortDateType = _props5.sortDateType,
+		    sortDateType = _props5$sortDateType === undefined ? 'nearest_event_date' : _props5$sortDateType;
+
+
+		var last_date = void 0;
+
+		return events.map(function (event) {
+			var m_event_date = moment.unix(event[sortDateType] || event.first_event_date),
+			    event_date = m_event_date.format(__C.DATE_FORMAT),
+			    is_different_day = last_date !== event_date;
+
+			last_date = event_date;
+
+			return React.createElement(EventBlock, {
+				key: event.id,
+				event: event,
+				date: m_event_date,
+				coverWidth: coverWidth,
+				hasDivider: is_different_day
+			});
+		});
+	}
+});
+
+EventBlocks.propTypes = {
+	events: PropTypes.oneOfType([PropTypes.arrayOf(PropTypes.instanceOf(OneEvent)), PropTypes.instanceOf(EventsCollection)]).isRequired,
+	sortDateType: PropTypes.string,
+	coverWidth: PropTypes.number
+};
+PageLink.propTypes = {
+	href: PropTypes.string.isRequired,
+	children: PropTypes.oneOfType([PropTypes.string, PropTypes.node, PropTypes.element])
+};
+
+function PageLink(_ref16) {
+	var href = _ref16.href,
+	    children = _ref16.children,
+	    rest_props = _objectWithoutProperties(_ref16, ['href', 'children']);
+
+	return React.createElement(
+		ReactRouterDOM.Link,
+		_extends({ to: href }, rest_props),
+		children
+	);
+}
+/**
+ *
+ * @param {buildProps} props
+ * @param {Object<OneUser.ACCOUNTS, string>} props.links
+ * @constructor
+ */
+function SocialLinks(_ref17) {
+	var _ref17$links = _ref17.links,
+	    links = _ref17$links === undefined ? {} : _ref17$links,
+	    className = _ref17.className,
+	    rest_props = _objectWithoutProperties(_ref17, ['links', 'className']);
+
+	var ICON_SLUGS = {
+		VK: 'vk',
+		GOOGLE: 'google-plus',
+		FACEBOOK: 'facebook-official'
+	};
+
+	return React.createElement(
+		'div',
+		{ className: 'social_link_wrapper' },
+		Object.keys(OneUser.ACCOUNTS).map(function (account_type) {
+			var parent_classes = 'social_link -color_' + OneUser.ACCOUNTS[account_type] + ' -valign_center ' + new HtmlClassesArray(className),
+			    icon_classes = 'fa_icon fa-' + ICON_SLUGS[account_type];
+
+			if (links.hasOwnProperty(OneUser.ACCOUNTS[account_type])) {
+
+				return React.createElement(
+					'a',
+					_extends({ key: account_type, className: parent_classes, href: links[OneUser.ACCOUNTS[account_type]], target: '_blank' }, rest_props),
+					React.createElement('i', { className: icon_classes })
+				);
+			} else {
+
+				return React.createElement(
+					'span',
+					_extends({ key: account_type, className: parent_classes }, rest_props),
+					React.createElement('i', { className: icon_classes })
+				);
+			}
+		})
+	);
+}
+
+var Tabs = function (_React$Component5) {
+	_inherits(Tabs, _React$Component5);
+
+	/**
+  *
+  * @param props
+  * @param props.selectedTab
+  * @param props.className
+  * @param props.headerClasses
+  * @param props.bodyWrapperClasses
+  */
+	function Tabs(props) {
+		_classCallCheck(this, Tabs);
+
+		var _this15 = _possibleConstructorReturn(this, (Tabs.__proto__ || Object.getPrototypeOf(Tabs)).call(this, props));
+
+		_this15.state = {
+			selected_tab: props.selectedTab || null
+		};
+
+		_this15.changeTab = _this15.changeTab.bind(_this15);
+		return _this15;
+	}
+
+	_createClass(Tabs, [{
+		key: 'changeTab',
+		value: function changeTab(new_state) {
+			this.setState(function (prev_state) {
+				if (prev_state.selected_tab !== new_state) {
+
+					return {
+						selected_tab: new_state
+					};
+				}
+
+				return null;
+			});
+		}
+	}, {
+		key: 'render',
+		value: function render() {
+			var _this16 = this;
+
+			var _props6 = this.props,
+			    className = _props6.className,
+			    headerClasses = _props6.headerClasses,
+			    bodyWrapperClasses = _props6.bodyWrapperClasses,
+			    selectedTab = _props6.selectedTab,
+			    rest_props = _objectWithoutProperties(_props6, ['className', 'headerClasses', 'bodyWrapperClasses', 'selectedTab']),
+			    children = React.Children.toArray(this.props.children);
+
+			return React.createElement(
+				'div',
+				_extends({ className: new HtmlClassesArray(className) + ' Tabs' }, rest_props),
+				React.createElement(
+					'header',
+					{ className: new HtmlClassesArray(headerClasses) + ' tabs_header HeaderTabs' },
+					children.map(function (child) {
+						return React.createElement(
+							'span',
+							{
+								key: child.props.name,
+								className: 'tab Tab ' + (child.props.name === _this16.state.selected_tab ? '-active' : ''),
+								onClick: function onClick() {
+									return _this16.changeTab(child.props.name);
+								}
+							},
+							child.props.title
+						);
+					})
+				),
+				React.createElement(
+					'div',
+					{ className: new HtmlClassesArray(bodyWrapperClasses) + ' tab_bodies_wrap TabsBodyWrapper' },
+					children.map(function (child) {
+						return React.createElement(
+							'div',
+							{ className: 'tab_body TabsBody ' + (child.props.name === _this16.state.selected_tab ? '-active' : ''), key: child.props.name },
+							child.props.children
+						);
+					})
+				)
+			);
+		}
+	}]);
+
+	return Tabs;
+}(React.Component);
+
+Tabs.propTypes = {
+	className: PropTypes.oneOfType([PropTypes.string, PropTypes.instanceOf(HtmlClassesArray)]),
+	headerClasses: PropTypes.oneOfType([PropTypes.string, PropTypes.arrayOf(PropTypes.string), PropTypes.instanceOf(HtmlClassesArray)]),
+	bodyWrapperClasses: PropTypes.oneOfType([PropTypes.string, PropTypes.arrayOf(PropTypes.string), PropTypes.instanceOf(HtmlClassesArray)]),
+	selectedTab: PropTypes.string
+};
+
+var Tab = function (_React$Component6) {
+	_inherits(Tab, _React$Component6);
+
+	function Tab() {
+		_classCallCheck(this, Tab);
+
+		return _possibleConstructorReturn(this, (Tab.__proto__ || Object.getPrototypeOf(Tab)).apply(this, arguments));
+	}
+
+	return Tab;
+}(React.Component);
+
+Tab.propTypes = {
+	title: PropTypes.string.isRequired,
+	name: PropTypes.string.isRequired
+};
+/**
+ * @requires componentsContainer.js
+ */
+function UserActivity(_ref18) {
+	var user = _ref18.user,
+	    activity = _ref18.activity,
+	    avatarClasses = _ref18.avatarClasses;
+
+	var classes = new HtmlClassesArray('activity_block'),
+	    avatar_classes = new HtmlClassesArray(avatarClasses),
+	    creator_name = user.full_name || user.first_name + ' ' + user.last_name,
+	    date = moment.unix(activity.created_at).calendar(null, __LOCALE.DATE.CALENDAR_DATE_TIME);
+
+	var img_url = void 0,
+	    entity_url = void 0,
+	    entity_title = void 0;
+
+	classes.push('-type_' + activity.type_code);
+	avatar_classes.push(__C.CLASSES.SIZES.X50, __C.CLASSES.UNIVERSAL_STATES.ROUNDED);
+
+	switch (true) {
+		case activity instanceof OneOrganizationActivity:
+			{
+				classes.push('-entity_organization');
+				img_url = activity.organization.img_small_url || activity.organization.img_url;
+				entity_url = '/organization/' + activity.organization.id;
+				entity_title = activity.organization.short_name;
+				break;
+			}
+		case activity instanceof OneEventActivity:
+			{
+				classes.push('-entity_event');
+				img_url = activity.event.image_horizontal_small_url || activity.event.image_horizontal_url;
+				entity_url = '/event/' + activity.event.id;
+				entity_title = activity.event.title;
+				break;
+			}
+	}
+
+	return React.createElement(
+		'div',
+		{ className: classes },
+		React.createElement(Avatar, { entity: user, className: avatar_classes, badgeClass: UserActivity.AVATAR_BADGE_ICON[activity.type_code] }),
+		React.createElement(
+			'div',
+			{ className: 'activity_block_content' },
+			React.createElement(
+				'p',
+				{ className: 'activity_block_top' },
+				React.createElement(
+					PageLink,
+					{ className: 'activity_block_creator link', href: '/user/' + user.id },
+					creator_name
+				),
+				' ' + i18n(UserActivity.ACTION_TEXT[activity.type_code], 1, {}, {
+					gender: user.gender
+				})
+			),
+			React.createElement(
+				'p',
+				{ className: 'activity_block_middle' },
+				React.createElement(
+					PageLink,
+					{ className: 'link', href: entity_url },
+					entity_title
+				)
+			),
+			React.createElement(
+				'p',
+				{ className: 'activity_block_bottom' },
+				date
+			)
+		),
+		React.createElement(
+			PageLink,
+			{ className: 'activity_block_image img_holder link', href: entity_url },
+			React.createElement('img', { src: img_url, height: '48', onClick: function onClick(e) {
+					return e.target.src = '/app/img/brand_logo.png';
+				} })
+		)
+	);
+}
+
+UserActivity.propTypes = {
+	user: PropTypes.instanceOf(OneUser).isRequired,
+	activity: PropTypes.instanceOf(OneAbstractActivity).isRequired,
+	avatarClasses: PropTypes.oneOfType([PropTypes.string, PropTypes.instanceOf(HtmlClassesArray)])
+};
+
+UserActivity.AVATAR_BADGE_ICON = (_UserActivity$AVATAR_ = {}, _defineProperty(_UserActivity$AVATAR_, OneAbstractActivity.TYPES.SUBSCRIBE, 'plus'), _defineProperty(_UserActivity$AVATAR_, OneAbstractActivity.TYPES.UNSUBSCRIBE, 'minus'), _defineProperty(_UserActivity$AVATAR_, OneAbstractActivity.TYPES.FAVE, 'star'), _defineProperty(_UserActivity$AVATAR_, OneAbstractActivity.TYPES.UNFAVE, 'minus'), _UserActivity$AVATAR_);
+
+UserActivity.ACTION_TEXT = (_UserActivity$ACTION_ = {}, _defineProperty(_UserActivity$ACTION_, OneAbstractActivity.TYPES.SUBSCRIBE, __S.USER_SUBSCRIBED_TO_ORG), _defineProperty(_UserActivity$ACTION_, OneAbstractActivity.TYPES.UNSUBSCRIBE, __S.USER_UNSUBSCRIBED_FROM_ORG), _defineProperty(_UserActivity$ACTION_, OneAbstractActivity.TYPES.FAVE, __S.USER_FAVORED_EVENT), _defineProperty(_UserActivity$ACTION_, OneAbstractActivity.TYPES.UNFAVE, __S.USER_UNFAVORED_EVENT), _defineProperty(_UserActivity$ACTION_, OneAbstractActivity.TYPES.SHARE_VK, __S.USER_SHARED_EVENT), _defineProperty(_UserActivity$ACTION_, OneAbstractActivity.TYPES.SHARE_FB, __S.USER_SHARED_EVENT), _defineProperty(_UserActivity$ACTION_, OneAbstractActivity.TYPES.SHARE_TW, __S.USER_SHARED_EVENT), _UserActivity$ACTION_);
+
+var UserActivities = componentsContainer(UserActivity, {
+	entity_name: 'activity',
+	entities_name: 'activities',
+	CollectionClass: UsersActivitiesCollection,
+	noEntities: function noEntities() {
+		return React.createElement(
+			Cap,
+			null,
+			i18n(__S.NO_ACTIVITIES)
+		);
+	}
+});
+
+UserActivities.propTypes = {
+	user: PropTypes.instanceOf(OneUser).isRequired,
+	activities: PropTypes.oneOfType([PropTypes.instanceOf(UsersActivitiesCollection), PropTypes.arrayOf(PropTypes.instanceOf(OneAbstractActivity))]).isRequired
+};
+/**
+ *
+ * @param {buildProps} props
+ * @param {(UsersCollection|Array<OneUser>|OneUser)} props.users
+ * @param {boolean} [props.isLink = false]
+ * @param {Array<string>} [props.avatarClasses = []]
+ * @param {string} [props.size = '70x70']
+ * @constructor
+ */
+function UserTombstones(_ref19) {
+	var _ref19$users = _ref19.users,
+	    users = _ref19$users === undefined ? new UsersCollection() : _ref19$users,
+	    _ref19$isLink = _ref19.isLink,
+	    isLink = _ref19$isLink === undefined ? false : _ref19$isLink,
+	    _ref19$avatarClasses = _ref19.avatarClasses,
+	    avatarClasses = _ref19$avatarClasses === undefined ? [] : _ref19$avatarClasses,
+	    className = _ref19.className,
+	    _ref19$size = _ref19.size,
+	    size = _ref19$size === undefined ? '70x70' : _ref19$size,
+	    rest_props = _objectWithoutProperties(_ref19, ['users', 'isLink', 'avatarClasses', 'className', 'size']);
+
+	var tombstone_classes = new HtmlClassesArray(className),
+	    avatar_component_classes = new HtmlClassesArray([].concat(_toConsumableArray(avatarClasses), ['-rounded', '-size_' + size]));
+
+	return (users instanceof Array ? users : [users]).map(function (user, id) {
+		var name = user.full_name || [user.first_name, user.last_name].join(' ');
+
+		if (isLink) {
+
+			return React.createElement(
+				PageLink,
+				_extends({
+					key: user.id,
+					className: 'user_tombstone link ' + tombstone_classes,
+					href: '/user/' + user.id
+				}, rest_props),
+				React.createElement(Avatars, { entities: users, className: avatar_component_classes }),
+				React.createElement(
+					'p',
+					{ className: 'user_tombstone_title' },
+					name
+				)
+			);
+		}
+		return React.createElement(
+			'div',
+			_extends({
+				key: user.id,
+				className: 'user_tombstone ' + tombstone_classes
+			}, rest_props),
+			React.createElement(Avatars, { entities: users, className: avatar_component_classes }),
+			React.createElement(
+				'p',
+				{ className: 'user_tombstone_title' },
+				name
+			)
+		);
+	});
+}
 /**
  *
  * @param {object} options
@@ -16142,28 +16087,28 @@ function asyncPage(
 /**
  * @template {object} pageProps
  */
-_ref17, PageClass) {
-	var _ref17$constructPage = _ref17.constructPage,
-	    constructPage = _ref17$constructPage === undefined ? function (args) {
+_ref20, PageClass) {
+	var _ref20$constructPage = _ref20.constructPage,
+	    constructPage = _ref20$constructPage === undefined ? function (args) {
 		return {};
-	} : _ref17$constructPage,
-	    _ref17$fetchData = _ref17.fetchData,
-	    fetchData = _ref17$fetchData === undefined ? function (props) {
+	} : _ref20$constructPage,
+	    _ref20$fetchData = _ref20.fetchData,
+	    fetchData = _ref20$fetchData === undefined ? function (props) {
 		return Promise.resolve();
-	} : _ref17$fetchData,
-	    _ref17$pageTitle = _ref17.pageTitle,
-	    pageTitle = _ref17$pageTitle === undefined ? function (props) {
+	} : _ref20$fetchData,
+	    _ref20$pageTitle = _ref20.pageTitle,
+	    pageTitle = _ref20$pageTitle === undefined ? function (props) {
 		return null;
-	} : _ref17$pageTitle,
-	    _ref17$headerTabs = _ref17.headerTabs,
-	    headerTabs = _ref17$headerTabs === undefined ? false : _ref17$headerTabs,
-	    _ref17$is_admin_page = _ref17.is_admin_page,
-	    is_admin_page = _ref17$is_admin_page === undefined ? false : _ref17$is_admin_page,
-	    _ref17$state_name = _ref17.state_name,
-	    state_name = _ref17$state_name === undefined ? '' : _ref17$state_name;
+	} : _ref20$pageTitle,
+	    _ref20$headerTabs = _ref20.headerTabs,
+	    headerTabs = _ref20$headerTabs === undefined ? false : _ref20$headerTabs,
+	    _ref20$is_admin_page = _ref20.is_admin_page,
+	    is_admin_page = _ref20$is_admin_page === undefined ? false : _ref20$is_admin_page,
+	    _ref20$state_name = _ref20.state_name,
+	    state_name = _ref20$state_name === undefined ? '' : _ref20$state_name;
 
-	var AsyncPageAdapter = function (_React$Component6) {
-		_inherits(AsyncPageAdapter, _React$Component6);
+	var AsyncPageAdapter = function (_React$Component7) {
+		_inherits(AsyncPageAdapter, _React$Component7);
 
 		_createClass(AsyncPageAdapter, null, [{
 			key: 'name',
@@ -16176,23 +16121,23 @@ _ref17, PageClass) {
 		function AsyncPageAdapter(props) {
 			_classCallCheck(this, AsyncPageAdapter);
 
-			var _this15 = _possibleConstructorReturn(this, (AsyncPageAdapter.__proto__ || Object.getPrototypeOf(AsyncPageAdapter)).call(this, props));
+			var _this18 = _possibleConstructorReturn(this, (AsyncPageAdapter.__proto__ || Object.getPrototypeOf(AsyncPageAdapter)).call(this, props));
 
 			__APP.HISTORY = props.history;
-			__APP.CURRENT_REACT_PAGE = _this15;
-			_this15.pageProps = constructPage(props.match.params);
-			_this15.origin_page = null;
-			_this15.state = {
+			__APP.CURRENT_REACT_PAGE = _this18;
+			_this18.pageProps = constructPage(props.match.params);
+			_this18.origin_page = null;
+			_this18.state = {
 				is_data_fetching: true,
 				fetched_data: null
 			};
-			return _this15;
+			return _this18;
 		}
 
 		_createClass(AsyncPageAdapter, [{
 			key: 'componentWillMount',
 			value: function componentWillMount() {
-				var _this16 = this;
+				var _this19 = this;
 
 				__APP.SERVER.abortAllConnections();
 				__APP.SIDEBAR.activateNavItem(window.location.pathname);
@@ -16223,9 +16168,9 @@ _ref17, PageClass) {
 				}
 
 				fetchData.call(this.pageProps, this.pageProps).then(function (data) {
-					__APP.changeTitle(isFunction(pageTitle) ? pageTitle.call(_this16.pageProps, _this16.pageProps) : pageTitle);
+					__APP.changeTitle(isFunction(pageTitle) ? pageTitle.call(_this19.pageProps, _this19.pageProps) : pageTitle);
 
-					_this16.setState({
+					_this19.setState({
 						is_data_fetching: false,
 						fetched_data: data
 					});
@@ -16241,7 +16186,7 @@ _ref17, PageClass) {
 		}, {
 			key: 'render',
 			value: function render() {
-				var _this17 = this;
+				var _this20 = this;
 
 				var _state = this.state,
 				    is_data_fetching = _state.is_data_fetching,
@@ -16254,7 +16199,7 @@ _ref17, PageClass) {
 				}
 
 				return React.createElement(PageClass, _extends({}, _extends({ fetched_data: fetched_data }, this.pageProps), { ref: function ref(component) {
-						return _this17.origin_page = component;
+						return _this20.origin_page = component;
 					} }));
 			}
 		}]);
@@ -16284,9 +16229,9 @@ function contentWrap() {
  * @requires asyncPage.js
  */
 var UserPage = asyncPage({
-	constructPage: function constructPage(_ref18) {
-		var _ref18$user_id = _ref18.user_id,
-		    user_id = _ref18$user_id === undefined ? __APP.USER.id : _ref18$user_id;
+	constructPage: function constructPage(_ref21) {
+		var _ref21$user_id = _ref21.user_id,
+		    user_id = _ref21$user_id === undefined ? __APP.USER.id : _ref21$user_id;
 
 
 		return {
@@ -16310,8 +16255,8 @@ var UserPage = asyncPage({
 
 		return props.user.full_name;
 	}
-}, function (_React$Component7) {
-	_inherits(UserPage, _React$Component7);
+}, function (_React$Component8) {
+	_inherits(UserPage, _React$Component8);
 
 	_createClass(UserPage, null, [{
 		key: 'SidebarWrapper',
@@ -16328,13 +16273,13 @@ var UserPage = asyncPage({
    * @return {XML}
    * @constructor
    */
-		value: function SidebarWrapper(_ref19) {
-			var user = _ref19.user,
-			    title = _ref19.title,
-			    noEntitiesText = _ref19.noEntitiesText,
-			    entities = _ref19.entities,
-			    entitiesType = _ref19.entitiesType,
-			    showAllModalClass = _ref19.showAllModalClass;
+		value: function SidebarWrapper(_ref22) {
+			var user = _ref22.user,
+			    title = _ref22.title,
+			    noEntitiesText = _ref22.noEntitiesText,
+			    entities = _ref22.entities,
+			    entitiesType = _ref22.entitiesType,
+			    showAllModalClass = _ref22.showAllModalClass;
 
 			if (entities.length) {
 				var avatar_classes = [__C.CLASSES.SIZES.X30],
@@ -16395,17 +16340,17 @@ var UserPage = asyncPage({
 	}]);
 
 	function UserPage(props) {
-		var _this18$disable_uploa, _this18$block_scroll;
+		var _this21$disable_uploa, _this21$block_scroll;
 
 		_classCallCheck(this, UserPage);
 
-		var _this18 = _possibleConstructorReturn(this, (UserPage.__proto__ || Object.getPrototypeOf(UserPage)).call(this, props));
+		var _this21 = _possibleConstructorReturn(this, (UserPage.__proto__ || Object.getPrototypeOf(UserPage)).call(this, props));
 
-		_this18.disable_uploads = (_this18$disable_uploa = {}, _defineProperty(_this18$disable_uploa, __C.ENTITIES.EVENT, false), _defineProperty(_this18$disable_uploa, __C.ENTITIES.ACTIVITY, false), _this18$disable_uploa);
-		_this18.block_scroll = (_this18$block_scroll = {}, _defineProperty(_this18$block_scroll, __C.ENTITIES.EVENT, false), _defineProperty(_this18$block_scroll, __C.ENTITIES.ACTIVITY, false), _this18$block_scroll);
+		_this21.disable_uploads = (_this21$disable_uploa = {}, _defineProperty(_this21$disable_uploa, __C.ENTITIES.EVENT, false), _defineProperty(_this21$disable_uploa, __C.ENTITIES.ACTIVITY, false), _this21$disable_uploa);
+		_this21.block_scroll = (_this21$block_scroll = {}, _defineProperty(_this21$block_scroll, __C.ENTITIES.EVENT, false), _defineProperty(_this21$block_scroll, __C.ENTITIES.ACTIVITY, false), _this21$block_scroll);
 
-		_this18.active_tab = __C.ENTITIES.EVENT;
-		_this18.favored_fetch_data = {
+		_this21.active_tab = __C.ENTITIES.EVENT;
+		_this21.favored_fetch_data = {
 			fields: new Fields('image_horizontal_medium_url', 'favored_users_count', 'is_favorite', 'is_registered', 'registration_locally', 'registration_available', 'ticketing_locally', 'ticketing_available', 'dates', {
 				favored: {
 					length: 5
@@ -16414,13 +16359,13 @@ var UserPage = asyncPage({
 			order_by: 'nearest_event_date,-first_event_date',
 			length: 10
 		};
-		return _this18;
+		return _this21;
 	}
 
 	_createClass(UserPage, [{
 		key: 'componentDidMount',
 		value: function componentDidMount() {
-			var _this19 = this;
+			var _this22 = this;
 
 			var user = this.props.user,
 			    promises = [];
@@ -16436,7 +16381,7 @@ var UserPage = asyncPage({
 
 			if (promises.length) {
 				Promise.race(promises).then(function () {
-					_this19.bindScrollEvents();
+					_this22.bindScrollEvents();
 				});
 			} else {
 				this.bindScrollEvents();
@@ -16482,7 +16427,7 @@ var UserPage = asyncPage({
    * @returns {Promise}
    */
 		value: function uploadEntities(type) {
-			var _this20 = this;
+			var _this23 = this;
 
 			var is_upload_disabled = this.disable_uploads[type],
 			    is_scroll_blocked = this.block_scroll[type];
@@ -16517,22 +16462,22 @@ var UserPage = asyncPage({
 			this.block_scroll[type] = true;
 
 			return fetch_promise.then(function (entities) {
-				_this20.block_scroll[type] = false;
+				_this23.block_scroll[type] = false;
 
 				if (!entities.length) {
-					_this20.disable_uploads[type] = true;
+					_this23.disable_uploads[type] = true;
 				}
 
 				switch (type) {
 					case __C.ENTITIES.EVENT:
 						{
 
-							return _this20.favored_events.unsetLoadingState().update();
+							return _this23.favored_events.unsetLoadingState().update();
 						}
 					case __C.ENTITIES.ACTIVITY:
 						{
 
-							return _this20.activities.unsetLoadingState().update();
+							return _this23.activities.unsetLoadingState().update();
 						}
 				}
 
@@ -16549,7 +16494,7 @@ var UserPage = asyncPage({
 	}, {
 		key: 'bindScrollEvents',
 		value: function bindScrollEvents() {
-			var _this21 = this;
+			var _this24 = this;
 
 			var $window = $(window);
 
@@ -16565,7 +16510,7 @@ var UserPage = asyncPage({
 
 						$window.on('scroll.uploadEntities', function () {
 							if (isScrollRemain(1000)) {
-								_this21.uploadEntities(_this21.tabs.state.selected_tab);
+								_this24.uploadEntities(_this24.tabs.state.selected_tab);
 							}
 						});
 					}
@@ -16579,7 +16524,7 @@ var UserPage = asyncPage({
 	}, {
 		key: 'render',
 		value: function render() {
-			var _this22 = this;
+			var _this25 = this;
 
 			var user = this.props.user,
 			    SidebarWrapper = UserPage.SidebarWrapper,
@@ -16636,7 +16581,7 @@ var UserPage = asyncPage({
 					Tabs,
 					{
 						ref: function ref(component) {
-							return _this22.tabs = component;
+							return _this25.tabs = component;
 						},
 						className: 'page user_page_content',
 						headerClasses: 'user_page_content_header -color_accent',
@@ -16646,14 +16591,14 @@ var UserPage = asyncPage({
 						Tab,
 						{ title: i18n(__S.ACTIVITY, 1), name: 'activity' },
 						React.createElement(UserActivities, { ref: function ref(component) {
-								return _this22.activities = component;
+								return _this25.activities = component;
 							}, user: user, activities: user.actions })
 					),
 					React.createElement(
 						Tab,
 						{ title: i18n(__S.FAVORED_EVENT, 2), name: 'event' },
 						React.createElement(EventBlocks, { ref: function ref(component) {
-								return _this22.favored_events = component;
+								return _this25.favored_events = component;
 							}, events: user.favored })
 					)
 				)
@@ -16693,17 +16638,17 @@ var MyProfilePage = asyncPage({
 	function MyProfilePage(props) {
 		_classCallCheck(this, MyProfilePage);
 
-		var _this23 = _possibleConstructorReturn(this, (MyProfilePage.__proto__ || Object.getPrototypeOf(MyProfilePage)).call(this, props));
+		var _this26 = _possibleConstructorReturn(this, (MyProfilePage.__proto__ || Object.getPrototypeOf(MyProfilePage)).call(this, props));
 
-		_this23.favored_fetch_data.fields.push('is_favorite');
-		return _this23;
+		_this26.favored_fetch_data.fields.push('is_favorite');
+		return _this26;
 	}
 
 	return MyProfilePage;
 }(UserPage.OriginPage));
 
-var NoReactPage = function (_React$Component8) {
-	_inherits(NoReactPage, _React$Component8);
+var NoReactPage = function (_React$Component9) {
+	_inherits(NoReactPage, _React$Component9);
 
 	function NoReactPage() {
 		_classCallCheck(this, NoReactPage);
@@ -17056,9 +17001,365 @@ TopBarNoAuth = extending(AbstractTopBar, function () {
 
 	return TopBarNoAuth;
 }());
-function LoaderBlock(_ref20) {
-	var className = _ref20.className,
-	    rest_props = _objectWithoutProperties(_ref20, ['className']);
+/**
+ * @class ReactActionButton
+ * @extends React.Component
+ *
+ * @static {Object<string, string>} STATES
+ * @static {Object<string, Object<STATES, ?string>>} DEFAULTS
+ * @static {function} addAvatar
+ *
+ * @property {Object<STATES, ?string>} labels
+ * @property {Object<STATES, ?string>} colors
+ * @property {Object<STATES, ?string>} icons
+ * @property {STATES} current_state
+ * @property {HtmlClassesArray} classes
+ * @property {object} state
+ * @property {boolean} state.is_checked
+ * @property {boolean} state.is_hovered
+ */
+
+var ReactActionButton = function (_React$Component10) {
+	_inherits(ReactActionButton, _React$Component10);
+
+	function ReactActionButton(props, context) {
+		_classCallCheck(this, ReactActionButton);
+
+		var _this28 = _possibleConstructorReturn(this, (ReactActionButton.__proto__ || Object.getPrototypeOf(ReactActionButton)).call(this, props, context));
+
+		_this28.state = {
+			is_checked: props.isChecked,
+			is_hovered: false
+		};
+
+		_this28.labels = props.labels === null ? ReactActionButton.DEFAULTS.labels : _extends({}, _this28.constructor.DEFAULTS.labels, props.labels);
+		_this28.colors = props.colors === null ? ReactActionButton.DEFAULTS.colors : _extends({}, _this28.constructor.DEFAULTS.colors, props.colors);
+		_this28.icons = props.icons === null ? ReactActionButton.DEFAULTS.icons : _extends({}, _this28.constructor.DEFAULTS.icons, props.icons);
+
+		_this28.mouseHoverHandler = _this28.mouseHoverHandler.bind(_this28);
+		_this28.mouseLeaveHandler = _this28.mouseLeaveHandler.bind(_this28);
+		_this28.checkedStateChange = _this28.checkedStateChange.bind(_this28);
+		_this28.onClickHandler = _this28.onClickHandler.bind(_this28);
+		_this28.clickAction = _this28.clickAction.bind(_this28);
+
+		Object.defineProperties(_this28, {
+			classes: {
+				get: function get() {
+					var classes = new HtmlClassesArray(this.props.className);
+
+					if (!empty(this.icons[this.current_state])) {
+						classes.push(__C.CLASSES.ICON_CLASS, this.icons[this.current_state]);
+					}
+
+					if (!empty(this.colors[this.current_state])) {
+						classes.push(this.colors[this.current_state]);
+					}
+
+					return classes;
+				}
+			},
+			current_state: {
+				get: function get() {
+
+					switch (true) {
+						case this.state.is_checked && this.state.is_hovered:
+							{
+
+								return ReactActionButton.STATES.CHECKED_HOVER;
+							}
+						case this.state.is_checked && !this.state.is_hovered:
+							{
+
+								return ReactActionButton.STATES.CHECKED;
+							}
+						case !this.state.is_checked && this.state.is_hovered:
+							{
+
+								return ReactActionButton.STATES.UNCHECKED_HOVER;
+							}
+						case !this.state.is_checked && !this.state.is_hovered:
+							{
+
+								return ReactActionButton.STATES.UNCHECKED;
+							}
+					}
+				}
+			}
+		});
+		return _this28;
+	}
+
+	_createClass(ReactActionButton, [{
+		key: 'showAuthModal',
+		value: function showAuthModal() {
+			var modal = this.modal;
+
+
+			if (!modal) {
+				modal = new AuthModal(null, {
+					note: 'Для выполнения этого действия, нужно войти через социальную сеть'
+				});
+				this.modal = modal;
+			}
+
+			return modal.show();
+		}
+	}, {
+		key: 'clickAction',
+		value: function clickAction() {
+
+			return Promise.resolve();
+		}
+	}, {
+		key: 'onClickHandler',
+		value: function onClickHandler(e) {
+			var onClick = this.props.onClick;
+
+
+			if (__APP.USER.isLoggedOut()) {
+
+				return this.showAuthModal();
+			}
+
+			this.clickAction();
+			this.checkedStateChange();
+			if (isFunction(onClick)) {
+				onClick(e);
+			}
+
+			if (isFunction(window.askToSubscribe)) {
+				window.askToSubscribe();
+			}
+		}
+	}, {
+		key: 'checkedStateChange',
+		value: function checkedStateChange() {
+			if (this.state.is_checked) {
+				this.setState({
+					is_checked: false
+				});
+			} else {
+				this.setState({
+					is_checked: true
+				});
+			}
+		}
+	}, {
+		key: 'mouseHoverHandler',
+		value: function mouseHoverHandler() {
+			this.setState({
+				is_hovered: true
+			});
+		}
+	}, {
+		key: 'mouseLeaveHandler',
+		value: function mouseLeaveHandler() {
+			this.setState({
+				is_hovered: false
+			});
+		}
+	}, {
+		key: 'render',
+		value: function render() {
+
+			return React.createElement(
+				RippleButton,
+				{
+					className: this.classes,
+					onClick: this.onClickHandler,
+					onMouseEnter: this.mouseHoverHandler,
+					onMouseLeave: this.mouseLeaveHandler
+				},
+				this.labels[this.current_state]
+			);
+		}
+	}]);
+
+	return ReactActionButton;
+}(React.Component);
+
+ReactActionButton.STATES = {
+	CHECKED: 'CHECKED',
+	UNCHECKED: 'UNCHECKED',
+	CHECKED_HOVER: 'CHECKED_HOVER',
+	UNCHECKED_HOVER: 'UNCHECKED_HOVER'
+};
+
+ReactActionButton.DEFAULTS = {
+	labels: (_labels = {}, _defineProperty(_labels, ReactActionButton.STATES.CHECKED, null), _defineProperty(_labels, ReactActionButton.STATES.UNCHECKED, null), _defineProperty(_labels, ReactActionButton.STATES.CHECKED_HOVER, null), _defineProperty(_labels, ReactActionButton.STATES.UNCHECKED_HOVER, null), _labels),
+	colors: (_colors = {}, _defineProperty(_colors, ReactActionButton.STATES.CHECKED, null), _defineProperty(_colors, ReactActionButton.STATES.UNCHECKED, null), _defineProperty(_colors, ReactActionButton.STATES.CHECKED_HOVER, null), _defineProperty(_colors, ReactActionButton.STATES.UNCHECKED_HOVER, null), _colors),
+	icons: (_icons = {}, _defineProperty(_icons, ReactActionButton.STATES.CHECKED, null), _defineProperty(_icons, ReactActionButton.STATES.UNCHECKED, null), _defineProperty(_icons, ReactActionButton.STATES.CHECKED_HOVER, null), _defineProperty(_icons, ReactActionButton.STATES.UNCHECKED_HOVER, null), _icons)
+};
+
+ReactActionButton.propTypes = {
+	isChecked: PropTypes.bool,
+	className: PropTypes.oneOfType([PropTypes.string, PropTypes.instanceOf(HtmlClassesArray)]),
+	labels: PropTypes.object,
+	colors: PropTypes.object,
+	icons: PropTypes.object,
+	onClick: PropTypes.func
+};
+/**
+ * @requires ActionButton.js
+ * @requires ../AvatarCollectionContextProvider.js
+ */
+
+var ReactAddToFavoriteButton = function (_ReactActionButton) {
+	_inherits(ReactAddToFavoriteButton, _ReactActionButton);
+
+	function ReactAddToFavoriteButton(props, context) {
+		_classCallCheck(this, ReactAddToFavoriteButton);
+
+		var _this29 = _possibleConstructorReturn(this, (ReactAddToFavoriteButton.__proto__ || Object.getPrototypeOf(ReactAddToFavoriteButton)).call(this, props, context));
+
+		_this29.event = props.event;
+		if (!isVoid(context[AvatarCollectionContextProvider.CONTEXT_NAME])) {
+			_this29.state.is_checked = context[AvatarCollectionContextProvider.CONTEXT_NAME].isSubscribed;
+		}
+		return _this29;
+	}
+
+	_createClass(ReactAddToFavoriteButton, [{
+		key: 'showAuthModal',
+		value: function showAuthModal() {
+			var modal = this.modal;
+
+
+			if (!modal) {
+				modal = new AuthModal(location.origin + '/event/' + this.event.id, {
+					note: 'Чтобы добавить событие в избранное, необходимо войти через социальную сеть'
+				});
+				this.modal = modal;
+			}
+
+			cookies.setItem('auth_command', 'add_to_favorite');
+			cookies.setItem('auth_entity_id', this.event.id);
+
+			return modal.show();
+		}
+	}, {
+		key: 'clickAction',
+		value: function clickAction() {
+			var _this30 = this;
+
+			if (this.state.is_checked) {
+
+				return this.event.unfavour().then(function (data) {
+					if (!isVoid(_this30.context[AvatarCollectionContextProvider.CONTEXT_NAME])) {
+						_this30.context[AvatarCollectionContextProvider.CONTEXT_NAME].unsubscribe();
+					}
+
+					return data;
+				});
+			} else {
+
+				return this.event.favour().then(function (data) {
+					if (!isVoid(_this30.context[AvatarCollectionContextProvider.CONTEXT_NAME])) {
+						_this30.context[AvatarCollectionContextProvider.CONTEXT_NAME].subscribe();
+					}
+
+					return data;
+				});
+			}
+		}
+	}]);
+
+	return ReactAddToFavoriteButton;
+}(ReactActionButton);
+
+ReactAddToFavoriteButton.DEFAULTS = {
+	labels: (_labels2 = {}, _defineProperty(_labels2, ReactActionButton.STATES.CHECKED, __LOCALES.ru_RU.TEXTS.BUTTON.FAVORED), _defineProperty(_labels2, ReactActionButton.STATES.UNCHECKED, __LOCALES.ru_RU.TEXTS.BUTTON.ADD_FAVORITE), _defineProperty(_labels2, ReactActionButton.STATES.CHECKED_HOVER, __LOCALES.ru_RU.TEXTS.BUTTON.REMOVE_FAVORITE), _defineProperty(_labels2, ReactActionButton.STATES.UNCHECKED_HOVER, __LOCALES.ru_RU.TEXTS.BUTTON.ADD_FAVORITE), _labels2),
+	colors: (_colors2 = {}, _defineProperty(_colors2, ReactActionButton.STATES.CHECKED, __C.CLASSES.COLORS.ACCENT), _defineProperty(_colors2, ReactActionButton.STATES.UNCHECKED, __C.CLASSES.COLORS.DEFAULT), _defineProperty(_colors2, ReactActionButton.STATES.CHECKED_HOVER, __C.CLASSES.COLORS.ACCENT), _defineProperty(_colors2, ReactActionButton.STATES.UNCHECKED_HOVER, __C.CLASSES.COLORS.NEUTRAL_ACCENT), _colors2),
+	icons: (_icons2 = {}, _defineProperty(_icons2, ReactActionButton.STATES.CHECKED, __C.CLASSES.ICONS.STAR), _defineProperty(_icons2, ReactActionButton.STATES.UNCHECKED, __C.CLASSES.ICONS.STAR_O), _defineProperty(_icons2, ReactActionButton.STATES.CHECKED_HOVER, __C.CLASSES.ICONS.TIMES), _defineProperty(_icons2, ReactActionButton.STATES.UNCHECKED_HOVER, __C.CLASSES.ICONS.STAR_O), _icons2)
+};
+
+ReactAddToFavoriteButton.propTypes = _extends({
+	event: PropTypes.instanceOf(OneEvent)
+}, ReactActionButton.propTypes);
+
+ReactAddToFavoriteButton.contextTypes = AvatarCollectionContextProvider.childContextTypes;
+function Cap(_ref23) {
+	var className = _ref23.className,
+	    children = _ref23.children,
+	    rest_props = _objectWithoutProperties(_ref23, ['className', 'children']);
+
+	return React.createElement(
+		'div',
+		_extends({ className: 'cap ' + new HtmlClassesArray(className) }, rest_props),
+		React.createElement(
+			'span',
+			{ className: 'cap_message' },
+			children
+		)
+	);
+}
+function OverlayCap(_ref24) {
+	var className = _ref24.className,
+	    children = _ref24.children,
+	    rest_props = _objectWithoutProperties(_ref24, ['className', 'children']);
+
+	return React.createElement(
+		'div',
+		_extends({ className: 'overlay_cap -unselectable -centering OverlayCap ' + new HtmlClassesArray(className) }, rest_props),
+		React.createElement(
+			'div',
+			{ className: 'overlay_cap_wrapper CapWrapper' },
+			children
+		)
+	);
+}
+
+var FormCheckbox = function (_React$Component11) {
+	_inherits(FormCheckbox, _React$Component11);
+
+	function FormCheckbox() {
+		_classCallCheck(this, FormCheckbox);
+
+		return _possibleConstructorReturn(this, (FormCheckbox.__proto__ || Object.getPrototypeOf(FormCheckbox)).apply(this, arguments));
+	}
+
+	_createClass(FormCheckbox, [{
+		key: 'render',
+		value: function render() {
+			var _props7 = this.props,
+			    _props7$id = _props7.id,
+			    id = _props7$id === undefined ? guid() : _props7$id,
+			    label = _props7.label,
+			    name = _props7.name,
+			    value = _props7.value,
+			    inputRef = _props7.inputRef,
+			    rest_props = _objectWithoutProperties(_props7, ['id', 'label', 'name', 'value', 'inputRef']);
+
+			return React.createElement(
+				'div',
+				{ className: 'form_unit form_checkbox_wrapper' },
+				React.createElement('input', _extends({
+					id: id,
+					className: 'form_checkbox',
+					type: 'checkbox',
+					name: name,
+					tabIndex: '-1',
+					ref: inputRef
+				}, typeof value === 'undefined' ? { value: value } : {}, rest_props)),
+				label && React.createElement(
+					'label',
+					{ className: 'form_label', htmlFor: id },
+					React.createElement(
+						'span',
+						null,
+						label
+					)
+				)
+			);
+		}
+	}]);
+
+	return FormCheckbox;
+}(React.Component);
+
+function LoaderBlock(_ref25) {
+	var className = _ref25.className,
+	    rest_props = _objectWithoutProperties(_ref25, ['className']);
 
 	return React.createElement(
 		'div',
@@ -17071,9 +17372,9 @@ function LoaderBlock(_ref20) {
 		)
 	);
 }
-function OverlayLoader(_ref21) {
-	var className = _ref21.className,
-	    rest_props = _objectWithoutProperties(_ref21, ['className']);
+function OverlayLoader(_ref26) {
+	var className = _ref26.className,
+	    rest_props = _objectWithoutProperties(_ref26, ['className']);
 
 	return React.createElement(LoaderBlock, _extends({ className: new HtmlClassesArray(className) + ' -loader_overlay' }, rest_props));
 }
@@ -20525,13 +20826,13 @@ SubscriptionsListModal = extending(AbstractListModal, function () {
   * @return {Promise}
   */
 	SubscriptionsListModal.prototype.uploadEntities = function () {
-		var _this25 = this;
+		var _this32 = this;
 
 		return this.entity.fetchSubscriptions({ length: 20 }).then(function (organizations) {
 			if (organizations.length) {
-				_this25.content.append(_this25.buildEntities(organizations));
+				_this32.content.append(_this32.buildEntities(organizations));
 			} else {
-				_this25.is_upload_disabled = true;
+				_this32.is_upload_disabled = true;
 			}
 		});
 	};
@@ -26277,30 +26578,6 @@ NotAvailableOrderPage = extending(AbstractFeedbackPage, function () {
 	return NotAvailableOrderPage;
 }());
 /**
- *
- * @class TicketPage
- * @extends Page
- */
-TicketPage = extending(Page, function () {
-	/**
-  *
-  * @constructor
-  * @constructs TicketPage
-  */
-	function TicketPage() {
-		Page.call(this);
-	}
-
-	TicketPage.prototype.render = function () {
-
-		this.$view.find('.Print').on('click', function () {
-			window.print();
-		});
-	};
-
-	return TicketPage;
-}());
-/**
  * @requires ../Class.Page.js
  */
 /**
@@ -27303,6 +27580,30 @@ SearchByTagPage = extending(SearchPage, function () {
 	return SearchByTagPage;
 }());
 /**
+ *
+ * @class TicketPage
+ * @extends Page
+ */
+TicketPage = extending(Page, function () {
+	/**
+  *
+  * @constructor
+  * @constructs TicketPage
+  */
+	function TicketPage() {
+		Page.call(this);
+	}
+
+	TicketPage.prototype.render = function () {
+
+		this.$view.find('.Print').on('click', function () {
+			window.print();
+		});
+	};
+
+	return TicketPage;
+}());
+/**
  * @requires ../Class.Page.js
  */
 /**
@@ -27618,21 +27919,21 @@ var OldUserPage = function (_Page) {
   * @constructs OldUserPage
   */
 	function OldUserPage(user_id) {
-		var _this26$disable_uploa, _this26$block_scroll;
+		var _this33$disable_uploa, _this33$block_scroll;
 
 		_classCallCheck(this, OldUserPage);
 
-		var _this26 = _possibleConstructorReturn(this, (OldUserPage.__proto__ || Object.getPrototypeOf(OldUserPage)).call(this));
+		var _this33 = _possibleConstructorReturn(this, (OldUserPage.__proto__ || Object.getPrototypeOf(OldUserPage)).call(this));
 
-		_this26.user_id = user_id;
-		_this26.user = new OneUser(user_id);
-		_this26.events_metadata = { last_date: '' };
+		_this33.user_id = user_id;
+		_this33.user = new OneUser(user_id);
+		_this33.events_metadata = { last_date: '' };
 
-		_this26.disable_uploads = (_this26$disable_uploa = {}, _defineProperty(_this26$disable_uploa, __C.ENTITIES.EVENT, false), _defineProperty(_this26$disable_uploa, __C.ENTITIES.ACTIVITY, false), _this26$disable_uploa);
-		_this26.block_scroll = (_this26$block_scroll = {}, _defineProperty(_this26$block_scroll, __C.ENTITIES.EVENT, false), _defineProperty(_this26$block_scroll, __C.ENTITIES.ACTIVITY, false), _this26$block_scroll);
+		_this33.disable_uploads = (_this33$disable_uploa = {}, _defineProperty(_this33$disable_uploa, __C.ENTITIES.EVENT, false), _defineProperty(_this33$disable_uploa, __C.ENTITIES.ACTIVITY, false), _this33$disable_uploa);
+		_this33.block_scroll = (_this33$block_scroll = {}, _defineProperty(_this33$block_scroll, __C.ENTITIES.EVENT, false), _defineProperty(_this33$block_scroll, __C.ENTITIES.ACTIVITY, false), _this33$block_scroll);
 
-		_this26.active_tab = __C.ENTITIES.EVENT;
-		_this26.favored_fetch_data = {
+		_this33.active_tab = __C.ENTITIES.EVENT;
+		_this33.favored_fetch_data = {
 			fields: new Fields('image_horizontal_medium_url', 'favored_users_count', 'is_favorite', 'is_registered', 'registration_locally', 'registration_available', 'ticketing_locally', 'ticketing_available', 'dates', {
 				favored: {
 					length: 5
@@ -27641,11 +27942,11 @@ var OldUserPage = function (_Page) {
 			order_by: 'nearest_event_date,-first_event_date',
 			length: 10
 		};
-		_this26.pageTitle = function () {
+		_this33.pageTitle = function () {
 
-			return _this26.user.full_name;
+			return _this33.user.full_name;
 		};
-		return _this26;
+		return _this33;
 	}
 
 	_createClass(OldUserPage, [{
@@ -27694,10 +27995,10 @@ var OldUserPage = function (_Page) {
 	}, {
 		key: 'buildActivities',
 		value: function buildActivities(activities) {
-			var _this27 = this;
+			var _this34 = this;
 
 			return __APP.BUILD.activity(activities.map(function (activity) {
-				activity.user = _this27.user;
+				activity.user = _this34.user;
 
 				return activity;
 			}));
@@ -27719,7 +28020,7 @@ var OldUserPage = function (_Page) {
    * @returns {Promise}
    */
 		value: function uploadEntities(type) {
-			var _this28 = this;
+			var _this35 = this;
 
 			var is_upload_disabled = this.disable_uploads[type],
 			    is_scroll_blocked = this.block_scroll[type];
@@ -27751,7 +28052,7 @@ var OldUserPage = function (_Page) {
 				$loader = __APP.BUILD.loaderBlock($wrapper);
 
 				return fetch_promise.then(function (entities) {
-					_this28.block_scroll[type] = false;
+					_this35.block_scroll[type] = false;
 					$loader.remove();
 
 					if (entities.length) {
@@ -27761,11 +28062,11 @@ var OldUserPage = function (_Page) {
 							case __C.ENTITIES.EVENT:
 								{
 
-									return _this28.page_component.favored_events.appendEvents(entities);
+									return _this35.page_component.favored_events.appendEvents(entities);
 								}
 							case __C.ENTITIES.ACTIVITY:
 								{
-									$entities = _this28.buildActivities(entities);
+									$entities = _this35.buildActivities(entities);
 									break;
 								}
 						}
@@ -27775,7 +28076,7 @@ var OldUserPage = function (_Page) {
 					} else {
 						if (!$wrapper.children().length) {
 							$wrapper.append(__APP.BUILD.cap('Активности нет'));
-							_this28.disable_uploads[type] = true;
+							_this35.disable_uploads[type] = true;
 						}
 					}
 				});
@@ -27801,7 +28102,7 @@ var OldUserPage = function (_Page) {
 	}, {
 		key: 'init',
 		value: function init() {
-			var _this29 = this;
+			var _this36 = this;
 
 			var $wrapper = this.$wrapper;
 
@@ -27810,15 +28111,15 @@ var OldUserPage = function (_Page) {
 			OldUserPage.bindEvents($wrapper);
 
 			$wrapper.find('.Tabs').on('tabs:change', function () {
-				_this29.active_tab = $wrapper.find('.TabsBody').filter('.' + __C.CLASSES.ACTIVE).data('tab_body_type');
-				_this29.bindScrollEvents();
+				_this36.active_tab = $wrapper.find('.TabsBody').filter('.' + __C.CLASSES.ACTIVE).data('tab_body_type');
+				_this36.bindScrollEvents();
 			});
 		}
 	}, {
 		key: 'bindScrollEvents',
 		value: function bindScrollEvents() {
 			var _event_names,
-			    _this30 = this;
+			    _this37 = this;
 
 			var $window = $(window),
 			    event_names = (_event_names = {}, _defineProperty(_event_names, __C.ENTITIES.EVENT, 'scroll.uploadEvents'), _defineProperty(_event_names, __C.ENTITIES.ACTIVITY, 'scroll.uploadActivities'), _event_names);
@@ -27835,9 +28136,9 @@ var OldUserPage = function (_Page) {
 						}
 
 						return new Promise(function (resolve) {
-							$window.on(event_names[_this30.active_tab], function () {
+							$window.on(event_names[_this37.active_tab], function () {
 								if (isScrollRemain(1000)) {
-									resolve(_this30.uploadEntities(_this30.active_tab));
+									resolve(_this37.uploadEntities(_this37.active_tab));
 								}
 							});
 						});
@@ -27852,7 +28153,7 @@ var OldUserPage = function (_Page) {
 	}, {
 		key: 'render',
 		value: function render() {
-			var _this31 = this;
+			var _this38 = this;
 
 			var user = this.user,
 			    is_another_user = this instanceof OldMyProfilePage === false,
@@ -27891,7 +28192,7 @@ var OldUserPage = function (_Page) {
 
 			if (promises.length) {
 				Promise.race(promises).then(function () {
-					_this31.bindScrollEvents();
+					_this38.bindScrollEvents();
 				});
 			} else {
 				this.bindScrollEvents();
@@ -27923,13 +28224,13 @@ var OldUserPage = function (_Page) {
    * @return {XML}
    * @constructor
    */
-		value: function SidebarWrapper(_ref22) {
-			var user = _ref22.user,
-			    title = _ref22.title,
-			    noEntitiesText = _ref22.noEntitiesText,
-			    entities = _ref22.entities,
-			    entitiesType = _ref22.entitiesType,
-			    showAllModalClass = _ref22.showAllModalClass;
+		value: function SidebarWrapper(_ref27) {
+			var user = _ref27.user,
+			    title = _ref27.title,
+			    noEntitiesText = _ref27.noEntitiesText,
+			    entities = _ref27.entities,
+			    entitiesType = _ref27.entitiesType,
+			    showAllModalClass = _ref27.showAllModalClass;
 
 			if (entities.length) {
 				var avatar_classes = [__C.CLASSES.SIZES.X30],
@@ -27998,10 +28299,10 @@ var OldUserPage = function (_Page) {
 
 	}, {
 		key: 'PageComponent',
-		value: function PageComponent(_ref23) {
-			var _this32 = this;
+		value: function PageComponent(_ref28) {
+			var _this39 = this;
 
-			var user = _ref23.user;
+			var user = _ref28.user;
 			var SidebarWrapper = OldUserPage.SidebarWrapper,
 			    is_another_user = __APP.USER.id !== parseInt(user.id),
 			    logoutClickHandler = function logoutClickHandler(e) {
@@ -28073,7 +28374,7 @@ var OldUserPage = function (_Page) {
 							'div',
 							{ className: 'tab_body TabsBody -active', 'data-tab_body_type': 'event' },
 							React.createElement(EventBlocks, { ref: function ref(component) {
-									return _this32.favored_events = component;
+									return _this39.favored_events = component;
 								}, events: user.favored })
 						)
 					)
@@ -28095,12 +28396,12 @@ var OldMyProfilePage = function (_OldUserPage) {
 	function OldMyProfilePage() {
 		_classCallCheck(this, OldMyProfilePage);
 
-		var _this33 = _possibleConstructorReturn(this, (OldMyProfilePage.__proto__ || Object.getPrototypeOf(OldMyProfilePage)).call(this, __APP.USER.id));
+		var _this40 = _possibleConstructorReturn(this, (OldMyProfilePage.__proto__ || Object.getPrototypeOf(OldMyProfilePage)).call(this, __APP.USER.id));
 
-		_this33.favored_fetch_data.fields.push('is_favorite');
-		_this33.user = __APP.USER;
-		_this33.page_title = 'Мой профиль';
-		return _this33;
+		_this40.favored_fetch_data.fields.push('is_favorite');
+		_this40.user = __APP.USER;
+		_this40.page_title = 'Мой профиль';
+		return _this40;
 	}
 
 	_createClass(OldMyProfilePage, [{
@@ -32056,14 +32357,14 @@ var EvendateApplication = function (_AbstractEvendateAppl) {
 	function EvendateApplication() {
 		_classCallCheck(this, EvendateApplication);
 
-		var _this34 = _possibleConstructorReturn(this, (EvendateApplication.__proto__ || Object.getPrototypeOf(EvendateApplication)).call(this));
+		var _this41 = _possibleConstructorReturn(this, (EvendateApplication.__proto__ || Object.getPrototypeOf(EvendateApplication)).call(this));
 
-		_this34.EXPORT = new ServerExports();
-		_this34.TOP_BAR = new AbstractTopBar();
-		_this34.SIDEBAR = new AbstractSidebar();
-		_this34.IS_WIDGET = false;
-		_this34.POST_MESSAGE = new AppPostMessageConnection(window);
-		_this34.ROUTING = {
+		_this41.EXPORT = new ServerExports();
+		_this41.TOP_BAR = new AbstractTopBar();
+		_this41.SIDEBAR = new AbstractSidebar();
+		_this41.IS_WIDGET = false;
+		_this41.POST_MESSAGE = new AppPostMessageConnection(window);
+		_this41.ROUTING = {
 			'admin': {
 				'organization': {
 					'^([0-9]+)': {
@@ -32199,7 +32500,7 @@ var EvendateApplication = function (_AbstractEvendateAppl) {
 			},
 			'': ActualEventsPage
 		};
-		return _this34;
+		return _this41;
 	}
 	/**
   *
@@ -32212,13 +32513,13 @@ var EvendateApplication = function (_AbstractEvendateAppl) {
 	_createClass(EvendateApplication, [{
 		key: 'repaint',
 		value: function repaint(colors) {
-			var _this35 = this;
+			var _this42 = this;
 
 			AbstractEvendateApplication.prototype.repaint.call(this, colors);
 
 			if (colors.header) {
 				(function (hex) {
-					var main_header_style = _this35.TOP_BAR.$main_header.get(0).style,
+					var main_header_style = _this42.TOP_BAR.$main_header.get(0).style,
 					    contrast_hex = getContrastColor(hex);
 
 					main_header_style.setProperty('--color_primary', hex);

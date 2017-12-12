@@ -46,7 +46,7 @@ function Avatar({
 	
 	return (
 		<div className={`avatar ${classes}`} title={name} {...rest_props}>
-			<img src={avatar_url} onError={e => e.target.src = '/app/img/brand_logo.png'} />
+			<img src={avatar_url || '/app/img/brand_logo.png'} onError={e => e.target.src = '/app/img/brand_logo.png'} />
 			{badgeClass && <span className="avatar_badge"><i className={`fa fa-${badgeClass}`} /></span>}
 		</div>
 	);

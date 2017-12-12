@@ -1,29 +1,57 @@
-class Button extends React.Component {
+function Button({
+	children,
+	className,
+	...rest_props
+}) {
 	
-	render() {
-		const {
-			children,
-			className,
-			...rest_props
-		} = this.props;
-		
-		let methods = Object.getMethods(rest_props),
-			props = Object.getProps(rest_props);
-		
-		for (let method_name in methods) {
-			methods[method_name] = methods[method_name].bind(this);
-		}
-		
-		return (
-			<button
-				ref={node => this.button = node}
-				className={`${__C.CLASSES.COMPONENT.BUTTON} ${new HtmlClassesArray(className)}`}
-				type="button"
-				{...methods}
-				{...props}
-			>
-				<span className="Text">{children}</span>
-			</button>
-		);
-	}
+	return (
+		<button
+			className={`${__C.CLASSES.COMPONENT.BUTTON} ${new HtmlClassesArray(className)}`}
+			type="button"
+			{...rest_props}
+		>
+			<span className="Text">{children}</span>
+		</button>
+	);
+}
+
+function RippleButton({
+	children,
+	className,
+	onClick,
+	...rest_props
+}) {
+	
+	return (
+		<button
+			className={`${__C.CLASSES.COMPONENT.BUTTON} ${new HtmlClassesArray(className)}`}
+			type="button"
+			onClick={e => {
+				rippleEffectHandler(e);
+				if (isFunction(onClick)) {
+					onClick(e);
+				}
+			}}
+			{...rest_props}
+		>
+			<span className="Text">{children}</span>
+		</button>
+	);
+}
+
+function Action({
+	children,
+	className,
+	...rest_props
+}) {
+	
+	return (
+		<button
+			className={`${__C.CLASSES.COMPONENT.ACTION} ${new HtmlClassesArray(className)}`}
+			type="button"
+			{...rest_props}
+		>
+			<span className="Text">{children}</span>
+		</button>
+	);
 }

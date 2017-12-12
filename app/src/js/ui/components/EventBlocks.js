@@ -12,7 +12,6 @@ function EventBlock({
 			__C.CLASSES.UNIVERSAL_STATES.ROUNDED,
 			__C.CLASSES.UNIVERSAL_STATES.BORDERED,
 			__C.CLASSES.SIZES.SMALL,
-			__C.CLASSES.HOOKS.ADD_AVATAR.COLLECTION
 		),
 		event_date = date.format(__C.DATE_FORMAT),
 		time = event.dates.reduce((times, date) => {
@@ -23,10 +22,6 @@ function EventBlock({
 			
 			return times;
 		}, []).join('; ');
-	
-	if (event.is_favorite) {
-		avatars_collection_classes.push(__C.CLASSES.HOOKS.ADD_AVATAR.STATES.SHIFTED);
-	}
 	
 	return (
 		<React.Fragment>
@@ -41,41 +36,39 @@ function EventBlock({
 					</header>
 					<div className="event_block_service">
 						<p><small>{time}</small></p>
-						<div className="event_block_action_buttons AddAvatarWrapper">
-							<div className="event_block_add_avatar_wrapper">
-								<AvatarCollection
-									users={event.favored}
-									maxCount={3}
-									className={avatars_collection_classes}
-									counterClasses={[
-										__C.CLASSES.SIZES.X30,
-										__C.CLASSES.UNIVERSAL_STATES.BORDERED,
-										__C.CLASSES.COLORS.MARGINAL,
-										__C.CLASSES.HOOKS.ADD_AVATAR.STATES.CASTABLE
-									]}
-									overallAvatarsCount={event.favored_users_count}
-									onClick={() => {
-										if (!this.favored_modal) {
-											this.favored_modal = new FavoredModal(event.id);
-										}
-										this.favored_modal.show();
-									}}
-								/>
-							</div>
-							<div className="event_block_action_buttons_wrapper">
-								<ReactAddToFavoriteButton
-									event={event}
-									isAddAvatar
-									isChecked
-									className={new HtmlClassesArray([
-										'event_block_main_action_button',
-										__C.CLASSES.SIZES.LOW,
-										__C.CLASSES.UNIVERSAL_STATES.ROUNDED,
-										__C.CLASSES.HOOKS.ADD_TO_FAVORITES,
-										__C.CLASSES.HOOKS.RIPPLE
-									])}
-								/>
-							</div>
+						<div className="event_block_action_buttons">
+							<AvatarCollectionContextProvider isSubscribed={event.is_favorite}>
+								<div className="event_block_add_avatar_wrapper">
+									<AvatarCollection
+										users={event.favored}
+										maxCount={3}
+										className={avatars_collection_classes}
+										counterClasses={[
+											__C.CLASSES.SIZES.X30,
+											__C.CLASSES.UNIVERSAL_STATES.BORDERED,
+											__C.CLASSES.COLORS.MARGINAL,
+											__C.CLASSES.HOOKS.ADD_AVATAR.STATES.CASTABLE
+										]}
+										overallAvatarsCount={event.favored_users_count}
+										onClick={() => {
+											if (!this.favored_modal) {
+												this.favored_modal = new FavoredModal(event.id);
+											}
+											this.favored_modal.show();
+										}}
+									/>
+								</div>
+								<div className="event_block_action_buttons_wrapper">
+									<ReactAddToFavoriteButton
+										event={event}
+										className={new HtmlClassesArray([
+											'event_block_main_action_button',
+											__C.CLASSES.SIZES.LOW,
+											__C.CLASSES.UNIVERSAL_STATES.ROUNDED,
+										])}
+									/>
+								</div>
+							</AvatarCollectionContextProvider>
 						</div>
 					</div>
 				</div>
