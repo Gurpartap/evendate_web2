@@ -10,6 +10,8 @@ class OrganizationsCollection extends AbstractCollection
 	private $db;
 	private $user;
 
+	static $cache = array();
+
 
 	public static function filter(ExtendedPDO $db,
 																AbstractUser $user = null,
@@ -316,11 +318,18 @@ class OrganizationsCollection extends AbstractCollection
 														 array $fields = null,
 														 array $filters = null): Organization
 	{
-		$organization = self::filter($db,
-			$user,
-			array_merge($filters ?? array(), array('id' => $id)),
-			$fields
-		);
+
+		//check in cache?
+		$fields_str = json_encode($fields) . json_encode($filters);
+		$fields_str .= $user->getId();
+		if (isset(self::$cache[$fields_str])) {
+			$organization = self::$cache[$fields_str];
+		} else {
+			$organization = self::filter($db, $user, array_merge($filters ?? array(), array('id' => $id)), $fields);
+			self::$cache[$fields_str] = $organization;
+		}
+//		$organization = self::filter($db, $user, array_merge($filters ?? array(), array('id' => $id)), $fields);
+
 		return $organization;
 	}
 

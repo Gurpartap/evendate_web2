@@ -110,7 +110,7 @@ CREATE OR REPLACE VIEW view_event_finance AS
     COUNT(view_tickets_orders.id)                                                 AS orders_count
   FROM events
     INNER JOIN view_tickets_orders ON view_tickets_orders.event_id = events.id
-  WHERE view_tickets_orders.status_id IN (2, 4, 8, 10, 13)
+  WHERE view_tickets_orders.status_id IN (2, 3, 7, 4, 8, 10, 13)
   GROUP BY events.id;
 
 
@@ -229,17 +229,21 @@ CREATE TABLE organizations_withdraws (
 
 CREATE OR REPLACE VIEW view_organization_finance AS
   SELECT
-    organizations.id                                        AS organization_id,
-    COALESCE(SUM(view_event_finance.total_income), 0)       AS total_income,
+    organizations.id                                                                    AS organization_id,
+    COALESCE(SUM(view_event_finance.total_income), 0)                                   AS total_income,
     COALESCE((SUM(view_event_finance.withdraw_available)
               - (SELECT COALESCE(SUM(sum), 0)
                  FROM organizations_withdraws
                  WHERE organizations_withdraws.organization_id = organizations.id
                        AND organizations_withdraws.organization_withdraw_status_id IN (1, 2, 3, 4))
-             ), 0)                                          AS withdraw_available,
-    SUM(view_event_finance.processing_commission_value)     AS processing_commission_value,
-    ROUND(AVG(view_event_finance.processing_commission), 2) AS processing_commission,
-    SUM(view_event_finance.evendate_commission_value)       AS evendate_commission_value
+             ), 0)                                                                      AS withdraw_available,
+    SUM(view_event_finance.processing_commission_value)                                 AS processing_commission_value,
+    ROUND(AVG(view_event_finance.processing_commission), 2)                             AS processing_commission,
+    SUM(view_event_finance.evendate_commission_value)                                   AS evendate_commission_value,
+    (SELECT COALESCE(SUM(sum), 0)
+     FROM organizations_withdraws
+     WHERE organizations_withdraws.organization_id = organizations.id
+           AND organizations_withdraws.organization_withdraw_status_id IN (1, 2, 3, 4)) AS withdrawn
   FROM organizations
     LEFT JOIN events ON organizations.id = events.organization_id
     LEFT JOIN view_event_finance ON view_event_finance.event_id = events.id
@@ -271,4 +275,4 @@ ALTER TABLE organizations_withdraws
 
 ALTER TABLE organizations_withdraws
   ADD CONSTRAINT organizations_withdraws_organization_withdraw_status_id_fkey
-FOREIGN KEY (organization_withdraw_status_id) REFERENCES organizations_withdraws_statuses(id);
+FOREIGN KEY (organization_withdraw_status_id) REFERENCES organizations_withdraws_statuses (id);

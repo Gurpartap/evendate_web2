@@ -107,12 +107,12 @@ class NetworkingManager
 
 
 	// it's little bit smelly, but needs to check access to current event (cant be in controller)
-	public function getProfilesList(array $fields, array $pagination, array $order_by)
+	public function getProfilesList(array $filters, array $fields, array $pagination, array $order_by)
 	{
 		return NetworkingProfilesCollection::filter(
 			$this->db,
 			$this->user,
-			array('event' => $this->event, 'for_user' => $this->user),
+			array_merge($filters, array('event' => $this->event, 'for_user' => $this->user)),
 			$fields,
 			$pagination,
 			$order_by
