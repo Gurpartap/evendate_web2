@@ -126,23 +126,28 @@ CREATE OR REPLACE VIEW view_networking_profiles AS
     DATE_PART('epoch', networking_goals.updated_at) :: INT             AS updated_at,
     CASE WHEN networking_goals.info IS NOT NULL OR networking_goals.created_at IS NOT NULL
       THEN TRUE
-    ELSE FALSE END                                                     AS signed_up
+    ELSE FALSE END                                                     AS signed_up,
+    networking_requests.uuid IS NOT NULL                               AS request_exists,
+    networking_requests.accept_status                                  AS request_status
   FROM users
-    FULL OUTER JOIN users u2 ON 1=1
+    FULL OUTER JOIN users u2 ON 1 = 1
     LEFT JOIN view_networking_access ON view_networking_access.user_id = users.id
     LEFT JOIN users_profiles ON users.id = (
       CASE WHEN ((SELECT COUNT(*)
-                 FROM networking_requests
-                 WHERE networking_requests.recipient_user_id = users.id
-                       AND networking_requests.sender_user_id = u2.id
-                       AND networking_requests.status = TRUE
-                       AND networking_requests.accept_status = TRUE) > 0) OR (users.id = u2.id)
+                  FROM networking_requests
+                  WHERE networking_requests.recipient_user_id = users.id
+                        AND networking_requests.sender_user_id = u2.id
+                        AND networking_requests.status = TRUE
+                        AND networking_requests.accept_status = TRUE) > 0) OR (users.id = u2.id)
         THEN users_profiles.user_id
       ELSE -1 END)
 
     LEFT JOIN networking_goals
       ON users.id = networking_goals.user_id AND networking_goals.event_id = view_networking_access.event_id
-ORDER BY users.id;
+    LEFT JOIN networking_requests ON u2.id = networking_requests.recipient_user_id
+                                     AND networking_requests.event_id = view_networking_access.event_id
+                                     AND networking_requests.status = TRUE
+  ORDER BY users.id;
 
 DROP VIEW IF EXISTS view_networking_requests;
 
@@ -160,3 +165,55 @@ CREATE OR REPLACE VIEW view_networking_requests AS
     DATE_PART('epoch', networking_requests.updated_at) :: INT  AS updated_at
   FROM
     networking_requests;
+
+--UPDATES
+CREATE OR REPLACE VIEW view_networking_profiles AS
+  SELECT
+    users.id,
+    u2.id                                                              AS for_id,
+    COALESCE(users_profiles.first_name, users.first_name)              AS first_name,
+    COALESCE(users_profiles.last_name, users.last_name)                AS last_name,
+    COALESCE(users_profiles.avatar_url, users.avatar_url)              AS avatar_url,
+    view_networking_access.event_id,
+    view_networking_access.user_id,
+    COALESCE(networking_goals.info, users_profiles.info)               AS info,
+    COALESCE(networking_goals.looking_for, users_profiles.looking_for) AS looking_for,
+    vk_url,
+    facebook_url,
+    twitter_url,
+    linkedin_url,
+    telegram_url,
+    instagram_url,
+    github_url,
+    users_profiles.email,
+    networking_goals.company_name,
+    DATE_PART('epoch', networking_goals.created_at) :: INT             AS created_at,
+    DATE_PART('epoch', networking_goals.updated_at) :: INT             AS updated_at,
+    CASE WHEN networking_goals.info IS NOT NULL OR networking_goals.created_at IS NOT NULL
+      THEN TRUE
+    ELSE FALSE END                                                     AS signed_up,
+    networking_requests.uuid IS NOT NULL                               AS request_exists,
+    networking_requests.accept_status                                  AS request_status,
+    networking_requests.uuid,
+    networking_requests.uuid                                           AS request_uuid
+
+  FROM users
+    FULL OUTER JOIN users u2 ON 1 = 1
+    LEFT JOIN view_networking_access ON view_networking_access.user_id = users.id
+    LEFT JOIN users_profiles ON users.id = (
+      CASE WHEN ((SELECT COUNT(*)
+                  FROM networking_requests
+                  WHERE networking_requests.recipient_user_id = users.id
+                        AND networking_requests.sender_user_id = u2.id
+                        AND networking_requests.status = TRUE
+                        AND networking_requests.accept_status = TRUE) > 0) OR (users.id = u2.id)
+        THEN users_profiles.user_id
+      ELSE -1 END)
+
+    LEFT JOIN networking_goals
+      ON users.id = networking_goals.user_id AND networking_goals.event_id = view_networking_access.event_id
+    LEFT JOIN networking_requests ON u2.id = networking_requests.recipient_user_id
+                                     AND networking_requests.event_id = view_networking_access.event_id
+                                     AND networking_requests.status = TRUE
+                                     AND networking_requests.sender_user_id = users.id
+  ORDER BY users.id;

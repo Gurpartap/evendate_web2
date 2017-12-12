@@ -11,7 +11,7 @@ class EventsCollection extends AbstractCollection
 
 	const VIEW_ALL_EVENTS = 'view_all_events';
 	const VIEW_ALL_EVENTS_WITH_ALIAS = 'view_all_events AS view_events';
-
+	static $cache = array();
 
 	private static function getIsEditor(Organization $organization = null, User $user)
 	{
@@ -655,7 +655,16 @@ class EventsCollection extends AbstractCollection
 														 int $id,
 														 array $fields = null): Event
 	{
-		$event = self::filter($db, $user, array('id' => $id), $fields);
+//		check in cache?
+		$fields_str = json_encode($fields). $user->getId();
+		if (isset(self::$cache[$fields_str])) {
+			$event = self::$cache[$fields_str];
+		} else {
+			$event = self::filter($db, $user, array('id' => $id), $fields);
+			self::$cache[$fields_str] = $event;
+		}
+//		$event = self::filter($db, $user, array('id' => $id), $fields);
+
 		return $event;
 	}
 

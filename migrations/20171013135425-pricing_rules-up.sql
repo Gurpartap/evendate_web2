@@ -90,7 +90,6 @@ CREATE OR REPLACE VIEW view_tickets_orders AS
     ticket_orders.promocode_id,
     ticket_orders.shop_sum_amount,
     CASE WHEN st.payed > 0
-              AND events.ticketing_locally = TRUE
               AND ticket_orders.shop_sum_amount > 0
               AND COALESCE(ticket_orders.final_sum, money.sum) > 0
       THEN ROUND((
@@ -98,7 +97,17 @@ CREATE OR REPLACE VIEW view_tickets_orders AS
                    COALESCE(ticket_orders.final_sum, money.sum) * 100
                  ), 2)
     ELSE NULL END                                                                                AS processing_commission,
-    FLOOR(ticket_orders.shop_sum_amount - (COALESCE(ticket_orders.final_sum, money.sum) * 0.01)) AS withdraw_available,
+    CASE WHEN (events.canceled AND (events.last_event_date + INTERVAL '120 days') > NOW())
+      THEN 0 - ((COALESCE(ticket_orders.final_sum, money.sum) - ticket_orders.shop_sum_amount) *  2)
+           - (COALESCE(ticket_orders.final_sum, money.sum) * 0.01) --events canceled
+    ELSE
+      FLOOR(ticket_orders.shop_sum_amount - (COALESCE(ticket_orders.final_sum, money.sum) * 0.01)
+            - (CASE WHEN ticket_orders.order_status_id IN (3, 7) OR events.canceled
+        THEN COALESCE(ticket_orders.final_sum, money.sum) - ticket_orders.shop_sum_amount
+               ELSE 0
+               END
+            ))
+    END                                                                                          AS withdraw_available,
     CASE WHEN st.payed > 0
               AND events.ticketing_locally = TRUE
       THEN (CASE
@@ -111,13 +120,17 @@ CREATE OR REPLACE VIEW view_tickets_orders AS
             ELSE 'OTH' END)
     ELSE NULL END                                                                                AS payment_type,
     CASE WHEN st.payed > 0
-              AND events.ticketing_locally = TRUE
               AND ticket_orders.shop_sum_amount > 0
               AND COALESCE(ticket_orders.final_sum, money.sum) > 0
-      THEN COALESCE(ticket_orders.final_sum, money.sum) - ticket_orders.shop_sum_amount
+      THEN (COALESCE(ticket_orders.final_sum, money.sum) - ticket_orders.shop_sum_amount
+            + (CASE WHEN ticket_orders.order_status_id IN (3, 7) OR events.canceled
+        THEN (COALESCE(ticket_orders.final_sum, money.sum) - ticket_orders.shop_sum_amount)
+               ELSE 0
+               END
+            )
+      )
     ELSE NULL END                                                                                AS processing_commission_value,
     CASE WHEN st.payed > 0
-              AND events.ticketing_locally = TRUE
               AND ticket_orders.shop_sum_amount > 0
               AND COALESCE(ticket_orders.final_sum, money.sum) > 0
       THEN FLOOR(COALESCE(ticket_orders.final_sum, money.sum) * 0.01)
@@ -127,7 +140,13 @@ CREATE OR REPLACE VIEW view_tickets_orders AS
      WHERE tickets.ticket_order_id = ticket_orders.id)                                           AS tickets_count,
     tickets_orders_statuses.type                                                                    ticket_order_status_type,
     ticket_orders.ticket_pricing_rule_id,
-    ticket_orders.ticket_pricing_rule_discount
+    ticket_orders.ticket_pricing_rule_discount,
+    (CASE WHEN ticket_orders.order_status_id IN (3, 7) OR events.canceled
+      THEN (COALESCE(ticket_orders.final_sum, money.sum) - ticket_orders.shop_sum_amount)
+     ELSE 0
+     END
+    )                                                                                            AS additional_commision,
+    events.ticketing_locally
   FROM ticket_orders
     INNER JOIN events ON events.id = ticket_orders.event_id
     LEFT JOIN (SELECT
@@ -149,13 +168,15 @@ CREATE OR REPLACE VIEW view_tickets_orders AS
     INNER JOIN tickets_orders_statuses ON tickets_orders_statuses.id =
                                           (CASE
                                            WHEN events.registration_approvement_required IS TRUE
-                                                AND COALESCE(ticket_orders.final_sum, money.sum) :: REAL = 0 :: REAL
                                                 AND
-                                                (ticket_orders.order_status_id = 4 OR ticket_orders.order_status_id = 1)
+                                                COALESCE(ticket_orders.final_sum, money.sum) :: REAL = 0 :: REAL
+                                                AND
+                                                (ticket_orders.order_status_id = 4 OR
+                                                 ticket_orders.order_status_id = 1)
                                              THEN 9 :: INT -- should not pay for tickets
 
                                            WHEN COALESCE(ticket_orders.final_sum, money.sum) :: REAL > 0 :: REAL
-                                                AND st.payed > 0 AND (ticket_orders.order_status_id NOT IN (3,7))
+                                                AND st.payed > 0 AND (ticket_orders.order_status_id NOT IN (3, 7))
                                              THEN 2 :: INT -- payed for tickets
 
                                            WHEN COALESCE(ticket_orders.final_sum, money.sum) :: REAL > 0 :: REAL

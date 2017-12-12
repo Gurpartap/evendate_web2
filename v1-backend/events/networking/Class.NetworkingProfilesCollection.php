@@ -61,6 +61,24 @@ class NetworkingProfilesCollection extends AbstractCollection
 					}
 					break;
 				}
+				case 'request_pending': {
+					if (filter_var($value, FILTER_VALIDATE_BOOLEAN)) {
+						$q_get_profiles->where('request_exists = TRUE AND request_status IS NULL');
+					}
+					break;
+				}
+				case 'request_accepted': {
+					if (filter_var($value, FILTER_VALIDATE_BOOLEAN)) {
+						$q_get_profiles->where('request_exists = TRUE AND request_status = TRUE');
+					}
+					break;
+				}
+				case 'request_rejected': {
+					if (filter_var($value, FILTER_VALIDATE_BOOLEAN)) {
+						$q_get_profiles->where('request_exists = TRUE AND request_status = FALSE');
+					}
+					break;
+				}
 			}
 		}
 
