@@ -136,6 +136,9 @@ $__modules['users'] = array(
 				return $__user->getSettings();
 			}
 		},
+		'{me/profile}' => function () use ($__user, $__request) {
+
+		},
 		'{me/contacts}' => function () use ($__user, $__request) {
 
 		},
