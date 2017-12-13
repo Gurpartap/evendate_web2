@@ -90,7 +90,6 @@ class NetworkingProfile extends AbstractEntity
 	public function getParams(AbstractUser $user = null, array $fields = null): Result
 	{
 		$result_data = parent::getParams($user, $fields)->getData();
-
 		if (isset($fields[self::REQUEST_FIELD_NAME])) {
 			$event = EventsCollection::one(
 				App::DB(),
@@ -99,13 +98,16 @@ class NetworkingProfile extends AbstractEntity
 				array()
 			);
 			$_fields = Fields::parseFields($fields[self::REQUEST_FIELD_NAME]['fields'] ?? '');
-			$result_data[self::REQUEST_FIELD_NAME] = NetworkingRequestsCollection::filter(
-				App::DB(),
-				$user,
-				array('event' => $event, 'user' => $user, 'uuid' => $this->request_uuid),
-				$_fields
-			)->getParams($user, $fields)->getData();
-
+			if ($this->request_uuid == null) {
+				$result_data[self::REQUEST_FIELD_NAME] = null;
+			} else {
+				$result_data[self::REQUEST_FIELD_NAME] = NetworkingRequestsCollection::filter(
+					App::DB(),
+					$user,
+					array('event' => $event, 'user' => $user, 'uuid' => $this->request_uuid),
+					$_fields
+				)->getParams($user, $fields)->getData();
+			}
 		}
 		return new Result(true, '', $result_data);
 	}
