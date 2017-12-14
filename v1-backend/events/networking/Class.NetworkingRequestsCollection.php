@@ -41,7 +41,7 @@ class NetworkingRequestsCollection extends AbstractCollection
 				}
 				case 'user': {
 					if ($value instanceof User) {
-						$q_get_requests->where('recipient_user_id = :recipient_user_id');
+						$q_get_requests->where('(recipient_user_id = :recipient_user_id OR sender_user_id = :recipient_user_id)');
 						$statements[':recipient_user_id'] = $value->getId();
 					}
 					break;
@@ -55,7 +55,6 @@ class NetworkingRequestsCollection extends AbstractCollection
 				}
 			}
 		}
-
 
 		$q_get_requests->distinct()
 			->from($from_table)

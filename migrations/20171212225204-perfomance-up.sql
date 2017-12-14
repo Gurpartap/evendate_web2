@@ -235,6 +235,7 @@ CREATE OR REPLACE VIEW view_all_events AS
                GROUP BY event_id) AS vtt(amount_sum, event_id) ON vtt.event_id = events.id
   WHERE view_organizations.status = TRUE;
 
+DROP MATERIALIZED VIEW view_events CASCADE;
 
 CREATE MATERIALIZED VIEW view_events
   AS
@@ -518,14 +519,14 @@ EXECUTE PROCEDURE refresh_events_mat_view();
 CREATE OR REPLACE VIEW view_networking_profiles AS
   SELECT
     users.id,
-    u2.id                                                              AS for_id,
-    COALESCE(users_profiles.first_name, users.first_name)              AS first_name,
-    COALESCE(users_profiles.last_name, users.last_name)                AS last_name,
-    COALESCE(users_profiles.avatar_url, users.avatar_url)              AS avatar_url,
+    u2.id                                                                      AS for_id,
+    COALESCE(users_profiles.first_name, users.first_name)                      AS first_name,
+    COALESCE(users_profiles.last_name, users.last_name)                        AS last_name,
+    COALESCE(users_profiles.avatar_url, users.avatar_url)                      AS avatar_url,
     view_networking_access.event_id,
     view_networking_access.user_id,
-    COALESCE(networking_goals.info, users_profiles.info)               AS info,
-    COALESCE(networking_goals.looking_for, users_profiles.looking_for) AS looking_for,
+    COALESCE(networking_goals.info, users_profiles.info)                       AS info,
+    COALESCE(networking_goals.looking_for, users_profiles.looking_for)         AS looking_for,
     vk_url,
     facebook_url,
     twitter_url,
@@ -535,16 +536,20 @@ CREATE OR REPLACE VIEW view_networking_profiles AS
     github_url,
     users_profiles.email,
     networking_goals.company_name,
-    DATE_PART('epoch', networking_goals.created_at) :: INT             AS created_at,
-    DATE_PART('epoch', networking_goals.updated_at) :: INT             AS updated_at,
+    DATE_PART('epoch', networking_goals.created_at) :: INT                     AS created_at,
+    DATE_PART('epoch', networking_goals.updated_at) :: INT                     AS updated_at,
     CASE WHEN networking_goals.info IS NOT NULL OR networking_goals.created_at IS NOT NULL
       THEN TRUE
-    ELSE FALSE END                                                     AS signed_up,
-    networking_requests.uuid IS NOT NULL                               AS request_exists,
-    networking_requests.accept_status                                  AS request_status,
+    ELSE FALSE END                                                             AS signed_up,
+    networking_requests.uuid IS NOT NULL                                       AS request_exists,
+    networking_requests.accept_status                                          AS request_status,
     networking_requests.uuid,
-    networking_requests.uuid                                           AS request_uuid
-
+    networking_requests.uuid                                                   AS request_uuid,
+    (SELECT uuid
+     FROM networking_requests
+     WHERE sender_user_id = u2.id
+           AND networking_requests.recipient_user_id = users.id
+           AND networking_requests.event_id = view_networking_access.event_id) AS outgoing_request_uuid
   FROM users
     FULL OUTER JOIN users u2 ON 1 = 1
     LEFT JOIN view_networking_access ON view_networking_access.user_id = users.id
@@ -566,23 +571,155 @@ CREATE OR REPLACE VIEW view_networking_profiles AS
                                      AND networking_requests.sender_user_id = users.id
   ORDER BY users.id;
 
-
 CREATE OR REPLACE VIEW view_networking_contacts
   AS
     SELECT
-      sender_user_id,
-      recipient_user_id,
-      message,
-      view_networking_profiles.*
-    FROM view_networking_requests
-  INNER JOIN view_networking_profiles ON view_networking_profiles.for_id =
-                                         view_networking_requests.recipient_user_id
-  WHERE
-    (view_networking_requests.recipient_user_id = 23 OR
-      view_networking_requests.sender_user_id = 23)
-      AND view_networking_requests.status = TRUE
-      AND view_networking_requests.accept_status = TRUE;
+      networking_requests.sender_user_id    AS for_id,
+      networking_requests.recipient_user_id AS user_id
+    FROM networking_requests
+    WHERE networking_requests.accept_status = TRUE
+          AND networking_requests.status = TRUE
+    UNION
+    SELECT
+      networking_requests.recipient_user_id AS for_id,
+      networking_requests.sender_user_id    AS user_id
+    FROM networking_requests
+    WHERE networking_requests.accept_status = TRUE
+          AND networking_requests.status = TRUE;
 
 
-SELECT * FROM recommendations_events
-ORDER BY recommendations_events.event_id DESC LIMIT 100;
+ALTER TABLE events
+  ADD COLUMN networking_enabled BOOLEAN DEFAULT FALSE;
+ALTER TABLE events
+  ADD COLUMN networking_start_date TIMESTAMP DEFAULT NULL;
+ALTER TABLE events
+  ADD COLUMN networking_end_date TIMESTAMP DEFAULT NULL;
+
+CREATE OR REPLACE VIEW view_all_events AS
+  SELECT DISTINCT
+    events.id :: INT,
+    events.title,
+    events.creator_id :: INT,
+    events.description,
+    events.detail_info_url,
+    events.begin_time,
+    events.end_time,
+    events.latitude :: REAL,
+    events.longitude :: REAL,
+    events.location,
+    events.min_price,
+    DATE_PART('epoch', events.public_at :: TIMESTAMP) :: INT                               AS public_at,
+    (events.status = FALSE AND events.public_at IS NOT
+                               NULL)                                                       AS is_delayed,
+    events.status,
+    events.canceled,
+    events.canceled                                                                        AS is_canceled,
+    vk_posts.group_id                                                                      AS vk_group_id,
+    vk_posts.image_path                                                                    AS vk_image_path,
+    vk_posts.message                                                                       AS vk_message,
+    events.registration_required,
+    DATE_PART('epoch', events.registration_till :: TIMESTAMP) :: INT                       AS registration_till,
+    events.is_free,
+    ((SELECT SUM(counter)
+      FROM (SELECT DISTINCT
+              events_dates.start_time,
+              events_dates.end_time,
+              1 AS counter
+            FROM events_dates
+            WHERE event_id = events.id AND status = TRUE) AS sb) = 1) :: BOOL
+                                                                                           AS is_same_time,
+    events.organization_id :: INT,
+    'https://evendate.io/event/' || events.id                                              AS link,
+    events.images_domain || 'event_images/large/' || events.image_vertical                 AS image_vertical_url,
+    events.images_domain || 'event_images/large/' || events.image_horizontal               AS image_horizontal_url,
+    events.images_domain || 'event_images/large/' || events.image_vertical                 AS image_vertical_large_url,
+    events.images_domain || 'event_images/large/' ||
+    events.image_horizontal                                                                AS image_horizontal_large_url,
+
+    events.images_domain || 'event_images/square/' || events.image_vertical                AS image_square_vertical_url,
+    events.images_domain || 'event_images/square/' ||
+    events.image_horizontal                                                                AS image_square_horizontal_url,
+
+    events.images_domain || 'event_images/medium/' ||
+    events.image_horizontal                                                                AS image_horizontal_medium_url,
+    events.images_domain || 'event_images/medium/' || events.image_vertical                AS image_vertical_medium_url,
+
+    events.images_domain || 'event_images/small/' || events.image_vertical                 AS image_vertical_small_url,
+    events.images_domain || 'event_images/small/' ||
+    events.image_horizontal                                                                AS image_horizontal_small_url,
+    events.images_domain || 'event_images/vk/' || vk_posts.image_path                      AS vk_image_url,
+    view_organizations.img_medium_url                                                      AS organization_logo_medium_url,
+    view_organizations.img_url                                                             AS organization_logo_large_url,
+    view_organizations.img_small_url                                                       AS organization_logo_small_url,
+    view_organizations.name                                                                AS organization_name,
+    organization_types.name                                                                AS organization_type_name,
+    view_organizations.short_name                                                          AS organization_short_name,
+    (SELECT DATE_PART('epoch',
+                      MIN(start_time_utc)) :: INT
+     FROM events_dates
+     WHERE event_id = events.id AND events_dates.start_time_utc >= NOW() :: DATE AND events_dates.status =
+                                                                                     TRUE) AS nearest_event_date,
+    DATE_PART('epoch', events.first_event_date) :: INT                                     AS first_event_date,
+    DATE_PART('epoch', events.last_event_date) :: INT                                      AS last_event_date,
+    DATE_PART('epoch', events.created_at) :: INT                                           AS created_at,
+    DATE_PART('epoch', events.updated_at) :: INT                                           AS updated_at,
+    (SELECT COUNT(id) :: INT AS favored_count
+     FROM favorite_events
+     WHERE status = TRUE AND event_id =
+                             events.id)                                                    AS favored_users_count,
+    events.fts,
+    events.registration_approvement_required,
+    events.registration_limit_count,
+    events.registration_locally,
+    events.registered_count,
+    (events.registration_locally = TRUE
+     AND events.status = TRUE
+     AND (events.registration_limit_count >
+          COALESCE((SELECT view_events_tickets_sold.count
+                    FROM view_events_tickets_sold
+                    WHERE
+                      view_events_tickets_sold.event_id = events.id), 0) :: INT OR
+          events.registration_limit_count IS NULL)
+     AND (DATE_PART('epoch', NOW()) :: INT < (DATE_PART('epoch', events.registration_till) :: INT) OR
+          events.registration_till IS NULL))                                               AS registration_available,
+    view_organizations.is_private                                                          AS organization_is_private,
+    events.first_event_date                                                                AS first_event_date_dt,
+    events.last_event_date                                                                 AS last_event_date_dt,
+    DATE_PART('epoch', events.registration_since :: TIMESTAMP) :: INT                      AS registration_since,
+    events.ticketing_locally,
+    events.is_online,
+    view_organizations.city_id,
+    (events.ticketing_locally = TRUE
+     AND events.status = TRUE
+     AND COALESCE(vtt.amount_sum :: INT, 0) > 0
+     AND COALESCE((SELECT COUNT(id)
+                   FROM view_sold_tickets
+                   WHERE view_sold_tickets.event_id = events.id), 0)
+         < COALESCE(vtt.amount_sum, 0)) :: BOOLEAN                                         AS ticketing_available,
+    events.booking_time,
+    events.accept_bitcoins,
+    events.apply_promocodes_and_pricing_rules,
+    events.networking_enabled AND
+    NOW() BETWEEN COALESCE(events.networking_start_date, events.first_event_date) AND COALESCE(
+        events.networking_end_date, events.last_event_date)                                AS networking_enabled,
+    DATE_PART('epoch', events.networking_start_date :: TIMESTAMP) :: INT                   AS networking_start_date,
+    DATE_PART('epoch', events.networking_end_date :: TIMESTAMP) :: INT                     AS networking_end_date
+  FROM events
+    INNER JOIN view_organizations ON view_organizations.id = events.organization_id
+    INNER JOIN organization_types ON organization_types.id = view_organizations.type_id
+    LEFT JOIN vk_posts ON events.id = vk_posts.event_id
+    LEFT JOIN (SELECT
+                 SUM(ticket_types.amount),
+                 event_id
+               FROM ticket_types
+               WHERE ((NOW() < sell_end_date AND NOW() > sell_start_date)
+                      OR (sell_end_date IS NULL AND sell_start_date < NOW())
+                      OR (sell_start_date IS NULL AND sell_end_date > NOW())
+                      OR (sell_start_date IS NULL AND sell_end_date IS NULL)
+                     )
+                     AND ticket_types.status = TRUE
+               GROUP BY event_id) AS vtt(amount_sum, event_id) ON vtt.event_id = events.id
+  WHERE view_organizations.status = TRUE;
+
+
+REFRESH MATERIALIZED VIEW CONCURRENTLY view_events;
