@@ -30,7 +30,7 @@ SubscribersModal = extending(AbstractUsersModal, (function() {
 	/**
 	 *
 	 * @param {AbstractUsersModal.uploadUsersCallback} [callback]
-	 * @return {jqPromise}
+	 * @return {Promise}
 	 */
 	SubscribersModal.prototype.uploadUsers = function(callback) {
 		var self = this;

@@ -24,8 +24,8 @@ BitcoinModal = extending(AbstractModal, (function() {
 		
 		this.event = new OneEvent();
 		this.order = new OneOrder();
-		this.fetching_promise = $.Deferred().promise();
-		this.render_deferred = $.Deferred();
+		this.fetching_promise = Promise;
+		this.render_deferred = Promise;
 		
 		if (event instanceof OneEvent) {
 			this.event.setData(event);
@@ -64,7 +64,7 @@ BitcoinModal = extending(AbstractModal, (function() {
 	BitcoinModal.prototype.render = function(props) {
 		var self = this;
 		
-		this.fetching_promise.done(function(bitcoin_data) {
+		this.fetching_promise.then(function(bitcoin_data) {
 			self.amount = bitcoin_data.amount;
 			self.address = bitcoin_data.address;
 			
@@ -102,7 +102,7 @@ BitcoinModal = extending(AbstractModal, (function() {
 		
 		this.render();
 		
-		this.render_deferred.done(function() {
+		this.render_deferred.then(function() {
 			self.__show();
 		});
 		

@@ -27,7 +27,7 @@ EditorsModal = extending(AbstractUsersModal, (function() {
 	/**
 	 *
 	 * @param {AbstractUsersModal.uploadUsersCallback} [callback]
-	 * @return {jqPromise}
+	 * @return {Promise}
 	 */
 	EditorsModal.prototype.uploadUsers = function(callback) {
 		var self = this;

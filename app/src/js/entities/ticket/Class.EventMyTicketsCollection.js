@@ -25,7 +25,7 @@ EventMyTicketsCollection = extending(AbstractEventTicketsCollection, (function()
 	 * @param {AJAXData} [ajax_data]
 	 * @param {AJAXCallback} [success]
 	 *
-	 * @return {jqPromise}
+	 * @return {Promise}
 	 */
 	EventMyTicketsCollection.fetchTickets = function(event_id, ajax_data, success) {
 		

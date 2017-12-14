@@ -79,11 +79,19 @@ class NetworkingProfilesCollection extends AbstractCollection
 					}
 					break;
 				}
+				case 'contacts': {
+					if (filter_var($value, FILTER_VALIDATE_BOOLEAN)) {
+						$q_get_profiles->where('for_id = :contacts_for_id');
+						$q_get_profiles->where('user_id IN (SELECT user_id FROM view_networking_contacts WHERE for_id = :contacts_for_id)');
+						$statements[':contacts_for_id'] = $user->getId();
+					}
+					break;
+				}
 			}
 		}
 
 
-		$q_get_profiles->distinct()
+		$q_get_profiles->distinct(true)
 			->from($from_table)
 			->cols($cols)
 			->orderBy($order_by);

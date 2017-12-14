@@ -299,9 +299,7 @@ require_once( 'parts/sidebar.php' );
   <div id="main_section">
 		<div class="modal_wrapper ModalsWrapper"><div class="modal_destroyer ModalDestroyer"></div></div>
 		<div class="app_inspectors_wrapper AppInspectorsWrapper"></div>
-    <div class="app_view -hidden PageView">
-      <div class="page_wrapper Content -fadeable"></div>
-    </div>
+		<div id="app_page_root" class="app_view PageView"></div>
 		<div id="main_section_cap" class="MainSectionCap"></div>
   </div>
 </div>

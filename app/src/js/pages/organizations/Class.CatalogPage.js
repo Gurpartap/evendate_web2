@@ -59,13 +59,13 @@ CatalogPage = extending(Page, (function() {
 			}
 		}).then(function() {
 			
-			return self.categories.fetchCategoriesWithOrganizations(self.categories_ajax_data, self.organizations_ajax_data, 0).done(function() {
+			return self.categories.fetchCategoriesWithOrganizations(self.categories_ajax_data, self.organizations_ajax_data, 0).then(function() {
 				self.all_organizations.setData(self.categories.reduce(function(collection, cat) {
 					
 					return collection.concat.apply(collection, cat.organizations);
 				}, [])).sortBy('subscribed_count');
 			});
-		}).promise();
+		});
 	};
 	/**
 	 *

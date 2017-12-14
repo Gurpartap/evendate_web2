@@ -39,7 +39,7 @@ UsersCollection = extending(EntitiesCollection, (function() {
 	 *
 	 * @param {UsersCollectionAJAXData} data
 	 * @param {AJAXCallback} [success]
-	 * @returns {jqPromise}
+	 * @returns {Promise}
 	 */
 	UsersCollection.fetchUsers = function(data, success) {
 		return __APP.SERVER.getData('/api/v1/users/', data, success);
@@ -49,7 +49,7 @@ UsersCollection = extending(EntitiesCollection, (function() {
 	 * @param {(string|number)} event_id
 	 * @param {UsersCollectionAJAXData} ajax_data
 	 * @param {AJAXCallback} [success]
-	 * @returns {jqPromise}
+	 * @returns {Promise}
 	 */
 	UsersCollection.fetchEventFavorites = function(event_id, ajax_data, success) {
 		return __APP.SERVER.getData('/api/v1/events/' + event_id, {fields: 'favored'.appendAjaxData(__APP.SERVER.validateData(ajax_data))}, function(data) {
@@ -66,7 +66,7 @@ UsersCollection = extending(EntitiesCollection, (function() {
 	 * @param {(string|number)} org_id
 	 * @param {UsersCollectionAJAXData} ajax_data
 	 * @param {AJAXCallback} [success]
-	 * @returns {jqPromise}
+	 * @returns {Promise}
 	 */
 	UsersCollection.fetchOrganizationSubscribers = function(org_id, ajax_data, success) {
 		return __APP.SERVER.getData('/api/v1/organizations/' + org_id, {fields: 'subscribed'.appendAjaxData(__APP.SERVER.validateData(ajax_data))}, function(data) {
@@ -83,7 +83,7 @@ UsersCollection = extending(EntitiesCollection, (function() {
 	 * @param {(string|number)} org_id
 	 * @param {UsersCollectionAJAXData} ajax_data
 	 * @param {AJAXCallback} [success]
-	 * @returns {jqPromise}
+	 * @returns {Promise}
 	 */
 	UsersCollection.fetchOrganizationStaff = function(org_id, ajax_data, success) {
 		return __APP.SERVER.getData('/api/v1/organizations/' + org_id + '/staff/', ajax_data, success);
@@ -103,7 +103,7 @@ UsersCollection = extending(EntitiesCollection, (function() {
 	 * @param {(number|string)} [length]
 	 * @param {AJAXCallback} [success]
 	 * @this Array<OneUser>
-	 * @returns {jqPromise}
+	 * @returns {Promise}
 	 */
 	UsersCollection.prototype.fetchUsers = function(data, length, success) {
 		var self = this,
@@ -124,7 +124,7 @@ UsersCollection = extending(EntitiesCollection, (function() {
 	 * @param {(number|string)} length
 	 * @param {UsersCollectionAJAXData} [data]
 	 * @param {AJAXCallback} [success]
-	 * @returns {jqPromise}
+	 * @returns {Promise}
 	 */
 	UsersCollection.prototype.fetchEventFavorites = function(event_id, length, data, success) {
 		var self = this,
@@ -145,7 +145,7 @@ UsersCollection = extending(EntitiesCollection, (function() {
 	 * @param {(number|string)} length
 	 * @param {UsersCollectionAJAXData} [data]
 	 * @param {AJAXCallback} [success]
-	 * @returns {jqPromise}
+	 * @returns {Promise}
 	 */
 	UsersCollection.prototype.fetchOrganizationSubscribers = function(org_id, length, data, success) {
 		var self = this,
@@ -166,7 +166,7 @@ UsersCollection = extending(EntitiesCollection, (function() {
 	 * @param {(number|string)} length
 	 * @param {UsersCollectionAJAXData} [data]
 	 * @param {AJAXCallback} [success]
-	 * @returns {jqPromise}
+	 * @returns {Promise}
 	 */
 	UsersCollection.prototype.fetchOrganizationStaff = function(org_id, length, data, success) {
 		var self = this,

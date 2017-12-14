@@ -109,14 +109,14 @@ OrganizationPage = extending(Page, (function() {
 	}
 	/**
 	 *
-	 * @return {jqPromise}
+	 * @return {Promise}
 	 */
 	OrganizationPage.prototype.fetchData = function() {
 		var self = this;
 		
-		return this.fetching_data_defer = this.organization.fetchOrganization(this.fields).done(function(data) {
+		return this.fetching_data_defer = this.organization.fetchOrganization(this.fields).then(function(data) {
 			self.is_admin = self.organization.role !== OneUser.ROLE.USER;
-		}).promise();
+		});
 	};
 	/**
 	 *

@@ -61,11 +61,11 @@ AddToFavoriteButton = extending(ActionButton, (function() {
 		var self = this;
 		
 		if (this.is_checked) {
-			this.event.unfavour().done(function() {
+			this.event.unfavour().then(function() {
 				self.afterUncheck();
 			});
 		} else {
-			this.event.favour().done(function() {
+			this.event.favour().then(function() {
 				self.afterCheck();
 			});
 		}

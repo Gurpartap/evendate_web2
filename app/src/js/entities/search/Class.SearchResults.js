@@ -43,7 +43,7 @@ SearchResults = extending(OneEntity, (function() {
 	 * @param {string} query_string
 	 * @param {AJAXData} [ajax_data]
 	 * @param {SearchResultsAJAXCallback} [success]
-	 * @returns {jqPromise}
+	 * @returns {Promise}
 	 */
 	SearchResults.fetchEventsAndOrganizations = function(query_string, ajax_data, success) {
 		return __APP.SERVER.getData('/api/v1/search/', $.extend({}, SearchResults.sanitizeQueryVar(query_string), ajax_data), success);
@@ -52,7 +52,7 @@ SearchResults = extending(OneEntity, (function() {
 	 *
 	 * @param {AJAXData} [events_ajax_data]
 	 * @param {function(organizations: Array<OneEvent>)} [success]
-	 * @returns {jqPromise}
+	 * @returns {Promise}
 	 */
 	SearchResults.prototype.fetchEvents = function(events_ajax_data, success) {
 		var self = this,
@@ -71,7 +71,7 @@ SearchResults = extending(OneEntity, (function() {
 	 *
 	 * @param {AJAXData} [organizations_ajax_data]
 	 * @param {function(organizations: Array<OneOrganization>)} [success]
-	 * @returns {jqPromise}
+	 * @returns {Promise}
 	 */
 	SearchResults.prototype.fetchOrganizations = function(organizations_ajax_data, success) {
 		var self = this,
@@ -91,7 +91,7 @@ SearchResults = extending(OneEntity, (function() {
 	 * @param {AJAXData} [events_ajax_data]
 	 * @param {AJAXData} [organizations_ajax_data]
 	 * @param {SearchResultsAJAXCallback} [success]
-	 * @returns {jqPromise}
+	 * @returns {Promise}
 	 */
 	SearchResults.prototype.fetchEventsAndOrganizations = function(events_ajax_data, organizations_ajax_data, success) {
 		var self = this,

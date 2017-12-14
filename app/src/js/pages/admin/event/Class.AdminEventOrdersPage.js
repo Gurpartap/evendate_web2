@@ -150,7 +150,7 @@ AdminEventOrdersPage = extending(AdminEventPage, (function() {
 			loader: (this.$loader = __APP.BUILD.overlayLoader())
 		}));
 		
-		this.orders.fetchAllOrders(this.orders_fields).done(function() {
+		this.orders.fetchAllOrders(this.orders_fields).then(function() {
 			if (!self.ordersTable) {
 				self.initOrdersTable();
 			}

@@ -255,7 +255,7 @@ OneOrder = extending(OneEntity, (function() {
 	 * @param {string} uuid
 	 * @param {(Fields|string)} [fields]
 	 *
-	 * @return {jqPromise}
+	 * @return {Promise}
 	 */
 	OneOrder.fetchOrder = function(uuid, fields) {
 		
@@ -272,7 +272,7 @@ OneOrder = extending(OneEntity, (function() {
 	 * @param {(OneOrder.ORDER_STATUSES|OneOrder.EXTENDED_ORDER_STATUSES)} new_status
 	 * @param {AJAXCallback} [success]
 	 *
-	 * @return {jqPromise}
+	 * @return {Promise}
 	 */
 	OneOrder.changeStatus = function(event_id, uuid, new_status, success) {
 		
@@ -308,7 +308,7 @@ OneOrder = extending(OneEntity, (function() {
 	 * @param {LegalEntitySendData} data
 	 * @param {AJAXCallback} [success]
 	 *
-	 * @return {jqPromise}
+	 * @return {Promise}
 	 */
 	OneOrder.makeLegalEntityPayment = function(event_id, uuid, data, success) {
 		
@@ -324,7 +324,7 @@ OneOrder = extending(OneEntity, (function() {
 	 * @param {LegalEntitySendData} data
 	 * @param {AJAXCallback} [success]
 	 *
-	 * @return {jqPromise}
+	 * @return {Promise}
 	 */
 	OneOrder.updateLegalEntityPayment = function(event_id, uuid, data, success) {
 		
@@ -339,7 +339,7 @@ OneOrder = extending(OneEntity, (function() {
 	 * @param {string} order_uuid
 	 * @param {AJAXCallback} [success]
 	 *
-	 * @return {jqPromise}
+	 * @return {Promise}
 	 */
 	OneOrder.fetchBitcoinData = function(event_id, order_uuid, success) {
 		
@@ -352,7 +352,7 @@ OneOrder = extending(OneEntity, (function() {
 	 *
 	 * @param {(Fields|string)} [fields]
 	 *
-	 * @return {jqPromise}
+	 * @return {Promise}
 	 */
 	OneOrder.prototype.fetch = function(fields) {
 		var self = this;
@@ -368,7 +368,7 @@ OneOrder = extending(OneEntity, (function() {
 	 * @param {(OneOrder.ORDER_STATUSES|OneOrder.EXTENDED_ORDER_STATUSES)} new_status
 	 * @param {AJAXCallback} [success]
 	 *
-	 * @return {jqPromise}
+	 * @return {Promise}
 	 */
 	OneOrder.prototype.changeStatus = function(new_status, success) {
 		var self = this;
@@ -387,7 +387,7 @@ OneOrder = extending(OneEntity, (function() {
 	 * @param {LegalEntitySendData} data
 	 * @param {AJAXCallback} [success]
 	 *
-	 * @return {jqPromise}
+	 * @return {Promise}
 	 */
 	OneOrder.prototype.makeLegalEntityPayment = function(data, success) {
 		var self = this;
@@ -405,7 +405,7 @@ OneOrder = extending(OneEntity, (function() {
 	 * @param {LegalEntitySendData} data
 	 * @param {AJAXCallback} [success]
 	 *
-	 * @return {jqPromise}
+	 * @return {Promise}
 	 */
 	OneOrder.prototype.updateLegalEntityPayment = function(data, success) {
 		var self = this;
@@ -427,7 +427,7 @@ OneOrder = extending(OneEntity, (function() {
 	 *
 	 * @param {BitcoinDataCB} [success]
 	 *
-	 * @return {jqPromise}
+	 * @return {Promise}
 	 */
 	OneOrder.prototype.fetchBitcoinData = function(success) {
 		var self = this;

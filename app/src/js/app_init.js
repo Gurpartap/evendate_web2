@@ -1,3 +1,7 @@
+/**
+ * @requires EvendateApplication.js
+ */
+__APP = new EvendateApplication();
 window.paceOptions = {
 	ajax: false, // disabled
 	document: false, // disabled
@@ -114,8 +118,8 @@ if (checkRedirect()) {
 			
 			+function configMoment() {
 				if (window.moment !== undefined) {
-					moment.locale(navigator.language);
-					//moment.tz.setDefault('Europe/Moscow');
+					moment.locale(language);
+					
 					moment.updateLocale('ru', {
 						monthsShort: __LOCALES.ru_RU.DATE.MONTH_SHORT_NAMES,
 						calendar: {
@@ -170,6 +174,12 @@ if (checkRedirect()) {
 				];
 			}();
 			
+			+function configI18N() {
+				if (!isVoid(window.i18n)) {
+					i18n.translator.add(__i18n[language_without_region_code] || __i18n.ru);
+				}
+			}();
+			
 			if (isNotDesktop()) {
 				$('.DownloadAppBand').addClass('-open_band');
 				$('.CloseDownloadAppBand').one('click', function() {
@@ -207,7 +217,7 @@ if (checkRedirect()) {
 				}
 				__APP.TOP_BAR.init();
 				__APP.SIDEBAR.init();
-				__APP.init();
+				__APP.renderReact();
 				bindPageLinks();
 			});
 			

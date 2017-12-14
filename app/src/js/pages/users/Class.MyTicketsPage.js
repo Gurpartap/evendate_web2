@@ -37,7 +37,7 @@ MyTicketsPage = extending(Page, (function() {
 		if (!this.disable_uploads && !this.block_scroll) {
 			$loader = __APP.BUILD.loaderBlock(this.$wrapper);
 			this.block_scroll = true;
-			this.tickets.fetchTickets(this.fetch_tickets_fields, this.fetch_tickets_quantity).done(function(tickets) {
+			this.tickets.fetchTickets(this.fetch_tickets_fields, this.fetch_tickets_quantity).then(function(tickets) {
 				var green_tickets = ExtendedTicketsCollection.getGreenTickets(tickets);
 				
 				self.block_scroll = false;

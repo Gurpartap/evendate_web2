@@ -123,6 +123,14 @@ DataSet = extending(Array, (function() {
 			emptyAdditionalLookup: function() {},
 			/**
 			 *
+			 * @return {DataSet}
+			 */
+			copy: function() {
+				
+				return (new this.constructor()).setData(this);
+			},
+			/**
+			 *
 			 * @return {Array}
 			 */
 			getArrayCopy: function() {

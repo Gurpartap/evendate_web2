@@ -49,7 +49,7 @@ OrganizationsCollection = extending(EntitiesCollection, (function() {
 	 * @param {(number|string)} [length]
 	 * @param {string} [order_by]
 	 * @param {AJAXCallback} [success]
-	 * @returns {jqPromise}
+	 * @returns {Promise}
 	 */
 	OrganizationsCollection.prototype.fetchSubscribedOrganizations = function(fields, length, order_by, success) {
 		var self = this,
@@ -73,7 +73,7 @@ OrganizationsCollection = extending(EntitiesCollection, (function() {
 	 * @param {(number|string)} [length]
 	 * @param {string} [order_by]
 	 * @param {AJAXCallback} [success]
-	 * @returns {jqPromise}
+	 * @returns {Promise}
 	 */
 	OrganizationsCollection.prototype.fetchMyOrganizations = function(roles, fields, length, order_by, success) {
 		var self = this,

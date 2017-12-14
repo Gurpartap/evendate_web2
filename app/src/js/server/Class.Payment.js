@@ -25,7 +25,7 @@ Payment = extending(AsynchronousConnection, (function() {
 	 * @param {number} organization_id
 	 * @param {function({uuid: string, sum: number})} success
 	 *
-	 * @return {jqPromise}
+	 * @return {Promise}
 	 */
 	Payment.payForTariff = function(organization_id, success) {
 		return AsynchronousConnection.dealAjax(

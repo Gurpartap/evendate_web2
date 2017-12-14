@@ -32,11 +32,11 @@ AbstractEventTicketsCollection = extending(TicketsCollection, (function() {
 	 * @param {AJAXData} [ajax_data]
 	 * @param {AJAXCallback} [success]
 	 *
-	 * @return {jqPromise}
+	 * @return {Promise}
 	 */
 	AbstractEventTicketsCollection.fetchTickets = function(event_id, ajax_data, success) {
 		
-		return $.Deferred().promise();
+		return Promise.resolve();
 	};
 	/**
 	 *
@@ -45,7 +45,7 @@ AbstractEventTicketsCollection = extending(TicketsCollection, (function() {
 	 * @param {(string|Array)} [order_by]
 	 * @param {AJAXCallback} [success]
 	 *
-	 * @return {jqPromise}
+	 * @return {Promise}
 	 */
 	AbstractEventTicketsCollection.prototype.fetchTickets = function(fields, length, order_by, success) {
 		var self = this;
@@ -69,7 +69,7 @@ AbstractEventTicketsCollection = extending(TicketsCollection, (function() {
 	 * @param {(string|Array)} [order_by]
 	 * @param {AJAXCallback} [success]
 	 *
-	 * @return {jqPromise}
+	 * @return {Promise}
 	 */
 	AbstractEventTicketsCollection.prototype.fetchAllTickets = function(fields, filters, order_by, success) {
 		var self = this;

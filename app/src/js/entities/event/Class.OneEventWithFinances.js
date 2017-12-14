@@ -58,7 +58,7 @@ OneEventWithFinances = extending(OneEvent, (function() {
 	 * @param {Fields} [fields]
 	 * @param {AJAXCallback} [success]
 	 *
-	 * @returns {jqPromise}
+	 * @returns {Promise}
 	 */
 	OneEventWithFinances.fetchEvent = function(event_id, fields, success) {
 		var finance_fields = new Fields();
@@ -76,7 +76,7 @@ OneEventWithFinances = extending(OneEvent, (function() {
 			return __APP.SERVER.multipleAjax(
 				__APP.SERVER.getData('/api/v1/events/{event_id}'.format({event_id: event_id}), {fields: fields}),
 				__APP.SERVER.getData(EventStatisticsCollection.ENDPOINT.FINANCE.format({event_id: event_id}), {fields: finance_fields})
-			).done(function(event_data, finances_data) {
+			).then(function([event_data, finances_data]) {
 				if (isFunction(success)) {
 					success(Object.assign({}, (event_data instanceof Array ? event_data[0] : event_data), finances_data));
 				}

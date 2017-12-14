@@ -31,7 +31,7 @@ DatesCollection = extending(EntitiesCollection, (function() {
 	 *
 	 * @param {DatesCollectionAJAXData} ajax_data
 	 * @param {AJAXCallback} [success]
-	 * @returns {jqPromise}
+	 * @returns {Promise}
 	 */
 	DatesCollection.fetchDates = function(ajax_data, success) {
 		

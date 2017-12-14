@@ -211,7 +211,7 @@ OrderPage = extending(Page, (function() {
 	 *
 	 * @param {boolean} [send_request=true]
 	 *
-	 * @returns {jqPromise}
+	 * @returns {Promise}
 	 */
 	OrderPage.prototype.commitOrder = function(send_request) {
 		var self = this,
@@ -225,26 +225,32 @@ OrderPage = extending(Page, (function() {
 				note: 'Вам необходимо войти через социальную сеть чтобы сделать заказ'
 			})).show();
 			
-			return $.Deferred().reject(new Error('Вы не авторизованы')).promise();
+			return Promise.reject(new Error('Вы не авторизованы'));
 		} else {
 			if (isFormValid($form)) {
+				var promise;
+				
 				send_data = this.gatherSendData();
 				
 				if (!send_request) {
 					
-					return $.Deferred().resolve(send_data).promise();
+					return Promise.resolve(send_data);
 				}
 				
 				this.$main_action_buttton.attr('disabled', true);
 				
-				return this.event.makeOrder(send_data).always(function(data) {
+				promise = this.event.makeOrder(send_data).then(data => {
 					self.$main_action_buttton.removeAttr('disabled');
 					
 					return data;
-				}).promise();
+				}, () => {
+					self.$main_action_buttton.removeAttr('disabled');
+				});
+				
+				return promise;
 			} else {
 				
-				return $.Deferred().reject(new Error('Форма заполнена неверно')).promise();
+				return Promise.reject(new Error('Форма заполнена неверно'));
 			}
 		}
 	};
@@ -318,7 +324,7 @@ OrderPage = extending(Page, (function() {
 				is_timeout_enabled = true;
 				timeout = window.setTimeout(function() {
 					is_timeout_enabled = false;
-					self.event.preOrder(self.gatherSendData()).done(function(data) {
+					self.event.preOrder(self.gatherSendData()).then(function(data) {
 						self.total_sum = data.price.final_sum;
 						
 						if (data.pricing_rule || data.promocode) {
@@ -435,7 +441,7 @@ OrderPage = extending(Page, (function() {
 			countTotalSum();
 			
 			this.render_vars.legal_entity_payment_button.on('click.LegalEntityPayment', function() {
-				self.commitOrder().done(function(data) {
+				self.commitOrder().then(function(data) {
 					var parsed_uri = parseUri(location);
 					
 					__APP.changeState(parsed_uri.path + '/' + data.order.uuid + '/from_legal_entity');
@@ -454,7 +460,7 @@ OrderPage = extending(Page, (function() {
 			
 			if (is_type_selected) {
 				if (__APP.IS_WIDGET) {
-					self.commitOrder(false).done(function(send_data) {
+					self.commitOrder(false).then(function(send_data) {
 						$payload = self.$wrapper.find('.OrderFormPayload');
 						$payload.val(JSON.stringify(mergeObjects({
 							redirect_to_payment: true,
@@ -464,7 +470,7 @@ OrderPage = extending(Page, (function() {
 						self.$wrapper.find('.OrderForm').submit();
 					});
 				} else {
-					self.commitOrder().done(function(data) {
+					self.commitOrder().then(function(data) {
 						
 						Payment.doPayment('order-' + data.order.uuid, data.order.final_sum, callback_url);
 					})
@@ -478,7 +484,7 @@ OrderPage = extending(Page, (function() {
 		});
 		
 		this.render_vars.register_button.on('click.Register', function() {
-			self.commitOrder().done(function(data) {
+			self.commitOrder().then(function(data) {
 				var callback_url,
 					parsed_callback;
 				
@@ -510,7 +516,7 @@ OrderPage = extending(Page, (function() {
 					modal;
 				
 				if (!$this.data('modal')) {
-					self.commitOrder().done(function(data) {
+					self.commitOrder().then(function(data) {
 						modal = new BitcoinModal(self.event, data.order.uuid);
 						$this.data('modal', modal);
 						

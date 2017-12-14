@@ -39,7 +39,7 @@ OneCategory = extending(OneEntity, (function() {
 	 * @param {(string|number)} category_id
 	 * @param {AJAXData} data
 	 * @param {AJAXCallback} [success]
-	 * @return {jqPromise}
+	 * @return {Promise}
 	 */
 	OneCategory.fetchCategory = function(category_id, data, success) {
 		return __APP.SERVER.getData('/api/v1/organizations/types', $.extend({}, data, {id: category_id}), success);
@@ -48,7 +48,7 @@ OneCategory = extending(OneEntity, (function() {
 	 *
 	 * @param {(Array|string)} fields
 	 * @param {AJAXCallback} [success]
-	 * @return {jqPromise}
+	 * @return {Promise}
 	 */
 	OneCategory.prototype.fetchCategory = function(fields, success) {
 		var self = this;

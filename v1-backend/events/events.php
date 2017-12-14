@@ -116,6 +116,11 @@ $__modules['events'] = array(
 			$net_man = new NetworkingManager($event, $__user, $__db);
 			return $net_man->getProfilesList($__request, $__fields, $__pagination, $__order_by ?? array());
 		},
+		'{/(id:[0-9]+)/networking/contacts}' => function ($event_id) use ($__db, $__request, $__offset, $__pagination, $__length, $__user, $__fields, $__order_by) {
+			$event = EventsCollection::one($__db, $__user, $event_id, array());
+			$net_man = new NetworkingManager($event, $__user, $__db);
+			return $net_man->getContactsList($__fields, $__pagination, $__order_by ?? array());
+		},
 		'{/(id:[0-9]+)/networking/requests/(uuid:\w+-\w+-\w+-\w+-\w+)}' => function ($event_id, $uuid) use ($__db, $__request, $__offset, $__pagination, $__length, $__user, $__fields, $__order_by) {
 			$event = EventsCollection::one($__db, $__user, $event_id, array());
 			$net_man = new NetworkingManager($event, $__user, $__db);

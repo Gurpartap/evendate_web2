@@ -9,7 +9,7 @@ FavoredModal = extending(AbstractUsersModal, (function() {
 	/**
 	 *
 	 * @param {(number|string)} event_id
-	 * @param {string} [title=Добавили в избранное]
+	 * @param {string} [title = Добавили в избранное]
 	 * @constructor
 	 * @constructs FavoredModal
 	 */
@@ -28,7 +28,7 @@ FavoredModal = extending(AbstractUsersModal, (function() {
 	/**
 	 *
 	 * @param {AbstractUsersModal.uploadUsersCallback} [callback]
-	 * @return {jqPromise}
+	 * @return {Promise}
 	 */
 	FavoredModal.prototype.uploadUsers = function(callback) {
 		var self = this;

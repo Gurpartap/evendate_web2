@@ -40,7 +40,7 @@ OrganizationStatisticsCollection = extending(StatisticsCollection, (function() {
 	 * @param {Fields} fields
 	 * @param {AJAXCallback} [success]
 	 *
-	 * @returns jqPromise
+	 * @returns Promise
 	 */
 	OrganizationStatisticsCollection.fetchStatistics = function(org_id, fields, success) {
 		

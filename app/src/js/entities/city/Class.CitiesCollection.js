@@ -22,7 +22,7 @@ CitiesCollection = extending(EntitiesCollection, (function() {
 	 *
 	 * @param {AJAXData} data
 	 * @param {AJAXCallback} success
-	 * @return {jqPromise}
+	 * @return {Promise}
 	 */
 	CitiesCollection.fetchCities = function(data, success) {
 		return __APP.SERVER.getData('/api/v1/organizations/cities', data, success);
@@ -54,7 +54,7 @@ CitiesCollection = extending(EntitiesCollection, (function() {
 	 * @param {?number} [length]
 	 * @param {?string} [order_by]
 	 * @param {?function} [success]
-	 * @return {jqPromise}
+	 * @return {Promise}
 	 */
 	CitiesCollection.prototype.fetchCities = function(fields, length, order_by, success) {
 		var self = this;

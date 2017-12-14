@@ -24,7 +24,7 @@ DayEventsCollection = extending(EventsCollection, (function() {
 	 * @param {string} date
 	 * @param {EventsCollectionAJAXData} data
 	 * @param {AJAXCallback} [success]
-	 * @returns {jqPromise}
+	 * @returns {Promise}
 	 */
 	DayEventsCollection.fetchEvents = function(date, data, success) {
 		data.date = date;

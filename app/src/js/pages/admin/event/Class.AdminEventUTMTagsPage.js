@@ -15,14 +15,14 @@ AdminEventUTMTagsPage = extending(AdminEventPage, (function() {
 	 * @constructs AdminEventUTMTagsPage
 	 *
 	 * @property {EventUTMStatsCollection} utm_stats
-	 * @property {jqPromise} utm_stats_promise
+	 * @property {Promise} utm_stats_promise
 	 * @property {DataTable.Api} utmTable
 	 */
 	function AdminEventUTMTagsPage(event_id) {
 		AdminEventPage.call(this, event_id);
 		
 		this.utm_stats = new EventUTMStatsCollection(event_id);
-		this.utm_stats_promise = $.Deferred();
+		this.utm_stats_promise = Promise;
 		this.utmTable = null;
 		
 		Object.defineProperty(this, 'page_title_obj', {
@@ -91,7 +91,7 @@ AdminEventUTMTagsPage = extending(AdminEventPage, (function() {
 		this.$wrapper.html(tmpl('event-admin-utm-page'));
 		
 		this.initUTMTable();
-		this.utm_stats_promise.done(function() {
+		this.utm_stats_promise.then(function() {
 			self.utmTable.rows.add(self.utm_stats).order([5, 'desc']).draw();
 		});
 	};

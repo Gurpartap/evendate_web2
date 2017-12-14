@@ -8,6 +8,7 @@ class NetworkingRequest extends AbstractEntity
 
 	protected $sender_user_id;
 	protected $event_id;
+	protected $uuid;
 	private $nm;
 	protected $db;
 
@@ -95,6 +96,7 @@ class NetworkingRequest extends AbstractEntity
 			$q_upd->set('accept_status', filter_var($data['accept_status'], FILTER_VALIDATE_BOOLEAN) ? 'true' : 'false')
 				->set('accepted_at', 'NOW()');
 		}
+		$q_upd->where('uuid = ? ', $this->uuid);
 		$this->db->prepareExecute($q_upd);
 		return new Result(true, '');
 	}

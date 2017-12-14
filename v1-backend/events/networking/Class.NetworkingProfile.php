@@ -10,8 +10,10 @@ class NetworkingProfile extends AbstractEntity
 
 	protected $event_id;
 	protected $request_uuid;
+	protected $outgoing_request_uuid;
 
 	const REQUEST_FIELD_NAME = 'request';
+	const OUTGOING_REQUEST_FIELD_NAME = 'outgoing_request';
 
 	protected static $DEFAULT_COLS = array(
 		'first_name',
@@ -31,6 +33,7 @@ class NetworkingProfile extends AbstractEntity
 		'email',
 		'signed_up',
 		'request_uuid',
+		'outgoing_request_uuid',
 		'company_name'
 	);
 
@@ -55,6 +58,8 @@ class NetworkingProfile extends AbstractEntity
 			'user_id' => $this->nm->getUser()->getId(),
 			'vk_url' => $data['vk_url'] ?? null,
 			'facebook_url' => $data['facebook_url'] ?? null,
+			'first_name' => $data['first_name'] ?? null,
+			'last_name' => $data['last_name'] ?? null,
 			'twitter_url' => $data['twitter_url'] ?? null,
 			'linkedin_url' => $data['linkedin_url'] ?? null,
 			'telegram_url' => $data['telegram_url'] ?? null,
@@ -90,7 +95,6 @@ class NetworkingProfile extends AbstractEntity
 	public function getParams(AbstractUser $user = null, array $fields = null): Result
 	{
 		$result_data = parent::getParams($user, $fields)->getData();
-
 		if (isset($fields[self::REQUEST_FIELD_NAME])) {
 			$event = EventsCollection::one(
 				App::DB(),
@@ -99,13 +103,36 @@ class NetworkingProfile extends AbstractEntity
 				array()
 			);
 			$_fields = Fields::parseFields($fields[self::REQUEST_FIELD_NAME]['fields'] ?? '');
-			$result_data[self::REQUEST_FIELD_NAME] = NetworkingRequestsCollection::filter(
+			if ($this->request_uuid == null) {
+				$result_data[self::REQUEST_FIELD_NAME] = null;
+			} else {
+				$result_data[self::REQUEST_FIELD_NAME] = NetworkingRequestsCollection::filter(
+					App::DB(),
+					$user,
+					array('event' => $event, 'user' => $user, 'uuid' => $this->request_uuid),
+					$_fields
+				)->getParams($user, $fields)->getData();
+			}
+		}
+
+		if (isset($fields[self::OUTGOING_REQUEST_FIELD_NAME])) {
+			$event = EventsCollection::one(
 				App::DB(),
 				$user,
-				array('event' => $event, 'user' => $user, 'uuid' => $this->request_uuid),
-				$_fields
-			)->getParams($user, $fields)->getData();
-
+				$this->event_id,
+				array()
+			);
+			$_fields = Fields::parseFields($fields[self::OUTGOING_REQUEST_FIELD_NAME]['fields'] ?? '');
+			if ($this->outgoing_request_uuid == null) {
+				$result_data[self::OUTGOING_REQUEST_FIELD_NAME] = null;
+			} else {
+				$result_data[self::OUTGOING_REQUEST_FIELD_NAME] = NetworkingRequestsCollection::filter(
+					App::DB(),
+					$user,
+					array('event' => $event, 'user' => $user, 'uuid' => $this->outgoing_request_uuid),
+					$_fields
+				)->getParams($user, $fields)->getData();
+			}
 		}
 		return new Result(true, '', $result_data);
 	}

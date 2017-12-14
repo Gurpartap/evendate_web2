@@ -19,7 +19,7 @@ HelpAppInspector = extending(AbstractAppInspector, (function() {
 	}
 	/**
 	 *
-	 * @returns {jqPromise}
+	 * @returns {Promise}
 	 */
 	HelpAppInspector.prototype.fetchData = function() {
 		

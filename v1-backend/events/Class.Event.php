@@ -158,6 +158,9 @@ class Event extends AbstractEntity
 		'accept_bitcoins',
 		'apply_promocodes_and_pricing_rules',
 		'booking_time',
+		'networking_enabled',
+		'networking_start_date',
+		'networking_end_date',
 //		'registered_count',
 
 		self::IS_FAVORITE_FIELD_NAME => '(SELECT id IS NOT NULL
@@ -376,7 +379,7 @@ class Event extends AbstractEntity
 			return ($datea < $dateb) ? -1 : 1;
 		}
 
-			usort($dates, "sortFunc");
+		usort($dates, "sortFunc");
 		return $dates;
 	}
 
@@ -1800,93 +1803,95 @@ class Event extends AbstractEntity
 			}
 
 			switch ($final_field['type']) {
-				case 'email': {
-					if ($final_field['required'] == true) {
-						if (filter_var($final_field['value'], FILTER_VALIDATE_EMAIL) == FALSE) {
-							$final_field['error'] = 'Укажите, пожалуйста, валидный E-mail.';
-							$errors[] = $final_field;
+				case 'email':
+					{
+						if ($final_field['required'] == true) {
+							if (filter_var($final_field['value'], FILTER_VALIDATE_EMAIL) == FALSE) {
+								$final_field['error'] = 'Укажите, пожалуйста, валидный E-mail.';
+								$errors[] = $final_field;
+							}
 						}
+						break;
 					}
-					break;
-				}
 
 				case 'select_multi':
-				case 'select': {
-					if ($final_field['required'] == true) {
-						if ($final_field['type'] == 'select') {
-							if (is_array($final_field['value'])) {
-								if (count($final_field['value']) != 1) {
+				case 'select':
+					{
+						if ($final_field['required'] == true) {
+							if ($final_field['type'] == 'select') {
+								if (is_array($final_field['value'])) {
+									if (count($final_field['value']) != 1) {
+										$final_field['error'] = 'Укажите, пожалуйста, валидные значения.';
+										$errors[] = $final_field;
+										$final_field['value'] = null;
+										break;
+									}
+								} elseif (isset($final_field['_values']) && is_array($final_field['_values'])) {
+									if (count($final_field['_values']) != 1) {
+										$final_field['error'] = 'Укажите, пожалуйста, валидные значения.';
+										$errors[] = $final_field;
+										$final_field['_values'] = null;
+										break;
+									}
+								} elseif ($final_field['value'] == null) {
 									$final_field['error'] = 'Укажите, пожалуйста, валидные значения.';
 									$errors[] = $final_field;
 									$final_field['value'] = null;
 									break;
 								}
-							} elseif (isset($final_field['_values']) && is_array($final_field['_values'])) {
-								if (count($final_field['_values']) != 1) {
-									$final_field['error'] = 'Укажите, пожалуйста, валидные значения.';
+							}
+						} elseif ($final_field['value'] == null && $final_field['values'] == null) {
+							break;
+						}
+
+						$possible_by_uuid = array();
+
+						foreach ($final_field['values'] as $possible) {
+							$possible_by_uuid[$possible['uuid']] = $possible;
+						}
+
+						$final_field['ins_values'] = array();
+						if (is_array($final_field['value'])) {
+							$final_field['value'] = array_unique($final_field['value'], SORT_STRING);
+							foreach ($final_field['value'] as $selected) {
+								if (!isset($possible_by_uuid[$selected])) {
+									$final_field['error'] = 'Выбранное значение отсутствует в списке возможных.';
 									$errors[] = $final_field;
-									$final_field['_values'] = null;
-									break;
+								} else {
+									$final_field['ins_values'][] = array(
+										'uuid' => $selected,
+										'value' => $possible_by_uuid[$selected]['value']
+									);
 								}
-							} elseif ($final_field['value'] == null) {
-								$final_field['error'] = 'Укажите, пожалуйста, валидные значения.';
+							}
+						} elseif (isset($final_field['_values']) && is_array($final_field['_values'])) { // specially for android
+							foreach ($final_field['_values'] as $selected) {
+								$_uuid = $selected['uuid'];
+								if (!isset($possible_by_uuid[$_uuid])) {
+									$final_field['error'] = 'Выбранное значение отсутствует в списке возможных.';
+									$errors[] = $final_field;
+								} else {
+									$final_field['ins_values'][] = array(
+										'uuid' => $_uuid,
+										'value' => $possible_by_uuid[$_uuid]['value']
+									);
+								}
+							}
+						} else {
+							$value_uuid = $final_field['value'];
+							if (!isset($possible_by_uuid[$value_uuid])) {
+								$final_field['error'] = 'Выбранное значение отсутствует в списке возможных.';
 								$errors[] = $final_field;
-								$final_field['value'] = null;
-								break;
+							} else {
+								$final_field['ins_values'][] = array(
+									'uuid' => $value_uuid,
+									'value' => $possible_by_uuid[$value_uuid]['value']
+								);
 							}
 						}
-					} elseif ($final_field['value'] == null && $final_field['values'] == null) {
+						$final_field['value'] = null;
 						break;
 					}
-
-					$possible_by_uuid = array();
-
-					foreach ($final_field['values'] as $possible) {
-						$possible_by_uuid[$possible['uuid']] = $possible;
-					}
-
-					$final_field['ins_values'] = array();
-					if (is_array($final_field['value'])) {
-						$final_field['value'] = array_unique($final_field['value'], SORT_STRING);
-						foreach ($final_field['value'] as $selected) {
-							if (!isset($possible_by_uuid[$selected])) {
-								$final_field['error'] = 'Выбранное значение отсутствует в списке возможных.';
-								$errors[] = $final_field;
-							} else {
-								$final_field['ins_values'][] = array(
-									'uuid' => $selected,
-									'value' => $possible_by_uuid[$selected]['value']
-								);
-							}
-						}
-					} elseif (isset($final_field['_values']) && is_array($final_field['_values'])) { // specially for android
-						foreach ($final_field['_values'] as $selected) {
-							$_uuid = $selected['uuid'];
-							if (!isset($possible_by_uuid[$_uuid])) {
-								$final_field['error'] = 'Выбранное значение отсутствует в списке возможных.';
-								$errors[] = $final_field;
-							} else {
-								$final_field['ins_values'][] = array(
-									'uuid' => $_uuid,
-									'value' => $possible_by_uuid[$_uuid]['value']
-								);
-							}
-						}
-					} else {
-						$value_uuid = $final_field['value'];
-						if (!isset($possible_by_uuid[$value_uuid])) {
-							$final_field['error'] = 'Выбранное значение отсутствует в списке возможных.';
-							$errors[] = $final_field;
-						} else {
-							$final_field['ins_values'][] = array(
-								'uuid' => $value_uuid,
-								'value' => $possible_by_uuid[$value_uuid]['value']
-							);
-						}
-					}
-					$final_field['value'] = null;
-					break;
-				}
 			}
 			$merged_fields[$key] = $final_field;
 			$return_fields[] = $final_field;
@@ -1981,20 +1986,20 @@ class Event extends AbstractEntity
 	{
 		$q_get_rules = App::queryFactory()->newSelect();
 		$q_get_rules->cols(array(
-				'id',
-				'uuid',
-				'name',
-				'event_id',
-				'tickets_pricing_rule_type_id',
-				'type_code',
-				'effort',
-				'is_percentage',
-				'is_fixed',
-				'rule',
-				'enabled',
-				'created_at',
-				'updated_at'
-			))
+			'id',
+			'uuid',
+			'name',
+			'event_id',
+			'tickets_pricing_rule_type_id',
+			'type_code',
+			'effort',
+			'is_percentage',
+			'is_fixed',
+			'rule',
+			'enabled',
+			'created_at',
+			'updated_at'
+		))
 			->from('view_tickets_pricing_rules')
 			->where('event_id = ?', $this->getId());
 

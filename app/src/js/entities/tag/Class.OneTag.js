@@ -30,7 +30,7 @@ OneTag = extending(OneEntity, function() {
 	 *
 	 * @param {(string|number)} tag_id
 	 * @param {AJAXCallback} [success]
-	 * @returns {jqPromise}
+	 * @returns {Promise}
 	 */
 	OneTag.fetchTag = function(tag_id, success) {
 		return __APP.SERVER.getData('/api/v1/tags/' + tag_id, {}, success);
@@ -38,7 +38,7 @@ OneTag = extending(OneEntity, function() {
 	/**
 	 *
 	 * @param {AJAXCallback} [success]
-	 * @returns {jqPromise}
+	 * @returns {Promise}
 	 */
 	OneTag.prototype.fetchTag = function(success) {
 		var self = this;

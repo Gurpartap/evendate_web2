@@ -172,4 +172,16 @@ class NetworkingManager
 		return new Result(true, '', $request->getData());
 	}
 
+	public function getContactsList($fields, $pagination, $order_by)
+	{
+		return NetworkingProfilesCollection::filter(
+			$this->db,
+			$this->user,
+			array('event' => $this->event, 'contacts' => true),
+			$fields,
+			$pagination,
+			$order_by
+		);
+	}
+
 }
