@@ -121,7 +121,7 @@ class NetworkingProfile extends AbstractEntity
 				array()
 			);
 			$_fields = Fields::parseFields($fields[self::OUTGOING_REQUEST_FIELD_NAME]['fields'] ?? '');
-			if ($this->request_uuid == null) {
+			if ($this->outgoing_request_uuid == null) {
 				$result_data[self::OUTGOING_REQUEST_FIELD_NAME] = null;
 			} else {
 				$result_data[self::OUTGOING_REQUEST_FIELD_NAME] = NetworkingRequestsCollection::filter(
