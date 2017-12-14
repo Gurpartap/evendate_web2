@@ -31,11 +31,63 @@ const EventNetworkingParticipantsPage = asyncPage({
 		super(props);
 		
 		this.state = {
+			is_fetching: false,
 			current_modal: null,
 			modal_props: null
 		};
 		
+		this.disable_upload = false;
+		
 		this.hideModal = this.hideModal.bind(this);
+	}
+	
+	componentDidMount() {
+		this.bindScrollEvents();
+	}
+	
+	componentWillUnmount() {
+		this.unbindScrollEvents();
+	}
+	
+	unbindScrollEvents() {
+		var $window = $(window);
+		
+		$window.off('scroll.uploadEntities');
+	}
+	
+	bindScrollEvents() {
+		var $window = $(window);
+		
+		this.unbindScrollEvents();
+		
+		if ( isScrollRemain(1000) ) {
+			this.uploadEntities();
+		}
+		
+		$window.on('scroll.uploadEntities', () => {
+			if ( isScrollRemain(1000) ) {
+				this.uploadEntities();
+			}
+		});
+	};
+	
+	uploadEntities() {
+		if (!this.disable_upload) {
+			this.disable_upload = true;
+			this.setState({
+				is_fetching: true
+			});
+			this.props.profiles.fetch(this.props.profiles_fields).then(data => {
+				if (data.length) {
+					this.disable_upload = false;
+				}
+				this.setState({
+					is_fetching: false
+				});
+				
+				return data;
+			});
+		}
 	}
 	
 	hideModal() {
@@ -79,6 +131,7 @@ const EventNetworkingParticipantsPage = asyncPage({
 							}
 						</EventNetworkingPage.NetworkingProfileUnit>
 					))}
+					{this.state.is_fetching && <LoaderBlock />}
 				</div>
 				{CurrentModal && <CurrentModal {...this.state.modal_props} hideModalHandler={this.hideModal} />}
 			</div>
