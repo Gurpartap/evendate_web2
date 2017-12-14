@@ -58,6 +58,8 @@ class NetworkingProfile extends AbstractEntity
 			'user_id' => $this->nm->getUser()->getId(),
 			'vk_url' => $data['vk_url'] ?? null,
 			'facebook_url' => $data['facebook_url'] ?? null,
+			'first_name' => $data['first_name'] ?? null,
+			'last_name' => $data['last_name'] ?? null,
 			'twitter_url' => $data['twitter_url'] ?? null,
 			'linkedin_url' => $data['linkedin_url'] ?? null,
 			'telegram_url' => $data['telegram_url'] ?? null,
