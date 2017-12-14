@@ -45,7 +45,9 @@ class NetworkingManager
 	public function accessByCode($code)
 	{
 		$q_check_code = App::queryFactory()->newSelect();
-		$q_check_code->from('events')
+		$q_check_code
+			->cols(array('id'))
+			->from('events')
 			->where('event_id = ?', $this->event->getId())
 			->where('networking_code = ? ', $code);
 
