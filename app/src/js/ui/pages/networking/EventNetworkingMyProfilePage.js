@@ -57,6 +57,7 @@ const EventNetworkingMyProfilePage = asyncPage({
 			instagram_url: this.refs.instagram_url.value,
 			github_url: this.refs.github_url.value,
 		}).then(data => {
+			this.props.my_profile.signed_up = true;
 			this.setState({
 				redirect_to: this.props.match.url.replace('profile', 'participants')
 			});
