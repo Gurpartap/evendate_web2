@@ -19,5 +19,7 @@ OneEntity = extending(Data, (function() {
 	
 	OneEntity.prototype.ID_PROP_NAME = 'id';
 	
+	OneEntity.prototype.fetch = function(fields) {};
+	
 	return OneEntity;
 }()));

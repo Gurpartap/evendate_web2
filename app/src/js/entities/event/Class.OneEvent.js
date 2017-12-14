@@ -82,6 +82,10 @@ OneEvent = extending(OneEntity, (function() {
 	 * @property {?timestamp} last_event_date
 	 * @property {?timestamp} nearest_event_date
 	 *
+	 * @property {?boolean} networking_enabled
+	 * @property {?timestamp} networking_start_date
+	 * @property {?timestamp} networking_end_date
+	 *
 	 * @property {TagsCollection} tags
 	 *
 	 * @property {PromocodeModelsCollection} promocodes
@@ -171,6 +175,10 @@ OneEvent = extending(OneEntity, (function() {
 		this.first_event_date = null;
 		this.last_event_date = null;
 		this.nearest_event_date = null;
+		
+		this.networking_enabled = null;
+		this.networking_start_date = null;
+		this.networking_end_date = null;
 		
 		this.tags = new TagsCollection();
 		

@@ -166,16 +166,19 @@ class AbstractEvendateApplication {
 	}
 	
 	renderReact() {
+		const {BrowserRouter} = ReactRouterDOM,
+			{Switch, Route, Redirect} = ReactRouter;
 		
 		ReactDOM.render((
-			<ReactRouterDOM.BrowserRouter>
-				<ReactRouter.Switch>
-					<ReactRouter.Route path="/my/profile" exact component={MyProfilePage} />
-					<ReactRouter.Redirect from={`/user/${this.USER.id}`} to="/my/profile" />
-					<ReactRouter.Route path="/user/:user_id" exact component={UserPage} />
-					<ReactRouter.Route component={NoReactPage} />
-				</ReactRouter.Switch>
-			</ReactRouterDOM.BrowserRouter>
+			<BrowserRouter>
+				<Switch>
+					<Route exact path="/my/profile" component={MyProfilePage} />
+					<Redirect from={`/user/${this.USER.id}`} to="/my/profile" />
+					<Route exact path="/user/:user_id" component={UserPage} />
+					<Route path="/event/:event_id/networking" component={EventNetworkingPage} />
+					<Route component={NoReactPage} />
+				</Switch>
+			</BrowserRouter>
 		), document.getElementById('app_page_root'));
 	}
 }

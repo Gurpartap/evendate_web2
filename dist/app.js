@@ -44,6 +44,7 @@ var __C = {
 		},
 		TEXT_COLORS: {
 			ACCENT: '-text_color_accent',
+			FRANKLIN: '-text_color_franklin',
 			MUTED_80: '-text_color_primary_80',
 			MUTED_50: '-text_color_primary_50'
 		},
@@ -3872,25 +3873,32 @@ ServerConnection = extending(AsynchronousConnection, function () {
 				data: ajax_data,
 				method: http_method,
 				contentType: content_type || 'application/x-www-form-urlencoded; charset=UTF-8',
-				success: function success(data, textStatus, jqXHR) {
-					return resolve(data);
+				success: function success(response, textStatus, jqXHR) {
+					try {
+						if (response.status) {
+							resolve(response.data);
+						} else {
+							reject({ jqXHR: jqXHR, textStatus: textStatus, response: response });
+						}
+					} catch (errorThrown) {
+						reject({ jqXHR: jqXHR, textStatus: textStatus, errorThrown: errorThrown });
+					}
 				},
 				error: function error(jqXHR, textStatus, errorThrown) {
 					return reject({ jqXHR: jqXHR, textStatus: textStatus, errorThrown: errorThrown });
 				}
 			}));
-		}).then(function (response) {
-			ajaxHandler(response, function (data, text) {
-				if (isFunction(success)) {
-					success(data);
-				}
-			});
+		}).then(function (data) {
+			if (isFunction(success)) {
+				success(data);
+			}
 
-			return response.data;
+			return data;
 		}).catch(function (_ref) {
 			var jqXHR = _ref.jqXHR,
 			    textStatus = _ref.textStatus,
-			    errorThrown = _ref.errorThrown;
+			    errorThrown = _ref.errorThrown,
+			    response = _ref.response;
 
 			if (errorThrown !== 'abort') {
 				if (isFunction(error)) {
@@ -3899,6 +3907,8 @@ ServerConnection = extending(AsynchronousConnection, function () {
 					self.ajaxErrorHandler(jqXHR, textStatus, errorThrown);
 				}
 			}
+
+			return response;
 		});
 	};
 	/**
@@ -4702,6 +4712,8 @@ OneEntity = extending(Data, function () {
 
 	OneEntity.prototype.ID_PROP_NAME = 'id';
 
+	OneEntity.prototype.fetch = function (fields) {};
+
 	return OneEntity;
 }());
 
@@ -5065,105 +5077,6 @@ TariffModel = extending(OneEntity, function () {
 	}
 
 	return TariffModel;
-}());
-/**
- * @requires ../../entities/Class.OneEntity.js
- */
-/**
- *
- * @class DateModel
- * @extends OneEntity
- */
-DateModel = extending(OneEntity, function () {
-	/**
-  *
-  * @constructor
-  * @constructs DateModel
-  *
-  * @property {(string|timestamp)} event_date
-  * @property {string} start_time
-  * @property {string} end_time
-  */
-	function DateModel() {
-		this.event_date = '';
-		this.start_time = '';
-		this.end_time = '';
-	}
-
-	return DateModel;
-}());
-/**
- * @requires ../../entities/Class.EntitiesCollection.js
- * @requires Class.DateModel.js
- */
-/**
- *
- * @class DateModelsCollection
- * @extends EntitiesCollection
- */
-DateModelsCollection = extending(EntitiesCollection, function () {
-	/**
-  *
-  * @constructor
-  * @constructs DateModelsCollection
-  */
-	function DateModelsCollection() {
-		EntitiesCollection.call(this);
-	}
-	DateModelsCollection.prototype.collection_of = DateModel;
-
-	return DateModelsCollection;
-}());
-/**
- * @requires ../../entities/Class.OneEntity.js
- */
-/**
- *
- * @class InterestModel
- * @extends OneEntity
- */
-InterestModel = extending(OneEntity, function () {
-	/**
-  *
-  * @constructor
-  * @constructs InterestModel
-  *
-  * @property {?number} topic_id
-  * @property {?string} topic_name
-  * @property {?float} value
-  * @property {?timestamp} updated_at
-  */
-	function InterestModel() {
-		this.topic_id = setDefaultValue(this.topic_id, 0);
-		this.topic_name = null;
-		this.value = null;
-		this.updated_at = null;
-	}
-	InterestModel.prototype.ID_PROP_NAME = 'topic_id';
-
-	return InterestModel;
-}());
-/**
- * @requires ../../entities/Class.EntitiesCollection.js
- * @requires Class.InterestModel.js
- */
-/**
- *
- * @class InterestModelsCollection
- * @extends EntitiesCollection
- */
-InterestModelsCollection = extending(EntitiesCollection, function () {
-	/**
-  *
-  * @constructor
-  * @constructs InterestModelsCollection
-  */
-	function InterestModelsCollection() {
-		EntitiesCollection.call(this);
-	}
-	InterestModelsCollection.prototype.collection_of = InterestModel;
-
-	return InterestModelsCollection;
 }());
 /**
  * @requires ../../entities/Class.OneEntity.js
@@ -5802,6 +5715,105 @@ OrganizationFinanceModel = extending(AbstractFinanceModel, function () {
 	}
 
 	return OrganizationFinanceModel;
+}());
+/**
+ * @requires ../../entities/Class.OneEntity.js
+ */
+/**
+ *
+ * @class DateModel
+ * @extends OneEntity
+ */
+DateModel = extending(OneEntity, function () {
+	/**
+  *
+  * @constructor
+  * @constructs DateModel
+  *
+  * @property {(string|timestamp)} event_date
+  * @property {string} start_time
+  * @property {string} end_time
+  */
+	function DateModel() {
+		this.event_date = '';
+		this.start_time = '';
+		this.end_time = '';
+	}
+
+	return DateModel;
+}());
+/**
+ * @requires ../../entities/Class.EntitiesCollection.js
+ * @requires Class.DateModel.js
+ */
+/**
+ *
+ * @class DateModelsCollection
+ * @extends EntitiesCollection
+ */
+DateModelsCollection = extending(EntitiesCollection, function () {
+	/**
+  *
+  * @constructor
+  * @constructs DateModelsCollection
+  */
+	function DateModelsCollection() {
+		EntitiesCollection.call(this);
+	}
+	DateModelsCollection.prototype.collection_of = DateModel;
+
+	return DateModelsCollection;
+}());
+/**
+ * @requires ../../entities/Class.OneEntity.js
+ */
+/**
+ *
+ * @class InterestModel
+ * @extends OneEntity
+ */
+InterestModel = extending(OneEntity, function () {
+	/**
+  *
+  * @constructor
+  * @constructs InterestModel
+  *
+  * @property {?number} topic_id
+  * @property {?string} topic_name
+  * @property {?float} value
+  * @property {?timestamp} updated_at
+  */
+	function InterestModel() {
+		this.topic_id = setDefaultValue(this.topic_id, 0);
+		this.topic_name = null;
+		this.value = null;
+		this.updated_at = null;
+	}
+	InterestModel.prototype.ID_PROP_NAME = 'topic_id';
+
+	return InterestModel;
+}());
+/**
+ * @requires ../../entities/Class.EntitiesCollection.js
+ * @requires Class.InterestModel.js
+ */
+/**
+ *
+ * @class InterestModelsCollection
+ * @extends EntitiesCollection
+ */
+InterestModelsCollection = extending(EntitiesCollection, function () {
+	/**
+  *
+  * @constructor
+  * @constructs InterestModelsCollection
+  */
+	function InterestModelsCollection() {
+		EntitiesCollection.call(this);
+	}
+	InterestModelsCollection.prototype.collection_of = InterestModel;
+
+	return InterestModelsCollection;
 }());
 /**
  * @requires ../Class.AbstractDataModel.js
@@ -7017,113 +7029,6 @@ OrganizationDispatchesCollection = extending(DispatchesCollection, function () {
 	};
 
 	return OrganizationDispatchesCollection;
-}());
-/**
- * @requires ../Class.OneEntity.js
- */
-/**
- *
- * @class OneNotification
- * @extends OneEntity
- */
-OneNotification = extending(OneEntity, function () {
-	/**
-  *
-  * @constructor
-  * @constructs OneNotification
-  *
-  * @property {?string} guid
-  * @property {?string} uuid
-  * @property {?(string|number)} event_id
-  * @property {?timestamp} notification_time
-  *
-  * @property {?string} notification_type
-  * @property {?timestamp} sent_time
-  * @property {?boolean} done
-  * @property {?timestamp} created_at
-  * @property {?timestamp} updated_at
-  */
-	function OneNotification() {
-		var self = this;
-
-		this.uuid = null;
-		this.event_id = null;
-		this.notification_time = null;
-		this.notification_type = null;
-
-		this.sent_time = null;
-		this.done = null;
-		this.created_at = null;
-		this.updated_at = null;
-
-		Object.defineProperty(this, OneNotification.prototype.ID_PROP_NAME, {
-			get: function get() {
-				return self.uuid || self.notification_type;
-			}
-		});
-	}
-
-	OneNotification.prototype.ID_PROP_NAME = 'guid';
-
-	OneNotification.NOTIFICATIN_TYPES = {
-		NOW: 'notification-now',
-		CANCELED: 'notification-event-canceled',
-		CHANGED_DATES: 'notification-event-changed-dates',
-		CHANGED_LOCATION: 'notification-event-changed-location',
-		CHANGED_PRICE: 'notification-event-changed-price',
-		CHANGED_REGISTRATION: 'notification-event-changed-registration',
-		ONE_DAY_REGISTRATION_CLOSE: 'notification-one-day-registration-close',
-		BEFORE_THREE_HOURS: 'notification-before-three-hours',
-		BEFORE_DAY: 'notification-before-day',
-		BEFORE_THREE_DAYS: 'notification-before-three-days',
-		BEFORE_WEEK: 'notification-before-week',
-		BEFORE_QUARTER_OF_HOUR: 'notification-before-quarter-of-hour',
-		CUSTOM: 'notification-custom',
-		REGISTRATION_APPROVED: 'notification-registration-approved',
-		REGISTRATION_CHECKED_OUT: 'notification-registration-checked-out',
-		REGISTRATION_NOT_CHECKED_OUT: 'notification-registration-not-checked-out',
-		REGISTRATION_NOT_APPROVED: 'notification-registration-not-approved',
-		USERS: 'users-notification',
-		ADDITIONAL_FOR_ORGANIZATION: 'notification-additional-for-organization'
-	};
-
-	return OneNotification;
-}());
-/**
- * @requires ../Class.EntitiesCollection.js
- * @requires Class.OneNotification.js
- */
-/**
- *
- * @class NotificationsCollection
- * @extends EntitiesCollection
- */
-NotificationsCollection = extending(EntitiesCollection, function () {
-	/**
-  *
-  * @constructor
-  * @constructs NotificationsCollection
-  *
-  * @property {Array<OneNotification>} future
-  */
-	function NotificationsCollection() {
-		EntitiesCollection.call(this);
-
-		Object.defineProperties(this, {
-			future: {
-				get: function get() {
-
-					return this.filter(function (notification) {
-
-						return !notification.done;
-					});
-				}
-			}
-		});
-	}
-	NotificationsCollection.prototype.collection_of = OneNotification;
-
-	return NotificationsCollection;
 }());
 /**
  * @requires ../Class.OneEntity.js
@@ -9318,6 +9223,113 @@ UsersCollection = extending(EntitiesCollection, function () {
 
 /**
  * @requires ../Class.OneEntity.js
+ */
+/**
+ *
+ * @class OneNotification
+ * @extends OneEntity
+ */
+OneNotification = extending(OneEntity, function () {
+	/**
+  *
+  * @constructor
+  * @constructs OneNotification
+  *
+  * @property {?string} guid
+  * @property {?string} uuid
+  * @property {?(string|number)} event_id
+  * @property {?timestamp} notification_time
+  *
+  * @property {?string} notification_type
+  * @property {?timestamp} sent_time
+  * @property {?boolean} done
+  * @property {?timestamp} created_at
+  * @property {?timestamp} updated_at
+  */
+	function OneNotification() {
+		var self = this;
+
+		this.uuid = null;
+		this.event_id = null;
+		this.notification_time = null;
+		this.notification_type = null;
+
+		this.sent_time = null;
+		this.done = null;
+		this.created_at = null;
+		this.updated_at = null;
+
+		Object.defineProperty(this, OneNotification.prototype.ID_PROP_NAME, {
+			get: function get() {
+				return self.uuid || self.notification_type;
+			}
+		});
+	}
+
+	OneNotification.prototype.ID_PROP_NAME = 'guid';
+
+	OneNotification.NOTIFICATIN_TYPES = {
+		NOW: 'notification-now',
+		CANCELED: 'notification-event-canceled',
+		CHANGED_DATES: 'notification-event-changed-dates',
+		CHANGED_LOCATION: 'notification-event-changed-location',
+		CHANGED_PRICE: 'notification-event-changed-price',
+		CHANGED_REGISTRATION: 'notification-event-changed-registration',
+		ONE_DAY_REGISTRATION_CLOSE: 'notification-one-day-registration-close',
+		BEFORE_THREE_HOURS: 'notification-before-three-hours',
+		BEFORE_DAY: 'notification-before-day',
+		BEFORE_THREE_DAYS: 'notification-before-three-days',
+		BEFORE_WEEK: 'notification-before-week',
+		BEFORE_QUARTER_OF_HOUR: 'notification-before-quarter-of-hour',
+		CUSTOM: 'notification-custom',
+		REGISTRATION_APPROVED: 'notification-registration-approved',
+		REGISTRATION_CHECKED_OUT: 'notification-registration-checked-out',
+		REGISTRATION_NOT_CHECKED_OUT: 'notification-registration-not-checked-out',
+		REGISTRATION_NOT_APPROVED: 'notification-registration-not-approved',
+		USERS: 'users-notification',
+		ADDITIONAL_FOR_ORGANIZATION: 'notification-additional-for-organization'
+	};
+
+	return OneNotification;
+}());
+/**
+ * @requires ../Class.EntitiesCollection.js
+ * @requires Class.OneNotification.js
+ */
+/**
+ *
+ * @class NotificationsCollection
+ * @extends EntitiesCollection
+ */
+NotificationsCollection = extending(EntitiesCollection, function () {
+	/**
+  *
+  * @constructor
+  * @constructs NotificationsCollection
+  *
+  * @property {Array<OneNotification>} future
+  */
+	function NotificationsCollection() {
+		EntitiesCollection.call(this);
+
+		Object.defineProperties(this, {
+			future: {
+				get: function get() {
+
+					return this.filter(function (notification) {
+
+						return !notification.done;
+					});
+				}
+			}
+		});
+	}
+	NotificationsCollection.prototype.collection_of = OneNotification;
+
+	return NotificationsCollection;
+}());
+/**
+ * @requires ../Class.OneEntity.js
  * @requires ../date/Class.DatesCollection.js
  * @requires ../tag/Class.TagsCollection.js
  * @requires ../order/Class.AbstractEventOrdersCollection.js
@@ -9399,6 +9411,10 @@ OneEvent = extending(OneEntity, function () {
   * @property {?timestamp} first_event_date
   * @property {?timestamp} last_event_date
   * @property {?timestamp} nearest_event_date
+  *
+  * @property {?boolean} networking_enabled
+  * @property {?timestamp} networking_start_date
+  * @property {?timestamp} networking_end_date
   *
   * @property {TagsCollection} tags
   *
@@ -9482,6 +9498,10 @@ OneEvent = extending(OneEntity, function () {
 		this.first_event_date = null;
 		this.last_event_date = null;
 		this.nearest_event_date = null;
+
+		this.networking_enabled = null;
+		this.networking_start_date = null;
+		this.networking_end_date = null;
 
 		this.tags = new TagsCollection();
 
@@ -10787,6 +10807,791 @@ TimelineEventsCollection = extending(EventsCollection, function () {
 	return TimelineEventsCollection;
 }());
 /**
+ * @requires ../Class.OneEntity.js
+ */
+/**
+ * @class OneNetworkingRequest
+ * @extends OneEntity
+ *
+ * @property {?string} uuid
+ * @property {?number} sender_user_id
+ * @property {?number} recipient_user_id
+ * @property {?string} message
+ * @property {?boolean} status
+ * @property {?boolean} accept_status
+ * @property {?timestamp} accepted_at
+ * @property {?timestamp} created_at
+ * @property {?timestamp} updated_at
+ */
+
+var OneNetworkingRequest = function (_OneEntity) {
+	_inherits(OneNetworkingRequest, _OneEntity);
+
+	function OneNetworkingRequest(uuid) {
+		_classCallCheck(this, OneNetworkingRequest);
+
+		var _this4 = _possibleConstructorReturn(this, (OneNetworkingRequest.__proto__ || Object.getPrototypeOf(OneNetworkingRequest)).call(this));
+
+		_this4.uuid = setDefaultValue(uuid, null);
+		_this4.sender_user_id = null;
+		_this4.recipient_user_id = null;
+		_this4.message = null;
+		_this4.status = null;
+		_this4.accept_status = null;
+		_this4.accepted_at = null;
+		_this4.created_at = null;
+		_this4.updated_at = null;
+		return _this4;
+	}
+
+	return OneNetworkingRequest;
+}(OneEntity);
+/**
+ * @requires OneNetworkingRequest.js
+ */
+
+
+var OneEventNetworkingRequest = function (_OneNetworkingRequest) {
+	_inherits(OneEventNetworkingRequest, _OneNetworkingRequest);
+
+	function OneEventNetworkingRequest(event_id, uuid) {
+		_classCallCheck(this, OneEventNetworkingRequest);
+
+		var _this5 = _possibleConstructorReturn(this, (OneEventNetworkingRequest.__proto__ || Object.getPrototypeOf(OneEventNetworkingRequest)).call(this, uuid));
+
+		_this5.event_id = setDefaultValue(event_id, null);
+		return _this5;
+	}
+
+	/**
+  *
+  * @param {number} event_id
+  * @param {number} user_id
+  * @param {string} [message]
+  *
+  * @return {Promise}
+  */
+
+
+	_createClass(OneEventNetworkingRequest, [{
+		key: 'create',
+
+
+		/**
+   * @param {object} [data]
+   * @param {number} [data.event_id]
+   * @param {number} [data.user_id]
+   * @param {number} [data.recipient_user_id]
+   * @param {string} [data.message]
+   *
+   * @return {Promise}
+   */
+		value: function create(data) {
+			var _this6 = this;
+
+			if (!isVoid(data)) {
+				this.setData(_extends({}, data, { recipient_user_id: data.user_id || data.recipient_user_id }));
+			}
+
+			return OneEventNetworkingRequest.createRequest(this.event_id, this.recipient_user_id, this.message).then(function (uuid) {
+				_this6.uuid = uuid instanceof Array ? uuid[0].uuid : uuid;
+
+				return _this6;
+			});
+		}
+	}, {
+		key: 'revokeRequest',
+		value: function revokeRequest() {
+			var _this7 = this;
+
+			return OneEventNetworkingRequest.updateRequest(this.event_id, this.uuid, { status: false }).then(function (data) {
+				_this7.status = false;
+
+				return data;
+			});
+		}
+	}, {
+		key: 'cancelRequest',
+		value: function cancelRequest() {
+			var _this8 = this;
+
+			return OneEventNetworkingRequest.updateRequest(this.event_id, this.uuid, { accept_status: false }).then(function (data) {
+				_this8.accept_status = false;
+
+				return data;
+			});
+		}
+	}, {
+		key: 'acceptRequest',
+		value: function acceptRequest() {
+			var _this9 = this;
+
+			return OneEventNetworkingRequest.updateRequest(this.event_id, this.uuid, { accept_status: true }).then(function (data) {
+				_this9.accept_status = true;
+
+				return data;
+			});
+		}
+	}, {
+		key: 'fetch',
+		value: function fetch(fields) {
+			var _this10 = this;
+
+			return OneEventNetworkingRequest.fetchRequest(this.event_id, this.uuid, { fields: fields }).then(function (data) {
+				_this10.setData(data);
+
+				return data;
+			});
+		}
+	}], [{
+		key: 'createRequest',
+		value: function createRequest(event_id, user_id, message) {
+
+			return __APP.SERVER.addData(OneEventNetworkingRequest.requestsPath(event_id), {
+				recipient_user_id: user_id,
+				message: message
+			});
+		}
+
+		/**
+   *
+   * @param event_id
+   * @param uuid
+   * @param {object} new_data
+   * @param {boolean} [new_data.status]
+   * @param {boolean} [new_data.accept]
+   * @return {Promise}
+   */
+
+	}, {
+		key: 'updateRequest',
+		value: function updateRequest(event_id, uuid, new_data) {
+
+			return __APP.SERVER.updateData(OneEventNetworkingRequest.requestPath(event_id, uuid), new_data);
+		}
+	}, {
+		key: 'revokeRequest',
+		value: function revokeRequest(event_id, uuid) {
+
+			return __APP.SERVER.updateData(OneEventNetworkingRequest.requestPath(event_id, uuid), { status: false });
+		}
+
+		/**
+   *
+   * @param {number} event_id
+   * @param {string} uuid
+   * @param {object} request_data
+   *
+   * @return {Promise}
+   */
+
+	}, {
+		key: 'fetchRequest',
+		value: function fetchRequest(event_id, uuid, request_data) {
+
+			return __APP.SERVER.getData(OneEventNetworkingRequest.requestPath(event_id, uuid), request_data);
+		}
+	}]);
+
+	return OneEventNetworkingRequest;
+}(OneNetworkingRequest);
+
+OneEventNetworkingRequest.requestPath = function (event_id, uuid) {
+	return '/api/v1/events/' + event_id + '/networking/requests/' + uuid;
+};
+OneEventNetworkingRequest.requestsPath = function (event_id) {
+	return '/api/v1/events/' + event_id + '/networking/requests/';
+};
+/**
+ * @requires ../Class.OneEntity.js
+ */
+
+var OneNetworkingProfile = function (_OneEntity2) {
+	_inherits(OneNetworkingProfile, _OneEntity2);
+
+	function OneNetworkingProfile(user_id) {
+		_classCallCheck(this, OneNetworkingProfile);
+
+		var _this11 = _possibleConstructorReturn(this, (OneNetworkingProfile.__proto__ || Object.getPrototypeOf(OneNetworkingProfile)).call(this));
+
+		_this11.user_id = setDefaultValue(user_id, null);
+		_this11.first_name = null;
+		_this11.last_name = null;
+		_this11.avatar_url = null;
+		_this11.info = null;
+		_this11.looking_for = null;
+		_this11.vk_url = null;
+		_this11.facebook_url = null;
+		_this11.twitter_url = null;
+		_this11.linkedin_url = null;
+		_this11.telegram_url = null;
+		_this11.instagram_url = null;
+		_this11.github_url = null;
+		_this11.email = null;
+		_this11.signed_up = null;
+		_this11.company_name = null;
+		_this11.request_uuid = null;
+		_this11.request = new OneNetworkingRequest(_this11.request_uuid);
+		_this11.outgoing_request_uuid = null;
+		_this11.outgoing_request = new OneNetworkingRequest(_this11.outgoing_request_uuid);
+		_this11.user = new OneUser(_this11.user_id);
+
+		Object.defineProperties(_this11.user, {
+			first_name: {
+				get: function get() {
+
+					return _this11.first_name;
+				}
+			},
+			last_name: {
+				get: function get() {
+
+					return _this11.last_name;
+				}
+			},
+			avatar_url: {
+				get: function get() {
+
+					return _this11.avatar_url;
+				}
+			}
+		});
+		return _this11;
+	}
+
+	_createClass(OneNetworkingProfile, [{
+		key: 'fetch',
+		value: function fetch(fields) {
+			var _this12 = this;
+
+			return OneNetworkingProfile.fetchProfile(this.user_id, fields).then(function (data) {
+				_this12.setData(data);
+
+				return data;
+			});
+		}
+	}], [{
+		key: 'fetchProfile',
+		value: function fetchProfile(user_id, fields) {
+
+			return __APP.SERVER.getData(OneNetworkingProfile.profilePath(user_id), { fields: fields });
+		}
+	}]);
+
+	return OneNetworkingProfile;
+}(OneEntity);
+
+OneNetworkingProfile.prototype.ID_PROP_NAME = 'user_id';
+OneNetworkingProfile.profilePath = function (user_id) {
+	return '/events/networking/profiles/' + user_id;
+};
+/**
+ * @requires ../Class.EntitiesCollection.js
+ * @requires OneNetworkingProfile.js
+ */
+
+var NetworkingProfilesCollection = function (_EntitiesCollection) {
+	_inherits(NetworkingProfilesCollection, _EntitiesCollection);
+
+	function NetworkingProfilesCollection() {
+		_classCallCheck(this, NetworkingProfilesCollection);
+
+		return _possibleConstructorReturn(this, (NetworkingProfilesCollection.__proto__ || Object.getPrototypeOf(NetworkingProfilesCollection)).apply(this, arguments));
+	}
+
+	_createClass(NetworkingProfilesCollection, [{
+		key: 'fetch',
+		value: function fetch(fields, length, order_by) {
+
+			return Promise.resolve();
+		}
+	}]);
+
+	return NetworkingProfilesCollection;
+}(EntitiesCollection);
+
+NetworkingProfilesCollection.prototype.collection_of = OneNetworkingProfile;
+/**
+ * @requires OneNetworkingProfile.js
+ */
+
+var OneEventNetworkingProfile = function (_OneNetworkingProfile) {
+	_inherits(OneEventNetworkingProfile, _OneNetworkingProfile);
+
+	function OneEventNetworkingProfile(user_id, event_id) {
+		_classCallCheck(this, OneEventNetworkingProfile);
+
+		var _this14 = _possibleConstructorReturn(this, (OneEventNetworkingProfile.__proto__ || Object.getPrototypeOf(OneEventNetworkingProfile)).call(this, user_id));
+
+		_this14.event_id = setDefaultValue(event_id, null);
+		_this14.request = new OneEventNetworkingRequest(event_id, _this14.request_uuid);
+		_this14.outgoing_request = new OneEventNetworkingRequest(event_id, _this14.outgoing_request_uuid);
+		return _this14;
+	}
+
+	_createClass(OneEventNetworkingProfile, [{
+		key: 'fetch',
+		value: function fetch(fields) {
+			var _this15 = this;
+
+			return OneEventNetworkingProfile.fetchProfile(this.event_id, this.user_id, fields).then(function (data) {
+				_this15.setData(data);
+
+				return data;
+			});
+		}
+	}], [{
+		key: 'fetchProfile',
+		value: function fetchProfile(event_id, user_id, fields) {
+
+			return __APP.SERVER.getData(OneEventNetworkingProfile.profilePath(event_id, user_id), { fields: fields });
+		}
+	}]);
+
+	return OneEventNetworkingProfile;
+}(OneNetworkingProfile);
+
+OneEventNetworkingProfile.profilePath = function (event_id, user_id) {
+	return '/events/' + event_id + '/networking/profiles/' + user_id;
+};
+/**
+ * @requires NetworkingProfilesCollection.js
+ * @requires OneEventNetworkingProfile.js
+ */
+
+var EventNetworkingProfilesCollection = function (_NetworkingProfilesCo) {
+	_inherits(EventNetworkingProfilesCollection, _NetworkingProfilesCo);
+
+	function EventNetworkingProfilesCollection(event_id) {
+		_classCallCheck(this, EventNetworkingProfilesCollection);
+
+		var _this16 = _possibleConstructorReturn(this, (EventNetworkingProfilesCollection.__proto__ || Object.getPrototypeOf(EventNetworkingProfilesCollection)).call(this));
+
+		Object.defineProperty(_this16, 'event_id', {
+			get: function get() {
+
+				return event_id;
+			}
+		});
+		return _this16;
+	}
+
+	/**
+  *
+  * @param {number} event_id
+  * @param {object} request_data
+  *
+  * @return {Promise}
+  */
+
+
+	_createClass(EventNetworkingProfilesCollection, [{
+		key: 'fetch',
+		value: function fetch(fields, length, order_by) {
+			var _this17 = this;
+
+			return EventNetworkingProfilesCollection.fetchProfiles(this.event_id, {
+				fields: fields,
+				length: length,
+				order_by: order_by,
+				offset: this.length
+			}).then(function (profiles) {
+				_this17.setData(profiles);
+
+				return _this17.__last_pushed;
+			});
+		}
+	}], [{
+		key: 'fetchProfiles',
+		value: function fetchProfiles(event_id, request_data) {
+
+			return __APP.SERVER.getData(EventNetworkingProfilesCollection.profilesPath(event_id), request_data);
+		}
+	}]);
+
+	return EventNetworkingProfilesCollection;
+}(NetworkingProfilesCollection);
+
+EventNetworkingProfilesCollection.prototype.collection_of = OneEventNetworkingProfile;
+EventNetworkingProfilesCollection.profilesPath = function (event_id) {
+	return '/events/' + event_id + '/networking/profiles/';
+};
+/**
+ * @requires EventNetworkingProfilesCollection.js
+ */
+
+var EventNetworkingAcceptedRequestProfilesCollection = function (_EventNetworkingProfi) {
+	_inherits(EventNetworkingAcceptedRequestProfilesCollection, _EventNetworkingProfi);
+
+	function EventNetworkingAcceptedRequestProfilesCollection() {
+		_classCallCheck(this, EventNetworkingAcceptedRequestProfilesCollection);
+
+		return _possibleConstructorReturn(this, (EventNetworkingAcceptedRequestProfilesCollection.__proto__ || Object.getPrototypeOf(EventNetworkingAcceptedRequestProfilesCollection)).apply(this, arguments));
+	}
+
+	_createClass(EventNetworkingAcceptedRequestProfilesCollection, [{
+		key: 'fetch',
+		value: function fetch(fields, length, order_by) {
+			var _this19 = this;
+
+			return EventNetworkingProfilesCollection.fetchProfiles(this.event_id, {
+				request_accepted: true,
+				fields: fields,
+				length: length,
+				order_by: order_by,
+				offset: this.length
+			}).then(function (profiles) {
+				_this19.setData(profiles);
+
+				return _this19.__last_pushed;
+			});
+		}
+	}]);
+
+	return EventNetworkingAcceptedRequestProfilesCollection;
+}(EventNetworkingProfilesCollection);
+/**
+ * @requires NetworkingProfilesCollection.js
+ */
+
+
+var NetworkingContactsProfilesCollection = function (_NetworkingProfilesCo2) {
+	_inherits(NetworkingContactsProfilesCollection, _NetworkingProfilesCo2);
+
+	function NetworkingContactsProfilesCollection() {
+		_classCallCheck(this, NetworkingContactsProfilesCollection);
+
+		return _possibleConstructorReturn(this, (NetworkingContactsProfilesCollection.__proto__ || Object.getPrototypeOf(NetworkingContactsProfilesCollection)).apply(this, arguments));
+	}
+
+	_createClass(NetworkingContactsProfilesCollection, [{
+		key: 'fetch',
+		value: function fetch(fields, length, order_by) {
+			var _this21 = this;
+
+			return NetworkingContactsProfilesCollection.fetchProfiles({
+				fields: fields,
+				length: length,
+				order_by: order_by,
+				offset: this.length
+			}).then(function (profiles) {
+				_this21.setData(profiles);
+
+				return _this21.__last_pushed;
+			});
+		}
+	}], [{
+		key: 'fetchProfiles',
+
+
+		/**
+   *
+   * @param {object} request_data
+   * @return {Promise}
+   */
+		value: function fetchProfiles(request_data) {
+
+			return __APP.SERVER.getData(NetworkingContactsProfilesCollection.profilesPath(), request_data);
+		}
+	}]);
+
+	return NetworkingContactsProfilesCollection;
+}(NetworkingProfilesCollection);
+
+NetworkingContactsProfilesCollection.prototype.collection_of = OneNetworkingProfile;
+NetworkingContactsProfilesCollection.profilesPath = function () {
+	return '/users/me/contacts/';
+};
+/**
+ * @requires NetworkingContactsProfilesCollection.js
+ */
+
+var EventNetworkingContactsProfilesCollection = function (_NetworkingContactsPr) {
+	_inherits(EventNetworkingContactsProfilesCollection, _NetworkingContactsPr);
+
+	function EventNetworkingContactsProfilesCollection(event_id) {
+		_classCallCheck(this, EventNetworkingContactsProfilesCollection);
+
+		var _this22 = _possibleConstructorReturn(this, (EventNetworkingContactsProfilesCollection.__proto__ || Object.getPrototypeOf(EventNetworkingContactsProfilesCollection)).call(this));
+
+		Object.defineProperty(_this22, 'event_id', {
+			get: function get() {
+
+				return event_id;
+			}
+		});
+		return _this22;
+	}
+
+	/**
+  *
+  * @param {number} event_id
+  * @param {object} request_data
+  * @return {Promise}
+  */
+
+
+	_createClass(EventNetworkingContactsProfilesCollection, [{
+		key: 'fetch',
+		value: function fetch(fields, length, order_by) {
+			var _this23 = this;
+
+			return EventNetworkingContactsProfilesCollection.fetchProfiles(this.event_id, {
+				fields: fields,
+				length: length,
+				order_by: order_by,
+				offset: this.length
+			}).then(function (profiles) {
+				_this23.setData(profiles);
+
+				return _this23.__last_pushed;
+			});
+		}
+	}], [{
+		key: 'fetchProfiles',
+		value: function fetchProfiles(event_id, request_data) {
+
+			return __APP.SERVER.getData(EventNetworkingContactsProfilesCollection.profilesPath(event_id), request_data);
+		}
+	}]);
+
+	return EventNetworkingContactsProfilesCollection;
+}(NetworkingContactsProfilesCollection);
+
+EventNetworkingContactsProfilesCollection.prototype.collection_of = OneEventNetworkingProfile;
+EventNetworkingContactsProfilesCollection.profilesPath = function (event_id) {
+	return '/events/' + event_id + '/networking/contacts';
+};
+/**
+ * @requires EventNetworkingProfilesCollection.js
+ */
+
+var EventNetworkingPendingRequestProfilesCollection = function (_EventNetworkingProfi2) {
+	_inherits(EventNetworkingPendingRequestProfilesCollection, _EventNetworkingProfi2);
+
+	function EventNetworkingPendingRequestProfilesCollection() {
+		_classCallCheck(this, EventNetworkingPendingRequestProfilesCollection);
+
+		return _possibleConstructorReturn(this, (EventNetworkingPendingRequestProfilesCollection.__proto__ || Object.getPrototypeOf(EventNetworkingPendingRequestProfilesCollection)).apply(this, arguments));
+	}
+
+	_createClass(EventNetworkingPendingRequestProfilesCollection, [{
+		key: 'fetch',
+		value: function fetch(fields, length, order_by) {
+			var _this25 = this;
+
+			return EventNetworkingProfilesCollection.fetchProfiles(this.event_id, {
+				request_pending: true,
+				fields: fields,
+				length: length,
+				order_by: order_by,
+				offset: this.length
+			}).then(function (profiles) {
+				_this25.setData(profiles);
+
+				return _this25.__last_pushed;
+			});
+		}
+	}]);
+
+	return EventNetworkingPendingRequestProfilesCollection;
+}(EventNetworkingProfilesCollection);
+/**
+ * @requires EventNetworkingProfilesCollection.js
+ */
+
+
+var EventNetworkingRejectedRequestProfilesCollection = function (_EventNetworkingProfi3) {
+	_inherits(EventNetworkingRejectedRequestProfilesCollection, _EventNetworkingProfi3);
+
+	function EventNetworkingRejectedRequestProfilesCollection() {
+		_classCallCheck(this, EventNetworkingRejectedRequestProfilesCollection);
+
+		return _possibleConstructorReturn(this, (EventNetworkingRejectedRequestProfilesCollection.__proto__ || Object.getPrototypeOf(EventNetworkingRejectedRequestProfilesCollection)).apply(this, arguments));
+	}
+
+	_createClass(EventNetworkingRejectedRequestProfilesCollection, [{
+		key: 'fetch',
+		value: function fetch(fields, length, order_by) {
+			var _this27 = this;
+
+			return EventNetworkingProfilesCollection.fetchProfiles(this.event_id, {
+				request_rejected: true,
+				fields: fields,
+				length: length,
+				order_by: order_by,
+				offset: this.length
+			}).then(function (profiles) {
+				_this27.setData(profiles);
+
+				return _this27.__last_pushed;
+			});
+		}
+	}]);
+
+	return EventNetworkingRejectedRequestProfilesCollection;
+}(EventNetworkingProfilesCollection);
+/**
+ * @requires OneEventNetworkingProfile.js
+ */
+
+
+var MyEventNetworkingProfile = function (_OneEventNetworkingPr) {
+	_inherits(MyEventNetworkingProfile, _OneEventNetworkingPr);
+
+	function MyEventNetworkingProfile(event_id) {
+		_classCallCheck(this, MyEventNetworkingProfile);
+
+		return _possibleConstructorReturn(this, (MyEventNetworkingProfile.__proto__ || Object.getPrototypeOf(MyEventNetworkingProfile)).call(this, 'me', event_id));
+	}
+
+	_createClass(MyEventNetworkingProfile, [{
+		key: 'checkAccess',
+
+
+		/**
+   *
+   * @param {Fields} [fields]
+   * @param {number} [event_id]
+   * @return {*}
+   */
+		value: function checkAccess(fields, event_id) {
+			var _this29 = this;
+
+			if (isVoid(this.event_id)) {
+				this.event_id = event_id;
+			}
+
+			return OneEventNetworkingProfile.fetchProfile(this.event_id, 'me', fields).then(function (data) {
+				_this29.setData(data);
+
+				return data;
+			}, function (reason) {
+				debugger;
+				if (!isVoid(reason.response)) {}
+			});
+		}
+
+		/**
+   *
+   * @param {string} code
+   * @param {Fields} [fields]
+   * @param {number} [event_id]
+   * @return {Promise}
+   */
+
+	}, {
+		key: 'redeemAccess',
+		value: function redeemAccess(code, fields, event_id) {
+			var _this30 = this;
+
+			if (isVoid(this.event_id)) {
+				this.event_id = event_id;
+			}
+
+			return MyEventNetworkingProfile.redeemEventAccess(this.event_id, 'me', code, fields).then(function (data) {
+				_this30.setData(data);
+
+				return data;
+			});
+		}
+	}, {
+		key: 'update',
+		value: function update(data) {
+			if (!isVoid(data)) {
+				this.setData(data);
+			}
+
+			return MyEventNetworkingProfile.updateProfile(this.event_id, {
+				first_name: this.first_name,
+				last_name: this.last_name,
+				avatar_url: this.avatar_url,
+				info: this.info,
+				looking_for: this.looking_for,
+				vk_url: this.vk_url,
+				facebook_url: this.facebook_url,
+				twitter_url: this.twitter_url,
+				linkedin_url: this.linkedin_url,
+				telegram_url: this.telegram_url,
+				instagram_url: this.instagram_url,
+				github_url: this.github_url,
+				company_name: this.company_name
+			});
+		}
+	}], [{
+		key: 'updateProfile',
+		value: function updateProfile(event_id, data) {
+
+			return __APP.SERVER.addData(OneEventNetworkingProfile.profilePath(event_id, 'me'), data);
+		}
+
+		/**
+   *
+   * @param {number} event_id
+   * @param {(number|string)} user_id
+   * @param {string} code
+   * @param {Fields} [fields]
+   * @return {Promise}
+   */
+
+	}, {
+		key: 'redeemEventAccess',
+		value: function redeemEventAccess(event_id, user_id, code, fields) {
+
+			return __APP.SERVER.getData(OneEventNetworkingProfile.profilePath(event_id, user_id), { fields: fields, code: code });
+		}
+	}]);
+
+	return MyEventNetworkingProfile;
+}(OneEventNetworkingProfile);
+/**
+ * @requires OneNetworkingProfile.js
+ */
+
+
+var MyNetworkingProfile = function (_OneNetworkingProfile2) {
+	_inherits(MyNetworkingProfile, _OneNetworkingProfile2);
+
+	function MyNetworkingProfile() {
+		_classCallCheck(this, MyNetworkingProfile);
+
+		return _possibleConstructorReturn(this, (MyNetworkingProfile.__proto__ || Object.getPrototypeOf(MyNetworkingProfile)).call(this, 'me'));
+	}
+
+	_createClass(MyNetworkingProfile, [{
+		key: 'update',
+		value: function update(data) {
+			if (!isVoid(data)) {
+				this.setData(data);
+			}
+
+			return MyNetworkingProfile.updateProfile(this.event_id, {
+				first_name: this.first_name,
+				last_name: this.last_name,
+				avatar_url: this.avatar_url,
+				info: this.info,
+				looking_for: this.looking_for,
+				vk_url: this.vk_url,
+				facebook_url: this.facebook_url,
+				twitter_url: this.twitter_url,
+				linkedin_url: this.linkedin_url,
+				telegram_url: this.telegram_url,
+				instagram_url: this.instagram_url,
+				github_url: this.github_url,
+				company_name: this.company_name
+			});
+		}
+	}], [{
+		key: 'updateProfile',
+		value: function updateProfile(data) {
+
+			return __APP.SERVER.addData(OneNetworkingProfile.profilePath('me'), data, true);
+		}
+	}]);
+
+	return MyNetworkingProfile;
+}(OneNetworkingProfile);
+/**
  * @requires Class.AbstractEventOrdersCollection.js
  */
 /**
@@ -10794,6 +11599,8 @@ TimelineEventsCollection = extending(EventsCollection, function () {
  * @class EventAllOrdersCollection
  * @extends AbstractEventOrdersCollection
  */
+
+
 EventAllOrdersCollection = extending(AbstractEventOrdersCollection, function () {
 	/**
   *
@@ -11122,84 +11929,6 @@ ExtendedOrdersCollection = extending(EntitiesCollection, function () {
 	return ExtendedOrdersCollection;
 }());
 /**
- * @requires ../../data_models/promocode/Class.PromocodeModel.js
- */
-/**
- *
- * @class OnePromocode
- * @extends PromocodeModel
- */
-OnePromocode = extending(PromocodeModel, function () {
-	/**
-  *
-  * @param {number} [event_id]
-  * @param {string} [uuid]
-  *
-  * @constructor
-  * @constructs OnePromocode
-  *
-  * @property {string} ?uuid
-  * @property {(number|string)} ?event_id
-  * @property {string} ?code
-  * @property {boolean} ?is_fixed
-  * @property {boolean} ?is_percentage
-  * @property {(number|string)} ?effort
-  * @property {(number|string)} ?use_limit
-  * @property {timestamp} ?start_date
-  * @property {timestamp} ?end_date
-  * @property {boolean} ?enabled
-  *
-  * @property {timestamp} ?created_at
-  * @property {timestamp} ?updated_at
-  */
-	function OnePromocode(event_id, uuid) {
-		PromocodeModel.call(this);
-
-		this.event_id = setDefaultValue(event_id, null);
-		this.uuid = setDefaultValue(uuid, null);
-	}
-
-	/**
-  *
-  * @param {number} event_id
-  * @param {string} code
-  * @param {Fields} [fields]
-  * @param {AJAXCallback} [success]
-  * @param {function} [error]
-  *
-  * @return {Promise}
-  */
-	OnePromocode.fetchPromocodebyCodeName = function (event_id, code, fields, success, error) {
-
-		return __APP.SERVER.getData('/api/v1/events/' + event_id + '/promocodes', {
-			code: code,
-			fields: fields
-		}, success, error);
-	};
-	/**
-  *
-  * @param {string} code
-  * @param {Fields} [fields]
-  * @param {AJAXCallback} [success]
-  * @param {function} [error]
-  *
-  * @return {Promise}
-  */
-	OnePromocode.prototype.fetchPromocodebyCodeName = function (code, fields, success, error) {
-		var self = this;
-
-		return OnePromocode.fetchPromocodebyCodeName(this.event_id, code, fields, function (data) {
-			self.setData(data);
-
-			if (isFunction(success)) {
-				success.call(self, data);
-			}
-		}, error);
-	};
-
-	return OnePromocode;
-}());
-/**
  * @requires ../Class.OneEntity.js
  * @requires ../../data_models/registration_field/Class.RegistrationFieldModel.js
  */
@@ -11354,6 +12083,84 @@ RegistrationFieldsCollection = extending(EntitiesCollection, function () {
 	};
 
 	return RegistrationFieldsCollection;
+}());
+/**
+ * @requires ../../data_models/promocode/Class.PromocodeModel.js
+ */
+/**
+ *
+ * @class OnePromocode
+ * @extends PromocodeModel
+ */
+OnePromocode = extending(PromocodeModel, function () {
+	/**
+  *
+  * @param {number} [event_id]
+  * @param {string} [uuid]
+  *
+  * @constructor
+  * @constructs OnePromocode
+  *
+  * @property {string} ?uuid
+  * @property {(number|string)} ?event_id
+  * @property {string} ?code
+  * @property {boolean} ?is_fixed
+  * @property {boolean} ?is_percentage
+  * @property {(number|string)} ?effort
+  * @property {(number|string)} ?use_limit
+  * @property {timestamp} ?start_date
+  * @property {timestamp} ?end_date
+  * @property {boolean} ?enabled
+  *
+  * @property {timestamp} ?created_at
+  * @property {timestamp} ?updated_at
+  */
+	function OnePromocode(event_id, uuid) {
+		PromocodeModel.call(this);
+
+		this.event_id = setDefaultValue(event_id, null);
+		this.uuid = setDefaultValue(uuid, null);
+	}
+
+	/**
+  *
+  * @param {number} event_id
+  * @param {string} code
+  * @param {Fields} [fields]
+  * @param {AJAXCallback} [success]
+  * @param {function} [error]
+  *
+  * @return {Promise}
+  */
+	OnePromocode.fetchPromocodebyCodeName = function (event_id, code, fields, success, error) {
+
+		return __APP.SERVER.getData('/api/v1/events/' + event_id + '/promocodes', {
+			code: code,
+			fields: fields
+		}, success, error);
+	};
+	/**
+  *
+  * @param {string} code
+  * @param {Fields} [fields]
+  * @param {AJAXCallback} [success]
+  * @param {function} [error]
+  *
+  * @return {Promise}
+  */
+	OnePromocode.prototype.fetchPromocodebyCodeName = function (code, fields, success, error) {
+		var self = this;
+
+		return OnePromocode.fetchPromocodebyCodeName(this.event_id, code, fields, function (data) {
+			self.setData(data);
+
+			if (isFunction(success)) {
+				success.call(self, data);
+			}
+		}, error);
+	};
+
+	return OnePromocode;
 }());
 /**
  * @requires ../Class.OneEntity.js
@@ -11785,155 +12592,6 @@ OrganizationsStatistics = extending(Statistics, function () {
 	return OrganizationsStatistics;
 }());
 /**
- * @requires Class.AbstractEventTicketsCollection.js
- */
-/**
- *
- * @class EventAllTicketsCollection
- * @extends AbstractEventTicketsCollection
- */
-EventAllTicketsCollection = extending(AbstractEventTicketsCollection, function () {
-	/**
-  * @param {(string|number)} event_id
-  *
-  * @constructor
-  * @constructs EventAllTicketsCollection
-  */
-	function EventAllTicketsCollection(event_id) {
-		AbstractEventTicketsCollection.call(this, event_id);
-	}
-
-	/**
-  *
-  * @param {(string|number)} event_id
-  * @param {AJAXData} [ajax_data]
-  * @param {AJAXCallback} [success]
-  *
-  * @return {Promise}
-  */
-	EventAllTicketsCollection.fetchTickets = function (event_id, ajax_data, success) {
-		ajax_data = ajax_data ? ajax_data : {};
-
-		return __APP.SERVER.getData('/api/v1/statistics/events/' + event_id + '/tickets', ajax_data, success);
-	};
-	/**
-  *
-  * @param {ServerExports.EXPORT_EXTENSION} [format=xlsx]
-  *
-  * @return {Promise}
-  */
-	EventAllTicketsCollection.prototype.export = function (format) {
-
-		return new ServerExports().eventTickets(this.event_id, format);
-	};
-
-	return EventAllTicketsCollection;
-}());
-/**
- * @requires Class.AbstractEventTicketsCollection.js
- */
-/**
- *
- * @class EventMyTicketsCollection
- * @extends AbstractEventTicketsCollection
- */
-EventMyTicketsCollection = extending(AbstractEventTicketsCollection, function () {
-	/**
-  *
-  * @param {(string|number)} [event_id=0]
-  *
-  * @constructor
-  * @constructs EventMyTicketsCollection
-  *
-  * @property {(string|number)} event_id
-  */
-	function EventMyTicketsCollection(event_id) {
-		AbstractEventTicketsCollection.call(this, event_id);
-	}
-	/**
-  *
-  * @param {(string|number)} event_id
-  * @param {AJAXData} [ajax_data]
-  * @param {AJAXCallback} [success]
-  *
-  * @return {Promise}
-  */
-	EventMyTicketsCollection.fetchTickets = function (event_id, ajax_data, success) {
-
-		return __APP.SERVER.getData('/api/v1/events/' + event_id + '/tickets', ajax_data, success);
-	};
-
-	return EventMyTicketsCollection;
-}());
-/**
- * @requires Class.EventAllTicketsCollection.js
- */
-/**
- *
- * @class SearchEventTicketsCollection
- * @extends EventAllTicketsCollection
- */
-SearchEventTicketsCollection = extending(EventAllTicketsCollection, function () {
-	/**
-  * @param {(string|number)} query_string
-  * @param {(string|number)} event_id
-  *
-  * @constructor
-  * @constructs SearchEventTicketsCollection
-  */
-	function SearchEventTicketsCollection(query_string, event_id) {
-		EventAllTicketsCollection.call(this, event_id);
-		this.query_string = query_string;
-	}
-
-	/**
-  *
-  * @param {(string|number)} query_string
-  * @param {(string|number)} event_id
-  * @param {AJAXData} [ajax_data]
-  * @param {AJAXCallback} [success]
-  *
-  * @return {Promise}
-  */
-	SearchEventTicketsCollection.fetchTickets = function (query_string, event_id, ajax_data, success) {
-		ajax_data = ajax_data ? ajax_data : {};
-
-		if ($.isNumeric(query_string)) {
-			ajax_data.number = query_string;
-		} else {
-			ajax_data.user_name = query_string;
-		}
-
-		return EventAllTicketsCollection.fetchTickets(event_id, ajax_data, success);
-	};
-	/**
-  *
-  * @param {(Fields|string)} [fields]
-  * @param {number} [length]
-  * @param {(string|Array)} [order_by]
-  * @param {AJAXCallback} [success]
-  *
-  * @return {Promise}
-  */
-	SearchEventTicketsCollection.prototype.fetchTickets = function (fields, length, order_by, success) {
-		var self = this;
-
-		return SearchEventTicketsCollection.fetchTickets(this.query_string, this.event_id, {
-			fields: fields || undefined,
-			offset: this.length,
-			length: length || undefined,
-			order_by: order_by || undefined
-		}, function (data) {
-			self.setData(data);
-			if (isFunction(success)) {
-				success.call(self, self.__last_pushed);
-			}
-		});
-	};
-
-	return SearchEventTicketsCollection;
-}());
-/**
  * @requires ../ticket/Class.OneTicket.js
  * @requires ../order/Class.OneOrder.js
  */
@@ -12302,145 +12960,6 @@ MyTicketsCollection = extending(ExtendedTicketsCollection, function () {
 	return MyTicketsCollection;
 }());
 /**
- * @requires ../Class.OneEntity.js
- */
-/**
- *
- * @class OneUTMStat
- * @extends OneEntity
- */
-OneUTMStat = extending(OneEntity, function () {
-	/**
-  *
-  * @constructor
-  * @constructs OneUTMStat
-  *
-  * @property {?string} uuid
-  * @property {?string} utm_source
-  * @property {?string} utm_medium
-  * @property {?string} utm_campaign
-  * @property {?string} utm_content
-  * @property {?string} utm_term
-  * @property {?number} open_count
-  * @property {?number} conversion
-  * @property {?number} orders_sum
-  */
-	function OneUTMStat() {
-		var self = this;
-
-		OneEntity.call(this);
-
-		this.utm_source = null;
-		this.utm_medium = null;
-		this.utm_campaign = null;
-		this.utm_content = null;
-		this.utm_term = null;
-		this.open_count = null;
-		this.conversion = null;
-		this.orders_sum = null;
-
-		Object.defineProperty(this, 'uuid', {
-			get: function get() {
-
-				return CryptoJS.MD5([self.utm_source, self.utm_medium, self.utm_campaign, self.utm_content, self.utm_term].clean().join('-')).toString();
-			}
-		});
-	}
-
-	OneUTMStat.prototype.ID_PROP_NAME = 'uuid';
-
-	return OneUTMStat;
-}());
-/**
- * @requires ../Class.EntitiesCollection.js
- * @requires Class.OneUTMStat.js
- */
-/**
- *
- * @class UTMStatsCollection
- * @extends EntitiesCollection
- */
-UTMStatsCollection = extending(EntitiesCollection, function () {
-	/**
-  *
-  * @constructor
-  * @constructs UTMStatsCollection
-  */
-	function UTMStatsCollection() {
-		EntitiesCollection.call(this);
-	}
-
-	UTMStatsCollection.prototype.collection_of = OneUTMStat;
-
-	UTMStatsCollection.ENDPOINT = Object.freeze({
-		UTM: '/statistics/events/{event_id}/utm'
-	});
-
-	/**
-  *
-  * @param {number} event_id
-  * @param {AJAXData} [ajax_data]
-  *
-  * @return {Promise}
-  */
-	UTMStatsCollection.fetchEventUTMStats = function (event_id, ajax_data) {
-
-		return __APP.SERVER.getData(UTMStatsCollection.ENDPOINT.UTM.format({ event_id: event_id }), ajax_data);
-	};
-
-	return UTMStatsCollection;
-}());
-/**
- * @requires Class.UTMStatsCollection.js
- */
-/**
- *
- * @class EventUTMStatsCollection
- * @extends UTMStatsCollection
- */
-EventUTMStatsCollection = extending(UTMStatsCollection, function () {
-	/**
-  *
-  * @param {number} event_id
-  *
-  * @constructor
-  * @constructs EventUTMStatsCollection
-  *
-  * @property {number} event_id
-  */
-	function EventUTMStatsCollection(event_id) {
-		UTMStatsCollection.call(this);
-
-		Object.defineProperty(this, 'event_id', {
-			value: event_id
-		});
-	}
-	/**
-  *
-  * @param {(Fields|string)} [fields]
-  * @param {number} [length]
-  * @param {(string|Array)} [order_by]
-  *
-  * @return {Promise}
-  */
-	EventUTMStatsCollection.prototype.fetch = function (fields, length, order_by) {
-		var self = this;
-
-		return UTMStatsCollection.fetchEventUTMStats(this.event_id, {
-			fields: fields || undefined,
-			offset: this.length,
-			length: length || undefined,
-			order_by: order_by || undefined
-		}).then(function (data) {
-			self.setData(data);
-
-			return self.__last_pushed;
-		});
-	};
-
-	return EventUTMStatsCollection;
-}());
-/**
  * @requires Class.OneUser.js
  */
 /**
@@ -12574,15 +13093,15 @@ CurrentUser = extending(OneUser, function () {
   * @returns {Promise}
   */
 	CurrentUser.prototype.fetchFriends = function (ajax_data, success) {
-		var _this4 = this;
+		var _this32 = this;
 
 		return CurrentUser.fetchFriends(_extends({}, ajax_data, { offset: this.friends.length })).then(function (data) {
-			_this4.friends.setData(data);
+			_this32.friends.setData(data);
 			if (isFunction(success)) {
-				success.call(_this4, _this4.friends.__last_pushed);
+				success.call(_this32, _this32.friends.__last_pushed);
 			}
 
-			return _this4.friends.__last_pushed;
+			return _this32.friends.__last_pushed;
 		});
 	};
 	/**
@@ -12781,6 +13300,294 @@ OrganizationSubscribersCollection = extending(UsersCollection, function () {
 	};
 
 	return OrganizationSubscribersCollection;
+}());
+/**
+ * @requires Class.AbstractEventTicketsCollection.js
+ */
+/**
+ *
+ * @class EventAllTicketsCollection
+ * @extends AbstractEventTicketsCollection
+ */
+EventAllTicketsCollection = extending(AbstractEventTicketsCollection, function () {
+	/**
+  * @param {(string|number)} event_id
+  *
+  * @constructor
+  * @constructs EventAllTicketsCollection
+  */
+	function EventAllTicketsCollection(event_id) {
+		AbstractEventTicketsCollection.call(this, event_id);
+	}
+
+	/**
+  *
+  * @param {(string|number)} event_id
+  * @param {AJAXData} [ajax_data]
+  * @param {AJAXCallback} [success]
+  *
+  * @return {Promise}
+  */
+	EventAllTicketsCollection.fetchTickets = function (event_id, ajax_data, success) {
+		ajax_data = ajax_data ? ajax_data : {};
+
+		return __APP.SERVER.getData('/api/v1/statistics/events/' + event_id + '/tickets', ajax_data, success);
+	};
+	/**
+  *
+  * @param {ServerExports.EXPORT_EXTENSION} [format=xlsx]
+  *
+  * @return {Promise}
+  */
+	EventAllTicketsCollection.prototype.export = function (format) {
+
+		return new ServerExports().eventTickets(this.event_id, format);
+	};
+
+	return EventAllTicketsCollection;
+}());
+/**
+ * @requires Class.AbstractEventTicketsCollection.js
+ */
+/**
+ *
+ * @class EventMyTicketsCollection
+ * @extends AbstractEventTicketsCollection
+ */
+EventMyTicketsCollection = extending(AbstractEventTicketsCollection, function () {
+	/**
+  *
+  * @param {(string|number)} [event_id=0]
+  *
+  * @constructor
+  * @constructs EventMyTicketsCollection
+  *
+  * @property {(string|number)} event_id
+  */
+	function EventMyTicketsCollection(event_id) {
+		AbstractEventTicketsCollection.call(this, event_id);
+	}
+	/**
+  *
+  * @param {(string|number)} event_id
+  * @param {AJAXData} [ajax_data]
+  * @param {AJAXCallback} [success]
+  *
+  * @return {Promise}
+  */
+	EventMyTicketsCollection.fetchTickets = function (event_id, ajax_data, success) {
+
+		return __APP.SERVER.getData('/api/v1/events/' + event_id + '/tickets', ajax_data, success);
+	};
+
+	return EventMyTicketsCollection;
+}());
+/**
+ * @requires Class.EventAllTicketsCollection.js
+ */
+/**
+ *
+ * @class SearchEventTicketsCollection
+ * @extends EventAllTicketsCollection
+ */
+SearchEventTicketsCollection = extending(EventAllTicketsCollection, function () {
+	/**
+  * @param {(string|number)} query_string
+  * @param {(string|number)} event_id
+  *
+  * @constructor
+  * @constructs SearchEventTicketsCollection
+  */
+	function SearchEventTicketsCollection(query_string, event_id) {
+		EventAllTicketsCollection.call(this, event_id);
+		this.query_string = query_string;
+	}
+
+	/**
+  *
+  * @param {(string|number)} query_string
+  * @param {(string|number)} event_id
+  * @param {AJAXData} [ajax_data]
+  * @param {AJAXCallback} [success]
+  *
+  * @return {Promise}
+  */
+	SearchEventTicketsCollection.fetchTickets = function (query_string, event_id, ajax_data, success) {
+		ajax_data = ajax_data ? ajax_data : {};
+
+		if ($.isNumeric(query_string)) {
+			ajax_data.number = query_string;
+		} else {
+			ajax_data.user_name = query_string;
+		}
+
+		return EventAllTicketsCollection.fetchTickets(event_id, ajax_data, success);
+	};
+	/**
+  *
+  * @param {(Fields|string)} [fields]
+  * @param {number} [length]
+  * @param {(string|Array)} [order_by]
+  * @param {AJAXCallback} [success]
+  *
+  * @return {Promise}
+  */
+	SearchEventTicketsCollection.prototype.fetchTickets = function (fields, length, order_by, success) {
+		var self = this;
+
+		return SearchEventTicketsCollection.fetchTickets(this.query_string, this.event_id, {
+			fields: fields || undefined,
+			offset: this.length,
+			length: length || undefined,
+			order_by: order_by || undefined
+		}, function (data) {
+			self.setData(data);
+			if (isFunction(success)) {
+				success.call(self, self.__last_pushed);
+			}
+		});
+	};
+
+	return SearchEventTicketsCollection;
+}());
+/**
+ * @requires ../Class.OneEntity.js
+ */
+/**
+ *
+ * @class OneUTMStat
+ * @extends OneEntity
+ */
+OneUTMStat = extending(OneEntity, function () {
+	/**
+  *
+  * @constructor
+  * @constructs OneUTMStat
+  *
+  * @property {?string} uuid
+  * @property {?string} utm_source
+  * @property {?string} utm_medium
+  * @property {?string} utm_campaign
+  * @property {?string} utm_content
+  * @property {?string} utm_term
+  * @property {?number} open_count
+  * @property {?number} conversion
+  * @property {?number} orders_sum
+  */
+	function OneUTMStat() {
+		var self = this;
+
+		OneEntity.call(this);
+
+		this.utm_source = null;
+		this.utm_medium = null;
+		this.utm_campaign = null;
+		this.utm_content = null;
+		this.utm_term = null;
+		this.open_count = null;
+		this.conversion = null;
+		this.orders_sum = null;
+
+		Object.defineProperty(this, 'uuid', {
+			get: function get() {
+
+				return CryptoJS.MD5([self.utm_source, self.utm_medium, self.utm_campaign, self.utm_content, self.utm_term].clean().join('-')).toString();
+			}
+		});
+	}
+
+	OneUTMStat.prototype.ID_PROP_NAME = 'uuid';
+
+	return OneUTMStat;
+}());
+/**
+ * @requires ../Class.EntitiesCollection.js
+ * @requires Class.OneUTMStat.js
+ */
+/**
+ *
+ * @class UTMStatsCollection
+ * @extends EntitiesCollection
+ */
+UTMStatsCollection = extending(EntitiesCollection, function () {
+	/**
+  *
+  * @constructor
+  * @constructs UTMStatsCollection
+  */
+	function UTMStatsCollection() {
+		EntitiesCollection.call(this);
+	}
+
+	UTMStatsCollection.prototype.collection_of = OneUTMStat;
+
+	UTMStatsCollection.ENDPOINT = Object.freeze({
+		UTM: '/statistics/events/{event_id}/utm'
+	});
+
+	/**
+  *
+  * @param {number} event_id
+  * @param {AJAXData} [ajax_data]
+  *
+  * @return {Promise}
+  */
+	UTMStatsCollection.fetchEventUTMStats = function (event_id, ajax_data) {
+
+		return __APP.SERVER.getData(UTMStatsCollection.ENDPOINT.UTM.format({ event_id: event_id }), ajax_data);
+	};
+
+	return UTMStatsCollection;
+}());
+/**
+ * @requires Class.UTMStatsCollection.js
+ */
+/**
+ *
+ * @class EventUTMStatsCollection
+ * @extends UTMStatsCollection
+ */
+EventUTMStatsCollection = extending(UTMStatsCollection, function () {
+	/**
+  *
+  * @param {number} event_id
+  *
+  * @constructor
+  * @constructs EventUTMStatsCollection
+  *
+  * @property {number} event_id
+  */
+	function EventUTMStatsCollection(event_id) {
+		UTMStatsCollection.call(this);
+
+		Object.defineProperty(this, 'event_id', {
+			value: event_id
+		});
+	}
+	/**
+  *
+  * @param {(Fields|string)} [fields]
+  * @param {number} [length]
+  * @param {(string|Array)} [order_by]
+  *
+  * @return {Promise}
+  */
+	EventUTMStatsCollection.prototype.fetch = function (fields, length, order_by) {
+		var self = this;
+
+		return UTMStatsCollection.fetchEventUTMStats(this.event_id, {
+			fields: fields || undefined,
+			offset: this.length,
+			length: length || undefined,
+			order_by: order_by || undefined
+		}).then(function (data) {
+			self.setData(data);
+
+			return self.__last_pushed;
+		});
+	};
+
+	return EventUTMStatsCollection;
 }());
 /**
  * @singleton
@@ -14848,6 +15655,69 @@ HelpAppInspector = extending(AbstractAppInspector, function () {
  */
 /**
  *
+ * @class NetworkingProfileAppInspector
+ * @extends AbstractAppInspector
+ */
+NetworkingProfileAppInspector = extending(AbstractAppInspector, function () {
+	/**
+  *
+  * @param {OneNetworkingProfile} profile
+  *
+  * @constructor
+  * @constructs NetworkingProfileAppInspector
+  *
+  * @property {OneNetworkingProfile} profile
+  */
+	function NetworkingProfileAppInspector(profile) {
+		var user = profile.user,
+		    company_name = profile.company_name,
+		    info = profile.info,
+		    icons = {
+			vk_url: 'vk',
+			facebook_url: 'facebook-official',
+			twitter_url: 'twitter',
+			linkedin_url: 'linkedin',
+			telegram_url: 'telegram',
+			instagram_url: 'instagram',
+			github_url: 'github'
+		},
+		    links = ['vk_url', 'facebook_url', 'twitter_url', 'linkedin_url', 'telegram_url', 'instagram_url', 'github_url'].reduce(function (bundle, key) {
+			if (!isVoid(profile[key]) && profile[key] !== '') {
+				bundle[key] = profile[key];
+			}
+
+			return bundle;
+		}, {}),
+		    link_keys = Object.keys(links);
+
+
+		this.profile = profile;
+		this.title = user.full_name;
+		this.$content = tmpl('networking-profile-app-inspector', {
+			avatar: __APP.BUILD.avatars(user, {
+				classes: [__C.CLASSES.UNIVERSAL_STATES.ROUNDED]
+			}),
+			full_name: user.full_name,
+			company_name: company_name,
+			info: info ? info : '-',
+			contacts: link_keys.length ? tmpl('app-inspector-contact', link_keys.map(function (type) {
+
+				return {
+					icon_class: icons[type],
+					url: links[type]
+				};
+			})) : 'Нет контактов'
+		});
+		AbstractAppInspector.call(this);
+	}
+
+	return NetworkingProfileAppInspector;
+}());
+/**
+ * @requires Class.AbstractAppInspector.js
+ */
+/**
+ *
  * @class OrderAppInspector
  * @extends AbstractAppInspector
  */
@@ -15041,28 +15911,28 @@ var AvatarCollectionContextProvider = function (_React$Component) {
 	function AvatarCollectionContextProvider(props) {
 		_classCallCheck(this, AvatarCollectionContextProvider);
 
-		var _this5 = _possibleConstructorReturn(this, (AvatarCollectionContextProvider.__proto__ || Object.getPrototypeOf(AvatarCollectionContextProvider)).call(this, props));
+		var _this33 = _possibleConstructorReturn(this, (AvatarCollectionContextProvider.__proto__ || Object.getPrototypeOf(AvatarCollectionContextProvider)).call(this, props));
 
-		_this5.state = {
+		_this33.state = {
 			is_subscribed: props.isSubscribed
 		};
-		return _this5;
+		return _this33;
 	}
 
 	_createClass(AvatarCollectionContextProvider, [{
 		key: 'getChildContext',
 		value: function getChildContext() {
-			var _this6 = this;
+			var _this34 = this;
 
 			return _defineProperty({}, AvatarCollectionContextProvider.CONTEXT_NAME, {
 				isSubscribed: this.state.is_subscribed,
 				subscribe: function subscribe() {
-					_this6.setState({
+					_this34.setState({
 						is_subscribed: true
 					});
 				},
 				unsubscribe: function unsubscribe() {
-					_this6.setState({
+					_this34.setState({
 						is_subscribed: false
 					});
 				}
@@ -15104,12 +15974,12 @@ var AvatarCollection = function (_React$Component2) {
 
 		var left = props.maxCount;
 
-		var _this7 = _possibleConstructorReturn(this, (AvatarCollection.__proto__ || Object.getPrototypeOf(AvatarCollection)).call(this, props, context));
+		var _this35 = _possibleConstructorReturn(this, (AvatarCollection.__proto__ || Object.getPrototypeOf(AvatarCollection)).call(this, props, context));
 
-		_this7.avatars = [__APP.USER].concat(_toConsumableArray(props.users.filter(function (user) {
+		_this35.avatars = [__APP.USER].concat(_toConsumableArray(props.users.filter(function (user) {
 			return __APP.USER.id !== parseInt(user.id) && left-- > 0;
 		})));
-		return _this7;
+		return _this35;
 	}
 
 	_createClass(AvatarCollection, [{
@@ -15340,30 +16210,30 @@ function componentsContainer(Component, _ref14) {
 		function ComponentsContainer(props) {
 			_classCallCheck(this, ComponentsContainer);
 
-			var _this8 = _possibleConstructorReturn(this, (ComponentsContainer.__proto__ || Object.getPrototypeOf(ComponentsContainer)).call(this, props));
+			var _this36 = _possibleConstructorReturn(this, (ComponentsContainer.__proto__ || Object.getPrototypeOf(ComponentsContainer)).call(this, props));
 
-			_this8.state = {
-				length: _this8.props[entities_name].length,
+			_this36.state = {
+				length: _this36.props[entities_name].length,
 				is_loading: false
 			};
-			return _this8;
+			return _this36;
 		}
 
 		_createClass(ComponentsContainer, [{
 			key: 'fetch',
 			value: function fetch() {
-				var _this9 = this;
+				var _this37 = this;
 
 				if (!isVoid(CollectionClass) && this.props[entities_name] instanceof CollectionClass) {
 					var _props$entities_name;
 
 					this.setLoadingState();
 					return (_props$entities_name = this.props[entities_name]).fetch.apply(_props$entities_name, arguments).then(function (entities) {
-						_this9.unsetLoadingState().update();
+						_this37.unsetLoadingState().update();
 
 						return entities;
 					}).catch(function () {
-						_this9.unsetLoadingState();
+						_this37.unsetLoadingState();
 					});
 				}
 
@@ -15435,9 +16305,9 @@ var Dropdown = function (_React$Component4) {
 	function Dropdown(props) {
 		_classCallCheck(this, Dropdown);
 
-		var _this10 = _possibleConstructorReturn(this, (Dropdown.__proto__ || Object.getPrototypeOf(Dropdown)).call(this, props));
+		var _this38 = _possibleConstructorReturn(this, (Dropdown.__proto__ || Object.getPrototypeOf(Dropdown)).call(this, props));
 
-		_this10.state = {
+		_this38.state = {
 			click_pos: {
 				X: 0,
 				Y: 0
@@ -15445,10 +16315,10 @@ var Dropdown = function (_React$Component4) {
 			opened: false
 		};
 
-		_this10.open = _this10.open.bind(_this10);
-		_this10.close = _this10.close.bind(_this10);
-		_this10.handleClickOutside = _this10.handleClickOutside.bind(_this10);
-		return _this10;
+		_this38.open = _this38.open.bind(_this38);
+		_this38.close = _this38.close.bind(_this38);
+		_this38.handleClickOutside = _this38.handleClickOutside.bind(_this38);
+		return _this38;
 	}
 
 	_createClass(Dropdown, [{
@@ -15466,7 +16336,7 @@ var Dropdown = function (_React$Component4) {
 	}, {
 		key: 'open',
 		value: function open(e) {
-			var _this11 = this;
+			var _this39 = this;
 
 			this.setState({
 				opened: true,
@@ -15475,19 +16345,19 @@ var Dropdown = function (_React$Component4) {
 					Y: e.pageY
 				}
 			}, function () {
-				_this11.bindClickOutside();
+				_this39.bindClickOutside();
 			});
 		}
 	}, {
 		key: 'close',
 		value: function close(e) {
-			var _this12 = this;
+			var _this40 = this;
 
 			this.setState({
 				opened: false
 			}, function () {
-				_this12.unbindClickOutside();
-				_this12.setState({
+				_this40.unbindClickOutside();
+				_this40.setState({
 					click_pos: {
 						X: 0,
 						Y: 0
@@ -15548,7 +16418,7 @@ var Dropdown = function (_React$Component4) {
 	}, {
 		key: 'render',
 		value: function render() {
-			var _this13 = this;
+			var _this41 = this;
 
 			var _props4 = this.props,
 			    renderControl = _props4.renderControl,
@@ -15567,7 +16437,7 @@ var Dropdown = function (_React$Component4) {
 					{
 						className: 'dropdown_box ' + (opened ? '-show' : ''),
 						ref: function ref(node) {
-							return _this13.dropdown = node;
+							return _this41.dropdown = node;
 						},
 						style: this.getPos()
 					},
@@ -15589,7 +16459,7 @@ Dropdown.propTypes = {
  * @requires componentsContainer.js
  */
 function EventBlock(_ref15) {
-	var _this14 = this;
+	var _this42 = this;
 
 	var event = _ref15.event,
 	    date = _ref15.date,
@@ -15662,10 +16532,10 @@ function EventBlock(_ref15) {
 									counterClasses: [__C.CLASSES.SIZES.X30, __C.CLASSES.UNIVERSAL_STATES.BORDERED, __C.CLASSES.COLORS.MARGINAL, __C.CLASSES.HOOKS.ADD_AVATAR.STATES.CASTABLE],
 									overallAvatarsCount: event.favored_users_count,
 									onClick: function onClick() {
-										if (!_this14.favored_modal) {
-											_this14.favored_modal = new FavoredModal(event.id);
+										if (!_this42.favored_modal) {
+											_this42.favored_modal = new FavoredModal(event.id);
 										}
-										_this14.favored_modal.show();
+										_this42.favored_modal.show();
 									}
 								})
 							),
@@ -15809,14 +16679,14 @@ var Tabs = function (_React$Component5) {
 	function Tabs(props) {
 		_classCallCheck(this, Tabs);
 
-		var _this15 = _possibleConstructorReturn(this, (Tabs.__proto__ || Object.getPrototypeOf(Tabs)).call(this, props));
+		var _this43 = _possibleConstructorReturn(this, (Tabs.__proto__ || Object.getPrototypeOf(Tabs)).call(this, props));
 
-		_this15.state = {
+		_this43.state = {
 			selected_tab: props.selectedTab || null
 		};
 
-		_this15.changeTab = _this15.changeTab.bind(_this15);
-		return _this15;
+		_this43.changeTab = _this43.changeTab.bind(_this43);
+		return _this43;
 	}
 
 	_createClass(Tabs, [{
@@ -15836,7 +16706,7 @@ var Tabs = function (_React$Component5) {
 	}, {
 		key: 'render',
 		value: function render() {
-			var _this16 = this;
+			var _this44 = this;
 
 			var _props6 = this.props,
 			    className = _props6.className,
@@ -15857,9 +16727,9 @@ var Tabs = function (_React$Component5) {
 							'span',
 							{
 								key: child.props.name,
-								className: 'tab Tab ' + (child.props.name === _this16.state.selected_tab ? '-active' : ''),
+								className: 'tab Tab ' + (child.props.name === _this44.state.selected_tab ? '-active' : ''),
 								onClick: function onClick() {
-									return _this16.changeTab(child.props.name);
+									return _this44.changeTab(child.props.name);
 								}
 							},
 							child.props.title
@@ -15872,7 +16742,7 @@ var Tabs = function (_React$Component5) {
 					children.map(function (child) {
 						return React.createElement(
 							'div',
-							{ className: 'tab_body TabsBody ' + (child.props.name === _this16.state.selected_tab ? '-active' : ''), key: child.props.name },
+							{ className: 'tab_body TabsBody ' + (child.props.name === _this44.state.selected_tab ? '-active' : ''), key: child.props.name },
 							child.props.children
 						);
 					})
@@ -16104,6 +16974,8 @@ _ref20, PageClass) {
 	    headerTabs = _ref20$headerTabs === undefined ? false : _ref20$headerTabs,
 	    _ref20$is_admin_page = _ref20.is_admin_page,
 	    is_admin_page = _ref20$is_admin_page === undefined ? false : _ref20$is_admin_page,
+	    _ref20$is_auth_requir = _ref20.is_auth_required,
+	    is_auth_required = _ref20$is_auth_requir === undefined ? false : _ref20$is_auth_requir,
 	    _ref20$state_name = _ref20.state_name,
 	    state_name = _ref20$state_name === undefined ? '' : _ref20$state_name;
 
@@ -16121,29 +16993,34 @@ _ref20, PageClass) {
 		function AsyncPageAdapter(props) {
 			_classCallCheck(this, AsyncPageAdapter);
 
-			var _this18 = _possibleConstructorReturn(this, (AsyncPageAdapter.__proto__ || Object.getPrototypeOf(AsyncPageAdapter)).call(this, props));
+			var _this46 = _possibleConstructorReturn(this, (AsyncPageAdapter.__proto__ || Object.getPrototypeOf(AsyncPageAdapter)).call(this, props));
 
 			__APP.HISTORY = props.history;
-			__APP.CURRENT_REACT_PAGE = _this18;
-			_this18.pageProps = constructPage(props.match.params);
-			_this18.origin_page = null;
-			_this18.state = {
-				is_data_fetching: true,
+			__APP.CURRENT_REACT_PAGE = _this46;
+			_this46.pageProps = _extends({}, props.match.params, constructPage.call(_this46, props.match.params));
+			_this46.origin_page = null;
+			_this46.state = {
+				is_data_fetching: !(is_auth_required && __APP.USER.isLoggedOut()),
 				fetched_data: null
 			};
-			return _this18;
+			return _this46;
 		}
 
 		_createClass(AsyncPageAdapter, [{
 			key: 'componentWillMount',
 			value: function componentWillMount() {
-				var _this19 = this;
+				var _this47 = this;
 
 				__APP.SERVER.abortAllConnections();
 				__APP.SIDEBAR.activateNavItem(window.location.pathname);
 
+				if (is_auth_required && __APP.USER.isLoggedOut()) {
+
+					return;
+				}
+
 				if (isFunction(headerTabs)) {
-					__APP.TOP_BAR.renderHeaderTabs(headerTabs());
+					__APP.TOP_BAR.renderHeaderTabs(headerTabs.call({ props: this.pageProps }));
 					__APP.TOP_BAR.showTabs();
 				} else if (__APP.TOP_BAR.is_tabs_rendered) {
 					__APP.TOP_BAR.hideTabs();
@@ -16167,10 +17044,10 @@ _ref20, PageClass) {
 					}
 				}
 
-				fetchData.call(this.pageProps, this.pageProps).then(function (data) {
-					__APP.changeTitle(isFunction(pageTitle) ? pageTitle.call(_this19.pageProps, _this19.pageProps) : pageTitle);
+				fetchData.call({ props: this.pageProps }, this.pageProps).then(function (data) {
+					__APP.changeTitle(isFunction(pageTitle) ? pageTitle.call(_this47.pageProps, _this47.pageProps) : pageTitle);
 
-					_this19.setState({
+					_this47.setState({
 						is_data_fetching: false,
 						fetched_data: data
 					});
@@ -16186,21 +17063,36 @@ _ref20, PageClass) {
 		}, {
 			key: 'render',
 			value: function render() {
-				var _this20 = this;
+				var _this48 = this;
 
 				var _state = this.state,
 				    is_data_fetching = _state.is_data_fetching,
 				    fetched_data = _state.fetched_data;
 
 
+				if (is_auth_required && __APP.USER.isLoggedOut()) {
+					cookies.removeItem('auth_command');
+					cookies.removeItem('auth_entity_id');
+					new AuthModal(location.href, {
+						note: 'Для получения доступа, вам необходимо авторизоваться'
+					}).show();
+
+					return null;
+				}
+
 				if (is_data_fetching) {
 
 					return React.createElement(OverlayLoader, null);
 				}
 
-				return React.createElement(PageClass, _extends({}, _extends({ fetched_data: fetched_data }, this.pageProps), { ref: function ref(component) {
-						return _this20.origin_page = component;
-					} }));
+				return React.createElement(PageClass, _extends({}, _extends({
+					match: this.props.match,
+					fetched_data: fetched_data
+				}, this.pageProps), {
+					ref: function ref(component) {
+						return _this48.origin_page = component;
+					}
+				}));
 			}
 		}]);
 
@@ -16340,17 +17232,17 @@ var UserPage = asyncPage({
 	}]);
 
 	function UserPage(props) {
-		var _this21$disable_uploa, _this21$block_scroll;
+		var _this49$disable_uploa, _this49$block_scroll;
 
 		_classCallCheck(this, UserPage);
 
-		var _this21 = _possibleConstructorReturn(this, (UserPage.__proto__ || Object.getPrototypeOf(UserPage)).call(this, props));
+		var _this49 = _possibleConstructorReturn(this, (UserPage.__proto__ || Object.getPrototypeOf(UserPage)).call(this, props));
 
-		_this21.disable_uploads = (_this21$disable_uploa = {}, _defineProperty(_this21$disable_uploa, __C.ENTITIES.EVENT, false), _defineProperty(_this21$disable_uploa, __C.ENTITIES.ACTIVITY, false), _this21$disable_uploa);
-		_this21.block_scroll = (_this21$block_scroll = {}, _defineProperty(_this21$block_scroll, __C.ENTITIES.EVENT, false), _defineProperty(_this21$block_scroll, __C.ENTITIES.ACTIVITY, false), _this21$block_scroll);
+		_this49.disable_uploads = (_this49$disable_uploa = {}, _defineProperty(_this49$disable_uploa, __C.ENTITIES.EVENT, false), _defineProperty(_this49$disable_uploa, __C.ENTITIES.ACTIVITY, false), _this49$disable_uploa);
+		_this49.block_scroll = (_this49$block_scroll = {}, _defineProperty(_this49$block_scroll, __C.ENTITIES.EVENT, false), _defineProperty(_this49$block_scroll, __C.ENTITIES.ACTIVITY, false), _this49$block_scroll);
 
-		_this21.active_tab = __C.ENTITIES.EVENT;
-		_this21.favored_fetch_data = {
+		_this49.active_tab = __C.ENTITIES.EVENT;
+		_this49.favored_fetch_data = {
 			fields: new Fields('image_horizontal_medium_url', 'favored_users_count', 'is_favorite', 'is_registered', 'registration_locally', 'registration_available', 'ticketing_locally', 'ticketing_available', 'dates', {
 				favored: {
 					length: 5
@@ -16359,13 +17251,13 @@ var UserPage = asyncPage({
 			order_by: 'nearest_event_date,-first_event_date',
 			length: 10
 		};
-		return _this21;
+		return _this49;
 	}
 
 	_createClass(UserPage, [{
 		key: 'componentDidMount',
 		value: function componentDidMount() {
-			var _this22 = this;
+			var _this50 = this;
 
 			var user = this.props.user,
 			    promises = [];
@@ -16381,7 +17273,7 @@ var UserPage = asyncPage({
 
 			if (promises.length) {
 				Promise.race(promises).then(function () {
-					_this22.bindScrollEvents();
+					_this50.bindScrollEvents();
 				});
 			} else {
 				this.bindScrollEvents();
@@ -16427,7 +17319,7 @@ var UserPage = asyncPage({
    * @returns {Promise}
    */
 		value: function uploadEntities(type) {
-			var _this23 = this;
+			var _this51 = this;
 
 			var is_upload_disabled = this.disable_uploads[type],
 			    is_scroll_blocked = this.block_scroll[type];
@@ -16462,22 +17354,22 @@ var UserPage = asyncPage({
 			this.block_scroll[type] = true;
 
 			return fetch_promise.then(function (entities) {
-				_this23.block_scroll[type] = false;
+				_this51.block_scroll[type] = false;
 
 				if (!entities.length) {
-					_this23.disable_uploads[type] = true;
+					_this51.disable_uploads[type] = true;
 				}
 
 				switch (type) {
 					case __C.ENTITIES.EVENT:
 						{
 
-							return _this23.favored_events.unsetLoadingState().update();
+							return _this51.favored_events.unsetLoadingState().update();
 						}
 					case __C.ENTITIES.ACTIVITY:
 						{
 
-							return _this23.activities.unsetLoadingState().update();
+							return _this51.activities.unsetLoadingState().update();
 						}
 				}
 
@@ -16494,7 +17386,7 @@ var UserPage = asyncPage({
 	}, {
 		key: 'bindScrollEvents',
 		value: function bindScrollEvents() {
-			var _this24 = this;
+			var _this52 = this;
 
 			var $window = $(window);
 
@@ -16510,7 +17402,7 @@ var UserPage = asyncPage({
 
 						$window.on('scroll.uploadEntities', function () {
 							if (isScrollRemain(1000)) {
-								_this24.uploadEntities(_this24.tabs.state.selected_tab);
+								_this52.uploadEntities(_this52.tabs.state.selected_tab);
 							}
 						});
 					}
@@ -16524,7 +17416,7 @@ var UserPage = asyncPage({
 	}, {
 		key: 'render',
 		value: function render() {
-			var _this25 = this;
+			var _this53 = this;
 
 			var user = this.props.user,
 			    SidebarWrapper = UserPage.SidebarWrapper,
@@ -16581,7 +17473,7 @@ var UserPage = asyncPage({
 					Tabs,
 					{
 						ref: function ref(component) {
-							return _this25.tabs = component;
+							return _this53.tabs = component;
 						},
 						className: 'page user_page_content',
 						headerClasses: 'user_page_content_header -color_accent',
@@ -16591,14 +17483,14 @@ var UserPage = asyncPage({
 						Tab,
 						{ title: i18n(__S.ACTIVITY, 1), name: 'activity' },
 						React.createElement(UserActivities, { ref: function ref(component) {
-								return _this25.activities = component;
+								return _this53.activities = component;
 							}, user: user, activities: user.actions })
 					),
 					React.createElement(
 						Tab,
 						{ title: i18n(__S.FAVORED_EVENT, 2), name: 'event' },
 						React.createElement(EventBlocks, { ref: function ref(component) {
-								return _this25.favored_events = component;
+								return _this53.favored_events = component;
 							}, events: user.favored })
 					)
 				)
@@ -16638,10 +17530,10 @@ var MyProfilePage = asyncPage({
 	function MyProfilePage(props) {
 		_classCallCheck(this, MyProfilePage);
 
-		var _this26 = _possibleConstructorReturn(this, (MyProfilePage.__proto__ || Object.getPrototypeOf(MyProfilePage)).call(this, props));
+		var _this54 = _possibleConstructorReturn(this, (MyProfilePage.__proto__ || Object.getPrototypeOf(MyProfilePage)).call(this, props));
 
-		_this26.favored_fetch_data.fields.push('is_favorite');
-		return _this26;
+		_this54.favored_fetch_data.fields.push('is_favorite');
+		return _this54;
 	}
 
 	return MyProfilePage;
@@ -16686,11 +17578,202 @@ var NoReactPage = function (_React$Component9) {
 	return NoReactPage;
 }(React.Component);
 /**
- * @abstract
- * @class
+ * @requires ../../entities/networking_profile/OneEventNetworkingProfile.js
  */
 
 
+var CreateNetworkingRequestModal = function (_React$Component10) {
+	_inherits(CreateNetworkingRequestModal, _React$Component10);
+
+	function CreateNetworkingRequestModal(props) {
+		_classCallCheck(this, CreateNetworkingRequestModal);
+
+		var _this56 = _possibleConstructorReturn(this, (CreateNetworkingRequestModal.__proto__ || Object.getPrototypeOf(CreateNetworkingRequestModal)).call(this, props));
+
+		_this56.state = {
+			with_message: false,
+			fade_in: true
+		};
+		_this56.inputs = [];
+		_this56.modal = null;
+		_this56.modal_wrapper = $('.ModalsWrapper').get(0);
+
+		_this56.handleClickOutside = _this56.handleClickOutside.bind(_this56);
+		return _this56;
+	}
+
+	_createClass(CreateNetworkingRequestModal, [{
+		key: 'componentWillMount',
+		value: function componentWillMount() {
+			$('body').addClass('-open_modal');
+		}
+	}, {
+		key: 'componentDidMount',
+		value: function componentDidMount() {
+			this.bindClickOutside();
+			this.setState({
+				fade_in: false
+			});
+		}
+	}, {
+		key: 'componentWillUnmount',
+		value: function componentWillUnmount() {
+			this.unbindClickOutside();
+			$('body').removeClass('-open_modal');
+		}
+	}, {
+		key: 'bindClickOutside',
+		value: function bindClickOutside() {
+			if (!this.props.canHide) {
+				document.addEventListener('mousedown', this.handleClickOutside);
+			}
+		}
+	}, {
+		key: 'unbindClickOutside',
+		value: function unbindClickOutside() {
+			if (!this.props.canHide) {
+				document.removeEventListener('mousedown', this.handleClickOutside);
+			}
+		}
+	}, {
+		key: 'handleClickOutside',
+		value: function handleClickOutside(event) {
+			if (this.modal && !this.modal.contains(event.target)) {
+				this.setState({
+					fade_in: false
+				}, this.props.hideModalHandler);
+			}
+		}
+	}, {
+		key: 'render',
+		value: function render() {
+			var _this57 = this;
+
+			var profile = this.props.profile,
+			    with_message = this.state.with_message;
+
+
+			return ReactDOM.createPortal(React.createElement(
+				'div',
+				{
+					className: 'modal_unit material -floating_material ' + (this.state.fade_in ? '-faded' : ''),
+					ref: function ref(node) {
+						return _this57.modal = node;
+					},
+					style: { width: 370 }
+				},
+				React.createElement(
+					'header',
+					{ className: 'modal_header' },
+					React.createElement(
+						'span',
+						null,
+						'\u041E\u0442\u043F\u0440\u0430\u0432\u043A\u0430 \u0437\u0430\u044F\u0432\u043A\u0438'
+					),
+					React.createElement(
+						RippleButton,
+						{ className: 'modal_destroy_button CloseModal', onClick: function onClick(e) {
+								_this57.props.hideModalHandler();
+							} },
+						'\xD7'
+					)
+				),
+				React.createElement(
+					'div',
+					{ className: 'modal_content' },
+					React.createElement(
+						'header',
+						{ className: 'create_networking_request_modal_head' },
+						React.createElement(
+							'aside',
+							{ className: 'create_networking_request_modal_head_side' },
+							React.createElement(Avatar, { entity: profile.user, className: new HtmlClassesArray(__C.CLASSES.UNIVERSAL_STATES.ROUNDED, __C.CLASSES.SIZES.X55) })
+						),
+						React.createElement(
+							'div',
+							{ className: 'create_networking_request_modal_head_body' },
+							React.createElement(
+								'h5',
+								{ className: 'create_networking_request_modal_title' },
+								profile.user.full_name
+							),
+							React.createElement(
+								'span',
+								{ className: 'create_networking_request_modal_subtitle' },
+								profile.company_name
+							)
+						)
+					),
+					with_message && React.createElement(
+						'div',
+						{ className: 'form_unit' },
+						React.createElement('textarea', {
+							className: 'form_textarea',
+							name: 'message',
+							placeholder: '\u0412\u0432\u0435\u0434\u0438\u0442\u0435 \u0441\u043E\u043E\u0431\u0449\u0435\u043D\u0438\u0435 (\u043D\u0435\u043E\u0431\u044F\u0437\u0430\u0442\u0435\u043B\u044C\u043D\u043E)',
+							ref: 'message'
+						})
+					),
+					React.createElement(
+						'div',
+						{ className: 'form_group -parts_e_2' },
+						React.createElement(
+							'div',
+							{ className: 'form_unit' },
+							with_message || React.createElement(
+								Action,
+								{
+									className: 'fa_icon fa-commenting',
+									onClick: function onClick(e) {
+										_this57.setState({
+											with_message: true
+										});
+									}
+								},
+								'\u041F\u0440\u0438\u043A\u0440\u0435\u043F\u0438\u0442\u044C \u0441\u043E\u043E\u0431\u0449\u0435\u043D\u0438\u0435'
+							)
+						),
+						React.createElement(
+							'div',
+							{ className: 'form_unit' },
+							React.createElement(
+								RippleButton,
+								{
+									className: new HtmlClassesArray(__C.CLASSES.COLORS.ACCENT),
+									onClick: function onClick(e) {
+										profile.request.create({
+											event_id: profile.event_id,
+											user_id: profile.user_id,
+											sender_user_id: __APP.USER.id,
+											message: with_message ? _this57.refs.message.value : null
+										}).then(function (data) {
+											_this57.props.hideModalHandler();
+
+											return data;
+										});
+									}
+								},
+								'\u041E\u0442\u043F\u0440\u0430\u0432\u0438\u0442\u044C \u0437\u0430\u044F\u0432\u043A\u0443'
+							)
+						)
+					)
+				)
+			), this.modal_wrapper);
+		}
+	}]);
+
+	return CreateNetworkingRequestModal;
+}(React.Component);
+
+CreateNetworkingRequestModal.propTypes = {
+	profile: PropTypes.instanceOf(OneEventNetworkingProfile),
+	canHide: PropTypes.bool,
+	hideModalHandler: PropTypes.func
+};
+/**
+ * @abstract
+ * @class
+ */
 AbstractSidebar = function () {
 	/**
   *
@@ -17019,30 +18102,30 @@ TopBarNoAuth = extending(AbstractTopBar, function () {
  * @property {boolean} state.is_hovered
  */
 
-var ReactActionButton = function (_React$Component10) {
-	_inherits(ReactActionButton, _React$Component10);
+var ReactActionButton = function (_React$Component11) {
+	_inherits(ReactActionButton, _React$Component11);
 
 	function ReactActionButton(props, context) {
 		_classCallCheck(this, ReactActionButton);
 
-		var _this28 = _possibleConstructorReturn(this, (ReactActionButton.__proto__ || Object.getPrototypeOf(ReactActionButton)).call(this, props, context));
+		var _this58 = _possibleConstructorReturn(this, (ReactActionButton.__proto__ || Object.getPrototypeOf(ReactActionButton)).call(this, props, context));
 
-		_this28.state = {
+		_this58.state = {
 			is_checked: props.isChecked,
 			is_hovered: false
 		};
 
-		_this28.labels = props.labels === null ? ReactActionButton.DEFAULTS.labels : _extends({}, _this28.constructor.DEFAULTS.labels, props.labels);
-		_this28.colors = props.colors === null ? ReactActionButton.DEFAULTS.colors : _extends({}, _this28.constructor.DEFAULTS.colors, props.colors);
-		_this28.icons = props.icons === null ? ReactActionButton.DEFAULTS.icons : _extends({}, _this28.constructor.DEFAULTS.icons, props.icons);
+		_this58.labels = props.labels === null ? ReactActionButton.DEFAULTS.labels : _extends({}, _this58.constructor.DEFAULTS.labels, props.labels);
+		_this58.colors = props.colors === null ? ReactActionButton.DEFAULTS.colors : _extends({}, _this58.constructor.DEFAULTS.colors, props.colors);
+		_this58.icons = props.icons === null ? ReactActionButton.DEFAULTS.icons : _extends({}, _this58.constructor.DEFAULTS.icons, props.icons);
 
-		_this28.mouseHoverHandler = _this28.mouseHoverHandler.bind(_this28);
-		_this28.mouseLeaveHandler = _this28.mouseLeaveHandler.bind(_this28);
-		_this28.checkedStateChange = _this28.checkedStateChange.bind(_this28);
-		_this28.onClickHandler = _this28.onClickHandler.bind(_this28);
-		_this28.clickAction = _this28.clickAction.bind(_this28);
+		_this58.mouseHoverHandler = _this58.mouseHoverHandler.bind(_this58);
+		_this58.mouseLeaveHandler = _this58.mouseLeaveHandler.bind(_this58);
+		_this58.checkedStateChange = _this58.checkedStateChange.bind(_this58);
+		_this58.onClickHandler = _this58.onClickHandler.bind(_this58);
+		_this58.clickAction = _this58.clickAction.bind(_this58);
 
-		Object.defineProperties(_this28, {
+		Object.defineProperties(_this58, {
 			classes: {
 				get: function get() {
 					var classes = new HtmlClassesArray(this.props.className);
@@ -17086,7 +18169,7 @@ var ReactActionButton = function (_React$Component10) {
 				}
 			}
 		});
-		return _this28;
+		return _this58;
 	}
 
 	_createClass(ReactActionButton, [{
@@ -17210,13 +18293,13 @@ var ReactAddToFavoriteButton = function (_ReactActionButton) {
 	function ReactAddToFavoriteButton(props, context) {
 		_classCallCheck(this, ReactAddToFavoriteButton);
 
-		var _this29 = _possibleConstructorReturn(this, (ReactAddToFavoriteButton.__proto__ || Object.getPrototypeOf(ReactAddToFavoriteButton)).call(this, props, context));
+		var _this59 = _possibleConstructorReturn(this, (ReactAddToFavoriteButton.__proto__ || Object.getPrototypeOf(ReactAddToFavoriteButton)).call(this, props, context));
 
-		_this29.event = props.event;
+		_this59.event = props.event;
 		if (!isVoid(context[AvatarCollectionContextProvider.CONTEXT_NAME])) {
-			_this29.state.is_checked = context[AvatarCollectionContextProvider.CONTEXT_NAME].isSubscribed;
+			_this59.state.is_checked = context[AvatarCollectionContextProvider.CONTEXT_NAME].isSubscribed;
 		}
-		return _this29;
+		return _this59;
 	}
 
 	_createClass(ReactAddToFavoriteButton, [{
@@ -17240,13 +18323,13 @@ var ReactAddToFavoriteButton = function (_ReactActionButton) {
 	}, {
 		key: 'clickAction',
 		value: function clickAction() {
-			var _this30 = this;
+			var _this60 = this;
 
 			if (this.state.is_checked) {
 
 				return this.event.unfavour().then(function (data) {
-					if (!isVoid(_this30.context[AvatarCollectionContextProvider.CONTEXT_NAME])) {
-						_this30.context[AvatarCollectionContextProvider.CONTEXT_NAME].unsubscribe();
+					if (!isVoid(_this60.context[AvatarCollectionContextProvider.CONTEXT_NAME])) {
+						_this60.context[AvatarCollectionContextProvider.CONTEXT_NAME].unsubscribe();
 					}
 
 					return data;
@@ -17254,8 +18337,8 @@ var ReactAddToFavoriteButton = function (_ReactActionButton) {
 			} else {
 
 				return this.event.favour().then(function (data) {
-					if (!isVoid(_this30.context[AvatarCollectionContextProvider.CONTEXT_NAME])) {
-						_this30.context[AvatarCollectionContextProvider.CONTEXT_NAME].subscribe();
+					if (!isVoid(_this60.context[AvatarCollectionContextProvider.CONTEXT_NAME])) {
+						_this60.context[AvatarCollectionContextProvider.CONTEXT_NAME].subscribe();
 					}
 
 					return data;
@@ -17309,8 +18392,8 @@ function OverlayCap(_ref24) {
 	);
 }
 
-var FormCheckbox = function (_React$Component11) {
-	_inherits(FormCheckbox, _React$Component11);
+var FormCheckbox = function (_React$Component12) {
+	_inherits(FormCheckbox, _React$Component12);
 
 	function FormCheckbox() {
 		_classCallCheck(this, FormCheckbox);
@@ -17378,6 +18461,825 @@ function OverlayLoader(_ref26) {
 
 	return React.createElement(LoaderBlock, _extends({ className: new HtmlClassesArray(className) + ' -loader_overlay' }, rest_props));
 }
+/**
+ * @requires ../asyncPage.js
+ */
+var EventNetworkingContactsPage = asyncPage({
+	constructPage: function constructPage(_ref27) {
+		var event_id = _ref27.event_id;
+
+
+		return {
+			my_contacts_profiles: new EventNetworkingContactsProfilesCollection(event_id),
+			my_contacts_profiles_fields: new Fields()
+		};
+	},
+	fetchData: function fetchData() {
+
+		return this.props.my_contacts_profiles.fetch(this.props.my_contacts_profiles_fields);
+	},
+
+
+	pageTitle: 'Аудитория события',
+
+	headerTabs: function headerTabs() {
+
+		return [{ title: 'Участники', page: '/event/' + this.props.event_id + '/networking/participants' }, { title: 'Заявки', page: '/event/' + this.props.event_id + '/networking/requests' }, { title: 'Контакты', page: '/event/' + this.props.event_id + '/networking/contacts' }, { title: 'Мой профиль', page: '/event/' + this.props.event_id + '/networking/profile' }];
+	}
+}, function (_React$Component13) {
+	_inherits(EventNetworkingContactsPage, _React$Component13);
+
+	function EventNetworkingContactsPage() {
+		_classCallCheck(this, EventNetworkingContactsPage);
+
+		return _possibleConstructorReturn(this, (EventNetworkingContactsPage.__proto__ || Object.getPrototypeOf(EventNetworkingContactsPage)).apply(this, arguments));
+	}
+
+	_createClass(EventNetworkingContactsPage, [{
+		key: 'render',
+		value: function render() {
+			var my_contacts_profiles = this.props.my_contacts_profiles;
+
+
+			return contentWrap(React.createElement(
+				'div',
+				{ className: 'event_networking_page material -level_2_material' },
+				React.createElement(
+					'header',
+					{ className: 'event_networking_header -hidden' },
+					React.createElement('input', { className: 'event_networking_search form_input -rounded', placeholder: '\u041F\u043E\u0438\u0441\u043A \u0443\u0447\u0430\u0441\u0442\u043D\u0438\u043A\u043E\u0432' })
+				),
+				React.createElement(
+					'div',
+					{ className: 'event_networking_body' },
+					my_contacts_profiles.length ? my_contacts_profiles.map(function (profile) {
+						return React.createElement(
+							EventNetworkingPage.NetworkingProfileUnit,
+							{ key: profile.user_id, profile: profile },
+							profile.info && React.createElement(
+								'p',
+								null,
+								React.createElement(
+									'b',
+									null,
+									'\u041F\u043E\u043B\u0435\u0437\u0435\u043D:'
+								),
+								' ',
+								profile.info
+							)
+						);
+					}) : React.createElement(
+						Cap,
+						null,
+						'\u0423 \u0432\u0430\u0441 \u043F\u043E\u043A\u0430 \u043D\u0435\u0442 \u043A\u043E\u043D\u0442\u0430\u043A\u0442\u043E\u0432'
+					)
+				)
+			));
+		}
+	}]);
+
+	return EventNetworkingContactsPage;
+}(React.Component));
+/**
+ * @requires ../asyncPage.js
+ */
+
+var EventNetworkingMyProfilePage = asyncPage({
+	constructPage: function constructPage(_ref28) {
+		var event_id = _ref28.event_id;
+		var myProfile = this.props.myProfile;
+
+
+		return {
+			my_profile: isVoid(myProfile) ? new MyEventNetworkingProfile(event_id) : myProfile,
+			is_fetched: !isVoid(myProfile)
+		};
+	},
+	fetchData: function fetchData() {
+		if (this.props.is_fetched) {
+
+			return Promise.resolve();
+		}
+
+		return this.props.my_profile.fetch();
+	},
+
+
+	pageTitle: 'Мой профиль',
+
+	headerTabs: function headerTabs() {
+
+		return [{ title: 'Участники', page: '/event/' + this.props.event_id + '/networking/participants' }, { title: 'Заявки', page: '/event/' + this.props.event_id + '/networking/requests' }, { title: 'Контакты', page: '/event/' + this.props.event_id + '/networking/contacts' }, { title: 'Мой профиль', page: '/event/' + this.props.event_id + '/networking/profile' }];
+	}
+}, function (_React$Component14) {
+	_inherits(EventNetworkingMyProfilePage, _React$Component14);
+
+	function EventNetworkingMyProfilePage(props) {
+		_classCallCheck(this, EventNetworkingMyProfilePage);
+
+		var _this63 = _possibleConstructorReturn(this, (EventNetworkingMyProfilePage.__proto__ || Object.getPrototypeOf(EventNetworkingMyProfilePage)).call(this, props));
+
+		_this63.state = {
+			redirect_to: null
+		};
+
+		_this63.saveHandler = _this63.saveHandler.bind(_this63);
+		return _this63;
+	}
+
+	_createClass(EventNetworkingMyProfilePage, [{
+		key: 'saveHandler',
+		value: function saveHandler() {
+			var _this64 = this;
+
+			this.props.my_profile.update({
+				first_name: this.refs.first_name.value,
+				last_name: this.refs.last_name.value,
+				info: this.refs.info.value,
+				looking_for: this.refs.looking_for.value,
+				vk_url: this.refs.vk_url.value,
+				facebook_url: this.refs.facebook_url.value,
+				twitter_url: this.refs.twitter_url.value,
+				linkedin_url: this.refs.linkedin_url.value,
+				telegram_url: this.refs.telegram_url.value,
+				instagram_url: this.refs.instagram_url.value,
+				github_url: this.refs.github_url.value
+			}).then(function (data) {
+				_this64.setState({
+					redirect_to: _this64.props.match.url.replace('profile', 'participants')
+				});
+
+				return data;
+			});
+		}
+	}, {
+		key: 'render',
+		value: function render() {
+			var my_profile = this.props.my_profile,
+			    _ReactRouter = ReactRouter,
+			    Redirect = _ReactRouter.Redirect,
+			    vk_url = my_profile.vk_url,
+			    facebook_url = my_profile.facebook_url,
+			    twitter_url = my_profile.twitter_url,
+			    linkedin_url = my_profile.linkedin_url,
+			    telegram_url = my_profile.telegram_url,
+			    instagram_url = my_profile.instagram_url,
+			    github_url = my_profile.github_url,
+			    links = {
+				vk_url: vk_url,
+				facebook_url: facebook_url,
+				twitter_url: twitter_url,
+				linkedin_url: linkedin_url,
+				telegram_url: telegram_url,
+				instagram_url: instagram_url,
+				github_url: github_url
+			},
+			    labels = {
+				vk_url: 'VK',
+				facebook_url: 'Facebook',
+				twitter_url: 'Twitter',
+				linkedin_url: 'LinkedIn',
+				telegram_url: 'Telegram',
+				instagram_url: 'Instagram',
+				github_url: 'Github'
+			};
+
+
+			if (!isVoid(this.state.redirect_to)) {
+
+				return React.createElement(Redirect, { to: this.state.redirect_to });
+			}
+
+			return contentWrap(React.createElement(
+				'div',
+				{ className: 'event_networking_page material -level_2_material' },
+				React.createElement(
+					'header',
+					{ className: 'event_networking_my_profile_header' },
+					React.createElement(
+						'h2',
+						{ className: 'event_networking_my_profile_title' },
+						'\u0420\u0435\u0434\u0430\u043A\u0442\u0438\u0440\u043E\u0432\u0430\u043D\u0438\u0435 \u043F\u0440\u043E\u0444\u0438\u043B\u044F'
+					)
+				),
+				React.createElement(
+					'div',
+					{ className: 'event_networking_my_profile_body' },
+					React.createElement(
+						'h4',
+						null,
+						'\u0418\u043C\u044F'
+					),
+					React.createElement(
+						'div',
+						{ className: 'form_group -parts_e_2' },
+						React.createElement(
+							'div',
+							{ className: 'form_unit ' },
+							React.createElement('input', {
+								className: 'form_input',
+								name: 'last_name',
+								required: true,
+								placeholder: '\u0424\u0430\u043C\u0438\u043B\u0438\u044F',
+								type: 'text',
+								autoComplete: 'off',
+								defaultValue: my_profile.last_name,
+								ref: 'last_name'
+							})
+						),
+						React.createElement(
+							'div',
+							{ className: 'form_unit ' },
+							React.createElement('input', {
+								className: 'form_input',
+								name: 'first_name',
+								required: true,
+								placeholder: '\u0418\u043C\u044F',
+								type: 'text',
+								autoComplete: 'off',
+								defaultValue: my_profile.first_name,
+								ref: 'first_name'
+							})
+						)
+					),
+					React.createElement(
+						'p',
+						null,
+						'\u0412\u0432\u043E\u0434\u0438\u0442\u0435 \u0442\u043E\u043B\u044C\u043A\u043E \u043D\u0430\u0441\u0442\u043E\u044F\u0449\u0438\u0435 \u0444\u0430\u043C\u0438\u043B\u0438\u044E \u0438 \u0438\u043C\u044F'
+					),
+					React.createElement(
+						'h4',
+						null,
+						'\u0418\u043D\u0444\u043E\u0440\u043C\u0430\u0446\u0438\u044F \u043E \u0441\u0435\u0431\u0435'
+					),
+					React.createElement(
+						'p',
+						null,
+						'\u041D\u0430\u043F\u0440\u0438\u043C\u0435\u0440: \u0414\u0438\u0437\u0430\u0439\u043D \u0438\u043D\u0442\u0435\u0440\u0444\u0435\u0439\u0441\u043E\u0432, \u0440\u0430\u0437\u0440\u0430\u0431\u043E\u0442\u043A\u0430 \u043C\u043E\u0431\u0438\u043B\u044C\u043D\u044B\u0445 \u043F\u0440\u0438\u043B\u043E\u0436\u0435\u043D\u0438\u0439'
+					),
+					React.createElement(
+						'div',
+						{ className: 'form_unit' },
+						React.createElement('textarea', {
+							className: 'form_textarea',
+							name: 'info',
+							placeholder: '\u041D\u0435\u0441\u043A\u043E\u043B\u044C\u043A\u043E \u0441\u043B\u043E\u0432 \u043E \u0441\u0435\u0431\u0435 (\u043D\u0435\u043E\u0431\u044F\u0437\u0430\u0442\u0435\u043B\u044C\u043D\u043E)',
+							ref: 'info',
+							defaultValue: my_profile.info
+						})
+					),
+					React.createElement(
+						'h4',
+						null,
+						'\u0418\u0449\u0443'
+					),
+					React.createElement(
+						'p',
+						null,
+						'\u041D\u0430\u043F\u0438\u0448\u0438\u0442\u0435 \u0432 \u043F\u043E\u0438\u0441\u043A\u0430\u0445 \u0447\u0435\u0433\u043E \u0432\u044B \u043D\u0430\u0445\u043E\u0434\u0438\u0442\u0435\u0441\u044C \u043D\u0430 \u044D\u0442\u043E\u043C \u0441\u043E\u0431\u044B\u0442\u0438\u0438. \u042D\u0442\u043E \u043F\u043E\u043C\u043E\u0436\u0435\u0442 \u0434\u0440\u0443\u0433\u0438\u043C \u0443\u0447\u0430\u0441\u0442\u043D\u0438\u043A\u0430\u043C \u043D\u0430\u0439\u0442\u0438 \u0441 \u0412\u0430\u043C\u0438 \u043A\u043E\u043D\u0442\u0430\u043A\u0442.'
+					),
+					React.createElement(
+						'div',
+						{ className: 'form_unit' },
+						React.createElement('textarea', {
+							className: 'form_textarea',
+							name: 'looking_for',
+							placeholder: '\u041D\u0435\u0441\u043A\u043E\u043B\u044C\u043A\u043E \u0441\u043B\u043E\u0432 \u043E \u0442\u043E\u043C \u0447\u0442\u043E \u0432\u044B \u0438\u0449\u0435\u0442\u0435 (\u043D\u0435\u043E\u0431\u044F\u0437\u0430\u0442\u0435\u043B\u044C\u043D\u043E)',
+							ref: 'looking_for',
+							defaultValue: my_profile.looking_for
+						})
+					),
+					React.createElement(
+						'h4',
+						null,
+						'\u0421\u0441\u044B\u043B\u043A\u0438'
+					),
+					Object.keys(links).map(function (type) {
+						return React.createElement(
+							'div',
+							{ key: type, className: 'form_unit -inline' },
+							React.createElement(
+								'label',
+								{ className: 'form_label', htmlFor: 'event_networking_my_profile_' + type },
+								labels[type]
+							),
+							React.createElement('input', {
+								id: 'event_networking_my_profile_' + type,
+								className: 'form_input',
+								name: type,
+								placeholder: '\u0421\u0441\u044B\u043B\u043A\u0430',
+								type: 'text',
+								autoComplete: 'off',
+								defaultValue: links[type],
+								ref: type
+							})
+						);
+					}),
+					React.createElement(
+						'div',
+						{ className: 'form_unit -align_center' },
+						React.createElement(
+							RippleButton,
+							{
+								className: new HtmlClassesArray([__C.CLASSES.COLORS.ACCENT, __C.CLASSES.SIZES.HUGE]),
+								onClick: this.saveHandler
+							},
+							'\u0421\u043E\u0445\u0440\u0430\u043D\u0438\u0442\u044C'
+						)
+					)
+				)
+			));
+		}
+	}]);
+
+	return EventNetworkingMyProfilePage;
+}(React.Component));
+/**
+ * @requires ../asyncPage.js
+ */
+var EventNetworkingPage = asyncPage({
+	constructPage: function constructPage(_ref29) {
+		var event_id = _ref29.event_id;
+
+		var parsed_uri = parseUri(window.location);
+
+		return {
+			my_profile: new MyEventNetworkingProfile(event_id),
+			code: parsed_uri.queryKey['code'],
+			my_profile_fields: new Fields()
+		};
+	},
+	fetchData: function fetchData() {
+		var _props8 = this.props,
+		    my_profile = _props8.my_profile,
+		    my_profile_fields = _props8.my_profile_fields,
+		    code = _props8.code;
+
+
+		if (!isVoid(code)) {
+
+			return my_profile.redeemAccess(code, my_profile_fields);
+		}
+
+		return my_profile.checkAccess(my_profile_fields).catch(function (reason) {
+
+			debugger;
+		});
+	},
+
+
+	is_auth_required: true
+}, function (_React$Component15) {
+	_inherits(EventNetworkingPage, _React$Component15);
+
+	function EventNetworkingPage() {
+		_classCallCheck(this, EventNetworkingPage);
+
+		return _possibleConstructorReturn(this, (EventNetworkingPage.__proto__ || Object.getPrototypeOf(EventNetworkingPage)).apply(this, arguments));
+	}
+
+	_createClass(EventNetworkingPage, [{
+		key: 'render',
+		value: function render() {
+			var _this66 = this;
+
+			var _ReactRouter2 = ReactRouter,
+			    Switch = _ReactRouter2.Switch,
+			    Route = _ReactRouter2.Route,
+			    Redirect = _ReactRouter2.Redirect;
+
+
+			if (this.props.my_profile.signed_up === false && window.location.pathname !== this.props.match.url + '/profile') {
+
+				return React.createElement(Redirect, { to: this.props.match.url + '/profile' });
+			}
+
+			return React.createElement(
+				Switch,
+				null,
+				React.createElement(Route, { exact: true, path: '/event/:event_id/networking/participants', component: EventNetworkingParticipantsPage }),
+				React.createElement(Route, { exact: true, path: '/event/:event_id/networking/requests', component: EventNetworkingRequestsPage }),
+				React.createElement(Route, { exact: true, path: '/event/:event_id/networking/contacts', component: EventNetworkingContactsPage }),
+				React.createElement(Route, { exact: true, path: '/event/:event_id/networking/profile', component: function component(props) {
+						return React.createElement(EventNetworkingMyProfilePage, _extends({}, props, { myProfile: _this66.props.my_profile }));
+					} }),
+				React.createElement(Redirect, { strict: true, from: '/event/:event_id/networking', to: this.props.match.url + '/participants' })
+			);
+		}
+	}]);
+
+	return EventNetworkingPage;
+}(React.Component));
+
+EventNetworkingPage.NetworkingProfileUnit = function (_ref30) {
+	var profile = _ref30.profile,
+	    children = _ref30.children;
+	return React.createElement(
+		'div',
+		{ className: 'networking_profile_block' },
+		React.createElement(
+			'aside',
+			{ className: 'networking_profile_block_avatar', onClick: function onClick(e) {
+					new NetworkingProfileAppInspector(profile).show();
+				} },
+			React.createElement(Avatar, { entity: profile.user, className: new HtmlClassesArray(__C.CLASSES.UNIVERSAL_STATES.ROUNDED, __C.CLASSES.SIZES.X55) })
+		),
+		React.createElement(
+			'div',
+			{ className: 'networking_profile_block_main' },
+			React.createElement(
+				'header',
+				{ className: 'networking_profile_block_header', onClick: function onClick(e) {
+						new NetworkingProfileAppInspector(profile).show();
+					} },
+				React.createElement(
+					'h4',
+					{ className: 'networking_profile_block_title' },
+					profile.user.full_name
+				),
+				profile.company_name && React.createElement(
+					'span',
+					{ className: 'networking_profile_block_org' },
+					profile.company_name
+				)
+			),
+			React.createElement(
+				'div',
+				{ className: 'networking_profile_block_body' },
+				children
+			)
+		)
+	);
+};
+/**
+ * @requires ../asyncPage.js
+ */
+var EventNetworkingParticipantsPage = asyncPage({
+	constructPage: function constructPage(_ref31) {
+		var event_id = _ref31.event_id;
+
+
+		return {
+			profiles: new EventNetworkingProfilesCollection(event_id),
+			profiles_fields: new Fields('request', 'outgoing_request')
+		};
+	},
+	fetchData: function fetchData() {
+
+		return this.props.profiles.fetch(this.props.profiles_fields, 20);
+	},
+
+
+	pageTitle: 'Аудитория события',
+
+	headerTabs: function headerTabs() {
+
+		return [{ title: 'Участники', page: '/event/' + this.props.event_id + '/networking/participants' }, { title: 'Заявки', page: '/event/' + this.props.event_id + '/networking/requests' }, { title: 'Контакты', page: '/event/' + this.props.event_id + '/networking/contacts' }, { title: 'Мой профиль', page: '/event/' + this.props.event_id + '/networking/profile' }];
+	}
+}, function (_React$Component16) {
+	_inherits(EventNetworkingParticipantsPage, _React$Component16);
+
+	function EventNetworkingParticipantsPage(props) {
+		_classCallCheck(this, EventNetworkingParticipantsPage);
+
+		var _this67 = _possibleConstructorReturn(this, (EventNetworkingParticipantsPage.__proto__ || Object.getPrototypeOf(EventNetworkingParticipantsPage)).call(this, props));
+
+		_this67.state = {
+			current_modal: null,
+			modal_props: null
+		};
+
+		_this67.hideModal = _this67.hideModal.bind(_this67);
+		return _this67;
+	}
+
+	_createClass(EventNetworkingParticipantsPage, [{
+		key: 'hideModal',
+		value: function hideModal() {
+			this.setState({
+				current_modal: null,
+				modal_props: null
+			});
+		}
+	}, {
+		key: 'render',
+		value: function render() {
+			var _this68 = this;
+
+			var CurrentModal = this.state.current_modal;
+
+			return contentWrap(React.createElement(
+				'div',
+				{ className: 'event_networking_page material -level_2_material' },
+				React.createElement(
+					'header',
+					{ className: 'event_networking_header -hidden' },
+					React.createElement('input', { className: 'event_networking_search form_input -rounded', placeholder: '\u041F\u043E\u0438\u0441\u043A \u0443\u0447\u0430\u0441\u0442\u043D\u0438\u043A\u043E\u0432' })
+				),
+				React.createElement(
+					'div',
+					{ className: 'event_networking_body' },
+					this.props.profiles.map(function (profile) {
+						return React.createElement(
+							EventNetworkingPage.NetworkingProfileUnit,
+							{ key: profile.user_id, profile: profile },
+							profile.info && React.createElement(
+								'p',
+								null,
+								React.createElement(
+									'b',
+									null,
+									'\u041F\u043E\u043B\u0435\u0437\u0435\u043D:'
+								),
+								' ',
+								profile.info
+							),
+							profile.looking_for && React.createElement(
+								'p',
+								null,
+								React.createElement(
+									'b',
+									null,
+									'\u0418\u0449\u0435\u0442:'
+								),
+								' ',
+								profile.looking_for
+							),
+							profile.outgoing_request.uuid ? isVoid(profile.outgoing_request.accept_status) ? React.createElement(
+								'span',
+								{ className: __C.CLASSES.TEXT_COLORS.MUTED_50 },
+								'\u0417\u0430\u044F\u0432\u043A\u0430 \u043E\u0442\u043F\u0440\u0430\u0432\u043B\u0435\u043D\u0430'
+							) : profile.outgoing_request.accept_status ? React.createElement(
+								'span',
+								{ className: __C.CLASSES.TEXT_COLORS.FRANKLIN },
+								'\u0417\u0430\u044F\u0432\u043A\u0430 \u043F\u0440\u0438\u043D\u044F\u0442\u0430'
+							) : React.createElement(
+								'span',
+								{ className: __C.CLASSES.TEXT_COLORS.ACCENT },
+								'\u0417\u0430\u044F\u0432\u043A\u0430 \u043E\u0442\u043A\u043B\u043E\u043D\u0435\u043D\u0430'
+							) : React.createElement(
+								Action,
+								{
+									onClick: function onClick(e) {
+										_this68.setState({
+											current_modal: CreateNetworkingRequestModal,
+											modal_props: { profile: profile }
+										});
+									}
+								},
+								'\u041E\u0442\u043F\u0440\u0430\u0432\u0438\u0442\u044C \u0437\u0430\u044F\u0432\u043A\u0443'
+							)
+						);
+					})
+				),
+				CurrentModal && React.createElement(CurrentModal, _extends({}, this.state.modal_props, { hideModalHandler: this.hideModal }))
+			));
+		}
+	}]);
+
+	return EventNetworkingParticipantsPage;
+}(React.Component));
+/**
+ * @requires ../asyncPage.js
+ */
+var EventNetworkingRequestsPage = asyncPage({
+	constructPage: function constructPage(_ref32) {
+		var event_id = _ref32.event_id;
+
+
+		return {
+			pending_requests_profiles: new EventNetworkingPendingRequestProfilesCollection(event_id),
+			accepted_requests_profiles: new EventNetworkingAcceptedRequestProfilesCollection(event_id),
+			rejected_requests_profiles: new EventNetworkingRejectedRequestProfilesCollection(event_id),
+			requests_profiles_fields: new Fields('request')
+		};
+	},
+	fetchData: function fetchData() {
+
+		return Promise.all([this.props.pending_requests_profiles.fetch(this.props.requests_profiles_fields), this.props.accepted_requests_profiles.fetch(this.props.requests_profiles_fields), this.props.rejected_requests_profiles.fetch(this.props.requests_profiles_fields)]);
+	},
+
+
+	pageTitle: 'Аудитория события',
+
+	headerTabs: function headerTabs() {
+
+		return [{ title: 'Участники', page: '/event/' + this.props.event_id + '/networking/participants' }, { title: 'Заявки', page: '/event/' + this.props.event_id + '/networking/requests' }, { title: 'Контакты', page: '/event/' + this.props.event_id + '/networking/contacts' }, { title: 'Мой профиль', page: '/event/' + this.props.event_id + '/networking/profile' }];
+	}
+}, function (_React$Component17) {
+	_inherits(EventNetworkingRequestsPage, _React$Component17);
+
+	function EventNetworkingRequestsPage(props) {
+		_classCallCheck(this, EventNetworkingRequestsPage);
+
+		var _this69 = _possibleConstructorReturn(this, (EventNetworkingRequestsPage.__proto__ || Object.getPrototypeOf(EventNetworkingRequestsPage)).call(this, props));
+
+		_this69.state = {
+			pending: props.pending_requests_profiles.length,
+			accepted: props.accepted_requests_profiles.length,
+			rejected: props.rejected_requests_profiles.length
+		};
+		return _this69;
+	}
+
+	_createClass(EventNetworkingRequestsPage, [{
+		key: 'render',
+		value: function render() {
+			var _this70 = this;
+
+			var _props9 = this.props,
+			    pending_requests_profiles = _props9.pending_requests_profiles,
+			    accepted_requests_profiles = _props9.accepted_requests_profiles,
+			    rejected_requests_profiles = _props9.rejected_requests_profiles,
+			    NetworkingProfileUnit = EventNetworkingPage.NetworkingProfileUnit;
+
+
+			return contentWrap(React.createElement(
+				'div',
+				{ className: 'event_networking_page material -level_2_material' },
+				React.createElement(
+					'header',
+					{ className: 'event_networking_header  -hidden' },
+					React.createElement('input', { className: 'event_networking_search form_input -rounded', placeholder: '\u041F\u043E\u0438\u0441\u043A \u0443\u0447\u0430\u0441\u0442\u043D\u0438\u043A\u043E\u0432' })
+				),
+				React.createElement(
+					'div',
+					{ className: 'event_networking_body' },
+					!![].concat(_toConsumableArray(pending_requests_profiles), _toConsumableArray(accepted_requests_profiles), _toConsumableArray(rejected_requests_profiles)).length || React.createElement(
+						Cap,
+						null,
+						'\u0412\u0430\u043C \u043F\u043E\u043A\u0430 \u0435\u0449\u0435 \u043D\u0435 \u043F\u043E\u0441\u0442\u0443\u043F\u0438\u043B\u043E \u043D\u0438 \u043E\u0434\u043D\u043E\u0439 \u0437\u0430\u044F\u0432\u043A\u0438'
+					),
+					pending_requests_profiles.map(function (profile) {
+						return React.createElement(
+							NetworkingProfileUnit,
+							{ key: profile.user_id, profile: profile },
+							profile.info && React.createElement(
+								'p',
+								null,
+								React.createElement(
+									'b',
+									null,
+									'\u041F\u043E\u043B\u0435\u0437\u0435\u043D:'
+								),
+								' ',
+								profile.info
+							),
+							profile.looking_for && React.createElement(
+								'p',
+								null,
+								React.createElement(
+									'b',
+									null,
+									'\u0418\u0449\u0435\u0442:'
+								),
+								' ',
+								profile.looking_for
+							),
+							profile.request.message && React.createElement(
+								'p',
+								{ className: 'networking_profile_block_comment fa_icon fa-commenting' },
+								profile.request.message
+							),
+							React.createElement(
+								'div',
+								{ className: 'form_group -align_left' },
+								React.createElement(
+									'div',
+									{ className: 'form_unit' },
+									React.createElement(
+										RippleButton,
+										{
+											className: __C.CLASSES.COLORS.ACCENT,
+											onClick: function onClick(e) {
+												profile.request.acceptRequest().then(function (data) {
+													accepted_requests_profiles.push(pending_requests_profiles.pull(profile.user_id));
+													_this70.setState({
+														pending: pending_requests_profiles.length,
+														accepted: accepted_requests_profiles.length
+													});
+
+													return data;
+												});
+											}
+										},
+										'\u041F\u0440\u0438\u043D\u044F\u0442\u044C \u0437\u0430\u044F\u0432\u043A\u0443'
+									)
+								),
+								React.createElement(
+									'div',
+									{ className: 'form_unit -valign_center' },
+									React.createElement(
+										Action,
+										{
+											className: __C.CLASSES.COLORS.MARGINAL,
+											onClick: function onClick(e) {
+												profile.request.cancelRequest().then(function (data) {
+													rejected_requests_profiles.push(pending_requests_profiles.pull(profile.user_id));
+													_this70.setState({
+														pending: pending_requests_profiles.length,
+														rejected: rejected_requests_profiles.length
+													});
+
+													return data;
+												});
+											}
+										},
+										'\u0421\u043A\u0440\u044B\u0442\u044C'
+									)
+								)
+							)
+						);
+					}),
+					accepted_requests_profiles.map(function (profile) {
+						return React.createElement(
+							NetworkingProfileUnit,
+							{ key: profile.user_id, profile: profile },
+							profile.info && React.createElement(
+								'p',
+								null,
+								React.createElement(
+									'b',
+									null,
+									'\u041F\u043E\u043B\u0435\u0437\u0435\u043D:'
+								),
+								' ',
+								profile.info
+							),
+							profile.looking_for && React.createElement(
+								'p',
+								null,
+								React.createElement(
+									'b',
+									null,
+									'\u0418\u0449\u0435\u0442:'
+								),
+								' ',
+								profile.looking_for
+							),
+							profile.request.message && React.createElement(
+								'p',
+								{ className: 'networking_profile_block_comment fa_icon fa-commenting' },
+								profile.request.message
+							),
+							React.createElement(
+								RippleButton,
+								{
+									className: new HtmlClassesArray([__C.CLASSES.COLORS.MARGINAL, __C.CLASSES.ICON_CLASS, __C.CLASSES.ICONS.CHECK]),
+									disabled: true
+								},
+								'\u041F\u0440\u0438\u043D\u044F\u0442\u0430'
+							)
+						);
+					}),
+					rejected_requests_profiles.map(function (profile) {
+						return React.createElement(
+							NetworkingProfileUnit,
+							{ key: profile.user_id, profile: profile },
+							profile.info && React.createElement(
+								'p',
+								null,
+								React.createElement(
+									'b',
+									null,
+									'\u041F\u043E\u043B\u0435\u0437\u0435\u043D:'
+								),
+								' ',
+								profile.info
+							),
+							profile.looking_for && React.createElement(
+								'p',
+								null,
+								React.createElement(
+									'b',
+									null,
+									'\u0418\u0449\u0435\u0442:'
+								),
+								' ',
+								profile.looking_for
+							),
+							profile.request.message && React.createElement(
+								'p',
+								{ className: 'networking_profile_block_comment fa_icon fa-commenting' },
+								profile.request.message
+							),
+							React.createElement(
+								RippleButton,
+								{
+									className: new HtmlClassesArray([__C.CLASSES.COLORS.MARGINAL, __C.CLASSES.ICON_CLASS, __C.CLASSES.ICONS.TIMES]),
+									disabled: true
+								},
+								'\u041E\u0442\u043A\u043B\u043E\u043D\u0435\u043D\u0430'
+							)
+						);
+					})
+				)
+			));
+		}
+	}]);
+
+	return EventNetworkingRequestsPage;
+}(React.Component));
 /**
  * @class Calendar
  */
@@ -20826,13 +22728,13 @@ SubscriptionsListModal = extending(AbstractListModal, function () {
   * @return {Promise}
   */
 	SubscriptionsListModal.prototype.uploadEntities = function () {
-		var _this32 = this;
+		var _this71 = this;
 
 		return this.entity.fetchSubscriptions({ length: 20 }).then(function (organizations) {
 			if (organizations.length) {
-				_this32.content.append(_this32.buildEntities(organizations));
+				_this71.content.append(_this71.buildEntities(organizations));
 			} else {
-				_this32.is_upload_disabled = true;
+				_this71.is_upload_disabled = true;
 			}
 		});
 	};
@@ -27919,21 +29821,21 @@ var OldUserPage = function (_Page) {
   * @constructs OldUserPage
   */
 	function OldUserPage(user_id) {
-		var _this33$disable_uploa, _this33$block_scroll;
+		var _this72$disable_uploa, _this72$block_scroll;
 
 		_classCallCheck(this, OldUserPage);
 
-		var _this33 = _possibleConstructorReturn(this, (OldUserPage.__proto__ || Object.getPrototypeOf(OldUserPage)).call(this));
+		var _this72 = _possibleConstructorReturn(this, (OldUserPage.__proto__ || Object.getPrototypeOf(OldUserPage)).call(this));
 
-		_this33.user_id = user_id;
-		_this33.user = new OneUser(user_id);
-		_this33.events_metadata = { last_date: '' };
+		_this72.user_id = user_id;
+		_this72.user = new OneUser(user_id);
+		_this72.events_metadata = { last_date: '' };
 
-		_this33.disable_uploads = (_this33$disable_uploa = {}, _defineProperty(_this33$disable_uploa, __C.ENTITIES.EVENT, false), _defineProperty(_this33$disable_uploa, __C.ENTITIES.ACTIVITY, false), _this33$disable_uploa);
-		_this33.block_scroll = (_this33$block_scroll = {}, _defineProperty(_this33$block_scroll, __C.ENTITIES.EVENT, false), _defineProperty(_this33$block_scroll, __C.ENTITIES.ACTIVITY, false), _this33$block_scroll);
+		_this72.disable_uploads = (_this72$disable_uploa = {}, _defineProperty(_this72$disable_uploa, __C.ENTITIES.EVENT, false), _defineProperty(_this72$disable_uploa, __C.ENTITIES.ACTIVITY, false), _this72$disable_uploa);
+		_this72.block_scroll = (_this72$block_scroll = {}, _defineProperty(_this72$block_scroll, __C.ENTITIES.EVENT, false), _defineProperty(_this72$block_scroll, __C.ENTITIES.ACTIVITY, false), _this72$block_scroll);
 
-		_this33.active_tab = __C.ENTITIES.EVENT;
-		_this33.favored_fetch_data = {
+		_this72.active_tab = __C.ENTITIES.EVENT;
+		_this72.favored_fetch_data = {
 			fields: new Fields('image_horizontal_medium_url', 'favored_users_count', 'is_favorite', 'is_registered', 'registration_locally', 'registration_available', 'ticketing_locally', 'ticketing_available', 'dates', {
 				favored: {
 					length: 5
@@ -27942,11 +29844,11 @@ var OldUserPage = function (_Page) {
 			order_by: 'nearest_event_date,-first_event_date',
 			length: 10
 		};
-		_this33.pageTitle = function () {
+		_this72.pageTitle = function () {
 
-			return _this33.user.full_name;
+			return _this72.user.full_name;
 		};
-		return _this33;
+		return _this72;
 	}
 
 	_createClass(OldUserPage, [{
@@ -27995,10 +29897,10 @@ var OldUserPage = function (_Page) {
 	}, {
 		key: 'buildActivities',
 		value: function buildActivities(activities) {
-			var _this34 = this;
+			var _this73 = this;
 
 			return __APP.BUILD.activity(activities.map(function (activity) {
-				activity.user = _this34.user;
+				activity.user = _this73.user;
 
 				return activity;
 			}));
@@ -28020,7 +29922,7 @@ var OldUserPage = function (_Page) {
    * @returns {Promise}
    */
 		value: function uploadEntities(type) {
-			var _this35 = this;
+			var _this74 = this;
 
 			var is_upload_disabled = this.disable_uploads[type],
 			    is_scroll_blocked = this.block_scroll[type];
@@ -28052,7 +29954,7 @@ var OldUserPage = function (_Page) {
 				$loader = __APP.BUILD.loaderBlock($wrapper);
 
 				return fetch_promise.then(function (entities) {
-					_this35.block_scroll[type] = false;
+					_this74.block_scroll[type] = false;
 					$loader.remove();
 
 					if (entities.length) {
@@ -28062,11 +29964,11 @@ var OldUserPage = function (_Page) {
 							case __C.ENTITIES.EVENT:
 								{
 
-									return _this35.page_component.favored_events.appendEvents(entities);
+									return _this74.page_component.favored_events.appendEvents(entities);
 								}
 							case __C.ENTITIES.ACTIVITY:
 								{
-									$entities = _this35.buildActivities(entities);
+									$entities = _this74.buildActivities(entities);
 									break;
 								}
 						}
@@ -28076,7 +29978,7 @@ var OldUserPage = function (_Page) {
 					} else {
 						if (!$wrapper.children().length) {
 							$wrapper.append(__APP.BUILD.cap('Активности нет'));
-							_this35.disable_uploads[type] = true;
+							_this74.disable_uploads[type] = true;
 						}
 					}
 				});
@@ -28102,7 +30004,7 @@ var OldUserPage = function (_Page) {
 	}, {
 		key: 'init',
 		value: function init() {
-			var _this36 = this;
+			var _this75 = this;
 
 			var $wrapper = this.$wrapper;
 
@@ -28111,15 +30013,15 @@ var OldUserPage = function (_Page) {
 			OldUserPage.bindEvents($wrapper);
 
 			$wrapper.find('.Tabs').on('tabs:change', function () {
-				_this36.active_tab = $wrapper.find('.TabsBody').filter('.' + __C.CLASSES.ACTIVE).data('tab_body_type');
-				_this36.bindScrollEvents();
+				_this75.active_tab = $wrapper.find('.TabsBody').filter('.' + __C.CLASSES.ACTIVE).data('tab_body_type');
+				_this75.bindScrollEvents();
 			});
 		}
 	}, {
 		key: 'bindScrollEvents',
 		value: function bindScrollEvents() {
 			var _event_names,
-			    _this37 = this;
+			    _this76 = this;
 
 			var $window = $(window),
 			    event_names = (_event_names = {}, _defineProperty(_event_names, __C.ENTITIES.EVENT, 'scroll.uploadEvents'), _defineProperty(_event_names, __C.ENTITIES.ACTIVITY, 'scroll.uploadActivities'), _event_names);
@@ -28136,9 +30038,9 @@ var OldUserPage = function (_Page) {
 						}
 
 						return new Promise(function (resolve) {
-							$window.on(event_names[_this37.active_tab], function () {
+							$window.on(event_names[_this76.active_tab], function () {
 								if (isScrollRemain(1000)) {
-									resolve(_this37.uploadEntities(_this37.active_tab));
+									resolve(_this76.uploadEntities(_this76.active_tab));
 								}
 							});
 						});
@@ -28153,7 +30055,7 @@ var OldUserPage = function (_Page) {
 	}, {
 		key: 'render',
 		value: function render() {
-			var _this38 = this;
+			var _this77 = this;
 
 			var user = this.user,
 			    is_another_user = this instanceof OldMyProfilePage === false,
@@ -28192,7 +30094,7 @@ var OldUserPage = function (_Page) {
 
 			if (promises.length) {
 				Promise.race(promises).then(function () {
-					_this38.bindScrollEvents();
+					_this77.bindScrollEvents();
 				});
 			} else {
 				this.bindScrollEvents();
@@ -28224,13 +30126,13 @@ var OldUserPage = function (_Page) {
    * @return {XML}
    * @constructor
    */
-		value: function SidebarWrapper(_ref27) {
-			var user = _ref27.user,
-			    title = _ref27.title,
-			    noEntitiesText = _ref27.noEntitiesText,
-			    entities = _ref27.entities,
-			    entitiesType = _ref27.entitiesType,
-			    showAllModalClass = _ref27.showAllModalClass;
+		value: function SidebarWrapper(_ref33) {
+			var user = _ref33.user,
+			    title = _ref33.title,
+			    noEntitiesText = _ref33.noEntitiesText,
+			    entities = _ref33.entities,
+			    entitiesType = _ref33.entitiesType,
+			    showAllModalClass = _ref33.showAllModalClass;
 
 			if (entities.length) {
 				var avatar_classes = [__C.CLASSES.SIZES.X30],
@@ -28299,10 +30201,10 @@ var OldUserPage = function (_Page) {
 
 	}, {
 		key: 'PageComponent',
-		value: function PageComponent(_ref28) {
-			var _this39 = this;
+		value: function PageComponent(_ref34) {
+			var _this78 = this;
 
-			var user = _ref28.user;
+			var user = _ref34.user;
 			var SidebarWrapper = OldUserPage.SidebarWrapper,
 			    is_another_user = __APP.USER.id !== parseInt(user.id),
 			    logoutClickHandler = function logoutClickHandler(e) {
@@ -28374,7 +30276,7 @@ var OldUserPage = function (_Page) {
 							'div',
 							{ className: 'tab_body TabsBody -active', 'data-tab_body_type': 'event' },
 							React.createElement(EventBlocks, { ref: function ref(component) {
-									return _this39.favored_events = component;
+									return _this78.favored_events = component;
 								}, events: user.favored })
 						)
 					)
@@ -28396,12 +30298,12 @@ var OldMyProfilePage = function (_OldUserPage) {
 	function OldMyProfilePage() {
 		_classCallCheck(this, OldMyProfilePage);
 
-		var _this40 = _possibleConstructorReturn(this, (OldMyProfilePage.__proto__ || Object.getPrototypeOf(OldMyProfilePage)).call(this, __APP.USER.id));
+		var _this79 = _possibleConstructorReturn(this, (OldMyProfilePage.__proto__ || Object.getPrototypeOf(OldMyProfilePage)).call(this, __APP.USER.id));
 
-		_this40.favored_fetch_data.fields.push('is_favorite');
-		_this40.user = __APP.USER;
-		_this40.page_title = 'Мой профиль';
-		return _this40;
+		_this79.favored_fetch_data.fields.push('is_favorite');
+		_this79.user = __APP.USER;
+		_this79.page_title = 'Мой профиль';
+		return _this79;
 	}
 
 	_createClass(OldMyProfilePage, [{
@@ -32328,17 +34230,25 @@ var AbstractEvendateApplication = function () {
 	}, {
 		key: 'renderReact',
 		value: function renderReact() {
+			var _ReactRouterDOM = ReactRouterDOM,
+			    BrowserRouter = _ReactRouterDOM.BrowserRouter,
+			    _ReactRouter3 = ReactRouter,
+			    Switch = _ReactRouter3.Switch,
+			    Route = _ReactRouter3.Route,
+			    Redirect = _ReactRouter3.Redirect;
+
 
 			ReactDOM.render(React.createElement(
-				ReactRouterDOM.BrowserRouter,
+				BrowserRouter,
 				null,
 				React.createElement(
-					ReactRouter.Switch,
+					Switch,
 					null,
-					React.createElement(ReactRouter.Route, { path: '/my/profile', exact: true, component: MyProfilePage }),
-					React.createElement(ReactRouter.Redirect, { from: '/user/' + this.USER.id, to: '/my/profile' }),
-					React.createElement(ReactRouter.Route, { path: '/user/:user_id', exact: true, component: UserPage }),
-					React.createElement(ReactRouter.Route, { component: NoReactPage })
+					React.createElement(Route, { exact: true, path: '/my/profile', component: MyProfilePage }),
+					React.createElement(Redirect, { from: '/user/' + this.USER.id, to: '/my/profile' }),
+					React.createElement(Route, { exact: true, path: '/user/:user_id', component: UserPage }),
+					React.createElement(Route, { path: '/event/:event_id/networking', component: EventNetworkingPage }),
+					React.createElement(Route, { component: NoReactPage })
 				)
 			), document.getElementById('app_page_root'));
 		}
@@ -32357,14 +34267,14 @@ var EvendateApplication = function (_AbstractEvendateAppl) {
 	function EvendateApplication() {
 		_classCallCheck(this, EvendateApplication);
 
-		var _this41 = _possibleConstructorReturn(this, (EvendateApplication.__proto__ || Object.getPrototypeOf(EvendateApplication)).call(this));
+		var _this80 = _possibleConstructorReturn(this, (EvendateApplication.__proto__ || Object.getPrototypeOf(EvendateApplication)).call(this));
 
-		_this41.EXPORT = new ServerExports();
-		_this41.TOP_BAR = new AbstractTopBar();
-		_this41.SIDEBAR = new AbstractSidebar();
-		_this41.IS_WIDGET = false;
-		_this41.POST_MESSAGE = new AppPostMessageConnection(window);
-		_this41.ROUTING = {
+		_this80.EXPORT = new ServerExports();
+		_this80.TOP_BAR = new AbstractTopBar();
+		_this80.SIDEBAR = new AbstractSidebar();
+		_this80.IS_WIDGET = false;
+		_this80.POST_MESSAGE = new AppPostMessageConnection(window);
+		_this80.ROUTING = {
 			'admin': {
 				'organization': {
 					'^([0-9]+)': {
@@ -32500,7 +34410,7 @@ var EvendateApplication = function (_AbstractEvendateAppl) {
 			},
 			'': ActualEventsPage
 		};
-		return _this41;
+		return _this80;
 	}
 	/**
   *
@@ -32513,13 +34423,13 @@ var EvendateApplication = function (_AbstractEvendateAppl) {
 	_createClass(EvendateApplication, [{
 		key: 'repaint',
 		value: function repaint(colors) {
-			var _this42 = this;
+			var _this81 = this;
 
 			AbstractEvendateApplication.prototype.repaint.call(this, colors);
 
 			if (colors.header) {
 				(function (hex) {
-					var main_header_style = _this42.TOP_BAR.$main_header.get(0).style,
+					var main_header_style = _this81.TOP_BAR.$main_header.get(0).style,
 					    contrast_hex = getContrastColor(hex);
 
 					main_header_style.setProperty('--color_primary', hex);

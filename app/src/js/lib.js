@@ -22,6 +22,7 @@ const __C = {
 		},
 		TEXT_COLORS: {
 			ACCENT: '-text_color_accent',
+			FRANKLIN: '-text_color_franklin',
 			MUTED_80: '-text_color_primary_80',
 			MUTED_50: '-text_color_primary_50'
 		},

@@ -37,6 +37,7 @@ function asyncPage(
 		headerTabs = false,
 		
 		is_admin_page = false,
+		is_auth_required = false,
 		
 		state_name = ''
 	}, PageClass) {
@@ -51,10 +52,10 @@ function asyncPage(
 			
 			__APP.HISTORY = props.history;
 			__APP.CURRENT_REACT_PAGE = this;
-			this.pageProps = constructPage(props.match.params);
+			this.pageProps = {...props.match.params, ...constructPage.call(this, props.match.params)};
 			this.origin_page = null;
 			this.state = {
-				is_data_fetching: true,
+				is_data_fetching: !(is_auth_required && __APP.USER.isLoggedOut()),
 				fetched_data: null
 			};
 		}
@@ -63,8 +64,13 @@ function asyncPage(
 			__APP.SERVER.abortAllConnections();
 			__APP.SIDEBAR.activateNavItem(window.location.pathname);
 			
+			if (is_auth_required && __APP.USER.isLoggedOut()) {
+				
+				return;
+			}
+			
 			if (isFunction(headerTabs)) {
-				__APP.TOP_BAR.renderHeaderTabs(headerTabs());
+				__APP.TOP_BAR.renderHeaderTabs(headerTabs.call({props: this.pageProps}));
 				__APP.TOP_BAR.showTabs();
 			} else if (__APP.TOP_BAR.is_tabs_rendered) {
 				__APP.TOP_BAR.hideTabs();
@@ -86,7 +92,7 @@ function asyncPage(
 				}
 			}
 			
-			fetchData.call(this.pageProps, this.pageProps).then(data => {
+			fetchData.call({props: this.pageProps}, this.pageProps).then(data => {
 				__APP.changeTitle(isFunction(pageTitle) ? pageTitle.call(this.pageProps, this.pageProps) : pageTitle);
 				
 				this.setState({
@@ -108,12 +114,31 @@ function asyncPage(
 				fetched_data
 			} = this.state;
 			
+			if (is_auth_required && __APP.USER.isLoggedOut()) {
+				cookies.removeItem('auth_command');
+				cookies.removeItem('auth_entity_id');
+				(new AuthModal(location.href, {
+					note: 'Для получения доступа, вам необходимо авторизоваться'
+				})).show();
+				
+				return null;
+			}
+			
 			if (is_data_fetching) {
 				
 				return <OverlayLoader />;
 			}
 			
-			return <PageClass {...{fetched_data, ...this.pageProps}} ref={component => this.origin_page = component} />;
+			return (
+				<PageClass
+					{...{
+						match: this.props.match,
+						fetched_data,
+						...this.pageProps
+					}}
+					ref={component => this.origin_page = component}
+				/>
+			);
 		}
 	}
 	

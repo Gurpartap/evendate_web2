@@ -156,24 +156,32 @@ ServerConnection = extending(AsynchronousConnection, (function() {
 		
 		url = url.contains('/api/v1') ? url : `/api/v1${url}`;
 		
-		return (new Promise(function(resolve, reject) {
+		return (new Promise((resolve, reject) => {
 			self.current_connections.push($.ajax({
 				url: url,
 				data: ajax_data,
 				method: http_method,
 				contentType: content_type || 'application/x-www-form-urlencoded; charset=UTF-8',
-				success: (data, textStatus, jqXHR) => resolve(data),
+				success: (response, textStatus, jqXHR) => {
+					try {
+						if (response.status) {
+							resolve(response.data);
+						} else {
+							reject({jqXHR, textStatus, response});
+						}
+					} catch (errorThrown) {
+						reject({jqXHR, textStatus, errorThrown});
+					}
+				},
 				error: (jqXHR, textStatus, errorThrown) => reject({jqXHR, textStatus, errorThrown})
 			}));
-		})).then(function(response) {
-			ajaxHandler(response, function(data, text) {
-				if (isFunction(success)) {
-					success(data);
-				}
-			});
+		})).then(data => {
+			if (isFunction(success)) {
+				success(data);
+			}
 			
-			return response.data;
-		}).catch(function({jqXHR, textStatus, errorThrown}) {
+			return data;
+		}).catch(({jqXHR, textStatus, errorThrown, response}) => {
 			if (errorThrown !== 'abort') {
 				if (isFunction(error)) {
 					error(jqXHR, textStatus, errorThrown);
@@ -181,6 +189,8 @@ ServerConnection = extending(AsynchronousConnection, (function() {
 					self.ajaxErrorHandler(jqXHR, textStatus, errorThrown);
 				}
 			}
+			
+			return response;
 		});
 	};
 	/**
