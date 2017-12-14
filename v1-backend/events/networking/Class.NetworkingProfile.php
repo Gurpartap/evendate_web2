@@ -10,8 +10,10 @@ class NetworkingProfile extends AbstractEntity
 
 	protected $event_id;
 	protected $request_uuid;
+	protected $outgoing_request_uuid;
 
 	const REQUEST_FIELD_NAME = 'request';
+	const OUTGOING_REQUEST_FIELD_NAME = 'outgoing_request';
 
 	protected static $DEFAULT_COLS = array(
 		'first_name',
@@ -31,6 +33,7 @@ class NetworkingProfile extends AbstractEntity
 		'email',
 		'signed_up',
 		'request_uuid',
+		'outgoing_request_uuid',
 		'company_name'
 	);
 
@@ -105,6 +108,26 @@ class NetworkingProfile extends AbstractEntity
 					App::DB(),
 					$user,
 					array('event' => $event, 'user' => $user, 'uuid' => $this->request_uuid),
+					$_fields
+				)->getParams($user, $fields)->getData();
+			}
+		}
+
+		if (isset($fields[self::OUTGOING_REQUEST_FIELD_NAME])) {
+			$event = EventsCollection::one(
+				App::DB(),
+				$user,
+				$this->event_id,
+				array()
+			);
+			$_fields = Fields::parseFields($fields[self::OUTGOING_REQUEST_FIELD_NAME]['fields'] ?? '');
+			if ($this->request_uuid == null) {
+				$result_data[self::OUTGOING_REQUEST_FIELD_NAME] = null;
+			} else {
+				$result_data[self::OUTGOING_REQUEST_FIELD_NAME] = NetworkingRequestsCollection::filter(
+					App::DB(),
+					$user,
+					array('event' => $event, 'user' => $user, 'uuid' => $this->outgoing_request_uuid),
 					$_fields
 				)->getParams($user, $fields)->getData();
 			}
