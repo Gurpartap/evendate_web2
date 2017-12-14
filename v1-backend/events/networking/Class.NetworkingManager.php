@@ -48,7 +48,7 @@ class NetworkingManager
 		$q_check_code
 			->cols(array('id'))
 			->from('events')
-			->where('event_id = ?', $this->event->getId())
+			->where('id = ?', $this->event->getId())
 			->where('networking_code = ? ', $code);
 
 		if ($this->db->prepareExecute($q_check_code)->rowCount() == 0)

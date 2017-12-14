@@ -53,10 +53,10 @@ if (checkRedirect()) {
 		.ajaxStart(function() {
 			Pace.restart()
 		})
-		.ajaxError(function(event, jqxhr, settings, thrownError) {
+		.ajaxError(function(event, jqxhr, settings, thrownError) {/*
 			if (thrownError && thrownError === 'Forbidden') {
 				__APP.changeState('/', true, true);
-			}
+			}*/
 		})
 		.ready(function() {
 			var user_jqhxr,
