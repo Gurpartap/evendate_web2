@@ -29,7 +29,7 @@ EventUTMStatsCollection = extending(UTMStatsCollection, (function() {
 	 * @param {number} [length]
 	 * @param {(string|Array)} [order_by]
 	 *
-	 * @return {jqPromise}
+	 * @return {Promise}
 	 */
 	EventUTMStatsCollection.prototype.fetch = function(fields, length, order_by) {
 		var self = this;

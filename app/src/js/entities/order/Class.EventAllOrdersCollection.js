@@ -26,7 +26,7 @@ EventAllOrdersCollection = extending(AbstractEventOrdersCollection, (function() 
 	 * @param {AJAXData} [ajax_data]
 	 * @param {AJAXCallback} [success]
 	 *
-	 * @return {jqPromise}
+	 * @return {Promise}
 	 */
 	EventAllOrdersCollection.fetchOrders = function(event_id, ajax_data, success) {
 		return __APP.SERVER.getData('/api/v1/statistics/events/' + event_id + '/orders', ajax_data, success);
@@ -35,7 +35,7 @@ EventAllOrdersCollection = extending(AbstractEventOrdersCollection, (function() 
 	 *
 	 * @param {ServerExports.EXPORT_EXTENSION} [format=xlsx]
 	 *
-	 * @return {jqPromise}
+	 * @return {Promise}
 	 */
 	EventAllOrdersCollection.prototype.export = function(format) {
 		

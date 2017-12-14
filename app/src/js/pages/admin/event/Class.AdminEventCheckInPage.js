@@ -198,11 +198,11 @@ AdminEventCheckInPage = extending(AdminEventPage, (function() {
 			var ticket = self.tickets.getByID($(this).closest('.Ticket').data('ticket_uuid'));
 			
 			if (ticket.checkout) {
-				OneTicket.uncheck(ticket.event_id, ticket.uuid).done(function() {
+				OneTicket.uncheck(ticket.event_id, ticket.uuid).then(function() {
 					self.changeTicketState(ticket, AdminEventCheckInPage.STATES.AWAITING);
 				});
 			} else {
-				OneTicket.check(ticket.event_id, ticket.uuid).done(function() {
+				OneTicket.check(ticket.event_id, ticket.uuid).then(function() {
 					self.changeTicketState(ticket, AdminEventCheckInPage.STATES.CHECKED);
 				});
 			}
@@ -329,14 +329,13 @@ AdminEventCheckInPage = extending(AdminEventPage, (function() {
 		
 		this.tickets.fetchAllTickets(this.tickets_fields, {
 			order_status_type: 'green'
-		}, 'created_at').always(function() {
-			$loader.remove();
-		}).done(function() {
+		}, 'created_at').then(function() {
 			self.progress_bar.setMax(self.tickets.length);
 			self.progress_bar.set(self.tickets.checked.length);
 			
 			self.table_body.append(self.buildTableRows(self.tickets['new_' + self.current_checkin_state]));
 		});
+		$loader.remove();
 		
 		this.init();
 	};

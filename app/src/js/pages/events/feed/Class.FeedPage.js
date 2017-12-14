@@ -62,7 +62,7 @@ FeedPage = extending(Page, (function() {
 			
 			$this.on('click', function() {
 				$event.addClass('-cancel');
-				OneEvent.changeEventStatus(event_id, OneEvent.STATUS.HIDE).done(function() {
+				OneEvent.changeEventStatus(event_id, OneEvent.STATUS.HIDE).then(function() {
 					$event.after(__APP.BUILD.button({
 						classes: [__C.CLASSES.COLORS.NEUTRAL, 'ReturnEvent'],
 						title: 'Вернуть событие',
@@ -72,7 +72,7 @@ FeedPage = extending(Page, (function() {
 					}));
 					$event.siblings('.ReturnEvent').not('.-Handled_ReturnEvent').on('click', function() {
 						var $remove_button = $(this);
-						OneEvent.changeEventStatus(event_id, OneEvent.STATUS.SHOW).done(function() {
+						OneEvent.changeEventStatus(event_id, OneEvent.STATUS.SHOW).then(function() {
 							$remove_button.remove();
 							$event.removeClass('-cancel');
 						});
@@ -115,7 +115,7 @@ FeedPage = extending(Page, (function() {
 	/**
 	 *
 	 * @param {function(jQuery)} [success]
-	 * @returns {jqPromise}
+	 * @returns {Promise}
 	 */
 	FeedPage.prototype.appendEvents = function(success) {
 		var PAGE = this,
@@ -170,7 +170,7 @@ FeedPage = extending(Page, (function() {
 	FeedPage.prototype.initCitySelect = function() {
 		var PAGE = this;
 		
-		PAGE.cities.fetchCities(null, 0, 'distance,local_name').done(function() {
+		PAGE.cities.fetchCities(null, 0, 'distance,local_name').then(function() {
 			var $select = PAGE.$view.find('.FeedCitiesSelect');
 			
 			$select.html(tmpl('option', PAGE.cities.map(function(city) {
@@ -194,12 +194,12 @@ FeedPage = extending(Page, (function() {
 		var PAGE = this,
 			$window = $(window);
 		
-		if (!(__APP.PREVIOUS_PAGE instanceof FeedPage)) {
+		if (__APP.IS_PREV_PAGE_REACT || __APP.PREVIOUS_PAGE instanceof FeedPage === false) {
 			PAGE.initFeedCalendar();
 			PAGE.initCitySelect();
 		}
 		
-		if(__APP.USER.isLoggedOut()){
+		if (__APP.USER.isLoggedOut()) {
 			PAGE.$view.find('.BecomeOrg').on('click', function(e) {
 				cookies.removeItem('auth_command');
 				cookies.removeItem('auth_entity_id');
@@ -209,7 +209,7 @@ FeedPage = extending(Page, (function() {
 				
 				return false;
 			});
-			if(window.location.pathname === '/feed/favored' || window.location.pathname === '/feed/recommendations'){
+			if (window.location.pathname === '/feed/favored' || window.location.pathname === '/feed/recommendations') {
 				__APP.changeState('/feed/actual', true, true);
 				return null;
 			}

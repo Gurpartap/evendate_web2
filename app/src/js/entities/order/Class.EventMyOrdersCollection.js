@@ -26,7 +26,7 @@ EventMyOrdersCollection = extending(AbstractEventOrdersCollection, (function() {
 	 * @param {AJAXData} [ajax_data]
 	 * @param {AJAXCallback} [success]
 	 *
-	 * @return {jqPromise}
+	 * @return {Promise}
 	 */
 	EventMyOrdersCollection.fetchOrders = function(event_id, ajax_data, success) {
 		

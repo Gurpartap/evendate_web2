@@ -50,7 +50,7 @@ AbstractStatisticsCollection = extending(EntitiesCollection, (function() {
 	 * @param {Fields} fields
 	 * @param {AJAXCallback} [success]
 	 *
-	 * @returns jqPromise
+	 * @returns Promise
 	 */
 	AbstractStatisticsCollection.fetchStatistics = function(fields, success) {};
 	/**
@@ -62,7 +62,7 @@ AbstractStatisticsCollection = extending(EntitiesCollection, (function() {
 	 * @param {string} [till]
 	 * @param {AJAXCallback} [success]
 	 *
-	 * @returns jqPromise
+	 * @returns Promise
 	 */
 	AbstractStatisticsCollection.prototype.fetch = function(scale, since, till, success) {};
 	

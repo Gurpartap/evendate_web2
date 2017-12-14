@@ -24,18 +24,18 @@ FriendsListModal = extending(AbstractListModal, (function() {
 	}
 	/**
 	 *
-	 * @return {jqPromise}
+	 * @return {Promise}
 	 */
 	FriendsListModal.prototype.uploadEntities = function() {
 		var self = this;
 		
-		return __APP.USER.fetchFriends({length: 20}).done(function(friends) {
+		return __APP.USER.fetchFriends({length: 20}).then(function(friends) {
 			if(friends.length) {
 				self.content.append(self.buildEntities(friends));
 			} else {
 				self.is_upload_disabled = true;
 			}
-		}).promise();
+		});
 	};
 	/**
 	 *

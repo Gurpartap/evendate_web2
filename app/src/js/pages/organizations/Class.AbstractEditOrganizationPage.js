@@ -157,10 +157,9 @@ AbstractEditOrganizationPage = extending(Page, (function() {
 					socket.emit('utils.updateImages');
 					
 					__APP.changeState('/organization/' + self.organization.id);
-				}).always(function() {
-					self.$wrapper.removeClass(__C.CLASSES.STATUS.DISABLED);
-					$loader.remove();
 				});
+				self.$wrapper.removeClass(__C.CLASSES.STATUS.DISABLED);
+				$loader.remove();
 			}
 		}
 		

@@ -38,7 +38,7 @@ AdminEditDispatchPage = extending(AdminAbstractDispatchPage, (function() {
 	AdminEditDispatchPage.prototype.fetchData = function() {
 		var self = this;
 		
-		return this.fetching_data_defer = this.dispatch.fetch(this.dispatch_fields).done(function(dispatch) {
+		return this.fetching_data_defer = this.dispatch.fetch(this.dispatch_fields).then(function(dispatch) {
 			self.dispatch = dispatch;
 		});
 	};

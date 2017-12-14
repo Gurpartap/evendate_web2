@@ -67,11 +67,11 @@ AbstractAppInspector = extendingJQuery((function() {
 	};
 	/**
 	 *
-	 * @returns {jqPromise}
+	 * @returns {Promise}
 	 */
 	AbstractAppInspector.prototype.fetchData = function() {
 		
-		return $.Deferred().resolve().promise();
+		return Promise.resolve();
 	};
 	
 	AbstractAppInspector.prototype.fetchDone = function() {};
@@ -110,7 +110,7 @@ AbstractAppInspector = extendingJQuery((function() {
 		this.is_shown = true;
 		
 		if (!this.is_fetched) {
-			this.fetchData().done(function() {
+			this.fetchData().then(function() {
 				AbstractAppInspector.$wrapper.trigger('inspector:data_fetched');
 				self.fetchDone.apply(self, arguments);
 				self.is_fetched = true;

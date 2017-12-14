@@ -112,7 +112,7 @@ OneExtendedTicket = extending(OneTicket, (function() {
 	 * @param {(string|number)} uuid
 	 * @param {(Fields|string)} [fields]
 	 *
-	 * @return {jqPromise}
+	 * @return {Promise}
 	 */
 	OneExtendedTicket.fetchTicket = function(event_id, uuid, fields) {
 		var event_ajax_data;
@@ -138,7 +138,7 @@ OneExtendedTicket = extending(OneTicket, (function() {
 	 *
 	 * @param {(Fields|string)} [fields]
 	 *
-	 * @return {jqPromise}
+	 * @return {Promise}
 	 */
 	OneExtendedTicket.prototype.fetch = function(fields) {
 		var self = this;

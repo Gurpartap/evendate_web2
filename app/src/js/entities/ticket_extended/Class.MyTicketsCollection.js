@@ -21,7 +21,7 @@ MyTicketsCollection = extending(ExtendedTicketsCollection, (function() {
 	 * @param {AJAXData} [ajax_data]
 	 * @param {AJAXCallback} [success]
 	 *
-	 * @return {jqPromise}
+	 * @return {Promise}
 	 */
 	MyTicketsCollection.fetchTickets = function(ajax_data, success) {
 		ajax_data = ajax_data ? ajax_data : {};
@@ -40,7 +40,7 @@ MyTicketsCollection = extending(ExtendedTicketsCollection, (function() {
 	 * @param {(string|Array)} [order_by]
 	 * @param {AJAXCallback} [success]
 	 *
-	 * @return {jqPromise}
+	 * @return {Promise}
 	 */
 	MyTicketsCollection.prototype.fetchTickets = function(fields, length, order_by, success) {
 		var self = this;

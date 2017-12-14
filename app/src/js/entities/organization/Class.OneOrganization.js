@@ -196,7 +196,7 @@ OneOrganization = extending(OneEntity, (function() {
 	 * @param {(string|number)} org_id
 	 * @param {(Fields|string|Array)} [fields]
 	 * @param {AJAXCallback} [success]
-	 * @returns {jqPromise}
+	 * @returns {Promise}
 	 */
 	OneOrganization.fetchOrganization = function(org_id, fields, success) {
 		return __APP.SERVER.getData('/api/v1/organizations/' + org_id, {fields: fields}, success);
@@ -226,7 +226,7 @@ OneOrganization = extending(OneEntity, (function() {
 	 * @param {OrganizationModel} new_organization_data
 	 * @param {OneOrganizationCreateOrganizationCallback} [success]
 	 * @param {function} [error]
-	 * @returns {jqPromise}
+	 * @returns {Promise}
 	 */
 	OneOrganization.createOrganization = function(new_organization_data, success, error) {
 		return __APP.SERVER.addData('/api/v1/organizations/', new_organization_data, true, success, error);
@@ -237,7 +237,7 @@ OneOrganization = extending(OneEntity, (function() {
 	 * @param {OrganizationModel} organization_data
 	 * @param {OneOrganizationCreateOrganizationCallback} [success]
 	 * @param {function} [error]
-	 * @returns {jqPromise}
+	 * @returns {Promise}
 	 */
 	OneOrganization.updateOrganization = function(organization_id, organization_data, success, error) {
 		return __APP.SERVER.updateData('/api/v1/organizations/' + organization_id, organization_data, true, success, error);
@@ -248,7 +248,7 @@ OneOrganization = extending(OneEntity, (function() {
 	 * @param {(string|number)} user_id
 	 * @param {OneUser.ROLE} role
 	 * @param {AJAXCallback} [success]
-	 * @returns {jqPromise}
+	 * @returns {Promise}
 	 */
 	OneOrganization.addStaff = function(org_id, user_id, role, success) {
 		return __APP.SERVER.addData('/api/v1/organizations/' + org_id + '/staff', {
@@ -262,7 +262,7 @@ OneOrganization = extending(OneEntity, (function() {
 	 * @param {(string|number)} user_id
 	 * @param {OneUser.ROLE} role
 	 * @param {AJAXCallback} [success]
-	 * @returns {jqPromise}
+	 * @returns {Promise}
 	 */
 	OneOrganization.removeStaff = function(org_id, user_id, role, success) {
 		return __APP.SERVER.deleteData('/api/v1/organizations/' + org_id + '/staff', {
@@ -274,7 +274,7 @@ OneOrganization = extending(OneEntity, (function() {
 	 *
 	 * @param {(string|number)} org_id
 	 * @param {AJAXCallback} [success]
-	 * @returns {jqPromise}
+	 * @returns {Promise}
 	 */
 	OneOrganization.subscribeOrganization = function(org_id, success) {
 		return __APP.SERVER.addData('/api/v1/organizations/' + org_id + '/subscriptions', {}, false, success);
@@ -283,7 +283,7 @@ OneOrganization = extending(OneEntity, (function() {
 	 *
 	 * @param {(string|number)} org_id
 	 * @param {AJAXCallback} [success]
-	 * @returns {jqPromise}
+	 * @returns {Promise}
 	 */
 	OneOrganization.unsubscribeOrganization = function(org_id, success) {
 		return __APP.SERVER.deleteData('/api/v1/organizations/' + org_id + '/subscriptions', {}, success);
@@ -295,7 +295,7 @@ OneOrganization = extending(OneEntity, (function() {
 	 * @param {string} [comment]
 	 * @param {AJAXCallback} [success]
 	 *
-	 * @return {jqPromise}
+	 * @return {Promise}
 	 */
 	OneOrganization.requestWithdrawFunds = function(org_id, amount, comment, success) {
 		
@@ -315,7 +315,7 @@ OneOrganization = extending(OneEntity, (function() {
 	 * @param {string} [data.url]
 	 * @param {AJAXCallback} [success]
 	 *
-	 * @return {jqPromise}
+	 * @return {Promise}
 	 */
 	OneOrganization.sendFeedback = function(org_id, data, success) {
 	
@@ -326,7 +326,7 @@ OneOrganization = extending(OneEntity, (function() {
 	 * @param {(string|number)} org_id
 	 * @param {AJAXCallback} [success]
 	 *
-	 * @returns {jqPromise}
+	 * @returns {Promise}
 	 */
 	OneOrganization.fetchRequisites = function(org_id, success) {
 		
@@ -338,7 +338,7 @@ OneOrganization = extending(OneEntity, (function() {
 	 * @param {object} requisites
 	 * @param {AJAXCallback} [success]
 	 *
-	 * @returns {jqPromise}
+	 * @returns {Promise}
 	 */
 	OneOrganization.saveRequisites = function(org_id, requisites, success) {
 		
@@ -348,7 +348,7 @@ OneOrganization = extending(OneEntity, (function() {
 	 *
 	 * @param {(Fields|string|Array)} [fields]
 	 * @param {AJAXCallback} [success]
-	 * @returns {jqPromise}
+	 * @returns {Promise}
 	 */
 	OneOrganization.prototype.fetchOrganization = function(fields, success) {
 		var self = this;
@@ -364,7 +364,7 @@ OneOrganization = extending(OneEntity, (function() {
 	 * @param {OrganizationModel} new_organization_data
 	 * @param {OneOrganizationCreateOrganizationCallback} [success]
 	 * @param {function} [error]
-	 * @returns {jqPromise}
+	 * @returns {Promise}
 	 */
 	OneOrganization.prototype.createOrganization = function(new_organization_data, success, error) {
 		var self = this;
@@ -381,7 +381,7 @@ OneOrganization = extending(OneEntity, (function() {
 	 * @param {OrganizationModel} organization_data
 	 * @param {OneOrganizationCreateOrganizationCallback} [success]
 	 * @param {function} [error]
-	 * @returns {jqPromise}
+	 * @returns {Promise}
 	 */
 	OneOrganization.prototype.updateOrganization = function(organization_data, success, error) {
 		var self = this;
@@ -395,7 +395,7 @@ OneOrganization = extending(OneEntity, (function() {
 	/**
 	 *
 	 * @param {AJAXCallback} [success]
-	 * @returns {jqPromise}
+	 * @returns {Promise}
 	 */
 	OneOrganization.prototype.subscribe = function(success) {
 		var self = this;
@@ -410,7 +410,7 @@ OneOrganization = extending(OneEntity, (function() {
 	/**
 	 *
 	 * @param {AJAXCallback} [success]
-	 * @returns {jqPromise}
+	 * @returns {Promise}
 	 */
 	OneOrganization.prototype.unsubscribe = function(success) {
 		var self = this;
@@ -427,25 +427,25 @@ OneOrganization = extending(OneEntity, (function() {
 	 * @param {(string|number)} user_id
 	 * @param {OneUser.ROLE} role
 	 * @param {AJAXCallback} [success]
-	 * @returns {jqPromise}
+	 * @returns {Promise}
 	 */
 	OneOrganization.prototype.addStaff = function(user_id, role, success) {
 		var self = this,
 			user = new OneUser(user_id);
 		
-		return __APP.SERVER.multipleAjax(OneOrganization.addStaff(this.id, user_id, role), user.fetchUser(new Fields())).done(function(org_data, user_data) {
+		return __APP.SERVER.multipleAjax(OneOrganization.addStaff(this.id, user_id, role), user.fetchUser(new Fields())).then(function(org_data, user_data) {
 			self.staff.setData(user);
 			if (isFunction(success)) {
 				success.call(self, user);
 			}
-		}).promise();
+		});
 	};
 	/**
 	 *
 	 * @param {(string|number)} user_id
 	 * @param {OneUser.ROLE} role
 	 * @param {AJAXCallback} [success]
-	 * @returns {jqPromise}
+	 * @returns {Promise}
 	 */
 	OneOrganization.prototype.removeStaff = function(user_id, role, success) {
 		var self = this;
@@ -462,7 +462,7 @@ OneOrganization = extending(OneEntity, (function() {
 	 * @param {string} [comment]
 	 * @param {AJAXCallback} [success]
 	 *
-	 * @return {jqPromise}
+	 * @return {Promise}
 	 */
 	OneOrganization.prototype.requestWithdrawFunds = function(amount, comment, success) {
 		var self = this;
@@ -485,7 +485,7 @@ OneOrganization = extending(OneEntity, (function() {
 	 * @param {string} [data.url]
 	 * @param {AJAXCallback} [success]
 	 *
-	 * @return {jqPromise}
+	 * @return {Promise}
 	 */
 	OneOrganization.prototype.sendFeedback = function(data, success) {
 		

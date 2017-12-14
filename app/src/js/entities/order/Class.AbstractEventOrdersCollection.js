@@ -30,10 +30,10 @@ AbstractEventOrdersCollection = extending(OrdersCollection, (function() {
 	 * @param {AJAXData} [ajax_data]
 	 * @param {AJAXCallback} [success]
 	 *
-	 * @return {jqPromise}
+	 * @return {Promise}
 	 */
 	AbstractEventOrdersCollection.fetchOrders = function(event_id, ajax_data, success) {
-		return $.promise();
+		return Promise.resolve();
 	};
 	/**
 	 *
@@ -42,7 +42,7 @@ AbstractEventOrdersCollection = extending(OrdersCollection, (function() {
 	 * @param {(string|Array)} [order_by]
 	 * @param {AJAXCallback} [success]
 	 *
-	 * @returns {jqPromise}
+	 * @returns {Promise}
 	 */
 	AbstractEventOrdersCollection.prototype.fetchOrders = function(fields, length, order_by, success) {
 		var self = this;
@@ -65,7 +65,7 @@ AbstractEventOrdersCollection = extending(OrdersCollection, (function() {
 	 * @param {(Array<string>|string)} [order_by]
 	 * @param {AJAXCallback} [success]
 	 *
-	 * @returns {jqPromise}
+	 * @returns {Promise}
 	 */
 	AbstractEventOrdersCollection.prototype.fetchAllOrders = function(fields, order_by, success) {
 		var self = this;

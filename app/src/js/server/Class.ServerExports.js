@@ -39,7 +39,7 @@ ServerExports = extending(AsynchronousConnection, (function() {
 	 * @param {string} url
 	 * @param {ServerExports.EXPORT_EXTENSION} [format=xlsx]
 	 *
-	 * @return {jqPromise}
+	 * @return {Promise}
 	 */
 	ServerExports.prototype.export = function(url, format) {
 		url = url.contains('/api/v1') ? url : '/api/v1' + url;
@@ -55,7 +55,7 @@ ServerExports = extending(AsynchronousConnection, (function() {
 	 * @param {number} organization_id
 	 * @param {ServerExports.EXPORT_EXTENSION} [format=xlsx]
 	 *
-	 * @return {jqPromise}
+	 * @return {Promise}
 	 */
 	ServerExports.prototype.organizationSubscribers = function(organization_id, format) {
 	
@@ -66,7 +66,7 @@ ServerExports = extending(AsynchronousConnection, (function() {
 	 * @param {number} event_id
 	 * @param {ServerExports.EXPORT_EXTENSION} [format=xlsx]
 	 *
-	 * @return {jqPromise}
+	 * @return {Promise}
 	 */
 	ServerExports.prototype.eventOrders = function(event_id, format) {
 		
@@ -77,7 +77,7 @@ ServerExports = extending(AsynchronousConnection, (function() {
 	 * @param {number} event_id
 	 * @param {ServerExports.EXPORT_EXTENSION} [format=xlsx]
 	 *
-	 * @return {jqPromise}
+	 * @return {Promise}
 	 */
 	ServerExports.prototype.eventTickets = function(event_id, format) {
 		
@@ -88,7 +88,7 @@ ServerExports = extending(AsynchronousConnection, (function() {
 	 * @param {number} event_id
 	 * @param {string} uuid
 	 *
-	 * @return {jqPromise}
+	 * @return {Promise}
 	 */
 	ServerExports.prototype.eventTicket = function(event_id, uuid) {
 		

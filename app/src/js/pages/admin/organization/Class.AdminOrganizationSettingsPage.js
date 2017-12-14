@@ -114,7 +114,7 @@ AdminOrganizationSettingsPage = extending(AdminOrganizationPage, (function() {
 	};
 	/**
 	 *
-	 * @returns {jqPromise}
+	 * @returns {Promise}
 	 */
 	AdminOrganizationSettingsPage.prototype.updateOrganizationData = function() {
 		

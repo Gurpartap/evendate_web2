@@ -98,7 +98,7 @@ AdminOrganizationDispatchesPage = extending(AdminOrganizationPage, (function() {
 			})
 		}));
 		
-		promise.done(function() {
+		promise.then(function() {
 			self.$wrapper.find('.DispatchesWrapper').append(self.dispatches.length ? self.dispatchBuilder(self.dispatches) : __APP.BUILD.cap('Вы пока не создали ни одну рассылку'));
 		});
 	};

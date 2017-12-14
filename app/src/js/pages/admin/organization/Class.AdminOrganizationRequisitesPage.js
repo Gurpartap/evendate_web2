@@ -35,7 +35,7 @@ AdminOrganizationRequisitesPage = extending(AdminOrganizationPage, (function() {
 		
 		return this.fetching_data_defer = __APP.SERVER.multipleAjax(
 			this.organization.fetchOrganization(this.organization_fields),
-			OneOrganization.fetchRequisites(this.organization.id).done(function(data) {
+			OneOrganization.fetchRequisites(this.organization.id).then(function(data) {
 				Object.assign(self.requisites, data.agent_info);
 			})
 		);
@@ -170,15 +170,14 @@ AdminOrganizationRequisitesPage = extending(AdminOrganizationPage, (function() {
 			if (isFormValid($form)) {
 				$loader = __APP.BUILD.overlayLoader(self.$wrapper);
 				self.render_vars.submit_button.attr('disabled', true);
-				OneOrganization.saveRequisites(self.organization.id, self.gatherSendData()).always(function() {
-					$loader.remove();
-					self.render_vars.submit_button.removeAttr('disabled');
-				}).done(function() {
+				OneOrganization.saveRequisites(self.organization.id, self.gatherSendData()).then(function() {
 					showNotifier({
 						status: true,
 						text: 'Реквизиты успешно сохранены'
 					});
 				});
+				$loader.remove();
+				self.render_vars.submit_button.removeAttr('disabled');
 			}
 		});
 	};

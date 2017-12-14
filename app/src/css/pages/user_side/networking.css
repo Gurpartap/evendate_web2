@@ -1,0 +1,80 @@
+.event_networking_page {
+	margin: 36px auto;
+	max-width: 700px;
+}
+.event_networking_body {
+	padding: 24px 18px;
+}
+
+.networking_profile_block {
+	display: flex;
+	align-items: end;
+	padding: 12px 0;
+}
+
+.networking_profile_block_main {
+	width: 100%;
+	margin-left: 18px;
+	border-bottom: 1px solid #f2f2f2;
+}
+
+.networking_profile_block_body {
+	padding: 6px 0 24px;
+}
+
+.networking_profile_block_header,
+.networking_profile_block_avatar {cursor: pointer}
+
+.networking_profile_block_comment {
+	color: rgba(0, 0, 0, 0.54);
+}
+
+
+
+.event_networking_my_profile_header {
+	padding: 24px;
+	border-bottom: 1px solid rgba(197, 201, 209, 0.5);
+}
+
+.event_networking_my_profile_title {
+	margin: 0;
+	font-size: 34px;
+	font-weight: 400;
+}
+
+.event_networking_my_profile_body {
+	padding: 36px 24px;
+}
+
+
+/*INSPECTOR*/
+
+.networking_profile_inspector_header {
+	text-align: center;
+}
+
+.networking_profile_inspector_subtitle {
+	font-size: 12px;
+	font-weight: 500;
+	text-transform: uppercase;
+	color: rgba(0, 0, 0, .38);
+}
+
+.networking_profile_inspector_text {
+	font-size: 14px;
+	margin: 15px 0;
+	padding-bottom: 15px;
+	border-bottom: 1px solid #f2f2f2;
+}
+
+
+/*MODAL*/
+
+.create_networking_request_modal_head {
+	display: flex;
+	margin-bottom: 12px;
+}
+
+.create_networking_request_modal_head_body {
+	margin-left: 15px;
+}

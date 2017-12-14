@@ -20,7 +20,7 @@ MyOrdersCollection = extending(OrdersCollection, (function() {
 	 *
 	 * @param {AJAXData} ajax_data
 	 *
-	 * @return {jqPromise}
+	 * @return {Promise}
 	 */
 	MyOrdersCollection.fetchOrders = function(ajax_data) {
 		
@@ -32,7 +32,7 @@ MyOrdersCollection = extending(OrdersCollection, (function() {
 	 * @param {number} [length]
 	 * @param {(Array<string>|string)} [order_by]
 	 *
-	 * @return {jqPromise}
+	 * @return {Promise}
 	 */
 	MyOrdersCollection.prototype.fetch = function(fields, length, order_by) {
 		var self = this;
@@ -53,7 +53,7 @@ MyOrdersCollection = extending(OrdersCollection, (function() {
 	 * @param {Fields} [fields]
 	 * @param {(Array<string>|string)} [order_by]
 	 *
-	 * @return {jqPromise}
+	 * @return {Promise}
 	 */
 	MyOrdersCollection.prototype.fetchAll = function(fields, order_by) {
 		var self = this;

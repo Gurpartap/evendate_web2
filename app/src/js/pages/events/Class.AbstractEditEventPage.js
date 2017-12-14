@@ -1211,21 +1211,18 @@ AbstractEditEventPage = extending(Page, (function() {
 			__APP.changeState('/event/' + PAGE.event.id);
 		}
 		
-		function always() {
-			PAGE.$wrapper.removeClass(__C.CLASSES.STATUS.DISABLED);
-			$loader.remove();
-		}
-		
 		if (is_form_valid) {
 			PAGE.$wrapper.addClass(__C.CLASSES.STATUS.DISABLED);
 			$loader = __APP.BUILD.overlayLoader(PAGE.$view);
 			try {
 				send_data = this.gatherSendData();
 				if (is_edit) {
-					PAGE.event.updateEvent(send_data, afterSubmit).always(always);
+					PAGE.event.updateEvent(send_data).then(afterSubmit);
 				} else {
-					PAGE.event.createEvent(send_data, afterSubmit).always(always);
+					PAGE.event.createEvent(send_data).then(afterSubmit);
 				}
+				PAGE.$wrapper.removeClass(__C.CLASSES.STATUS.DISABLED);
+				$loader.remove();
 			} catch (e) {
 				ServerConnection.stdErrorHandler(e);
 			}
@@ -1450,7 +1447,7 @@ AbstractEditEventPage = extending(Page, (function() {
 		
 		(function checkVkPublicationAbility() {
 			if (__APP.USER.accounts.contains(OneUser.ACCOUNTS.VK)) {
-				__APP.SERVER.dealAjax(AsynchronousConnection.HTTP_METHODS.GET, '/api/v1/organizations/vk_groups').done(function(groups) {
+				__APP.SERVER.dealAjax(AsynchronousConnection.HTTP_METHODS.GET, '/api/v1/organizations/vk_groups').then(function(groups) {
 					var $vk_group_select = PAGE.$wrapper.find('select.VkGroupsSelect');
 					
 					$vk_group_select.append(__APP.BUILD.option(groups.map(function(group) {

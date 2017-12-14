@@ -262,9 +262,9 @@ MyOrdersPage = extending(Page, (function() {
 		} else {
 			this.$detail_wrapper.html(__APP.BUILD.floatingLoader());
 			this.$registration_fields_wrapper.html('');
-			order.fetch(this.fetch_order_fields).done(function() {
+			order.fetch(this.fetch_order_fields).then(function() {
 				renderOrder();
-			}).fail(function() {
+			}).catch(function() {
 				self.$detail_wrapper.html('');
 			});
 		}
@@ -301,7 +301,7 @@ MyOrdersPage = extending(Page, (function() {
 				if (y.scroll + 200 >= y.maxScroll && !self.block_scroll) {
 					self.block_scroll = true;
 					$loader = __APP.BUILD.loaderBlock($orders_wrapper);
-					self.orders.fetch(self.fetch_orders_fields, 5, '-created_at').done(function(orders) {
+					self.orders.fetch(self.fetch_orders_fields, 5, '-created_at').then(function(orders) {
 						$loader.remove();
 						if (orders.length) {
 							self.block_scroll = false;

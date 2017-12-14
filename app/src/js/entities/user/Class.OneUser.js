@@ -71,23 +71,25 @@ OneUser = extending(OneEntity, (function() {
 		this.interests = new InterestModelsCollection();
 		
 		Object.defineProperty(this, 'full_name', {
-			enumerable: true,
-			get: function() {
+			enumerable: true, get: function() {
 				return self.first_name + ' ' + self.last_name;
 			}
 		});
 	}
-	OneUser.prototype.subscriptions_fields = ['img_small_url', 'subscribed_count', 'new_events_count', 'actual_events_count'];
+	
+	OneUser.prototype.subscriptions_fields = [
+		'img_small_url',
+		'subscribed_count',
+		'new_events_count',
+		'actual_events_count'
+	];
 	Object.freeze(OneUser.prototype.subscriptions_fields);
 	/**
 	 * @const
 	 * @enum {string}
 	 */
 	OneUser.ROLE = {
-		UNAUTH: 'unauth',
-		USER: 'user',
-		MODERATOR: 'moderator',
-		ADMIN: 'admin'
+		UNAUTH: 'unauth', USER: 'user', MODERATOR: 'moderator', ADMIN: 'admin'
 	};
 	Object.freeze(OneUser.ROLE);
 	/**
@@ -95,9 +97,7 @@ OneUser = extending(OneEntity, (function() {
 	 * @enum {string}
 	 */
 	OneUser.GENDER = {
-		MALE: 'male',
-		FEMALE: 'female',
-		NEUTRAL: 'neutral'
+		MALE: 'male', FEMALE: 'female', NEUTRAL: 'neutral'
 	};
 	Object.freeze(OneUser.GENDER);
 	/**
@@ -105,9 +105,7 @@ OneUser = extending(OneEntity, (function() {
 	 * @enum {string}
 	 */
 	OneUser.ACCOUNTS = {
-		VK: 'vk',
-		GOOGLE: 'google',
-		FACEBOOK: 'facebook'
+		VK: 'vk', GOOGLE: 'google', FACEBOOK: 'facebook'
 	};
 	Object.freeze(OneUser.ACCOUNTS);
 	/**
@@ -115,7 +113,7 @@ OneUser = extending(OneEntity, (function() {
 	 * @param {(string|number)} user_id
 	 * @param {(Fields|Array|string)} [fields]
 	 * @param {AJAXCallback} [success]
-	 * @returns {jqPromise}
+	 * @returns {Promise}
 	 */
 	OneUser.fetchUser = function(user_id, fields, success) {
 		return __APP.SERVER.getData('/api/v1/users/' + user_id, {fields: fields}, success);
@@ -125,7 +123,7 @@ OneUser = extending(OneEntity, (function() {
 	 * @param {(string|number)} user_id
 	 * @param {AJAXData} [data]
 	 * @param {AJAXCallback} [success]
-	 * @returns {jqPromise}
+	 * @returns {Promise}
 	 */
 	OneUser.fetchFavored = function(user_id, data, success) {
 		return __APP.SERVER.getData('/api/v1/users/' + user_id + '/favorites', data, success);
@@ -135,7 +133,7 @@ OneUser = extending(OneEntity, (function() {
 	 * @param {(string|number)} user_id
 	 * @param {AJAXData} [data]
 	 * @param {AJAXCallback} [success]
-	 * @returns {jqPromise}
+	 * @returns {Promise}
 	 */
 	OneUser.fetchSubscriptions = function(user_id, data, success) {
 		return __APP.SERVER.getData('/api/v1/users/' + user_id + '/subscriptions', data, success);
@@ -145,7 +143,7 @@ OneUser = extending(OneEntity, (function() {
 	 * @param {(string|number)} user_id
 	 * @param {(Array|string)} [fields]
 	 * @param {AJAXCallback} [success]
-	 * @returns {jqPromise}
+	 * @returns {Promise}
 	 */
 	OneUser.fetchUserActivity = function(user_id, fields, success) {
 		return UsersActivitiesCollection.fetch(user_id, {fields: fields}, success);
@@ -158,10 +156,9 @@ OneUser = extending(OneEntity, (function() {
 	OneUser.recognizeRole = function(privileges) {
 		var role = OneUser.ROLE.USER;
 		privileges.forEach(function(privilege) {
-			if (privilege.role_id == 1 || privilege.name == OneUser.ROLE.ADMIN)
-				role = OneUser.ROLE.ADMIN;
-			if ((privilege.role_id == 2 || privilege.name == OneUser.ROLE.MODERATOR) && role !== OneUser.ROLE.ADMIN)
-				role = OneUser.ROLE.MODERATOR;
+			if (privilege.role_id == 1 || privilege.name == OneUser.ROLE.ADMIN) role = OneUser.ROLE.ADMIN;
+			if ((privilege.role_id == 2 || privilege.name == OneUser.ROLE.MODERATOR) &&
+			    role !== OneUser.ROLE.ADMIN) role = OneUser.ROLE.MODERATOR;
 		});
 		return role ? role : OneUser.ROLE.UNAUTH;
 	};
@@ -169,51 +166,62 @@ OneUser = extending(OneEntity, (function() {
 	 *
 	 * @param {(Fields|Array|string)} [fields]
 	 * @param {AJAXCallback} [success]
-	 * @returns {jqPromise}
+	 * @returns {Promise}
 	 */
 	OneUser.prototype.fetchUser = function(fields, success) {
 		var self = this;
+		
 		fields = setDefaultValue(fields, []);
 		
 		return OneUser.fetchUser(self.id, fields, function(data) {
 			data = data instanceof Array ? data[0] : data;
 			self.setData(data);
-			if (success && typeof success == 'function') {
+			if (isFunction(success)) {
 				success.call(self, data);
 			}
+			
+			return data;
 		});
 	};
 	/**
 	 *
 	 * @param {AJAXData} [data]
 	 * @param {AJAXCallback} [success]
-	 * @returns {jqPromise}
+	 * @returns {Promise}
 	 */
 	OneUser.prototype.fetchFavored = function(data, success) {
 		var self = this;
+		
 		data.offset = this.favored.length;
-		return OneUser.fetchFavored(self.id, data).done(function(favored) {
+		
+		return OneUser.fetchFavored(self.id, data).then(function(favored) {
 			self.favored.setData(favored);
-			if (success && typeof success == 'function') {
+			if (isFunction(success)) {
 				success.call(self, self.favored.__last_pushed);
 			}
-		}).promise();
+			
+			return self.favored.__last_pushed;
+		});
 	};
 	/**
 	 *
 	 * @param {AJAXData} [data]
 	 * @param {AJAXCallback} [success]
-	 * @returns {jqPromise}
+	 * @returns {Promise}
 	 */
 	OneUser.prototype.fetchSubscriptions = function(data, success) {
 		var self = this;
+		
 		data.offset = this.subscriptions.length;
-		return OneUser.fetchSubscriptions(self.id, data).done(function(subscriptions) {
+		
+		return OneUser.fetchSubscriptions(self.id, data).then(function(subscriptions) {
 			self.subscriptions.setData(subscriptions);
-			if (success && typeof success == 'function') {
+			if (isFunction(success)) {
 				success.call(self, self.subscriptions.__last_pushed);
 			}
-		}).promise();
+			
+			return self.subscriptions.__last_pushed;
+		});
 	};
 	
 	return OneUser;

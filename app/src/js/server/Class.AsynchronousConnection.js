@@ -35,16 +35,20 @@ AsynchronousConnection = (function() {
 	 * @param {function} [success]
 	 * @param {function} [error]
 	 *
-	 * @returns {jqPromise}
+	 * @returns {Promise}
 	 */
 	AsynchronousConnection.prototype.dealAjax = AsynchronousConnection.dealAjax = function(http_method, url, ajax_data, content_type, success, error) {
 		
-		return $.ajax({
-			url: url,
-			data: ajax_data,
-			method: http_method,
-			contentType: content_type || 'application/x-www-form-urlencoded; charset=UTF-8'
-		}).then((function(response, status_text, jqXHR) {
+		return (new Promise(function(resolve, reject) {
+			$.ajax({
+				url: url,
+				data: ajax_data,
+				method: http_method,
+				contentType: content_type || 'application/x-www-form-urlencoded; charset=UTF-8',
+				success: resolve,
+				error: reject
+			});
+		})).then((function(response) {
 			if (
 				response.hasOwnProperty('status') &&
 				response.hasOwnProperty('data') &&
@@ -56,23 +60,30 @@ AsynchronousConnection = (function() {
 			}
 			
 			return response;
-		})).fail(error).done(success);
+		})).catch(error).then(success);
 	};
 	/**
-	 * @param {...(jqXHR|Deferred|jqPromise)} Deferreds
+	 * @param {...(jqXHR|Deferred|Promise)} Deferreds
 	 * @param {function(..(Array|object))} [cb]
-	 * @return {jqPromise}
+	 * @return {Promise}
 	 */
-	AsynchronousConnection.prototype.multipleAjax = AsynchronousConnection.multipleAjax = function(){
+	AsynchronousConnection.prototype.multipleAjax = AsynchronousConnection.multipleAjax = function() {
 		var with_callback = (arguments[arguments.length - 1] instanceof Function),
-			promises = with_callback ? Array.prototype.splice.call(arguments, 0, arguments.length - 1) : Array.prototype.slice.call(arguments),
+			promises = with_callback ?
+			           Array.prototype.splice.call(arguments, 0, arguments.length - 1) :
+			           Array.prototype.slice.call(arguments),
 			parallel_promise;
 		
-		parallel_promise = $.when.apply($, promises);
-		if(with_callback) {
-			parallel_promise.done(Array.prototype.shift.call(arguments));
+		parallel_promise = Promise.all(promises);
+		if (with_callback) {
+			parallel_promise.then((results) => {
+				Array.prototype.shift.call(arguments).apply(this, [...results]);
+				
+				return this;
+			});
 		}
-		return parallel_promise.promise();
+		
+		return parallel_promise;
 	};
 	
 	

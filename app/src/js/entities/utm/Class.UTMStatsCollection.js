@@ -28,7 +28,7 @@ UTMStatsCollection = extending(EntitiesCollection, (function() {
 	 * @param {number} event_id
 	 * @param {AJAXData} [ajax_data]
 	 *
-	 * @return {jqPromise}
+	 * @return {Promise}
 	 */
 	UTMStatsCollection.fetchEventUTMStats = function(event_id, ajax_data) {
 		

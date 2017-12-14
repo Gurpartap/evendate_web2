@@ -38,10 +38,10 @@ AbstractListModal = extending(AbstractModal, (function() {
 	/**
 	 *
 	 * @abstract
-	 * @return {jqPromise}
+	 * @return {Promise}
 	 */
 	AbstractListModal.prototype.uploadEntities = function() {
-		return $.Deferred.resolve().promise();
+		return Promise.resolve();
 	};
 	/**
 	 *
@@ -68,7 +68,7 @@ AbstractListModal = extending(AbstractModal, (function() {
 		this.content.append(this.buildEntities(this.entities));
 		
 		if (this.entities.length < 5) {
-			this.uploadEntities().done(function() {
+			this.uploadEntities().then(function() {
 				self.__show();
 			});
 		} else {
@@ -86,10 +86,10 @@ AbstractListModal = extending(AbstractModal, (function() {
 			$loader = __APP.BUILD.loaderBlock(this.content);
 		
 		this.uploadEntities()
-			.fail(function() {
+			.catch(function() {
 				self.block_scroll = false;
 			})
-			.done(function(){
+			.then(function(){
 				$loader.remove();
 				callback.call(self);
 			});

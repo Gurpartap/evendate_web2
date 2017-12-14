@@ -1,13 +1,17 @@
 "use strict";
 
-var gulp = require('gulp'),
+const gulp = require('gulp'),
 	resolveDependencies = require('gulp-resolve-dependencies'),
 	concat = require('gulp-concat'),
 	uglify = require('gulp-uglify'),
 	autoprefixer = require('gulp-autoprefixer'),
 	csso = require('gulp-csso'),
 	rename = require('gulp-rename'),
-	runSequence = require('run-sequence').use(gulp),
+	babel = require('gulp-babel'),
+	console = require('console'),
+	cache = require('gulp-cached'),
+	remember = require('gulp-remember'),
+	gulpStreamToPromise = require('gulp-stream-to-promise'),
 	
 	templates_path = '../app/templates/',
 	js_path = '../app/src/js/',
@@ -25,8 +29,12 @@ var gulp = require('gulp'),
 			templates_path + 'pages/legal_entity_payment.html'
 		],
 		vendor_js: [
+			vendor_path + 'react/*.js',
+			vendor_path + 'react-router/*.js',
+			vendor_path + 'es6-promise/*.js',
 			vendor_path + 'moment/moment-with-locales.js',
 			vendor_path + 'moment/moment-timezone-with-data-2012-2022.js',
+			vendor_path + 'i18n/*.js',
 			vendor_path + 'jquery/jquery.js',
 			vendor_path + 'jquery.history/jquery.history.js',
 			vendor_path + 'jquery.inputmask/jquery.inputmask.bundle.min.js',
@@ -39,6 +47,7 @@ var gulp = require('gulp'),
 		],
 		app_js: [
 			js_path + 'lib.js',
+			js_path + 'locales.js',
 			
 			js_path + 'connections/Class.WidgetPostMessageConnection.js',
 			
@@ -70,8 +79,6 @@ var gulp = require('gulp'),
 			js_path + 'pages/order/*.js',
 			js_path + 'pages/Class.NotFoundPage.js',
 			
-			js_path + 'widget.js',
-			js_path + 'locales.js',
 			js_path + 'widget_init.js'
 		],
 		vendor_css: [
@@ -110,57 +117,116 @@ var gulp = require('gulp'),
 		]
 	};
 
-gulp.task('js', function() {
+function build(is_prod, cb) {
+	let css,
+		js,
+		tmpl;
 	
-	return gulp.src(srcs.vendor_js.concat(srcs.app_js))
-	           .pipe(resolveDependencies())
-	           .pipe(concat('widget.js'))
-	           .pipe(gulp.dest(dest_path));
-});
-
-gulp.task('css', function() {
+	css = new Promise((resolve, reject) => {
+		var stream;
+		
+		console.time('css');
+		
+		stream = gulp.src(srcs.vendor_css.concat(srcs.app_css))
+		             .pipe(resolveDependencies())
+		             .pipe(concat('widget.css'))
+		             .pipe(gulp.dest(dest_path));
+		
+		if (is_prod) {
+			stream = stream
+				.pipe(autoprefixer())
+				.pipe(csso())
+				.pipe(rename({extname: '.min.css'}))
+				.pipe(gulp.dest(dest_path));
+		}
+		
+		gulpStreamToPromise(stream).catch(reject).then(() => {
+			console.timeEnd('css');
+			resolve();
+		});
+		
+		console.time('css');
+	});
 	
-	return gulp.src(srcs.vendor_css.concat(srcs.app_css))
-	           .pipe(resolveDependencies())
-	           .pipe(concat('widget.css'))
-	           .pipe(gulp.dest(dest_path));
-});
-
-gulp.task('tmpl', function() {
+	js = new Promise((resolve, reject) => {
+		var stream;
+		
+		console.time('js');
+		
+		stream = gulp.src(srcs.vendor_js.concat(srcs.app_js));
+		
+		if (!is_prod) {
+			stream = stream
+				.pipe(cache('widget_scripts'))
+				.pipe(resolveDependencies())
+				.pipe(babel())
+				.pipe(remember('widget_scripts'))
+				.pipe(concat('widget.js'))
+				.pipe(gulp.dest(dest_path));
+		} else {
+			stream = stream
+				.pipe(resolveDependencies())
+				.pipe(concat('widget.js'))
+				.pipe(babel())
+				.pipe(gulp.dest(dest_path))
+				.pipe(uglify().on('error', e => {
+					reject(e);
+				}))
+				.pipe(rename({extname: '.min.js'}))
+				.pipe(gulp.dest(dest_path));
+		}
+		
+		gulpStreamToPromise(stream).catch(reject).then(() => {
+			console.timeEnd('js');
+			resolve();
+		});
+	});
 	
-	return gulp.src(srcs.templates)
-	           .pipe(concat('templates.html'))
-	           .pipe(gulp.dest(dest_path));
-});
-
-gulp.task('minify_js', ['js'], function() {
+	tmpl = new Promise(resolve => {
+		var stream;
+		
+		console.time('tmpl');
+		
+		stream = gulp.src(srcs.templates)
+		             .pipe(concat('templates.html'))
+		             .pipe(gulp.dest(dest_path));
+		
+		gulpStreamToPromise(stream).then(() => {
+			console.timeEnd('tmpl');
+			resolve();
+		});
+	});
 	
-	return gulp.src(dest_path + 'widget.js')
-	           .pipe(uglify())
-	           .pipe(rename({extname: '.min.js'}))
-	           .pipe(gulp.dest(dest_path));
-});
-
-gulp.task('minify_css', ['css'], function() {
-	
-	return gulp.src(dest_path + 'widget.css')
-	           .pipe(autoprefixer())
-	           .pipe(csso())
-	           .pipe(rename({extname: '.min.css'}))
-	           .pipe(gulp.dest(dest_path));
-});
+	return Promise.all([
+		js,
+		css,
+		tmpl
+	]).catch(e => {
+		console.error(e);
+		
+		return cb();
+	});
+}
 
 gulp.task('build_dev', function(cb) {
 	
-	return runSequence(['css', 'js', 'tmpl'], cb);
+	return build(false, cb);
 });
 
-gulp.task('watch', function() {
+gulp.task('watch', function(cb) {
+	var watcher = gulp.watch(srcs.vendor_js.concat(srcs.app_js, srcs.vendor_css, srcs.app_css, srcs.templates), ['build_dev']);
 	
-	return gulp.watch(srcs.vendor_js.concat(srcs.app_js, srcs.vendor_css, srcs.app_css, srcs.templates), ['build_dev']);
+	watcher.on('change', function (event) {
+		if (event.type === 'deleted') {
+			delete cache.caches['scripts'][event.path];
+			remember.forget('scripts', event.path);
+		}
+	});
+	
+	return watcher;
 });
 
 gulp.task('build', function(cb) {
 	
-	return runSequence(['minify_css', 'minify_js', 'tmpl'], cb);
+	return build(true, cb);
 });

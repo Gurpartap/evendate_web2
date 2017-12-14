@@ -104,7 +104,7 @@ OneAbstractDispatch = extending(OneEntity, (function() {
 	 * @param {string} uuid
 	 * @param {Fields} [fields]
 	 *
-	 * @return {jqPromise}
+	 * @return {Promise}
 	 */
 	OneAbstractDispatch.fetchDispatch = function(uuid, fields) {
 		
@@ -116,7 +116,7 @@ OneAbstractDispatch = extending(OneEntity, (function() {
 	 *
 	 * @param {Object} data
 	 *
-	 * @return {jqPromise}
+	 * @return {Promise}
 	 */
 	OneAbstractDispatch.createDispatch = function(data) {
 		
@@ -127,7 +127,7 @@ OneAbstractDispatch = extending(OneEntity, (function() {
 	 * @param {string} uuid
 	 * @param {Object} data
 	 *
-	 * @return {jqPromise}
+	 * @return {Promise}
 	 */
 	OneAbstractDispatch.updateDispatch = function(uuid, data) {
 		
@@ -137,7 +137,7 @@ OneAbstractDispatch = extending(OneEntity, (function() {
 	 *
 	 * @param {Fields} [fields]
 	 *
-	 * @return {jqPromise}
+	 * @return {Promise}
 	 */
 	OneAbstractDispatch.prototype.fetch = function(fields) {
 		
@@ -148,7 +148,7 @@ OneAbstractDispatch = extending(OneEntity, (function() {
 	};
 	/**
 	 *
-	 * @return {jqPromise}
+	 * @return {Promise}
 	 */
 	OneAbstractDispatch.prototype.save = function() {
 		if (isVoid(this.uuid)) {

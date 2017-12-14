@@ -21,7 +21,7 @@ CurrentUser = extending(OneUser, (function() {
 		 *
 		 * @param {AJAXData} data
 		 * @param {AJAXCallback} [success]
-		 * @returns {jqPromise}
+		 * @returns {Promise}
 		 */
 		FriendsActivitiesCollection.fetch = function(data, success) {
 			data = UsersActivitiesCollection.setDefaultData(data);
@@ -81,16 +81,18 @@ CurrentUser = extending(OneUser, (function() {
 	 *
 	 * @param {AJAXData} [data]
 	 * @param {AJAXCallback} [success]
-	 * @return {jqPromise}
+	 * @return {Promise}
 	 */
 	CurrentUser.fetchFriends = function(data, success){
+		
 		return __APP.SERVER.getData('/api/v1/users/friends', data, success);
 	};
 	/**
 	 *
 	 * @param {(Fields|Array|string)} [fields]
 	 * @param {AJAXCallback} [success]
-	 * @returns {jqPromise}
+	 *
+	 * @returns {Promise}
 	 */
 	CurrentUser.prototype.fetchUser = function(fields, success) {
 		var self = this,
@@ -98,37 +100,42 @@ CurrentUser = extending(OneUser, (function() {
 			afterAjax = function(data) {
 				data = data instanceof Array ? data[0] : data;
 				self.setData(data);
-				if (success && typeof success == 'function') {
+				if (isFunction(success)) {
 					success.call(self, data);
 				}
+				
+				return data;
 			};
+		
 		fields = setDefaultValue(fields, []);
 		
 		if(fields.hasOwnProperty('friends')) {
-			return __APP.SERVER.multipleAjax(promise, this.fetchFriends(fields.friends)).done(function(user_data, friends_data) {
+			
+			return Promise.all([promise, this.fetchFriends(fields.friends)]).then(([user_data, friends_data]) => {
 				user_data = user_data instanceof Array ? user_data[0] : user_data;
 				user_data.friends = friends_data;
-				afterAjax(user_data);
-			}).promise();
+				
+				return afterAjax(user_data);
+			});
 		}
-		return promise.done(afterAjax).promise();
+		
+		return promise.then(afterAjax);
 	};
 	/**
 	 *
 	 * @param {AJAXData} [ajax_data]
 	 * @param {AJAXCallback} [success]
-	 * @returns {jqPromise}
+	 * @returns {Promise}
 	 */
 	CurrentUser.prototype.fetchFriends = function(ajax_data, success) {
-		var self = this;
-		ajax_data = $.extend(ajax_data, {
-			offset: self.friends.length
-		});
-		return CurrentUser.fetchFriends(ajax_data, function(data) {
-			self.friends.setData(data);
-			if (success && typeof success == 'function') {
-				success.call(self, self.friends.__last_pushed);
+		
+		return CurrentUser.fetchFriends({...ajax_data, offset: this.friends.length}).then(data => {
+			this.friends.setData(data);
+			if (isFunction(success)) {
+				success.call(this, this.friends.__last_pushed);
 			}
+			
+			return this.friends.__last_pushed;
 		});
 	};
 	/**
@@ -153,13 +160,10 @@ CurrentUser = extending(OneUser, (function() {
 			window.open(__APP.AUTH_URLS[social_network], social_network.toUpperCase() + '_AUTH_WINDOW', 'status=1,toolbar=0,menubar=0&height=500,width=700');
 		}
 	};
-	/**
-	 *
-	 * @returns {jqPromise}
-	 */
+	
 	CurrentUser.prototype.logout = function() {
 		
-		return $.ajax({
+		$.ajax({
 			url: '/index.php',
 			data: {logout: true},
 			complete: function() {
@@ -178,7 +182,7 @@ CurrentUser = extending(OneUser, (function() {
 	 *
 	 * @param {(number|string)} [organization_id]
 	 * @param {AJAXCallback} [success]
-	 * @returns {(jqPromise|null)}
+	 * @returns {(Promise|null)}
 	 */
 	CurrentUser.prototype.subscribeToOrganization = function(organization_id, success) {
 		var self = this;
@@ -199,7 +203,7 @@ CurrentUser = extending(OneUser, (function() {
 	 *
 	 * @param {(number|string)} [organization_id]
 	 * @param {AJAXCallback} [success]
-	 * @returns {(jqPromise|null)}
+	 * @returns {(Promise|null)}
 	 */
 	CurrentUser.prototype.unsubscribeFromOrganization = function(organization_id, success) {
 		var self = this;

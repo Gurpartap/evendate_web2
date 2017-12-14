@@ -398,4 +398,43 @@ class User extends AbstractUser
 		return $this->db->prepareExecute($q_get_count)->fetchAll();
 	}
 
+	public function getMyProfile()
+	{
+		$q_get_profile = App::queryFactory()->newSelect();
+		$q_get_profile
+			->from('users_profiles')
+			->cols(array(
+				'first_name',
+				'last_name',
+				'avatar_url',
+				'info',
+				'looking_for',
+				'vk_url',
+				'facebook_url',
+				'twitter_url',
+				'linkedin_url',
+				'telegram_url',
+				'instagram_url',
+				'github_url',
+				'email'
+			))
+			->where('user_id = ?', $this->id);
+		$this->db->prepareExecute($q_get_profile)->fetch();
+	}
+
+	public function getMyContacts()
+	{
+		$q_get_contacts = App::queryFactory()->newSelect();
+		$q_get_contacts->from('view_networking_requests')
+			->cols(
+				'event_id',
+				'sender_user_id',
+				'recipient_user_id',
+				'message',
+				'',
+				''
+			);
+
+	}
+
 }

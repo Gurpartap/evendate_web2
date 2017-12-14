@@ -30,7 +30,7 @@ AdminEventRequestsPage = extending(AdminEventPage, (function() {
 		 *
 		 * @param {AJAXCallback} [success]
 		 *
-		 * @return {jqPromise}
+		 * @return {Promise}
 		 */
 		OneRequest.prototype.approveRequest = function(success) {
 			
@@ -40,7 +40,7 @@ AdminEventRequestsPage = extending(AdminEventPage, (function() {
 		 *
 		 * @param {AJAXCallback} [success]
 		 *
-		 * @return {jqPromise}
+		 * @return {Promise}
 		 */
 		OneRequest.prototype.rejectRequest = function(success) {
 			
@@ -110,7 +110,7 @@ AdminEventRequestsPage = extending(AdminEventPage, (function() {
 		 * @param {AJAXData} [ajax_data]
 		 * @param {AJAXCallback} [success]
 		 *
-		 * @return {jqPromise}
+		 * @return {Promise}
 		 */
 		RequestsCollection.fetchOrders = RequestsCollection.fetchRequests = EventAllOrdersCollection.fetchOrders;
 		/**
@@ -119,7 +119,7 @@ AdminEventRequestsPage = extending(AdminEventPage, (function() {
 		 * @param {(Array<string>|string)} [order_by]
 		 * @param {AJAXCallback} [success]
 		 *
-		 * @returns {jqPromise}
+		 * @returns {Promise}
 		 */
 		RequestsCollection.prototype.fetchAllRequests = EventAllOrdersCollection.prototype.fetchAllOrders;
 		
@@ -271,7 +271,7 @@ AdminEventRequestsPage = extending(AdminEventPage, (function() {
 				$this.find('.RejectRequest').on('click.RejectRequest', function() {
 					var $item;
 					
-					request.rejectRequest().done(function() {
+					request.rejectRequest().then(function() {
 						$item = self.requestItemBuilder(request);
 						
 						self.$rejected_requests_list.append($item);
@@ -331,7 +331,7 @@ AdminEventRequestsPage = extending(AdminEventPage, (function() {
 			request = $element.data('request'),
 			$item;
 		
-		request.approveRequest().done(function() {
+		request.approveRequest().then(function() {
 			$item = self.requestItemBuilder(request);
 			
 			self.$approved_requests_list.append($item);
@@ -406,7 +406,7 @@ AdminEventRequestsPage = extending(AdminEventPage, (function() {
 		
 		this.$requests_detail = this.$wrapper.find('.RequestDetail');
 		
-		this.requests.fetchAllRequests(this.requests_fields).done(function() {
+		this.requests.fetchAllRequests(this.requests_fields).then(function() {
 			var $lists;
 			
 			self.requests.sortBy('created_at');
