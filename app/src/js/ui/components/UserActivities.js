@@ -81,7 +81,7 @@ UserActivity.ACTION_TEXT = {
 	[OneAbstractActivity.TYPES.SHARE_TW]: __S.USER_SHARED_EVENT
 };
 
-
+debugger;
 const UserActivities = componentsContainer(UserActivity, {
 	entity_name: 'activity',
 	entities_name: 'activities',
