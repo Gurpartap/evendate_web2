@@ -2,6 +2,7 @@
  * @requires ../Class.Page.js
  */
 /**
+ * @deprecated
  * @class OldUserPage
  * @extends Page
  */

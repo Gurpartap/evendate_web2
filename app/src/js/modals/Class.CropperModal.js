@@ -18,6 +18,7 @@ CropperModal = extending(AbstractModal, (function() {
 		if (image_src) {
 			cropper_options = typeof cropper_options == 'object' ? cropper_options : {};
 			this.image_src = image_src;
+			this.is_fetched = true;
 			this.content = tmpl('modal-cropper-content', {
 				image_src: this.image_src
 			});
