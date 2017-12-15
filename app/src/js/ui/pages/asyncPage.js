@@ -42,11 +42,6 @@ function asyncPage(
 		state_name = ''
 	}, PageClass) {
 	class AsyncPageAdapter extends React.Component {
-		static get name() {
-			
-			return PageClass.name;
-		}
-		
 		constructor(props) {
 			super(props);
 			
