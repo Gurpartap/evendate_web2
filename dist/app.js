@@ -5816,6 +5816,79 @@ InterestModelsCollection = extending(EntitiesCollection, function () {
 	return InterestModelsCollection;
 }());
 /**
+ * @requires ../../entities/Class.OneEntity.js
+ */
+/**
+ *
+ * @class PromocodeModel
+ * @extends OneEntity
+ */
+PromocodeModel = extending(OneEntity, function () {
+	/**
+  *
+  * @constructor
+  * @constructs PromocodeModel
+  *
+  * @property {?string} uuid
+  * @property {?number} event_id
+  * @property {?string} code
+  * @property {?boolean} is_fixed
+  * @property {?boolean} is_percentage
+  * @property {?number} effort
+  * @property {?number} total_effort
+  * @property {?number} use_limit
+  * @property {?number} use_count
+  * @property {?timestamp} start_date
+  * @property {?timestamp} end_date
+  * @property {?boolean} enabled
+  *
+  * @property {?timestamp} created_at
+  * @property {?timestamp} updated_at
+  */
+	function PromocodeModel() {
+		this.uuid = null;
+		this.event_id = null;
+		this.code = null;
+		this.is_fixed = null;
+		this.is_percentage = null;
+		this.effort = null;
+		this.total_effort = null;
+		this.use_limit = null;
+		this.use_count = null;
+		this.start_date = null;
+		this.end_date = null;
+		this.enabled = null;
+
+		this.created_at = null;
+		this.updated_at = null;
+	}
+	PromocodeModel.prototype.ID_PROP_NAME = 'uuid';
+
+	return PromocodeModel;
+}());
+/**
+ * @requires ../../entities/Class.EntitiesCollection.js
+ * @requires Class.PromocodeModel.js
+ */
+/**
+ *
+ * @class PromocodeModelsCollection
+ * @extends EntitiesCollection
+ */
+PromocodeModelsCollection = extending(EntitiesCollection, function () {
+	/**
+  *
+  * @constructor
+  * @constructs PromocodeModelsCollection
+  */
+	function PromocodeModelsCollection() {
+		EntitiesCollection.call(this);
+	}
+	PromocodeModelsCollection.prototype.collection_of = PromocodeModel;
+
+	return PromocodeModelsCollection;
+}());
+/**
  * @requires ../Class.AbstractDataModel.js
  */
 /**
@@ -5899,79 +5972,6 @@ PricingRuleModelsCollection = extending(AbstractDataModelsCollection, function (
 	PricingRuleModelsCollection.prototype.collection_of = PricingRuleModel;
 
 	return PricingRuleModelsCollection;
-}());
-/**
- * @requires ../../entities/Class.OneEntity.js
- */
-/**
- *
- * @class PromocodeModel
- * @extends OneEntity
- */
-PromocodeModel = extending(OneEntity, function () {
-	/**
-  *
-  * @constructor
-  * @constructs PromocodeModel
-  *
-  * @property {?string} uuid
-  * @property {?number} event_id
-  * @property {?string} code
-  * @property {?boolean} is_fixed
-  * @property {?boolean} is_percentage
-  * @property {?number} effort
-  * @property {?number} total_effort
-  * @property {?number} use_limit
-  * @property {?number} use_count
-  * @property {?timestamp} start_date
-  * @property {?timestamp} end_date
-  * @property {?boolean} enabled
-  *
-  * @property {?timestamp} created_at
-  * @property {?timestamp} updated_at
-  */
-	function PromocodeModel() {
-		this.uuid = null;
-		this.event_id = null;
-		this.code = null;
-		this.is_fixed = null;
-		this.is_percentage = null;
-		this.effort = null;
-		this.total_effort = null;
-		this.use_limit = null;
-		this.use_count = null;
-		this.start_date = null;
-		this.end_date = null;
-		this.enabled = null;
-
-		this.created_at = null;
-		this.updated_at = null;
-	}
-	PromocodeModel.prototype.ID_PROP_NAME = 'uuid';
-
-	return PromocodeModel;
-}());
-/**
- * @requires ../../entities/Class.EntitiesCollection.js
- * @requires Class.PromocodeModel.js
- */
-/**
- *
- * @class PromocodeModelsCollection
- * @extends EntitiesCollection
- */
-PromocodeModelsCollection = extending(EntitiesCollection, function () {
-	/**
-  *
-  * @constructor
-  * @constructs PromocodeModelsCollection
-  */
-	function PromocodeModelsCollection() {
-		EntitiesCollection.call(this);
-	}
-	PromocodeModelsCollection.prototype.collection_of = PromocodeModel;
-
-	return PromocodeModelsCollection;
 }());
 /**
  * @requires ../../entities/Class.OneEntity.js
@@ -16946,6 +16946,198 @@ OrderAppInspector = extending(AbstractAppInspector, function () {
 	return OrderAppInspector;
 }());
 /**
+ * @requires ../../entities/networking_profile/OneEventNetworkingProfile.js
+ */
+
+var CreateNetworkingRequestModal = function (_React$Component7) {
+	_inherits(CreateNetworkingRequestModal, _React$Component7);
+
+	function CreateNetworkingRequestModal(props) {
+		_classCallCheck(this, CreateNetworkingRequestModal);
+
+		var _this46 = _possibleConstructorReturn(this, (CreateNetworkingRequestModal.__proto__ || Object.getPrototypeOf(CreateNetworkingRequestModal)).call(this, props));
+
+		_this46.state = {
+			with_message: false,
+			fade_in: true
+		};
+		_this46.inputs = [];
+		_this46.modal = null;
+		_this46.modal_wrapper = $('.ModalsWrapper').get(0);
+
+		_this46.handleClickOutside = _this46.handleClickOutside.bind(_this46);
+		return _this46;
+	}
+
+	_createClass(CreateNetworkingRequestModal, [{
+		key: 'componentWillMount',
+		value: function componentWillMount() {
+			$('body').addClass('-open_modal');
+		}
+	}, {
+		key: 'componentDidMount',
+		value: function componentDidMount() {
+			this.bindClickOutside();
+			this.setState({
+				fade_in: false
+			});
+		}
+	}, {
+		key: 'componentWillUnmount',
+		value: function componentWillUnmount() {
+			this.unbindClickOutside();
+			$('body').removeClass('-open_modal');
+		}
+	}, {
+		key: 'bindClickOutside',
+		value: function bindClickOutside() {
+			if (!this.props.canHide) {
+				document.addEventListener('mousedown', this.handleClickOutside);
+			}
+		}
+	}, {
+		key: 'unbindClickOutside',
+		value: function unbindClickOutside() {
+			if (!this.props.canHide) {
+				document.removeEventListener('mousedown', this.handleClickOutside);
+			}
+		}
+	}, {
+		key: 'handleClickOutside',
+		value: function handleClickOutside(event) {
+			if (this.modal && !this.modal.contains(event.target)) {
+				this.setState({
+					fade_in: false
+				}, this.props.hideModalHandler);
+			}
+		}
+	}, {
+		key: 'render',
+		value: function render() {
+			var _this47 = this;
+
+			var profile = this.props.profile,
+			    with_message = this.state.with_message;
+
+
+			return ReactDOM.createPortal(React.createElement(
+				'div',
+				{
+					className: 'modal_unit material -floating_material ' + (this.state.fade_in ? '-faded' : ''),
+					ref: function ref(node) {
+						return _this47.modal = node;
+					},
+					style: { width: 370 }
+				},
+				React.createElement(
+					'header',
+					{ className: 'modal_header' },
+					React.createElement(
+						'span',
+						null,
+						'\u041E\u0442\u043F\u0440\u0430\u0432\u043A\u0430 \u0437\u0430\u044F\u0432\u043A\u0438'
+					),
+					React.createElement(
+						RippleButton,
+						{ className: 'modal_destroy_button CloseModal', onClick: function onClick(e) {
+								_this47.props.hideModalHandler();
+							} },
+						'\xD7'
+					)
+				),
+				React.createElement(
+					'div',
+					{ className: 'modal_content' },
+					React.createElement(
+						'header',
+						{ className: 'create_networking_request_modal_head' },
+						React.createElement(
+							'aside',
+							{ className: 'create_networking_request_modal_head_side' },
+							React.createElement(Avatar, { entity: profile.user, className: new HtmlClassesArray(__C.CLASSES.UNIVERSAL_STATES.ROUNDED, __C.CLASSES.SIZES.X55) })
+						),
+						React.createElement(
+							'div',
+							{ className: 'create_networking_request_modal_head_body' },
+							React.createElement(
+								'h5',
+								{ className: 'create_networking_request_modal_title' },
+								profile.user.full_name
+							),
+							React.createElement(
+								'span',
+								{ className: 'create_networking_request_modal_subtitle' },
+								profile.company_name
+							)
+						)
+					),
+					with_message && React.createElement(
+						'div',
+						{ className: 'form_unit' },
+						React.createElement('textarea', {
+							className: 'form_textarea',
+							name: 'message',
+							placeholder: '\u0412\u0432\u0435\u0434\u0438\u0442\u0435 \u0441\u043E\u043E\u0431\u0449\u0435\u043D\u0438\u0435 (\u043D\u0435\u043E\u0431\u044F\u0437\u0430\u0442\u0435\u043B\u044C\u043D\u043E)',
+							ref: 'message'
+						})
+					),
+					React.createElement(
+						'div',
+						{ className: 'form_group -parts_e_2' },
+						React.createElement(
+							'div',
+							{ className: 'form_unit' },
+							with_message || React.createElement(
+								Action,
+								{
+									className: 'fa_icon fa-commenting',
+									onClick: function onClick(e) {
+										_this47.setState({
+											with_message: true
+										});
+									}
+								},
+								'\u041F\u0440\u0438\u043A\u0440\u0435\u043F\u0438\u0442\u044C \u0441\u043E\u043E\u0431\u0449\u0435\u043D\u0438\u0435'
+							)
+						),
+						React.createElement(
+							'div',
+							{ className: 'form_unit' },
+							React.createElement(
+								RippleButton,
+								{
+									className: new HtmlClassesArray(__C.CLASSES.COLORS.ACCENT),
+									onClick: function onClick(e) {
+										profile.request.create({
+											event_id: profile.event_id,
+											user_id: profile.user_id,
+											sender_user_id: __APP.USER.id,
+											message: with_message ? _this47.refs.message.value : null
+										}).then(function (data) {
+											_this47.props.hideModalHandler();
+
+											return data;
+										});
+									}
+								},
+								'\u041E\u0442\u043F\u0440\u0430\u0432\u0438\u0442\u044C \u0437\u0430\u044F\u0432\u043A\u0443'
+							)
+						)
+					)
+				)
+			), this.modal_wrapper);
+		}
+	}]);
+
+	return CreateNetworkingRequestModal;
+}(React.Component);
+
+CreateNetworkingRequestModal.propTypes = {
+	profile: PropTypes.instanceOf(OneEventNetworkingProfile),
+	canHide: PropTypes.bool,
+	hideModalHandler: PropTypes.func
+};
+/**
  *
  * @param {object} options
  * @param {React.Component} PageClass
@@ -16978,8 +17170,8 @@ _ref20, PageClass) {
 	    _ref20$state_name = _ref20.state_name,
 	    state_name = _ref20$state_name === undefined ? '' : _ref20$state_name;
 
-	var AsyncPageAdapter = function (_React$Component7) {
-		_inherits(AsyncPageAdapter, _React$Component7);
+	var AsyncPageAdapter = function (_React$Component8) {
+		_inherits(AsyncPageAdapter, _React$Component8);
 
 		_createClass(AsyncPageAdapter, null, [{
 			key: 'name',
@@ -16992,23 +17184,23 @@ _ref20, PageClass) {
 		function AsyncPageAdapter(props) {
 			_classCallCheck(this, AsyncPageAdapter);
 
-			var _this46 = _possibleConstructorReturn(this, (AsyncPageAdapter.__proto__ || Object.getPrototypeOf(AsyncPageAdapter)).call(this, props));
+			var _this48 = _possibleConstructorReturn(this, (AsyncPageAdapter.__proto__ || Object.getPrototypeOf(AsyncPageAdapter)).call(this, props));
 
 			__APP.HISTORY = props.history;
-			__APP.CURRENT_REACT_PAGE = _this46;
-			_this46.pageProps = _extends({}, props.match.params, constructPage.call(_this46, props.match.params));
-			_this46.origin_page = null;
-			_this46.state = {
+			__APP.CURRENT_REACT_PAGE = _this48;
+			_this48.pageProps = _extends({}, props.match.params, constructPage.call(_this48, props.match.params));
+			_this48.origin_page = null;
+			_this48.state = {
 				is_data_fetching: !(is_auth_required && __APP.USER.isLoggedOut()),
 				fetched_data: null
 			};
-			return _this46;
+			return _this48;
 		}
 
 		_createClass(AsyncPageAdapter, [{
 			key: 'componentWillMount',
 			value: function componentWillMount() {
-				var _this47 = this;
+				var _this49 = this;
 
 				__APP.SERVER.abortAllConnections();
 				__APP.SIDEBAR.activateNavItem(window.location.pathname);
@@ -17044,9 +17236,9 @@ _ref20, PageClass) {
 				}
 
 				fetchData.call({ props: this.pageProps }, this.pageProps).then(function (data) {
-					__APP.changeTitle(isFunction(pageTitle) ? pageTitle.call(_this47.pageProps, _this47.pageProps) : pageTitle);
+					__APP.changeTitle(isFunction(pageTitle) ? pageTitle.call(_this49.pageProps, _this49.pageProps) : pageTitle);
 
-					_this47.setState({
+					_this49.setState({
 						is_data_fetching: false,
 						fetched_data: data
 					});
@@ -17062,7 +17254,7 @@ _ref20, PageClass) {
 		}, {
 			key: 'render',
 			value: function render() {
-				var _this48 = this;
+				var _this50 = this;
 
 				var _state = this.state,
 				    is_data_fetching = _state.is_data_fetching,
@@ -17089,7 +17281,7 @@ _ref20, PageClass) {
 					fetched_data: fetched_data
 				}, this.pageProps), {
 					ref: function ref(component) {
-						return _this48.origin_page = component;
+						return _this50.origin_page = component;
 					}
 				}));
 			}
@@ -17146,8 +17338,8 @@ var UserPage = asyncPage({
 
 		return props.user.full_name;
 	}
-}, function (_React$Component8) {
-	_inherits(UserPage, _React$Component8);
+}, function (_React$Component9) {
+	_inherits(UserPage, _React$Component9);
 
 	_createClass(UserPage, null, [{
 		key: 'SidebarWrapper',
@@ -17231,17 +17423,17 @@ var UserPage = asyncPage({
 	}]);
 
 	function UserPage(props) {
-		var _this49$disable_uploa, _this49$block_scroll;
+		var _this51$disable_uploa, _this51$block_scroll;
 
 		_classCallCheck(this, UserPage);
 
-		var _this49 = _possibleConstructorReturn(this, (UserPage.__proto__ || Object.getPrototypeOf(UserPage)).call(this, props));
+		var _this51 = _possibleConstructorReturn(this, (UserPage.__proto__ || Object.getPrototypeOf(UserPage)).call(this, props));
 
-		_this49.disable_uploads = (_this49$disable_uploa = {}, _defineProperty(_this49$disable_uploa, __C.ENTITIES.EVENT, false), _defineProperty(_this49$disable_uploa, __C.ENTITIES.ACTIVITY, false), _this49$disable_uploa);
-		_this49.block_scroll = (_this49$block_scroll = {}, _defineProperty(_this49$block_scroll, __C.ENTITIES.EVENT, false), _defineProperty(_this49$block_scroll, __C.ENTITIES.ACTIVITY, false), _this49$block_scroll);
+		_this51.disable_uploads = (_this51$disable_uploa = {}, _defineProperty(_this51$disable_uploa, __C.ENTITIES.EVENT, false), _defineProperty(_this51$disable_uploa, __C.ENTITIES.ACTIVITY, false), _this51$disable_uploa);
+		_this51.block_scroll = (_this51$block_scroll = {}, _defineProperty(_this51$block_scroll, __C.ENTITIES.EVENT, false), _defineProperty(_this51$block_scroll, __C.ENTITIES.ACTIVITY, false), _this51$block_scroll);
 
-		_this49.active_tab = __C.ENTITIES.EVENT;
-		_this49.favored_fetch_data = {
+		_this51.active_tab = __C.ENTITIES.EVENT;
+		_this51.favored_fetch_data = {
 			fields: new Fields('image_horizontal_medium_url', 'favored_users_count', 'is_favorite', 'is_registered', 'registration_locally', 'registration_available', 'ticketing_locally', 'ticketing_available', 'dates', {
 				favored: {
 					length: 5
@@ -17250,13 +17442,13 @@ var UserPage = asyncPage({
 			order_by: 'nearest_event_date,-first_event_date',
 			length: 10
 		};
-		return _this49;
+		return _this51;
 	}
 
 	_createClass(UserPage, [{
 		key: 'componentDidMount',
 		value: function componentDidMount() {
-			var _this50 = this;
+			var _this52 = this;
 
 			var user = this.props.user,
 			    promises = [];
@@ -17272,7 +17464,7 @@ var UserPage = asyncPage({
 
 			if (promises.length) {
 				Promise.race(promises).then(function () {
-					_this50.bindScrollEvents();
+					_this52.bindScrollEvents();
 				});
 			} else {
 				this.bindScrollEvents();
@@ -17318,7 +17510,7 @@ var UserPage = asyncPage({
    * @returns {Promise}
    */
 		value: function uploadEntities(type) {
-			var _this51 = this;
+			var _this53 = this;
 
 			var is_upload_disabled = this.disable_uploads[type],
 			    is_scroll_blocked = this.block_scroll[type];
@@ -17353,22 +17545,22 @@ var UserPage = asyncPage({
 			this.block_scroll[type] = true;
 
 			return fetch_promise.then(function (entities) {
-				_this51.block_scroll[type] = false;
+				_this53.block_scroll[type] = false;
 
 				if (!entities.length) {
-					_this51.disable_uploads[type] = true;
+					_this53.disable_uploads[type] = true;
 				}
 
 				switch (type) {
 					case __C.ENTITIES.EVENT:
 						{
 
-							return _this51.favored_events.unsetLoadingState().update();
+							return _this53.favored_events.unsetLoadingState().update();
 						}
 					case __C.ENTITIES.ACTIVITY:
 						{
 
-							return _this51.activities.unsetLoadingState().update();
+							return _this53.activities.unsetLoadingState().update();
 						}
 				}
 
@@ -17385,7 +17577,7 @@ var UserPage = asyncPage({
 	}, {
 		key: 'bindScrollEvents',
 		value: function bindScrollEvents() {
-			var _this52 = this;
+			var _this54 = this;
 
 			var $window = $(window);
 
@@ -17401,7 +17593,7 @@ var UserPage = asyncPage({
 
 						$window.on('scroll.uploadEntities', function () {
 							if (isScrollRemain(1000)) {
-								_this52.uploadEntities(_this52.tabs.state.selected_tab);
+								_this54.uploadEntities(_this54.tabs.state.selected_tab);
 							}
 						});
 					}
@@ -17415,7 +17607,7 @@ var UserPage = asyncPage({
 	}, {
 		key: 'render',
 		value: function render() {
-			var _this53 = this;
+			var _this55 = this;
 
 			var user = this.props.user,
 			    SidebarWrapper = UserPage.SidebarWrapper,
@@ -17472,7 +17664,7 @@ var UserPage = asyncPage({
 					Tabs,
 					{
 						ref: function ref(component) {
-							return _this53.tabs = component;
+							return _this55.tabs = component;
 						},
 						className: 'page user_page_content',
 						headerClasses: 'user_page_content_header -color_accent',
@@ -17482,14 +17674,14 @@ var UserPage = asyncPage({
 						Tab,
 						{ title: i18n(__S.ACTIVITY, 1), name: 'activity' },
 						React.createElement(UserActivities, { ref: function ref(component) {
-								return _this53.activities = component;
+								return _this55.activities = component;
 							}, user: user, activities: user.actions })
 					),
 					React.createElement(
 						Tab,
 						{ title: i18n(__S.FAVORED_EVENT, 2), name: 'event' },
 						React.createElement(EventBlocks, { ref: function ref(component) {
-								return _this53.favored_events = component;
+								return _this55.favored_events = component;
 							}, events: user.favored })
 					)
 				)
@@ -17529,17 +17721,17 @@ var MyProfilePage = asyncPage({
 	function MyProfilePage(props) {
 		_classCallCheck(this, MyProfilePage);
 
-		var _this54 = _possibleConstructorReturn(this, (MyProfilePage.__proto__ || Object.getPrototypeOf(MyProfilePage)).call(this, props));
+		var _this56 = _possibleConstructorReturn(this, (MyProfilePage.__proto__ || Object.getPrototypeOf(MyProfilePage)).call(this, props));
 
-		_this54.favored_fetch_data.fields.push('is_favorite');
-		return _this54;
+		_this56.favored_fetch_data.fields.push('is_favorite');
+		return _this56;
 	}
 
 	return MyProfilePage;
 }(UserPage.OriginPage));
 
-var NoReactPage = function (_React$Component9) {
-	_inherits(NoReactPage, _React$Component9);
+var NoReactPage = function (_React$Component10) {
+	_inherits(NoReactPage, _React$Component10);
 
 	function NoReactPage() {
 		_classCallCheck(this, NoReactPage);
@@ -17577,327 +17769,11 @@ var NoReactPage = function (_React$Component9) {
 	return NoReactPage;
 }(React.Component);
 /**
- * @requires ../../entities/networking_profile/OneEventNetworkingProfile.js
- */
-
-
-var CreateNetworkingRequestModal = function (_React$Component10) {
-	_inherits(CreateNetworkingRequestModal, _React$Component10);
-
-	function CreateNetworkingRequestModal(props) {
-		_classCallCheck(this, CreateNetworkingRequestModal);
-
-		var _this56 = _possibleConstructorReturn(this, (CreateNetworkingRequestModal.__proto__ || Object.getPrototypeOf(CreateNetworkingRequestModal)).call(this, props));
-
-		_this56.state = {
-			with_message: false,
-			fade_in: true
-		};
-		_this56.inputs = [];
-		_this56.modal = null;
-		_this56.modal_wrapper = $('.ModalsWrapper').get(0);
-
-		_this56.handleClickOutside = _this56.handleClickOutside.bind(_this56);
-		return _this56;
-	}
-
-	_createClass(CreateNetworkingRequestModal, [{
-		key: 'componentWillMount',
-		value: function componentWillMount() {
-			$('body').addClass('-open_modal');
-		}
-	}, {
-		key: 'componentDidMount',
-		value: function componentDidMount() {
-			this.bindClickOutside();
-			this.setState({
-				fade_in: false
-			});
-		}
-	}, {
-		key: 'componentWillUnmount',
-		value: function componentWillUnmount() {
-			this.unbindClickOutside();
-			$('body').removeClass('-open_modal');
-		}
-	}, {
-		key: 'bindClickOutside',
-		value: function bindClickOutside() {
-			if (!this.props.canHide) {
-				document.addEventListener('mousedown', this.handleClickOutside);
-			}
-		}
-	}, {
-		key: 'unbindClickOutside',
-		value: function unbindClickOutside() {
-			if (!this.props.canHide) {
-				document.removeEventListener('mousedown', this.handleClickOutside);
-			}
-		}
-	}, {
-		key: 'handleClickOutside',
-		value: function handleClickOutside(event) {
-			if (this.modal && !this.modal.contains(event.target)) {
-				this.setState({
-					fade_in: false
-				}, this.props.hideModalHandler);
-			}
-		}
-	}, {
-		key: 'render',
-		value: function render() {
-			var _this57 = this;
-
-			var profile = this.props.profile,
-			    with_message = this.state.with_message;
-
-
-			return ReactDOM.createPortal(React.createElement(
-				'div',
-				{
-					className: 'modal_unit material -floating_material ' + (this.state.fade_in ? '-faded' : ''),
-					ref: function ref(node) {
-						return _this57.modal = node;
-					},
-					style: { width: 370 }
-				},
-				React.createElement(
-					'header',
-					{ className: 'modal_header' },
-					React.createElement(
-						'span',
-						null,
-						'\u041E\u0442\u043F\u0440\u0430\u0432\u043A\u0430 \u0437\u0430\u044F\u0432\u043A\u0438'
-					),
-					React.createElement(
-						RippleButton,
-						{ className: 'modal_destroy_button CloseModal', onClick: function onClick(e) {
-								_this57.props.hideModalHandler();
-							} },
-						'\xD7'
-					)
-				),
-				React.createElement(
-					'div',
-					{ className: 'modal_content' },
-					React.createElement(
-						'header',
-						{ className: 'create_networking_request_modal_head' },
-						React.createElement(
-							'aside',
-							{ className: 'create_networking_request_modal_head_side' },
-							React.createElement(Avatar, { entity: profile.user, className: new HtmlClassesArray(__C.CLASSES.UNIVERSAL_STATES.ROUNDED, __C.CLASSES.SIZES.X55) })
-						),
-						React.createElement(
-							'div',
-							{ className: 'create_networking_request_modal_head_body' },
-							React.createElement(
-								'h5',
-								{ className: 'create_networking_request_modal_title' },
-								profile.user.full_name
-							),
-							React.createElement(
-								'span',
-								{ className: 'create_networking_request_modal_subtitle' },
-								profile.company_name
-							)
-						)
-					),
-					with_message && React.createElement(
-						'div',
-						{ className: 'form_unit' },
-						React.createElement('textarea', {
-							className: 'form_textarea',
-							name: 'message',
-							placeholder: '\u0412\u0432\u0435\u0434\u0438\u0442\u0435 \u0441\u043E\u043E\u0431\u0449\u0435\u043D\u0438\u0435 (\u043D\u0435\u043E\u0431\u044F\u0437\u0430\u0442\u0435\u043B\u044C\u043D\u043E)',
-							ref: 'message'
-						})
-					),
-					React.createElement(
-						'div',
-						{ className: 'form_group -parts_e_2' },
-						React.createElement(
-							'div',
-							{ className: 'form_unit' },
-							with_message || React.createElement(
-								Action,
-								{
-									className: 'fa_icon fa-commenting',
-									onClick: function onClick(e) {
-										_this57.setState({
-											with_message: true
-										});
-									}
-								},
-								'\u041F\u0440\u0438\u043A\u0440\u0435\u043F\u0438\u0442\u044C \u0441\u043E\u043E\u0431\u0449\u0435\u043D\u0438\u0435'
-							)
-						),
-						React.createElement(
-							'div',
-							{ className: 'form_unit' },
-							React.createElement(
-								RippleButton,
-								{
-									className: new HtmlClassesArray(__C.CLASSES.COLORS.ACCENT),
-									onClick: function onClick(e) {
-										profile.request.create({
-											event_id: profile.event_id,
-											user_id: profile.user_id,
-											sender_user_id: __APP.USER.id,
-											message: with_message ? _this57.refs.message.value : null
-										}).then(function (data) {
-											_this57.props.hideModalHandler();
-
-											return data;
-										});
-									}
-								},
-								'\u041E\u0442\u043F\u0440\u0430\u0432\u0438\u0442\u044C \u0437\u0430\u044F\u0432\u043A\u0443'
-							)
-						)
-					)
-				)
-			), this.modal_wrapper);
-		}
-	}]);
-
-	return CreateNetworkingRequestModal;
-}(React.Component);
-
-CreateNetworkingRequestModal.propTypes = {
-	profile: PropTypes.instanceOf(OneEventNetworkingProfile),
-	canHide: PropTypes.bool,
-	hideModalHandler: PropTypes.func
-};
-/**
  * @abstract
  * @class
  */
-AbstractSidebar = function () {
-	/**
-  *
-  * @constructor
-  * @constructs AbstractSidebar
-  */
-	function AbstractSidebar() {
-		this.$sidebar = $('#main_sidebar');
-		this.$subscribed_orgs = this.$sidebar.find('.SidebarOrganizationsList');
-		this.$nav_items = this.$sidebar.find('.SidebarNavItem');
-	}
 
-	AbstractSidebar.prototype.init = function () {
-		this.$sidebar.find('.SidebarNav').addClass('-items_' + this.$nav_items.not('.-hidden').length);
-		this.$sidebar.find('.SidebarScroll').scrollbar();
-	};
 
-	AbstractSidebar.prototype.updateSubscriptions = function () {};
-	/**
-  *
-  * @param {string} [pathname]
-  */
-	AbstractSidebar.prototype.activateNavItem = function (pathname) {
-		pathname = pathname || window.location.pathname;
-
-		this.$nav_items.removeClass(__C.CLASSES.ACTIVE).filter(function () {
-
-			return pathname.indexOf(this.getAttribute('href')) === 0;
-		}).addClass(__C.CLASSES.ACTIVE);
-	};
-
-	return AbstractSidebar;
-}();
-/**
- * @requires Class.AbstractSidebar.js
- */
-/**
- * @class
- * @extends AbstractSidebar
- */
-Sidebar = extending(AbstractSidebar, function () {
-	/**
-  *
-  * @constructor
-  * @construct Sidebar
-  */
-	function Sidebar() {
-		AbstractSidebar.call(this);
-	}
-
-	Sidebar.prototype.init = function () {
-		var self = this;
-		self.updateSubscriptions();
-		$(window).on('subscribe unsubscribe', function () {
-			self.updateSubscriptions();
-		});
-
-		AbstractSidebar.prototype.init.call(this);
-	};
-
-	Sidebar.prototype.updateSubscriptions = function () {
-		var $subscribed_orgs = this.$subscribed_orgs,
-		    timing = 0,
-		    current_menu_items = $.map($subscribed_orgs.children(), function (el) {
-			return $(el).data('organization_id');
-		}),
-		    to_add = __APP.USER.subscriptions.filter(function (item) {
-			return current_menu_items.indexOf(item.id) === -1;
-		}),
-		    to_remove = current_menu_items.filter(function (item) {
-			return !__APP.USER.subscriptions.has(item);
-		});
-
-		if (to_add.length) {
-			__APP.BUILD.organizationItems(to_add, {
-				block_classes: ['animated'],
-				avatar_classes: ['-size_30x30']
-			})[$subscribed_orgs.length ? 'prependTo' : 'appendTo']($subscribed_orgs).each(function (i, org_block) {
-				setTimeout(function () {
-					$(org_block).addClass('-show');
-				}, timing += 100);
-			});
-
-			bindPageLinks($subscribed_orgs);
-		}
-		if (to_remove.length) {
-			to_remove.forEach(function (id) {
-				var $organization_item = $subscribed_orgs.find('.organization_item[data-organization_id="' + id + '"]').removeClass('-show');
-				setTimeout(function () {
-					$organization_item.remove();
-				}, 500);
-			});
-		}
-	};
-
-	return Sidebar;
-}());
-/**
- * @requires Class.AbstractSidebar.js
- */
-/**
- * @class
- * @extends AbstractSidebar
- */
-SidebarNoAuth = extending(AbstractSidebar, function () {
-	/**
-  *
-  * @constructor
-  * @constructs SidebarNoAuth
-  */
-	function SidebarNoAuth() {
-		AbstractSidebar.call(this);
-	}
-
-	SidebarNoAuth.prototype.init = function () {
-		this.$sidebar.find('.SidebarOrganizationsScroll').addClass(__C.CLASSES.HIDDEN);
-		AbstractSidebar.prototype.init.call(this);
-	};
-
-	return SidebarNoAuth;
-}());
-/**
- * @abstract
- * @class
- */
 AbstractTopBar = function () {
 	/**
   *
@@ -18082,6 +17958,131 @@ TopBarNoAuth = extending(AbstractTopBar, function () {
 	};
 
 	return TopBarNoAuth;
+}());
+/**
+ * @abstract
+ * @class
+ */
+AbstractSidebar = function () {
+	/**
+  *
+  * @constructor
+  * @constructs AbstractSidebar
+  */
+	function AbstractSidebar() {
+		this.$sidebar = $('#main_sidebar');
+		this.$subscribed_orgs = this.$sidebar.find('.SidebarOrganizationsList');
+		this.$nav_items = this.$sidebar.find('.SidebarNavItem');
+	}
+
+	AbstractSidebar.prototype.init = function () {
+		this.$sidebar.find('.SidebarNav').addClass('-items_' + this.$nav_items.not('.-hidden').length);
+		this.$sidebar.find('.SidebarScroll').scrollbar();
+	};
+
+	AbstractSidebar.prototype.updateSubscriptions = function () {};
+	/**
+  *
+  * @param {string} [pathname]
+  */
+	AbstractSidebar.prototype.activateNavItem = function (pathname) {
+		pathname = pathname || window.location.pathname;
+
+		this.$nav_items.removeClass(__C.CLASSES.ACTIVE).filter(function () {
+
+			return pathname.indexOf(this.getAttribute('href')) === 0;
+		}).addClass(__C.CLASSES.ACTIVE);
+	};
+
+	return AbstractSidebar;
+}();
+/**
+ * @requires Class.AbstractSidebar.js
+ */
+/**
+ * @class
+ * @extends AbstractSidebar
+ */
+Sidebar = extending(AbstractSidebar, function () {
+	/**
+  *
+  * @constructor
+  * @construct Sidebar
+  */
+	function Sidebar() {
+		AbstractSidebar.call(this);
+	}
+
+	Sidebar.prototype.init = function () {
+		var self = this;
+		self.updateSubscriptions();
+		$(window).on('subscribe unsubscribe', function () {
+			self.updateSubscriptions();
+		});
+
+		AbstractSidebar.prototype.init.call(this);
+	};
+
+	Sidebar.prototype.updateSubscriptions = function () {
+		var $subscribed_orgs = this.$subscribed_orgs,
+		    timing = 0,
+		    current_menu_items = $.map($subscribed_orgs.children(), function (el) {
+			return $(el).data('organization_id');
+		}),
+		    to_add = __APP.USER.subscriptions.filter(function (item) {
+			return current_menu_items.indexOf(item.id) === -1;
+		}),
+		    to_remove = current_menu_items.filter(function (item) {
+			return !__APP.USER.subscriptions.has(item);
+		});
+
+		if (to_add.length) {
+			__APP.BUILD.organizationItems(to_add, {
+				block_classes: ['animated'],
+				avatar_classes: ['-size_30x30']
+			})[$subscribed_orgs.length ? 'prependTo' : 'appendTo']($subscribed_orgs).each(function (i, org_block) {
+				setTimeout(function () {
+					$(org_block).addClass('-show');
+				}, timing += 100);
+			});
+
+			bindPageLinks($subscribed_orgs);
+		}
+		if (to_remove.length) {
+			to_remove.forEach(function (id) {
+				var $organization_item = $subscribed_orgs.find('.organization_item[data-organization_id="' + id + '"]').removeClass('-show');
+				setTimeout(function () {
+					$organization_item.remove();
+				}, 500);
+			});
+		}
+	};
+
+	return Sidebar;
+}());
+/**
+ * @requires Class.AbstractSidebar.js
+ */
+/**
+ * @class
+ * @extends AbstractSidebar
+ */
+SidebarNoAuth = extending(AbstractSidebar, function () {
+	/**
+  *
+  * @constructor
+  * @constructs SidebarNoAuth
+  */
+	function SidebarNoAuth() {
+		AbstractSidebar.call(this);
+	}
+
+	SidebarNoAuth.prototype.init = function () {
+		this.$sidebar.find('.SidebarOrganizationsScroll').addClass(__C.CLASSES.HIDDEN);
+		AbstractSidebar.prototype.init.call(this);
+	};
+
+	return SidebarNoAuth;
 }());
 /**
  * @class ReactActionButton
@@ -22189,6 +22190,7 @@ CropperModal = extending(AbstractModal, function () {
 		if (image_src) {
 			cropper_options = (typeof cropper_options === 'undefined' ? 'undefined' : _typeof(cropper_options)) == 'object' ? cropper_options : {};
 			this.image_src = image_src;
+			this.is_fetched = true;
 			this.content = tmpl('modal-cropper-content', {
 				image_src: this.image_src
 			});
@@ -28546,171 +28548,6 @@ NotAvailableOrderPage = extending(AbstractFeedbackPage, function () {
  */
 /**
  *
- * @class SearchPage
- * @extends Page
- */
-SearchPage = extending(Page, function () {
-	/**
-  *
-  * @param {string} search
-  * @constructor
-  * @constructs SearchPage
-  */
-	function SearchPage(search) {
-		Page.call(this);
-
-		this.page_title = 'Поиск';
-		this.$search_bar_input = $('#search_bar_input');
-		this.search_string = decodeURIComponent(search);
-		this.events_ajax_data = {
-			length: 10,
-			fields: FeedPage.fields.copy(),
-			order_by: 'nearest_event_date,-first_event_date'
-		};
-		this.organizations_ajax_data = {
-			length: 30,
-			fields: new Fields(['subscribed_count', 'img_small_url'])
-		};
-		this.past_events = false;
-		this.search_results = new SearchResults(this.search_string);
-	}
-	/**
-  *
-  * @param {(OneOrganization|Array<OneOrganization>|OrganizationsCollection)} organizations
-  * @returns {jQuery}
-  */
-	SearchPage.buildOrganizationItems = function (organizations) {
-		return __APP.BUILD.organizationItems(organizations, {
-			block_classes: ['-show'],
-			avatar_classes: ['-size_50x50', '-rounded'],
-			counter_classes: [__C.CLASSES.HIDDEN]
-		});
-	};
-	/**
-  *
-  * @param {(OneEvent|Array<OneEvent>|EventsCollection)} events
-  * @returns {jQuery}
-  */
-	SearchPage.buildEventCards = function (events) {
-		var $events = $();
-		if (events.length == 0) {
-			$events = tmpl('search-no-events', {});
-		} else {
-			events.forEach(function (event) {
-				if (event.nearest_event_date == undefined && !this.past_events) {
-					$events = $events.add(tmpl('divider', { title: 'Прошедшие события' }));
-					this.past_events = true;
-				}
-				$events = $events.add(__APP.BUILD.eventCards(event));
-			});
-		}
-		return $events;
-	};
-
-	SearchPage.prototype.fetchData = function () {
-		return this.fetching_data_defer = this.search_results.fetchEventsAndOrganizations(this.events_ajax_data, this.organizations_ajax_data);
-	};
-
-	SearchPage.prototype.init = function () {
-		var PAGE = this,
-		    $window = $(window),
-		    $organizations_scrollbar;
-
-		function bindFeedEvents($parent) {
-			trimAvatarsCollection($parent);
-			bindRippleEffect($parent);
-			__APP.MODALS.bindCallModal($parent);
-			bindPageLinks($parent);
-
-			$parent.find('.HideEvent').remove();
-		}
-
-		$organizations_scrollbar = this.$wrapper.find('.SearchOrganizationsScrollbar').scrollbar({
-			disableBodyScroll: true,
-			onScroll: function onScroll(y) {
-				if (y.scroll == y.maxScroll) {
-					PAGE.search_results.fetchOrganizations(PAGE.organizations_ajax_data, function (organizations) {
-						if (organizations.length) {
-							$organizations_scrollbar.append(SearchPage.buildOrganizationItems(organizations));
-						} else {
-							$organizations_scrollbar.off('scroll.onScroll');
-						}
-						bindPageLinks($organizations_scrollbar);
-					});
-				}
-			}
-		});
-		$window.off('scroll.upload' + PAGE.constructor.name);
-		$window.on('scroll.upload' + PAGE.constructor.name, function () {
-			if ($window.height() + $window.scrollTop() + 200 >= $(document).height() && !PAGE.block_scroll) {
-				PAGE.block_scroll = true;
-				PAGE.search_results.fetchEvents(PAGE.events_ajax_data, function (events) {
-					var $events;
-					if (events.length) {
-						$events = SearchPage.buildEventCards(PAGE.search_results.events.__last_pushed);
-						PAGE.$wrapper.find('.SearchEvents').append($events);
-						bindFeedEvents($events);
-						PAGE.block_scroll = false;
-					} else {
-						$window.off('scroll.upload' + PAGE.constructor.name);
-					}
-				});
-			}
-		});
-		bindFeedEvents(this.$wrapper);
-	};
-
-	SearchPage.prototype.render = function () {
-		var data = {};
-
-		$('.TopBarOverlay').addClass('-open_search_bar');
-		this.$search_bar_input.val(this.search_string);
-
-		data.events = SearchPage.buildEventCards(this.search_results.events);
-		if (this.search_results.organizations.length == 0) {
-			data.no_organizations = __C.CLASSES.HIDDEN;
-		} else {
-			data.organizations = SearchPage.buildOrganizationItems(this.search_results.organizations);
-		}
-
-		this.$wrapper.append(tmpl('search-wrapper', data));
-		this.init();
-	};
-
-	SearchPage.prototype.destroy = function () {
-		$('.TopBarOverlay').removeClass('-open_search_bar');
-		this.$search_bar_input.val('');
-	};
-
-	return SearchPage;
-}());
-/**
- * @requires Class.SearchPage.js
- */
-/**
- *
- * @class SearchByTagPage
- * @extends SearchPage
- */
-SearchByTagPage = extending(SearchPage, function () {
-	/**
-  *
-  * @constructor
-  * @constructs SearchByTagPage
-  */
-	function SearchByTagPage(search) {
-		SearchPage.call(this, search);
-		this.search_string = '#' + decodeURIComponent(search);
-		this.search_results = new SearchResults(this.search_string);
-	}
-
-	return SearchByTagPage;
-}());
-/**
- * @requires ../Class.Page.js
- */
-/**
- *
  * @class AbstractEditOrganizationPage
  * @extends Page
  */
@@ -29171,7 +29008,7 @@ EditOrganizationPage = extending(AbstractEditOrganizationPage, function () {
 		    additional_fields;
 
 		if (this.organization.role === OneUser.ROLE.USER) {
-			debugger;
+
 			return __APP.changeState('/', true, true);
 		}
 
@@ -29544,6 +29381,171 @@ OrganizationPage = extending(Page, function () {
 	return OrganizationPage;
 }());
 /**
+ * @requires ../Class.Page.js
+ */
+/**
+ *
+ * @class SearchPage
+ * @extends Page
+ */
+SearchPage = extending(Page, function () {
+	/**
+  *
+  * @param {string} search
+  * @constructor
+  * @constructs SearchPage
+  */
+	function SearchPage(search) {
+		Page.call(this);
+
+		this.page_title = 'Поиск';
+		this.$search_bar_input = $('#search_bar_input');
+		this.search_string = decodeURIComponent(search);
+		this.events_ajax_data = {
+			length: 10,
+			fields: FeedPage.fields.copy(),
+			order_by: 'nearest_event_date,-first_event_date'
+		};
+		this.organizations_ajax_data = {
+			length: 30,
+			fields: new Fields(['subscribed_count', 'img_small_url'])
+		};
+		this.past_events = false;
+		this.search_results = new SearchResults(this.search_string);
+	}
+	/**
+  *
+  * @param {(OneOrganization|Array<OneOrganization>|OrganizationsCollection)} organizations
+  * @returns {jQuery}
+  */
+	SearchPage.buildOrganizationItems = function (organizations) {
+		return __APP.BUILD.organizationItems(organizations, {
+			block_classes: ['-show'],
+			avatar_classes: ['-size_50x50', '-rounded'],
+			counter_classes: [__C.CLASSES.HIDDEN]
+		});
+	};
+	/**
+  *
+  * @param {(OneEvent|Array<OneEvent>|EventsCollection)} events
+  * @returns {jQuery}
+  */
+	SearchPage.buildEventCards = function (events) {
+		var $events = $();
+		if (events.length == 0) {
+			$events = tmpl('search-no-events', {});
+		} else {
+			events.forEach(function (event) {
+				if (event.nearest_event_date == undefined && !this.past_events) {
+					$events = $events.add(tmpl('divider', { title: 'Прошедшие события' }));
+					this.past_events = true;
+				}
+				$events = $events.add(__APP.BUILD.eventCards(event));
+			});
+		}
+		return $events;
+	};
+
+	SearchPage.prototype.fetchData = function () {
+		return this.fetching_data_defer = this.search_results.fetchEventsAndOrganizations(this.events_ajax_data, this.organizations_ajax_data);
+	};
+
+	SearchPage.prototype.init = function () {
+		var PAGE = this,
+		    $window = $(window),
+		    $organizations_scrollbar;
+
+		function bindFeedEvents($parent) {
+			trimAvatarsCollection($parent);
+			bindRippleEffect($parent);
+			__APP.MODALS.bindCallModal($parent);
+			bindPageLinks($parent);
+
+			$parent.find('.HideEvent').remove();
+		}
+
+		$organizations_scrollbar = this.$wrapper.find('.SearchOrganizationsScrollbar').scrollbar({
+			disableBodyScroll: true,
+			onScroll: function onScroll(y) {
+				if (y.scroll == y.maxScroll) {
+					PAGE.search_results.fetchOrganizations(PAGE.organizations_ajax_data, function (organizations) {
+						if (organizations.length) {
+							$organizations_scrollbar.append(SearchPage.buildOrganizationItems(organizations));
+						} else {
+							$organizations_scrollbar.off('scroll.onScroll');
+						}
+						bindPageLinks($organizations_scrollbar);
+					});
+				}
+			}
+		});
+		$window.off('scroll.upload' + PAGE.constructor.name);
+		$window.on('scroll.upload' + PAGE.constructor.name, function () {
+			if ($window.height() + $window.scrollTop() + 200 >= $(document).height() && !PAGE.block_scroll) {
+				PAGE.block_scroll = true;
+				PAGE.search_results.fetchEvents(PAGE.events_ajax_data, function (events) {
+					var $events;
+					if (events.length) {
+						$events = SearchPage.buildEventCards(PAGE.search_results.events.__last_pushed);
+						PAGE.$wrapper.find('.SearchEvents').append($events);
+						bindFeedEvents($events);
+						PAGE.block_scroll = false;
+					} else {
+						$window.off('scroll.upload' + PAGE.constructor.name);
+					}
+				});
+			}
+		});
+		bindFeedEvents(this.$wrapper);
+	};
+
+	SearchPage.prototype.render = function () {
+		var data = {};
+
+		$('.TopBarOverlay').addClass('-open_search_bar');
+		this.$search_bar_input.val(this.search_string);
+
+		data.events = SearchPage.buildEventCards(this.search_results.events);
+		if (this.search_results.organizations.length == 0) {
+			data.no_organizations = __C.CLASSES.HIDDEN;
+		} else {
+			data.organizations = SearchPage.buildOrganizationItems(this.search_results.organizations);
+		}
+
+		this.$wrapper.append(tmpl('search-wrapper', data));
+		this.init();
+	};
+
+	SearchPage.prototype.destroy = function () {
+		$('.TopBarOverlay').removeClass('-open_search_bar');
+		this.$search_bar_input.val('');
+	};
+
+	return SearchPage;
+}());
+/**
+ * @requires Class.SearchPage.js
+ */
+/**
+ *
+ * @class SearchByTagPage
+ * @extends SearchPage
+ */
+SearchByTagPage = extending(SearchPage, function () {
+	/**
+  *
+  * @constructor
+  * @constructs SearchByTagPage
+  */
+	function SearchByTagPage(search) {
+		SearchPage.call(this, search);
+		this.search_string = '#' + decodeURIComponent(search);
+		this.search_results = new SearchResults(this.search_string);
+	}
+
+	return SearchByTagPage;
+}());
+/**
  *
  * @class TicketPage
  * @extends Page
@@ -29870,6 +29872,7 @@ MyOrdersPage = extending(Page, function () {
  * @requires ../Class.Page.js
  */
 /**
+ * @deprecated
  * @class OldUserPage
  * @extends Page
  */
