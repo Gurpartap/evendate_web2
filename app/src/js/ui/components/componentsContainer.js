@@ -19,11 +19,6 @@ function componentsContainer(Component, {
 	renderEntities = null
 }) {
 	class ComponentsContainer extends React.Component {
-		static get name() {
-			
-			return `CollectionOf${Component.name}`;
-		}
-		
 		constructor(props) {
 			super(props);
 			
