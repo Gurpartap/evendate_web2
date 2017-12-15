@@ -2190,6 +2190,411 @@
 		</div>
 	</div>
 </script>
+<script type="javascript/template" id="tmpl-event-admin-check-in-page">
+	<div class="event_admin_check_in material">
+		<header class="event_admin_check_in_header">
+			<h2 class="event_admin_check_in_title">Контроль входа</h2>
+			<div class="event_admin_check_in_search_bar">
+				<input id="event_admin_check_in_search" class="event_admin_check_in_search form_input SearchTickets -rounded" required placeholder="Поиск билетов">
+				<span class="event_admin_check_in_search_clear ClearSearch">&times;</span>
+			</div>
+			{radio_group}
+			<div class="event_admin_check_in_progress_bar">
+				{progress_bar}
+			</div>
+		</header>
+		<table class="statistics_table event_admin_check_in_table CheckInTable -tickets_status_awaiting">
+			<thead>
+				<tr>
+					<th class="-unselectable" data-sort-order="desc"><span class="Text">Номер билета</span></th>
+					<th class="-unselectable" align="left" data-sort-order="desc"><span class="Text">Держатель</span></th>
+					<th class="-unselectable" align="left" data-sort-order="desc"><span class="Text">Название билета</span></th>
+					<th class="-unselectable" align="left" data-sort-order="desc" width="250px"><span class="Text">Статус</span></th>
+				</tr>
+			</thead>
+			<tbody></tbody>
+		</table>
+	</div>
+</script>
+
+<script type="javascript/template" id="tmpl-event-admin-check-in-row">
+	<tr class="Ticket Ticket_{ticket_id} {state_modificator}" data-ticket_uuid="{ticket_id}">
+		<td align="center"><span class="Text">{number}</span></td>
+		<td data-sort="{full_name}">{avatar_block}</td>
+		<td><span class="Text">{ticket_type}</span></td>
+		<td>
+			<span class="check_in_ticket_status StatusText Text">{status_text}</span>
+			<span class="check_in_ticket_action action CheckoutTicket Text">{action_text}</span>
+		</td>
+	</tr>
+</script>
+
+<script type="javascript/template" id="tmpl-event-admin-check-in-row-no-tickets">
+	<tr>
+		<td colspan="4" align="center"><span class="Text">{text}</span></td>
+	</tr>
+</script>
+<script type="javascript/template" id="tmpl-admin-event-orders-page">
+	<div class="event_admin_orders_page material -level_2_material">
+		<div class="event_admin_orders_page_table_wrapper OrdersTableWrapper -status_disabled">
+			<header class="event_admin_orders_page_header">
+				<div class="event_admin_orders_page_header_wrapper">
+					<h3 class="event_admin_orders_page_title">Заказы</h3>
+				</div>
+				<div class="event_admin_orders_page_header_wrapper">
+					{header_buttons}
+					<div class="event_admin_orders_page_table_search_block">
+						<input class="form_input -rounded -search_bar OrdersTableSearch" placeholder="Поиск заказов">
+					</div>
+				</div>
+			</header>
+			<div class="event_admin_orders_page_header">
+				{statuses_help}
+			</div>
+			<table class="table -data_table_override -data_table_row_selection OrdersTable">
+				<thead>
+					<tr>
+						<th>Номер заказа</th>
+						<th>Статус заказа</th>
+						<th>Покупатель</th>
+						<th>E-mail</th>
+						<th>Время покупки</th>
+					</tr>
+				</thead>
+				<tbody></tbody>
+			</table>
+		</div>
+
+		{loader}
+	</div>
+</script>
+
+<script type="javascript/template" id="tmpl-admin-event-orders-page-row-expand-wrapper">
+	<div class="data_tables_row_expand_wrapper">
+		<span class="data_tables_row_expand fa_icon DataTableRowExpand fa-plus"></span>
+		<span class="Text">{number}</span>
+	</div>
+</script>
+
+<script type="javascript/template" id="tmpl-admin-event-orders-page-tr">
+	<tr data-order_uuid="{uuid}">
+		<td>
+			<div class="data_tables_row_expand_wrapper">
+				<span class="data_tables_row_expand fa_icon DataTableRowExpand fa-plus"></span>
+				<span class="Text">{number}</span>
+			</div>
+		</td>
+		<td>{status}</td>
+		<td>{orderer}</td>
+		<td>{email}</td>
+		<td data-order="{buy_timestamp}" data-sort="{buy_timestamp}">{buy_time}</td>
+	</tr>
+</script>
+
+<script type="javascript/template" id="tmpl-admin-event-orders-page-table-child-row">
+	<div class="event_admin_orders_page_table_child_row collapsing_wrapper -smooth_hiding CollapsingWrapper">
+		<div class="collapsing_content CollapsingContent">
+			<table>
+				{ticket_rows}
+			</table>
+		</div>
+	</div>
+</script>
+
+<script type="javascript/template" id="tmpl-admin-event-orders-page-ticket-row">
+	<tr>
+		<td class="child_ladder">Билет {number}</td>
+		<td>{ticket_type_name}</td>
+		<td>{price}</td>
+		<td><small class="-transform_uppercase -text_color_marginal">{used}</small></td>
+	</tr>
+</script>
+<script type="javascript/template" id="tmpl-eventstat-overview">
+	<div class="page eventstat_overview">
+		<header class="eventstat_overview_header">
+			<div class="eventstat_overview_header_block img_holder">
+				<img src="{image_horizontal_url}?width={cover_width}" class="CallModal" data-modal_type="media" data-modal_media_type="image" data-modal_media_url="{image_horizontal_url}" width="{cover_width}">
+			</div>
+			<div class="eventstat_overview_header_block eventstat_overview_info">
+				<span class="eventstat_overview_event_title">{title}</span>
+				<div class="eventstat_overview_dates">
+					{dates_block}
+				</div>
+				<div class="eventstat_overview_buttons">
+					<a href="/event/{id}" class="button -size_low -color_neutral RippleEffect Link">Перейти на страницу</a>
+				</div>
+			</div>
+			<div class="eventstat_overview_header_block eventstat_overview_scoreboards_wrapper">
+				<div class="eventstat_overview_scoreboards EventstatsScoreboards">{scoreboards}</div>
+				<span class="action -color_accent fa_icon fa-plus-circle -hidden">Добавить к сравнению</span>
+			</div>
+		</header>
+		<div class="eventstat_overview_content">
+			<div class="eventstat_overview_charts EventStatAreaCharts">
+				<div class="eventstat_overview_chart AreaChart NotificationsSentAreaChart"></div>
+				<div class="eventstat_overview_chart AreaChart ViewAreaChart"></div>
+				<div class="eventstat_overview_chart AreaChart ViewDetailAreaChart"></div>
+				<div class="eventstat_overview_chart AreaChart OpenConversionsAreaChart"></div>
+				<div class="eventstat_overview_chart AreaChart FaveAreaChart"></div>
+				<div class="eventstat_overview_chart AreaChart FaveConversionsAreaChart"></div>
+			</div>
+			<div class="eventstat_overview_big_scoreboards EventstatsBigScoreboards">{big_scoreboards}</div>
+		</div>
+	</div>
+</script>
+
+<script type="javascript/template" id="tmpl-eventstat-overview-datetime">
+	<div class="eventstat_overview_datetime">
+		<div class="eventstat_overview_date"><span>{date}</span></div>
+		<div class="eventstat_overview_time"><span>{time}</span></div>
+	</div>
+</script>
+<script type="javascript/template" id="tmpl-event-admin-requests-page">
+	<div class="event_admin_requests_page material -level_2_material">
+		<div class="event_admin_requests_list_wrapper Tabs">
+			<header class="event_admin_requests_header">
+				<div class="event_admin_requests_header_wrapper RequestsPageHeaderWrapper">
+					<div class="event_admin_requests_page_title_wrapper">
+						<h3 class="event_admin_requests_page_title">Заявки</h3>
+					</div>
+					<div class="event_admin_requests_search_block">
+						<div class="event_admin_requests_search_bar">
+							<input class="event_admin_requests_search_bar_input form_input -rounded RequestsPageSearch" type="text">
+							<button class="event_admin_requests_search_block_button fa_icon fa-search -empty RequestsPageSearchButton" type="button"></button>
+						</div>
+					</div>
+				</div>
+				<div class="event_admin_requests_tabs tabs_header -color_accent HeaderTabs">
+					<span class="tab Tab -active" data-requests_list_name="new">Новые</span>
+					<span class="tab Tab" data-requests_list_name="approved">Принятые</span>
+					<span class="tab Tab" data-requests_list_name="rejected">Отклоненные</span>
+				</div>
+			</header>
+			<div class="event_admin_requests_lists tab_bodies_wrap TabsBodyWrapper RequestsLists">
+				<section class="tab_body TabsBody -active">{loader}</section>
+			</div>
+			<footer class="event_admin_requests_footer">
+				<button class="action -color_accent -no_uppercase ApproveAllRequests" type="button">Принять все заявки</button>
+			</footer>
+		</div>
+		<div class="event_admin_request_detail scrollbar-outer RequestDetailScrollbar">
+			<div class="event_admin_request_detail_wrapper RequestDetail">
+				{request_detail}
+			</div>
+		</div>
+	</div>
+</script>
+
+
+
+<script type="javascript/template" id="tmpl-event-admin-requests-lists">
+	<section class="event_admin_requests_list_scroll_wrapper tab_body TabsBody -active">
+		<div class="event_admin_requests_list_scroll scrollbar-outer RequestsListScrollbar NewRequestsList">{new_requests}</div>
+	</section>
+	<section class="event_admin_requests_list_scroll_wrapper tab_body TabsBody">
+		<div class="event_admin_requests_list_scroll scrollbar-outer RequestsListScrollbar ApprovedRequestsList">{approved_requests}</div>
+	</section>
+	<section class="event_admin_requests_list_scroll_wrapper tab_body TabsBody">
+		<div class="event_admin_requests_list_scroll scrollbar-outer RequestsListScrollbar RejectedRequestsList">{rejected_requests}</div>
+	</section>
+</script>
+
+
+<script type="javascript/template" id="tmpl-event-admin-request-item">
+	<article class="extended_list_item event_admin_request_item RequestItem">
+		<div class="event_admin_request_item_content">
+			<aside class="event_admin_request_item_aside">{orderer_avatar}</aside>
+			<div class="event_admin_request_item_body">
+				<div class="event_admin_request_item_head">
+					<div class="event_admin_request_item_head_wrap">
+						<span class="event_admin_request_item_head_text">Заказ</span>
+						<span class="event_admin_request_item_head_text event_admin_request_number">{order_number}</span>
+					</div>
+					<div class="event_admin_request_item_head_wrap">
+						<span class="event_admin_request_item_head_text">{request_time}</span>
+						<span class="event_admin_request_item_head_text">{request_date}</span>
+					</div>
+				</div>
+				<h5 class="event_admin_request_item_name">{orderer_full_name}</h5>
+			</div>
+		</div>
+		<footer class="event_admin_request_item_footer">
+			{action_buttons}
+		</footer>
+	</article>
+</script>
+
+<script type="javascript/template" id="tmpl-event-admin-request-detail">
+	<header class="event_admin_request_detail_header">
+		<div class="event_admin_request_detail_header_main">
+			<h3 class="event_admin_request_detail_title">Заказ {order_number}</h3>
+			<span class="event_admin_request_detail_subtitle">{orderer_full_name}</span>
+		</div>
+		<aside class="event_admin_request_detail_header_side">{orderer_avatar}</aside>
+	</header>
+	<h6 class="event_admin_request_detail_registration_form_title">Анкета пользователя</h6>
+	<div class="event_admin_request_detail_registration_form_fields">
+		{registration_fields}
+	</div>
+</script>
+
+<script type="javascript/template" id="tmpl-event-admin-request-detail-no-select">
+	<p><span class="-text_color_primary_30">Выберите заявку из списка слева, чтобы получить дополнительную информацию по ней</span></p>
+</script>
+
+<script type="javascript/template" id="tmpl-event-admin-no-request-items">
+	<p class="event_admin_no_request_items">Нет заявок</p>
+</script>
+<script type="javascript/template" id="tmpl-admin-event-sales-page">
+	<div class="event_admin_sales_page material -level_2_material">
+		<header class="event_admin_sales_header">
+			<div class="event_admin_sales_header_main">
+				<h3 class="event_admin_sales_title">{title}</h3>
+				<div class="event_admin_sales_header_bottom">
+					<aside class="event_admin_sales_big_date scoreboard -size_huge -color_accent -align_center">
+						<span class="scoreboard_number">{first_event_date_day}</span>
+						<span class="scoreboard_title">{first_event_date_month}</span>
+					</aside>
+					<div class="event_admin_sales_header_info">
+						<p class="-text_color_primary_80 -font_weight_bolder">{formatted_dates}</p>
+						<p class="-text_color_primary_80 -font_weight_bolder"><span>Регистрация {registration_dates}</span></p>
+						<div class="form_group -parts_e_e">
+							<div class="form_unit">
+								{sales_settings_button}
+							</div>
+							<div class="form_unit">
+								{promotion_button}
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+			<aside class="event_admin_sales_header_side">
+				<div class="event_admin_sales_brief_block">
+					<div class="scoreboard -size_normal">
+						<span class="scoreboard_title">Билеты</span>
+						<span class="scoreboard_number">{sold_count} / {sum_amount}</span>
+					</div>
+				</div>
+				<div class="event_admin_sales_brief_block">
+					<div class="scoreboard -size_normal">
+						<span class="scoreboard_title">Заявки</span>
+						<span class="scoreboard_number">{orders_count}</span>
+					</div>
+				</div>
+				<div class="event_admin_sales_brief_block">
+					<div class="scoreboard -size_normal">
+						<span class="scoreboard_title">Контроль входа</span>
+						<span class="scoreboard_number">{checked_out_count} / {sold_count}</span>
+					</div>
+				</div>
+				<div class="event_admin_sales_brief_block">
+					<div class="scoreboard -size_normal">
+						<span class="scoreboard_title">Возвраты</span>
+						<span class="scoreboard_number">0</span>
+					</div>
+				</div>
+			</aside>
+		</header>
+		<div class="event_admin_sales_page_main">
+			<div class="flex_grid -parts_2_1_2 -strict_width">
+				<div class="grid_box">
+					<h4>Типы билетов</h4>
+					{ticket_types}
+				</div>
+				<div class="grid_box"></div>
+				<div class="grid_box">
+					<h4>Финансы</h4>
+					<div class="scoreboard -size_big">
+						<span class="scoreboard_title">Выручка</span>
+						<span class="scoreboard_number">{total_income}</span>
+					</div>
+					<div class="flex_grid -parts_equal_2">
+						<div class="grid_box">
+							<div class="scoreboard -size_normal">
+								<span class="scoreboard_title">Комиссия Evendate</span>
+								<span class="scoreboard_number">{evendate_commission_value} (1%)</span>
+							</div>
+						</div>
+						<div class="grid_box">
+							<div class="scoreboard -size_normal">
+								<span class="scoreboard_title">Комиссия за эквайринг</span>
+								<span class="scoreboard_number">{processing_commission_value}</span>
+								<span class="scoreboard_number tooltip" title="Комиссия зависит от способа оплаты участниками. Процент высчитывается как округленное среднее со всех заказов.">({processing_commission}%)</span>
+							</div>
+						</div>
+					</div>
+					<div class="scoreboard -size_big">
+						<span class="scoreboard_title">Заработано</span>
+						<span class="scoreboard_number -text_color_accent">{withdraw_available}</span>
+					</div>
+					{withdraw_funds_button}
+				</div>
+			</div>
+			{charts}
+			{promocodes}
+		</div>
+	</div>
+</script>
+
+<script type="javascript/template" id="tmpl-admin-event-sales-chart">
+	<div class="event_admin_sales_chart chart_wrapper {classes} AreaChart"></div>
+</script>
+
+<script type="javascript/template" id="tmpl-admin-event-sales-ticket-type">
+	<div class="event_admin_sales_ticket_type">
+		<h5 class="event_admin_sales_ticket_type_title">{name} {stamp}</h5>
+		<p class="event_admin_sales_ticket_type_info">
+			<span class="event_admin_sales_ticket_type_dates">{dates}</span>
+			<span class="event_admin_sales_ticket_type_price">{price}</span>
+		</p>
+		{progress_bar}
+	</div>
+</script>
+
+<script type="javascript/template" id="tmpl-admin-event-sales-promocodes">
+	<h4>Промокоды</h4>
+	<div class="-edge_to_edge">
+		<table class="table -data_table_override PromocodesTable">
+			<thead>
+				<tr>
+					<th>Код</th>
+					<th>Скидка</th>
+					<th>Период активности</th>
+					<th>Использовано</th>
+					<th>Общая сумма скидки</th>
+				</tr>
+			</thead>
+			<tbody></tbody>
+			<tfoot>
+				<tr>
+					<th colspan="4" align="right">Суммарная скидка по промокадам:</th>
+					<th class="EffortTotalSum"></th>
+				</tr>
+			</tfoot>
+		</table>
+	</div>
+</script>
+<script type="javascript/template" id="tmpl-event-admin-utm-page">
+	<div class="event_admin_utm_page material -level_2_material">
+		<h2 class="event_admin_utm_title">Метки UTM</h2>
+		<table class="table -data_table_override UTMTable">
+			<thead>
+				<tr>
+					<th>UTM Source</th>
+					<th>UTM Medium</th>
+					<th>UTM Campaign</th>
+					<th>UTM Content</th>
+					<th>UTM Term</th>
+					<th>Визитов</th>
+					<th>Конверсия</th>
+					<th>Сумма заказов</th>
+				</tr>
+			</thead>
+			<tbody></tbody>
+		</table>
+	</div>
+</script>
 <script type="javascript/template" id="tmpl-admin-organization-crm-page">
 	<div class="org_admin_crm_page material -level_2_material">
 		<div class="org_admin_crm_page_table_wrapper CRMTableWrapper">
@@ -2845,410 +3250,5 @@
 			</div>
 			{premium_tariff_help}
 		</fieldset>
-	</div>
-</script>
-<script type="javascript/template" id="tmpl-event-admin-check-in-page">
-	<div class="event_admin_check_in material">
-		<header class="event_admin_check_in_header">
-			<h2 class="event_admin_check_in_title">Контроль входа</h2>
-			<div class="event_admin_check_in_search_bar">
-				<input id="event_admin_check_in_search" class="event_admin_check_in_search form_input SearchTickets -rounded" required placeholder="Поиск билетов">
-				<span class="event_admin_check_in_search_clear ClearSearch">&times;</span>
-			</div>
-			{radio_group}
-			<div class="event_admin_check_in_progress_bar">
-				{progress_bar}
-			</div>
-		</header>
-		<table class="statistics_table event_admin_check_in_table CheckInTable -tickets_status_awaiting">
-			<thead>
-				<tr>
-					<th class="-unselectable" data-sort-order="desc"><span class="Text">Номер билета</span></th>
-					<th class="-unselectable" align="left" data-sort-order="desc"><span class="Text">Держатель</span></th>
-					<th class="-unselectable" align="left" data-sort-order="desc"><span class="Text">Название билета</span></th>
-					<th class="-unselectable" align="left" data-sort-order="desc" width="250px"><span class="Text">Статус</span></th>
-				</tr>
-			</thead>
-			<tbody></tbody>
-		</table>
-	</div>
-</script>
-
-<script type="javascript/template" id="tmpl-event-admin-check-in-row">
-	<tr class="Ticket Ticket_{ticket_id} {state_modificator}" data-ticket_uuid="{ticket_id}">
-		<td align="center"><span class="Text">{number}</span></td>
-		<td data-sort="{full_name}">{avatar_block}</td>
-		<td><span class="Text">{ticket_type}</span></td>
-		<td>
-			<span class="check_in_ticket_status StatusText Text">{status_text}</span>
-			<span class="check_in_ticket_action action CheckoutTicket Text">{action_text}</span>
-		</td>
-	</tr>
-</script>
-
-<script type="javascript/template" id="tmpl-event-admin-check-in-row-no-tickets">
-	<tr>
-		<td colspan="4" align="center"><span class="Text">{text}</span></td>
-	</tr>
-</script>
-<script type="javascript/template" id="tmpl-admin-event-orders-page">
-	<div class="event_admin_orders_page material -level_2_material">
-		<div class="event_admin_orders_page_table_wrapper OrdersTableWrapper -status_disabled">
-			<header class="event_admin_orders_page_header">
-				<div class="event_admin_orders_page_header_wrapper">
-					<h3 class="event_admin_orders_page_title">Заказы</h3>
-				</div>
-				<div class="event_admin_orders_page_header_wrapper">
-					{header_buttons}
-					<div class="event_admin_orders_page_table_search_block">
-						<input class="form_input -rounded -search_bar OrdersTableSearch" placeholder="Поиск заказов">
-					</div>
-				</div>
-			</header>
-			<div class="event_admin_orders_page_header">
-				{statuses_help}
-			</div>
-			<table class="table -data_table_override -data_table_row_selection OrdersTable">
-				<thead>
-					<tr>
-						<th>Номер заказа</th>
-						<th>Статус заказа</th>
-						<th>Покупатель</th>
-						<th>E-mail</th>
-						<th>Время покупки</th>
-					</tr>
-				</thead>
-				<tbody></tbody>
-			</table>
-		</div>
-
-		{loader}
-	</div>
-</script>
-
-<script type="javascript/template" id="tmpl-admin-event-orders-page-row-expand-wrapper">
-	<div class="data_tables_row_expand_wrapper">
-		<span class="data_tables_row_expand fa_icon DataTableRowExpand fa-plus"></span>
-		<span class="Text">{number}</span>
-	</div>
-</script>
-
-<script type="javascript/template" id="tmpl-admin-event-orders-page-tr">
-	<tr data-order_uuid="{uuid}">
-		<td>
-			<div class="data_tables_row_expand_wrapper">
-				<span class="data_tables_row_expand fa_icon DataTableRowExpand fa-plus"></span>
-				<span class="Text">{number}</span>
-			</div>
-		</td>
-		<td>{status}</td>
-		<td>{orderer}</td>
-		<td>{email}</td>
-		<td data-order="{buy_timestamp}" data-sort="{buy_timestamp}">{buy_time}</td>
-	</tr>
-</script>
-
-<script type="javascript/template" id="tmpl-admin-event-orders-page-table-child-row">
-	<div class="event_admin_orders_page_table_child_row collapsing_wrapper -smooth_hiding CollapsingWrapper">
-		<div class="collapsing_content CollapsingContent">
-			<table>
-				{ticket_rows}
-			</table>
-		</div>
-	</div>
-</script>
-
-<script type="javascript/template" id="tmpl-admin-event-orders-page-ticket-row">
-	<tr>
-		<td class="child_ladder">Билет {number}</td>
-		<td>{ticket_type_name}</td>
-		<td>{price}</td>
-		<td><small class="-transform_uppercase -text_color_marginal">{used}</small></td>
-	</tr>
-</script>
-<script type="javascript/template" id="tmpl-eventstat-overview">
-	<div class="page eventstat_overview">
-		<header class="eventstat_overview_header">
-			<div class="eventstat_overview_header_block img_holder">
-				<img src="{image_horizontal_url}?width={cover_width}" class="CallModal" data-modal_type="media" data-modal_media_type="image" data-modal_media_url="{image_horizontal_url}" width="{cover_width}">
-			</div>
-			<div class="eventstat_overview_header_block eventstat_overview_info">
-				<span class="eventstat_overview_event_title">{title}</span>
-				<div class="eventstat_overview_dates">
-					{dates_block}
-				</div>
-				<div class="eventstat_overview_buttons">
-					<a href="/event/{id}" class="button -size_low -color_neutral RippleEffect Link">Перейти на страницу</a>
-				</div>
-			</div>
-			<div class="eventstat_overview_header_block eventstat_overview_scoreboards_wrapper">
-				<div class="eventstat_overview_scoreboards EventstatsScoreboards">{scoreboards}</div>
-				<span class="action -color_accent fa_icon fa-plus-circle -hidden">Добавить к сравнению</span>
-			</div>
-		</header>
-		<div class="eventstat_overview_content">
-			<div class="eventstat_overview_charts EventStatAreaCharts">
-				<div class="eventstat_overview_chart AreaChart NotificationsSentAreaChart"></div>
-				<div class="eventstat_overview_chart AreaChart ViewAreaChart"></div>
-				<div class="eventstat_overview_chart AreaChart ViewDetailAreaChart"></div>
-				<div class="eventstat_overview_chart AreaChart OpenConversionsAreaChart"></div>
-				<div class="eventstat_overview_chart AreaChart FaveAreaChart"></div>
-				<div class="eventstat_overview_chart AreaChart FaveConversionsAreaChart"></div>
-			</div>
-			<div class="eventstat_overview_big_scoreboards EventstatsBigScoreboards">{big_scoreboards}</div>
-		</div>
-	</div>
-</script>
-
-<script type="javascript/template" id="tmpl-eventstat-overview-datetime">
-	<div class="eventstat_overview_datetime">
-		<div class="eventstat_overview_date"><span>{date}</span></div>
-		<div class="eventstat_overview_time"><span>{time}</span></div>
-	</div>
-</script>
-<script type="javascript/template" id="tmpl-event-admin-requests-page">
-	<div class="event_admin_requests_page material -level_2_material">
-		<div class="event_admin_requests_list_wrapper Tabs">
-			<header class="event_admin_requests_header">
-				<div class="event_admin_requests_header_wrapper RequestsPageHeaderWrapper">
-					<div class="event_admin_requests_page_title_wrapper">
-						<h3 class="event_admin_requests_page_title">Заявки</h3>
-					</div>
-					<div class="event_admin_requests_search_block">
-						<div class="event_admin_requests_search_bar">
-							<input class="event_admin_requests_search_bar_input form_input -rounded RequestsPageSearch" type="text">
-							<button class="event_admin_requests_search_block_button fa_icon fa-search -empty RequestsPageSearchButton" type="button"></button>
-						</div>
-					</div>
-				</div>
-				<div class="event_admin_requests_tabs tabs_header -color_accent HeaderTabs">
-					<span class="tab Tab -active" data-requests_list_name="new">Новые</span>
-					<span class="tab Tab" data-requests_list_name="approved">Принятые</span>
-					<span class="tab Tab" data-requests_list_name="rejected">Отклоненные</span>
-				</div>
-			</header>
-			<div class="event_admin_requests_lists tab_bodies_wrap TabsBodyWrapper RequestsLists">
-				<section class="tab_body TabsBody -active">{loader}</section>
-			</div>
-			<footer class="event_admin_requests_footer">
-				<button class="action -color_accent -no_uppercase ApproveAllRequests" type="button">Принять все заявки</button>
-			</footer>
-		</div>
-		<div class="event_admin_request_detail scrollbar-outer RequestDetailScrollbar">
-			<div class="event_admin_request_detail_wrapper RequestDetail">
-				{request_detail}
-			</div>
-		</div>
-	</div>
-</script>
-
-
-
-<script type="javascript/template" id="tmpl-event-admin-requests-lists">
-	<section class="event_admin_requests_list_scroll_wrapper tab_body TabsBody -active">
-		<div class="event_admin_requests_list_scroll scrollbar-outer RequestsListScrollbar NewRequestsList">{new_requests}</div>
-	</section>
-	<section class="event_admin_requests_list_scroll_wrapper tab_body TabsBody">
-		<div class="event_admin_requests_list_scroll scrollbar-outer RequestsListScrollbar ApprovedRequestsList">{approved_requests}</div>
-	</section>
-	<section class="event_admin_requests_list_scroll_wrapper tab_body TabsBody">
-		<div class="event_admin_requests_list_scroll scrollbar-outer RequestsListScrollbar RejectedRequestsList">{rejected_requests}</div>
-	</section>
-</script>
-
-
-<script type="javascript/template" id="tmpl-event-admin-request-item">
-	<article class="extended_list_item event_admin_request_item RequestItem">
-		<div class="event_admin_request_item_content">
-			<aside class="event_admin_request_item_aside">{orderer_avatar}</aside>
-			<div class="event_admin_request_item_body">
-				<div class="event_admin_request_item_head">
-					<div class="event_admin_request_item_head_wrap">
-						<span class="event_admin_request_item_head_text">Заказ</span>
-						<span class="event_admin_request_item_head_text event_admin_request_number">{order_number}</span>
-					</div>
-					<div class="event_admin_request_item_head_wrap">
-						<span class="event_admin_request_item_head_text">{request_time}</span>
-						<span class="event_admin_request_item_head_text">{request_date}</span>
-					</div>
-				</div>
-				<h5 class="event_admin_request_item_name">{orderer_full_name}</h5>
-			</div>
-		</div>
-		<footer class="event_admin_request_item_footer">
-			{action_buttons}
-		</footer>
-	</article>
-</script>
-
-<script type="javascript/template" id="tmpl-event-admin-request-detail">
-	<header class="event_admin_request_detail_header">
-		<div class="event_admin_request_detail_header_main">
-			<h3 class="event_admin_request_detail_title">Заказ {order_number}</h3>
-			<span class="event_admin_request_detail_subtitle">{orderer_full_name}</span>
-		</div>
-		<aside class="event_admin_request_detail_header_side">{orderer_avatar}</aside>
-	</header>
-	<h6 class="event_admin_request_detail_registration_form_title">Анкета пользователя</h6>
-	<div class="event_admin_request_detail_registration_form_fields">
-		{registration_fields}
-	</div>
-</script>
-
-<script type="javascript/template" id="tmpl-event-admin-request-detail-no-select">
-	<p><span class="-text_color_primary_30">Выберите заявку из списка слева, чтобы получить дополнительную информацию по ней</span></p>
-</script>
-
-<script type="javascript/template" id="tmpl-event-admin-no-request-items">
-	<p class="event_admin_no_request_items">Нет заявок</p>
-</script>
-<script type="javascript/template" id="tmpl-admin-event-sales-page">
-	<div class="event_admin_sales_page material -level_2_material">
-		<header class="event_admin_sales_header">
-			<div class="event_admin_sales_header_main">
-				<h3 class="event_admin_sales_title">{title}</h3>
-				<div class="event_admin_sales_header_bottom">
-					<aside class="event_admin_sales_big_date scoreboard -size_huge -color_accent -align_center">
-						<span class="scoreboard_number">{first_event_date_day}</span>
-						<span class="scoreboard_title">{first_event_date_month}</span>
-					</aside>
-					<div class="event_admin_sales_header_info">
-						<p class="-text_color_primary_80 -font_weight_bolder">{formatted_dates}</p>
-						<p class="-text_color_primary_80 -font_weight_bolder"><span>Регистрация {registration_dates}</span></p>
-						<div class="form_group -parts_e_e">
-							<div class="form_unit">
-								{sales_settings_button}
-							</div>
-							<div class="form_unit">
-								{promotion_button}
-							</div>
-						</div>
-					</div>
-				</div>
-			</div>
-			<aside class="event_admin_sales_header_side">
-				<div class="event_admin_sales_brief_block">
-					<div class="scoreboard -size_normal">
-						<span class="scoreboard_title">Билеты</span>
-						<span class="scoreboard_number">{sold_count} / {sum_amount}</span>
-					</div>
-				</div>
-				<div class="event_admin_sales_brief_block">
-					<div class="scoreboard -size_normal">
-						<span class="scoreboard_title">Заявки</span>
-						<span class="scoreboard_number">{orders_count}</span>
-					</div>
-				</div>
-				<div class="event_admin_sales_brief_block">
-					<div class="scoreboard -size_normal">
-						<span class="scoreboard_title">Контроль входа</span>
-						<span class="scoreboard_number">{checked_out_count} / {sold_count}</span>
-					</div>
-				</div>
-				<div class="event_admin_sales_brief_block">
-					<div class="scoreboard -size_normal">
-						<span class="scoreboard_title">Возвраты</span>
-						<span class="scoreboard_number">0</span>
-					</div>
-				</div>
-			</aside>
-		</header>
-		<div class="event_admin_sales_page_main">
-			<div class="flex_grid -parts_2_1_2 -strict_width">
-				<div class="grid_box">
-					<h4>Типы билетов</h4>
-					{ticket_types}
-				</div>
-				<div class="grid_box"></div>
-				<div class="grid_box">
-					<h4>Финансы</h4>
-					<div class="scoreboard -size_big">
-						<span class="scoreboard_title">Выручка</span>
-						<span class="scoreboard_number">{total_income}</span>
-					</div>
-					<div class="flex_grid -parts_equal_2">
-						<div class="grid_box">
-							<div class="scoreboard -size_normal">
-								<span class="scoreboard_title">Комиссия Evendate</span>
-								<span class="scoreboard_number">{evendate_commission_value} (1%)</span>
-							</div>
-						</div>
-						<div class="grid_box">
-							<div class="scoreboard -size_normal">
-								<span class="scoreboard_title">Комиссия за эквайринг</span>
-								<span class="scoreboard_number">{processing_commission_value}</span>
-								<span class="scoreboard_number tooltip" title="Комиссия зависит от способа оплаты участниками. Процент высчитывается как округленное среднее со всех заказов.">({processing_commission}%)</span>
-							</div>
-						</div>
-					</div>
-					<div class="scoreboard -size_big">
-						<span class="scoreboard_title">Заработано</span>
-						<span class="scoreboard_number -text_color_accent">{withdraw_available}</span>
-					</div>
-					{withdraw_funds_button}
-				</div>
-			</div>
-			{charts}
-			{promocodes}
-		</div>
-	</div>
-</script>
-
-<script type="javascript/template" id="tmpl-admin-event-sales-chart">
-	<div class="event_admin_sales_chart chart_wrapper {classes} AreaChart"></div>
-</script>
-
-<script type="javascript/template" id="tmpl-admin-event-sales-ticket-type">
-	<div class="event_admin_sales_ticket_type">
-		<h5 class="event_admin_sales_ticket_type_title">{name} {stamp}</h5>
-		<p class="event_admin_sales_ticket_type_info">
-			<span class="event_admin_sales_ticket_type_dates">{dates}</span>
-			<span class="event_admin_sales_ticket_type_price">{price}</span>
-		</p>
-		{progress_bar}
-	</div>
-</script>
-
-<script type="javascript/template" id="tmpl-admin-event-sales-promocodes">
-	<h4>Промокоды</h4>
-	<div class="-edge_to_edge">
-		<table class="table -data_table_override PromocodesTable">
-			<thead>
-				<tr>
-					<th>Код</th>
-					<th>Скидка</th>
-					<th>Период активности</th>
-					<th>Использовано</th>
-					<th>Общая сумма скидки</th>
-				</tr>
-			</thead>
-			<tbody></tbody>
-			<tfoot>
-				<tr>
-					<th colspan="4" align="right">Суммарная скидка по промокадам:</th>
-					<th class="EffortTotalSum"></th>
-				</tr>
-			</tfoot>
-		</table>
-	</div>
-</script>
-<script type="javascript/template" id="tmpl-event-admin-utm-page">
-	<div class="event_admin_utm_page material -level_2_material">
-		<h2 class="event_admin_utm_title">Метки UTM</h2>
-		<table class="table -data_table_override UTMTable">
-			<thead>
-				<tr>
-					<th>UTM Source</th>
-					<th>UTM Medium</th>
-					<th>UTM Campaign</th>
-					<th>UTM Content</th>
-					<th>UTM Term</th>
-					<th>Визитов</th>
-					<th>Конверсия</th>
-					<th>Сумма заказов</th>
-				</tr>
-			</thead>
-			<tbody></tbody>
-		</table>
 	</div>
 </script>
