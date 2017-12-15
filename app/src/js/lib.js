@@ -464,17 +464,6 @@ Object.toHtmlDataSet = function() {
 	});
 	return dataset.join(' ');
 };
-
-function objectToHTMLDataAttr(obj) {
-	
-	return Object.props(obj).reduce(function(new_obj, key) {
-		
-		return {
-			...new_obj,
-			[`data-${key}`]: obj[key]
-		};
-	}, {});
-}
 /**
  * Converts object into string of html attributes
  *
@@ -531,16 +520,14 @@ Array.toSpaceSeparatedString = function() {
 	return this.join(' ');
 };
 
-class HtmlClassesArray extends Array {
-	constructor(arg) {
-		super();
-		
+HtmlClassesArray = extending(Array, (function() {
+	function HtmlClassesArray(arg) {
 		if (arguments.length > 1) {
-			this.push(...arguments);
+			this.push.apply(this, arguments);
 		} else if (arg instanceof Array) {
-			this.push(...arg);
+			this.push.apply(this, arg);
 		} else if (typeof arg === 'string') {
-			this.push(...(arg.split(' ')));
+			this.push.apply(this, arg.split(' '));
 		}
 		this.__proto__ = HtmlClassesArray.prototype;
 		this.__proto__.name = 'HtmlClassesArray';
@@ -548,11 +535,15 @@ class HtmlClassesArray extends Array {
 		return this;
 	}
 	
-	toString() {
-		
-		return this.unique().join(' ');
-	}
-}
+	Object.defineProperty(HtmlClassesArray.prototype, 'toString', {
+		value: function() {
+			
+			return this.unique().join(' ');
+		}
+	});
+	
+	return HtmlClassesArray;
+})());
 
 if (window.PropTypes) {
 	+function(PropTypes) {

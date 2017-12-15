@@ -1,22 +1,22 @@
+var _extends = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; };
+
+var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+
 var _slicedToArray = function () { function sliceIterator(arr, i) { var _arr = []; var _n = true; var _d = false; var _e = undefined; try { for (var _i = arr[Symbol.iterator](), _s; !(_n = (_s = _i.next()).done); _n = true) { _arr.push(_s.value); if (i && _arr.length === i) break; } } catch (err) { _d = true; _e = err; } finally { try { if (!_n && _i["return"]) _i["return"](); } finally { if (_d) throw _e; } } return _arr; } return function (arr, i) { if (Array.isArray(arr)) { return arr; } else if (Symbol.iterator in Object(arr)) { return sliceIterator(arr, i); } else { throw new TypeError("Invalid attempt to destructure non-iterable instance"); } }; }();
 
 var _values2, _values3, _values4, _values5, _values6, _UserActivity$AVATAR_, _UserActivity$ACTION_, _labels, _colors, _icons, _labels2, _colors2, _icons2;
 
-var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
-
 var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) { return typeof obj; } : function (obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; };
 
-var _extends = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; };
-
 function _objectWithoutProperties(obj, keys) { var target = {}; for (var i in obj) { if (keys.indexOf(i) >= 0) continue; if (!Object.prototype.hasOwnProperty.call(obj, i)) continue; target[i] = obj[i]; } return target; }
-
-function _toConsumableArray(arr) { if (Array.isArray(arr)) { for (var i = 0, arr2 = Array(arr.length); i < arr.length; i++) { arr2[i] = arr[i]; } return arr2; } else { return Array.from(arr); } }
 
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
 function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
 
 function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
+
+function _toConsumableArray(arr) { if (Array.isArray(arr)) { for (var i = 0, arr2 = Array(arr.length); i < arr.length; i++) { arr2[i] = arr[i]; } return arr2; } else { return Array.from(arr); } }
 
 function _defineProperty(obj, key, value) { if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
 
@@ -492,14 +492,6 @@ Object.toHtmlDataSet = function () {
 	});
 	return dataset.join(' ');
 };
-
-function objectToHTMLDataAttr(obj) {
-
-	return Object.props(obj).reduce(function (new_obj, key) {
-
-		return _extends({}, new_obj, _defineProperty({}, 'data-' + key, obj[key]));
-	}, {});
-}
 /**
  * Converts object into string of html attributes
  *
@@ -564,39 +556,30 @@ Array.toSpaceSeparatedString = function () {
 	return this.join(' ');
 };
 
-var HtmlClassesArray = function (_Array) {
-	_inherits(HtmlClassesArray, _Array);
-
+HtmlClassesArray = extending(Array, function () {
 	function HtmlClassesArray(arg) {
-		var _ret;
-
-		_classCallCheck(this, HtmlClassesArray);
-
-		var _this = _possibleConstructorReturn(this, (HtmlClassesArray.__proto__ || Object.getPrototypeOf(HtmlClassesArray)).call(this));
-
 		if (arguments.length > 1) {
-			_this.push.apply(_this, arguments);
+			this.push.apply(this, arguments);
 		} else if (arg instanceof Array) {
-			_this.push.apply(_this, _toConsumableArray(arg));
+			this.push.apply(this, arg);
 		} else if (typeof arg === 'string') {
-			_this.push.apply(_this, _toConsumableArray(arg.split(' ')));
+			this.push.apply(this, arg.split(' '));
 		}
-		_this.__proto__ = HtmlClassesArray.prototype;
-		_this.__proto__.name = 'HtmlClassesArray';
+		this.__proto__ = HtmlClassesArray.prototype;
+		this.__proto__.name = 'HtmlClassesArray';
 
-		return _ret = _this, _possibleConstructorReturn(_this, _ret);
+		return this;
 	}
 
-	_createClass(HtmlClassesArray, [{
-		key: 'toString',
-		value: function toString() {
+	Object.defineProperty(HtmlClassesArray.prototype, 'toString', {
+		value: function value() {
 
 			return this.unique().join(' ');
 		}
-	}]);
+	});
 
 	return HtmlClassesArray;
-}(Array);
+}());
 
 if (window.PropTypes) {
 	+function (PropTypes) {
@@ -3576,7 +3559,7 @@ AsynchronousConnection = function () {
   */
 	AsynchronousConnection.prototype.multipleAjax = AsynchronousConnection.multipleAjax = function () {
 		var _arguments = arguments,
-		    _this2 = this;
+		    _this = this;
 
 		var with_callback = arguments[arguments.length - 1] instanceof Function,
 		    promises = with_callback ? Array.prototype.splice.call(arguments, 0, arguments.length - 1) : Array.prototype.slice.call(arguments),
@@ -3585,9 +3568,9 @@ AsynchronousConnection = function () {
 		parallel_promise = Promise.all(promises);
 		if (with_callback) {
 			parallel_promise.then(function (results) {
-				Array.prototype.shift.call(_arguments).apply(_this2, [].concat(_toConsumableArray(results)));
+				Array.prototype.shift.call(_arguments).apply(_this, [].concat(_toConsumableArray(results)));
 
-				return _this2;
+				return _this;
 			});
 		}
 
@@ -5818,6 +5801,79 @@ InterestModelsCollection = extending(EntitiesCollection, function () {
 	return InterestModelsCollection;
 }());
 /**
+ * @requires ../../entities/Class.OneEntity.js
+ */
+/**
+ *
+ * @class PromocodeModel
+ * @extends OneEntity
+ */
+PromocodeModel = extending(OneEntity, function () {
+	/**
+  *
+  * @constructor
+  * @constructs PromocodeModel
+  *
+  * @property {?string} uuid
+  * @property {?number} event_id
+  * @property {?string} code
+  * @property {?boolean} is_fixed
+  * @property {?boolean} is_percentage
+  * @property {?number} effort
+  * @property {?number} total_effort
+  * @property {?number} use_limit
+  * @property {?number} use_count
+  * @property {?timestamp} start_date
+  * @property {?timestamp} end_date
+  * @property {?boolean} enabled
+  *
+  * @property {?timestamp} created_at
+  * @property {?timestamp} updated_at
+  */
+	function PromocodeModel() {
+		this.uuid = null;
+		this.event_id = null;
+		this.code = null;
+		this.is_fixed = null;
+		this.is_percentage = null;
+		this.effort = null;
+		this.total_effort = null;
+		this.use_limit = null;
+		this.use_count = null;
+		this.start_date = null;
+		this.end_date = null;
+		this.enabled = null;
+
+		this.created_at = null;
+		this.updated_at = null;
+	}
+	PromocodeModel.prototype.ID_PROP_NAME = 'uuid';
+
+	return PromocodeModel;
+}());
+/**
+ * @requires ../../entities/Class.EntitiesCollection.js
+ * @requires Class.PromocodeModel.js
+ */
+/**
+ *
+ * @class PromocodeModelsCollection
+ * @extends EntitiesCollection
+ */
+PromocodeModelsCollection = extending(EntitiesCollection, function () {
+	/**
+  *
+  * @constructor
+  * @constructs PromocodeModelsCollection
+  */
+	function PromocodeModelsCollection() {
+		EntitiesCollection.call(this);
+	}
+	PromocodeModelsCollection.prototype.collection_of = PromocodeModel;
+
+	return PromocodeModelsCollection;
+}());
+/**
  * @requires ../Class.AbstractDataModel.js
  */
 /**
@@ -5901,79 +5957,6 @@ PricingRuleModelsCollection = extending(AbstractDataModelsCollection, function (
 	PricingRuleModelsCollection.prototype.collection_of = PricingRuleModel;
 
 	return PricingRuleModelsCollection;
-}());
-/**
- * @requires ../../entities/Class.OneEntity.js
- */
-/**
- *
- * @class PromocodeModel
- * @extends OneEntity
- */
-PromocodeModel = extending(OneEntity, function () {
-	/**
-  *
-  * @constructor
-  * @constructs PromocodeModel
-  *
-  * @property {?string} uuid
-  * @property {?number} event_id
-  * @property {?string} code
-  * @property {?boolean} is_fixed
-  * @property {?boolean} is_percentage
-  * @property {?number} effort
-  * @property {?number} total_effort
-  * @property {?number} use_limit
-  * @property {?number} use_count
-  * @property {?timestamp} start_date
-  * @property {?timestamp} end_date
-  * @property {?boolean} enabled
-  *
-  * @property {?timestamp} created_at
-  * @property {?timestamp} updated_at
-  */
-	function PromocodeModel() {
-		this.uuid = null;
-		this.event_id = null;
-		this.code = null;
-		this.is_fixed = null;
-		this.is_percentage = null;
-		this.effort = null;
-		this.total_effort = null;
-		this.use_limit = null;
-		this.use_count = null;
-		this.start_date = null;
-		this.end_date = null;
-		this.enabled = null;
-
-		this.created_at = null;
-		this.updated_at = null;
-	}
-	PromocodeModel.prototype.ID_PROP_NAME = 'uuid';
-
-	return PromocodeModel;
-}());
-/**
- * @requires ../../entities/Class.EntitiesCollection.js
- * @requires Class.PromocodeModel.js
- */
-/**
- *
- * @class PromocodeModelsCollection
- * @extends EntitiesCollection
- */
-PromocodeModelsCollection = extending(EntitiesCollection, function () {
-	/**
-  *
-  * @constructor
-  * @constructs PromocodeModelsCollection
-  */
-	function PromocodeModelsCollection() {
-		EntitiesCollection.call(this);
-	}
-	PromocodeModelsCollection.prototype.collection_of = PromocodeModel;
-
-	return PromocodeModelsCollection;
 }());
 /**
  * @requires ../../entities/Class.OneEntity.js
@@ -6372,7 +6355,7 @@ UsersActivitiesCollection = extending(EntitiesCollection, function () {
   * @returns {Promise}
   */
 	UsersActivitiesCollection.prototype.fetch = function (fields, length, order_by, success) {
-		var _this3 = this;
+		var _this2 = this;
 
 		var ajax_data = {
 			fields: fields,
@@ -6384,13 +6367,122 @@ UsersActivitiesCollection = extending(EntitiesCollection, function () {
 			ajax_data.order_by = order_by;
 		}
 		return this.constructor.fetch(this.user_id, ajax_data).then(function (data) {
-			_this3.setData(data);
+			_this2.setData(data);
 
-			return new _this3.constructor().setData(data);
+			return new _this2.constructor().setData(data);
 		});
 	};
 
 	return UsersActivitiesCollection;
+}());
+/**
+ * @requires ../Class.OneEntity.js
+ */
+/**
+ * @class OneCity
+ * @extends OneEntity
+ */
+OneCity = extending(OneEntity, function () {
+	/**
+  *
+  * @param {(string|number)} [city_id]
+  * @constructor
+  * @constructs OneCity
+  *
+  * @property {(string|number)} id=0
+  * @property {?string} en_name
+  * @property {?number} country_id
+  * @property {?string} local_name
+  * @property {CategoriesCollection} organization_type
+  * @property {?number} timediff_seconds
+  */
+	function OneCity(city_id) {
+		this.id = setDefaultValue(city_id, 0);
+
+		this.en_name = null;
+		this.country_id = null;
+		this.local_name = null;
+		this.organization_type = new CategoriesCollection();
+		this.timediff_seconds = null;
+	}
+
+	return OneCity;
+}());
+/**
+ * @requires ../Class.EntitiesCollection.js
+ * @requires Class.OneCity.js
+ */
+/**
+ *
+ * @class CitiesCollection
+ * @extends EntitiesCollection
+ */
+CitiesCollection = extending(EntitiesCollection, function () {
+	/**
+  *
+  * @constructor
+  * @constructs CitiesCollection
+  */
+	function CitiesCollection() {
+		EntitiesCollection.call(this);
+	}
+
+	CitiesCollection.prototype.collection_of = OneCity;
+	/**
+  *
+  * @param {AJAXData} data
+  * @param {AJAXCallback} success
+  * @return {Promise}
+  */
+	CitiesCollection.fetchCities = function (data, success) {
+		return __APP.SERVER.getData('/api/v1/organizations/cities', data, success);
+	};
+	/**
+  *
+  * @param {string} name
+  * @returns {(OneCity|null)}
+  */
+	CitiesCollection.prototype.getByName = function (name) {
+		for (var i = 0; i < this.length; i++) {
+			if (this[i].en_name == name) {
+				return this[i];
+			}
+		}
+		return null;
+	};
+	/**
+  *
+  * @param {(string|number)} id
+  * @returns {boolean}
+  */
+	CitiesCollection.prototype.has = function (id) {
+		return ($.isNumeric(id) ? this.getByID(id) : this.getByName(id)) instanceof OneEntity;
+	};
+	/**
+  *
+  * @param {?(Fields|Array|string)} [fields]
+  * @param {?number} [length]
+  * @param {?string} [order_by]
+  * @param {?function} [success]
+  * @return {Promise}
+  */
+	CitiesCollection.prototype.fetchCities = function (fields, length, order_by, success) {
+		var self = this;
+
+		return CitiesCollection.fetchCities({
+			fields: fields || undefined,
+			offset: this.length,
+			length: length || undefined,
+			order_by: order_by || undefined
+		}, function (data) {
+			self.setData(data);
+			if (success && typeof success == 'function') {
+				success.call(self, self.__last_pushed);
+			}
+		});
+	};
+
+	return CitiesCollection;
 }());
 /**
  * @requires ../Class.OneEntity.js
@@ -6532,115 +6624,6 @@ CategoriesCollection = extending(EntitiesCollection, function () {
 	};
 
 	return CategoriesCollection;
-}());
-/**
- * @requires ../Class.OneEntity.js
- */
-/**
- * @class OneCity
- * @extends OneEntity
- */
-OneCity = extending(OneEntity, function () {
-	/**
-  *
-  * @param {(string|number)} [city_id]
-  * @constructor
-  * @constructs OneCity
-  *
-  * @property {(string|number)} id=0
-  * @property {?string} en_name
-  * @property {?number} country_id
-  * @property {?string} local_name
-  * @property {CategoriesCollection} organization_type
-  * @property {?number} timediff_seconds
-  */
-	function OneCity(city_id) {
-		this.id = setDefaultValue(city_id, 0);
-
-		this.en_name = null;
-		this.country_id = null;
-		this.local_name = null;
-		this.organization_type = new CategoriesCollection();
-		this.timediff_seconds = null;
-	}
-
-	return OneCity;
-}());
-/**
- * @requires ../Class.EntitiesCollection.js
- * @requires Class.OneCity.js
- */
-/**
- *
- * @class CitiesCollection
- * @extends EntitiesCollection
- */
-CitiesCollection = extending(EntitiesCollection, function () {
-	/**
-  *
-  * @constructor
-  * @constructs CitiesCollection
-  */
-	function CitiesCollection() {
-		EntitiesCollection.call(this);
-	}
-
-	CitiesCollection.prototype.collection_of = OneCity;
-	/**
-  *
-  * @param {AJAXData} data
-  * @param {AJAXCallback} success
-  * @return {Promise}
-  */
-	CitiesCollection.fetchCities = function (data, success) {
-		return __APP.SERVER.getData('/api/v1/organizations/cities', data, success);
-	};
-	/**
-  *
-  * @param {string} name
-  * @returns {(OneCity|null)}
-  */
-	CitiesCollection.prototype.getByName = function (name) {
-		for (var i = 0; i < this.length; i++) {
-			if (this[i].en_name == name) {
-				return this[i];
-			}
-		}
-		return null;
-	};
-	/**
-  *
-  * @param {(string|number)} id
-  * @returns {boolean}
-  */
-	CitiesCollection.prototype.has = function (id) {
-		return ($.isNumeric(id) ? this.getByID(id) : this.getByName(id)) instanceof OneEntity;
-	};
-	/**
-  *
-  * @param {?(Fields|Array|string)} [fields]
-  * @param {?number} [length]
-  * @param {?string} [order_by]
-  * @param {?function} [success]
-  * @return {Promise}
-  */
-	CitiesCollection.prototype.fetchCities = function (fields, length, order_by, success) {
-		var self = this;
-
-		return CitiesCollection.fetchCities({
-			fields: fields || undefined,
-			offset: this.length,
-			length: length || undefined,
-			order_by: order_by || undefined
-		}, function (data) {
-			self.setData(data);
-			if (success && typeof success == 'function') {
-				success.call(self, self.__last_pushed);
-			}
-		});
-	};
-
-	return CitiesCollection;
 }());
 /**
  * @requires ../../data_models/date/Class.DateModel.js
@@ -10818,60 +10801,60 @@ var OneNetworkingProfile = function (_OneEntity) {
 	function OneNetworkingProfile(user_id) {
 		_classCallCheck(this, OneNetworkingProfile);
 
-		var _this4 = _possibleConstructorReturn(this, (OneNetworkingProfile.__proto__ || Object.getPrototypeOf(OneNetworkingProfile)).call(this));
+		var _this3 = _possibleConstructorReturn(this, (OneNetworkingProfile.__proto__ || Object.getPrototypeOf(OneNetworkingProfile)).call(this));
 
-		_this4.user_id = setDefaultValue(user_id, null);
-		_this4.first_name = null;
-		_this4.last_name = null;
-		_this4.avatar_url = null;
-		_this4.info = null;
-		_this4.looking_for = null;
-		_this4.vk_url = null;
-		_this4.facebook_url = null;
-		_this4.twitter_url = null;
-		_this4.linkedin_url = null;
-		_this4.telegram_url = null;
-		_this4.instagram_url = null;
-		_this4.github_url = null;
-		_this4.email = null;
-		_this4.signed_up = null;
-		_this4.company_name = null;
-		_this4.request_uuid = null;
-		_this4.request = new OneNetworkingRequest(_this4.request_uuid);
-		_this4.outgoing_request_uuid = null;
-		_this4.outgoing_request = new OneNetworkingRequest(_this4.outgoing_request_uuid);
-		_this4.user = new OneUser(_this4.user_id);
+		_this3.user_id = setDefaultValue(user_id, null);
+		_this3.first_name = null;
+		_this3.last_name = null;
+		_this3.avatar_url = null;
+		_this3.info = null;
+		_this3.looking_for = null;
+		_this3.vk_url = null;
+		_this3.facebook_url = null;
+		_this3.twitter_url = null;
+		_this3.linkedin_url = null;
+		_this3.telegram_url = null;
+		_this3.instagram_url = null;
+		_this3.github_url = null;
+		_this3.email = null;
+		_this3.signed_up = null;
+		_this3.company_name = null;
+		_this3.request_uuid = null;
+		_this3.request = new OneNetworkingRequest(_this3.request_uuid);
+		_this3.outgoing_request_uuid = null;
+		_this3.outgoing_request = new OneNetworkingRequest(_this3.outgoing_request_uuid);
+		_this3.user = new OneUser(_this3.user_id);
 
-		Object.defineProperties(_this4.user, {
+		Object.defineProperties(_this3.user, {
 			first_name: {
 				get: function get() {
 
-					return _this4.first_name;
+					return _this3.first_name;
 				}
 			},
 			last_name: {
 				get: function get() {
 
-					return _this4.last_name;
+					return _this3.last_name;
 				}
 			},
 			avatar_url: {
 				get: function get() {
 
-					return _this4.avatar_url;
+					return _this3.avatar_url;
 				}
 			}
 		});
-		return _this4;
+		return _this3;
 	}
 
 	_createClass(OneNetworkingProfile, [{
 		key: 'fetch',
 		value: function fetch(fields) {
-			var _this5 = this;
+			var _this4 = this;
 
 			return OneNetworkingProfile.fetchProfile(this.user_id, fields).then(function (data) {
-				_this5.setData(data);
+				_this4.setData(data);
 
 				return data;
 			});
@@ -10927,21 +10910,21 @@ var OneEventNetworkingProfile = function (_OneNetworkingProfile) {
 	function OneEventNetworkingProfile(user_id, event_id) {
 		_classCallCheck(this, OneEventNetworkingProfile);
 
-		var _this7 = _possibleConstructorReturn(this, (OneEventNetworkingProfile.__proto__ || Object.getPrototypeOf(OneEventNetworkingProfile)).call(this, user_id));
+		var _this6 = _possibleConstructorReturn(this, (OneEventNetworkingProfile.__proto__ || Object.getPrototypeOf(OneEventNetworkingProfile)).call(this, user_id));
 
-		_this7.event_id = setDefaultValue(event_id, null);
-		_this7.request = new OneEventNetworkingRequest(event_id, _this7.request_uuid);
-		_this7.outgoing_request = new OneEventNetworkingRequest(event_id, _this7.outgoing_request_uuid);
-		return _this7;
+		_this6.event_id = setDefaultValue(event_id, null);
+		_this6.request = new OneEventNetworkingRequest(event_id, _this6.request_uuid);
+		_this6.outgoing_request = new OneEventNetworkingRequest(event_id, _this6.outgoing_request_uuid);
+		return _this6;
 	}
 
 	_createClass(OneEventNetworkingProfile, [{
 		key: 'fetch',
 		value: function fetch(fields) {
-			var _this8 = this;
+			var _this7 = this;
 
 			return OneEventNetworkingProfile.fetchProfile(this.event_id, this.user_id, fields).then(function (data) {
-				_this8.setData(data);
+				_this7.setData(data);
 
 				return data;
 			});
@@ -10971,15 +10954,15 @@ var EventNetworkingProfilesCollection = function (_NetworkingProfilesCo) {
 	function EventNetworkingProfilesCollection(event_id) {
 		_classCallCheck(this, EventNetworkingProfilesCollection);
 
-		var _this9 = _possibleConstructorReturn(this, (EventNetworkingProfilesCollection.__proto__ || Object.getPrototypeOf(EventNetworkingProfilesCollection)).call(this));
+		var _this8 = _possibleConstructorReturn(this, (EventNetworkingProfilesCollection.__proto__ || Object.getPrototypeOf(EventNetworkingProfilesCollection)).call(this));
 
-		Object.defineProperty(_this9, 'event_id', {
+		Object.defineProperty(_this8, 'event_id', {
 			get: function get() {
 
 				return event_id;
 			}
 		});
-		return _this9;
+		return _this8;
 	}
 
 	/**
@@ -10994,7 +10977,7 @@ var EventNetworkingProfilesCollection = function (_NetworkingProfilesCo) {
 	_createClass(EventNetworkingProfilesCollection, [{
 		key: 'fetch',
 		value: function fetch(fields, length, order_by) {
-			var _this10 = this;
+			var _this9 = this;
 
 			return EventNetworkingProfilesCollection.fetchProfiles(this.event_id, {
 				fields: fields,
@@ -11002,9 +10985,9 @@ var EventNetworkingProfilesCollection = function (_NetworkingProfilesCo) {
 				order_by: order_by,
 				offset: this.length
 			}).then(function (profiles) {
-				_this10.setData(profiles);
+				_this9.setData(profiles);
 
-				return _this10.__last_pushed;
+				return _this9.__last_pushed;
 			});
 		}
 	}], [{
@@ -11038,7 +11021,7 @@ var EventNetworkingAcceptedRequestProfilesCollection = function (_EventNetworkin
 	_createClass(EventNetworkingAcceptedRequestProfilesCollection, [{
 		key: 'fetch',
 		value: function fetch(fields, length, order_by) {
-			var _this12 = this;
+			var _this11 = this;
 
 			return EventNetworkingProfilesCollection.fetchProfiles(this.event_id, {
 				request_accepted: true,
@@ -11047,9 +11030,9 @@ var EventNetworkingAcceptedRequestProfilesCollection = function (_EventNetworkin
 				order_by: order_by,
 				offset: this.length
 			}).then(function (profiles) {
-				_this12.setData(profiles);
+				_this11.setData(profiles);
 
-				return _this12.__last_pushed;
+				return _this11.__last_pushed;
 			});
 		}
 	}]);
@@ -11073,7 +11056,7 @@ var NetworkingContactsProfilesCollection = function (_NetworkingProfilesCo2) {
 	_createClass(NetworkingContactsProfilesCollection, [{
 		key: 'fetch',
 		value: function fetch(fields, length, order_by) {
-			var _this14 = this;
+			var _this13 = this;
 
 			return NetworkingContactsProfilesCollection.fetchProfiles({
 				fields: fields,
@@ -11081,9 +11064,9 @@ var NetworkingContactsProfilesCollection = function (_NetworkingProfilesCo2) {
 				order_by: order_by,
 				offset: this.length
 			}).then(function (profiles) {
-				_this14.setData(profiles);
+				_this13.setData(profiles);
 
-				return _this14.__last_pushed;
+				return _this13.__last_pushed;
 			});
 		}
 	}], [{
@@ -11118,15 +11101,15 @@ var EventNetworkingContactsProfilesCollection = function (_NetworkingContactsPr)
 	function EventNetworkingContactsProfilesCollection(event_id) {
 		_classCallCheck(this, EventNetworkingContactsProfilesCollection);
 
-		var _this15 = _possibleConstructorReturn(this, (EventNetworkingContactsProfilesCollection.__proto__ || Object.getPrototypeOf(EventNetworkingContactsProfilesCollection)).call(this));
+		var _this14 = _possibleConstructorReturn(this, (EventNetworkingContactsProfilesCollection.__proto__ || Object.getPrototypeOf(EventNetworkingContactsProfilesCollection)).call(this));
 
-		Object.defineProperty(_this15, 'event_id', {
+		Object.defineProperty(_this14, 'event_id', {
 			get: function get() {
 
 				return event_id;
 			}
 		});
-		return _this15;
+		return _this14;
 	}
 
 	/**
@@ -11140,7 +11123,7 @@ var EventNetworkingContactsProfilesCollection = function (_NetworkingContactsPr)
 	_createClass(EventNetworkingContactsProfilesCollection, [{
 		key: 'fetch',
 		value: function fetch(fields, length, order_by) {
-			var _this16 = this;
+			var _this15 = this;
 
 			return EventNetworkingContactsProfilesCollection.fetchProfiles(this.event_id, {
 				fields: fields,
@@ -11148,9 +11131,9 @@ var EventNetworkingContactsProfilesCollection = function (_NetworkingContactsPr)
 				order_by: order_by,
 				offset: this.length
 			}).then(function (profiles) {
-				_this16.setData(profiles);
+				_this15.setData(profiles);
 
-				return _this16.__last_pushed;
+				return _this15.__last_pushed;
 			});
 		}
 	}], [{
@@ -11184,7 +11167,7 @@ var EventNetworkingPendingRequestProfilesCollection = function (_EventNetworking
 	_createClass(EventNetworkingPendingRequestProfilesCollection, [{
 		key: 'fetch',
 		value: function fetch(fields, length, order_by) {
-			var _this18 = this;
+			var _this17 = this;
 
 			return EventNetworkingProfilesCollection.fetchProfiles(this.event_id, {
 				request_pending: true,
@@ -11193,9 +11176,9 @@ var EventNetworkingPendingRequestProfilesCollection = function (_EventNetworking
 				order_by: order_by,
 				offset: this.length
 			}).then(function (profiles) {
-				_this18.setData(profiles);
+				_this17.setData(profiles);
 
-				return _this18.__last_pushed;
+				return _this17.__last_pushed;
 			});
 		}
 	}]);
@@ -11219,7 +11202,7 @@ var EventNetworkingRejectedRequestProfilesCollection = function (_EventNetworkin
 	_createClass(EventNetworkingRejectedRequestProfilesCollection, [{
 		key: 'fetch',
 		value: function fetch(fields, length, order_by) {
-			var _this20 = this;
+			var _this19 = this;
 
 			return EventNetworkingProfilesCollection.fetchProfiles(this.event_id, {
 				request_rejected: true,
@@ -11228,9 +11211,9 @@ var EventNetworkingRejectedRequestProfilesCollection = function (_EventNetworkin
 				order_by: order_by,
 				offset: this.length
 			}).then(function (profiles) {
-				_this20.setData(profiles);
+				_this19.setData(profiles);
 
-				return _this20.__last_pushed;
+				return _this19.__last_pushed;
 			});
 		}
 	}]);
@@ -11262,14 +11245,14 @@ var MyEventNetworkingProfile = function (_OneEventNetworkingPr) {
    * @return {*}
    */
 		value: function checkAccess(fields, event_id) {
-			var _this22 = this;
+			var _this21 = this;
 
 			if (isVoid(this.event_id)) {
 				this.event_id = event_id;
 			}
 
 			return OneEventNetworkingProfile.fetchProfile(this.event_id, 'me', fields).then(function (data) {
-				_this22.setData(data);
+				_this21.setData(data);
 
 				return data;
 			}, function (reason) {
@@ -11289,14 +11272,14 @@ var MyEventNetworkingProfile = function (_OneEventNetworkingPr) {
 	}, {
 		key: 'redeemAccess',
 		value: function redeemAccess(code, fields, event_id) {
-			var _this23 = this;
+			var _this22 = this;
 
 			if (isVoid(this.event_id)) {
 				this.event_id = event_id;
 			}
 
 			return MyEventNetworkingProfile.redeemEventAccess(this.event_id, 'me', code, fields).then(function (data) {
-				_this23.setData(data);
+				_this22.setData(data);
 
 				return data;
 			});
@@ -11422,18 +11405,18 @@ var OneNetworkingRequest = function (_OneEntity2) {
 	function OneNetworkingRequest(uuid) {
 		_classCallCheck(this, OneNetworkingRequest);
 
-		var _this25 = _possibleConstructorReturn(this, (OneNetworkingRequest.__proto__ || Object.getPrototypeOf(OneNetworkingRequest)).call(this));
+		var _this24 = _possibleConstructorReturn(this, (OneNetworkingRequest.__proto__ || Object.getPrototypeOf(OneNetworkingRequest)).call(this));
 
-		_this25.uuid = setDefaultValue(uuid, null);
-		_this25.sender_user_id = null;
-		_this25.recipient_user_id = null;
-		_this25.message = null;
-		_this25.status = null;
-		_this25.accept_status = null;
-		_this25.accepted_at = null;
-		_this25.created_at = null;
-		_this25.updated_at = null;
-		return _this25;
+		_this24.uuid = setDefaultValue(uuid, null);
+		_this24.sender_user_id = null;
+		_this24.recipient_user_id = null;
+		_this24.message = null;
+		_this24.status = null;
+		_this24.accept_status = null;
+		_this24.accepted_at = null;
+		_this24.created_at = null;
+		_this24.updated_at = null;
+		return _this24;
 	}
 
 	return OneNetworkingRequest;
@@ -11449,10 +11432,10 @@ var OneEventNetworkingRequest = function (_OneNetworkingRequest) {
 	function OneEventNetworkingRequest(event_id, uuid) {
 		_classCallCheck(this, OneEventNetworkingRequest);
 
-		var _this26 = _possibleConstructorReturn(this, (OneEventNetworkingRequest.__proto__ || Object.getPrototypeOf(OneEventNetworkingRequest)).call(this, uuid));
+		var _this25 = _possibleConstructorReturn(this, (OneEventNetworkingRequest.__proto__ || Object.getPrototypeOf(OneEventNetworkingRequest)).call(this, uuid));
 
-		_this26.event_id = setDefaultValue(event_id, null);
-		return _this26;
+		_this25.event_id = setDefaultValue(event_id, null);
+		return _this25;
 	}
 
 	/**
@@ -11479,25 +11462,25 @@ var OneEventNetworkingRequest = function (_OneNetworkingRequest) {
    * @return {Promise}
    */
 		value: function create(data) {
-			var _this27 = this;
+			var _this26 = this;
 
 			if (!isVoid(data)) {
 				this.setData(_extends({}, data, { recipient_user_id: data.user_id || data.recipient_user_id }));
 			}
 
 			return OneEventNetworkingRequest.createRequest(this.event_id, this.recipient_user_id, this.message).then(function (uuid) {
-				_this27.uuid = uuid instanceof Array ? uuid[0].uuid : uuid;
+				_this26.uuid = uuid instanceof Array ? uuid[0].uuid : uuid;
 
-				return _this27;
+				return _this26;
 			});
 		}
 	}, {
 		key: 'revokeRequest',
 		value: function revokeRequest() {
-			var _this28 = this;
+			var _this27 = this;
 
 			return OneEventNetworkingRequest.updateRequest(this.event_id, this.uuid, { status: false }).then(function (data) {
-				_this28.status = false;
+				_this27.status = false;
 
 				return data;
 			});
@@ -11505,10 +11488,10 @@ var OneEventNetworkingRequest = function (_OneNetworkingRequest) {
 	}, {
 		key: 'cancelRequest',
 		value: function cancelRequest() {
-			var _this29 = this;
+			var _this28 = this;
 
 			return OneEventNetworkingRequest.updateRequest(this.event_id, this.uuid, { accept_status: false }).then(function (data) {
-				_this29.accept_status = false;
+				_this28.accept_status = false;
 
 				return data;
 			});
@@ -11516,10 +11499,10 @@ var OneEventNetworkingRequest = function (_OneNetworkingRequest) {
 	}, {
 		key: 'acceptRequest',
 		value: function acceptRequest() {
-			var _this30 = this;
+			var _this29 = this;
 
 			return OneEventNetworkingRequest.updateRequest(this.event_id, this.uuid, { accept_status: true }).then(function (data) {
-				_this30.accept_status = true;
+				_this29.accept_status = true;
 
 				return data;
 			});
@@ -11527,10 +11510,10 @@ var OneEventNetworkingRequest = function (_OneNetworkingRequest) {
 	}, {
 		key: 'fetch',
 		value: function fetch(fields) {
-			var _this31 = this;
+			var _this30 = this;
 
 			return OneEventNetworkingRequest.fetchRequest(this.event_id, this.uuid, { fields: fields }).then(function (data) {
-				_this31.setData(data);
+				_this30.setData(data);
 
 				return data;
 			});
@@ -11594,6 +11577,163 @@ OneEventNetworkingRequest.requestPath = function (event_id, uuid) {
 OneEventNetworkingRequest.requestsPath = function (event_id) {
 	return '/api/v1/events/' + event_id + '/networking/requests/';
 };
+/**
+ * @requires Class.AbstractEventOrdersCollection.js
+ */
+/**
+ *
+ * @class EventAllOrdersCollection
+ * @extends AbstractEventOrdersCollection
+ */
+EventAllOrdersCollection = extending(AbstractEventOrdersCollection, function () {
+	/**
+  *
+  * @param {(string|number)} [event_id=0]
+  *
+  * @constructor
+  * @constructs EventAllOrdersCollection
+  *
+  * @property {(string|number)} event_id
+  */
+	function EventAllOrdersCollection(event_id) {
+		AbstractEventOrdersCollection.call(this, event_id);
+	}
+
+	/**
+  *
+  * @param {(string|number)} event_id
+  * @param {AJAXData} [ajax_data]
+  * @param {AJAXCallback} [success]
+  *
+  * @return {Promise}
+  */
+	EventAllOrdersCollection.fetchOrders = function (event_id, ajax_data, success) {
+		return __APP.SERVER.getData('/api/v1/statistics/events/' + event_id + '/orders', ajax_data, success);
+	};
+	/**
+  *
+  * @param {ServerExports.EXPORT_EXTENSION} [format=xlsx]
+  *
+  * @return {Promise}
+  */
+	EventAllOrdersCollection.prototype.export = function (format) {
+
+		return new ServerExports().eventOrders(this.event_id, format);
+	};
+
+	return EventAllOrdersCollection;
+}());
+/**
+ * @requires Class.AbstractEventOrdersCollection.js
+ */
+/**
+ *
+ * @class EventMyOrdersCollection
+ * @extends AbstractEventOrdersCollection
+ */
+EventMyOrdersCollection = extending(AbstractEventOrdersCollection, function () {
+	/**
+  *
+  * @param {(string|number)} [event_id=0]
+  *
+  * @constructor
+  * @constructs EventMyOrdersCollection
+  *
+  * @property {(string|number)} event_id
+  */
+	function EventMyOrdersCollection(event_id) {
+		AbstractEventOrdersCollection.call(this, event_id);
+	}
+
+	/**
+  *
+  * @param {(string|number)} event_id
+  * @param {AJAXData} [ajax_data]
+  * @param {AJAXCallback} [success]
+  *
+  * @return {Promise}
+  */
+	EventMyOrdersCollection.fetchOrders = function (event_id, ajax_data, success) {
+
+		return __APP.SERVER.getData('/api/v1/events/' + event_id + '/orders', ajax_data, success);
+	};
+
+	return EventMyOrdersCollection;
+}());
+/**
+ * @requires Class.OrdersCollection.js
+ */
+/**
+ *
+ * @class MyOrdersCollection
+ * @extends OrdersCollection
+ */
+MyOrdersCollection = extending(OrdersCollection, function () {
+	/**
+  *
+  * @constructor
+  * @constructs MyOrdersCollection
+  */
+	function MyOrdersCollection() {
+		ExtendedOrdersCollection.call(this);
+	}
+
+	/**
+  *
+  * @param {AJAXData} ajax_data
+  *
+  * @return {Promise}
+  */
+	MyOrdersCollection.fetchOrders = function (ajax_data) {
+
+		return __APP.SERVER.getData(OrdersCollection.ENDPOINT.ORDER, ajax_data);
+	};
+	/**
+  *
+  * @param {Fields} [fields]
+  * @param {number} [length]
+  * @param {(Array<string>|string)} [order_by]
+  *
+  * @return {Promise}
+  */
+	MyOrdersCollection.prototype.fetch = function (fields, length, order_by) {
+		var self = this;
+
+		return MyOrdersCollection.fetchOrders({
+			fields: fields || undefined,
+			offset: this.length || undefined,
+			length: length || undefined,
+			order_by: order_by || undefined
+		}).then(function (orders) {
+			self.setData(orders);
+
+			return self.__last_pushed;
+		});
+	};
+	/**
+  *
+  * @param {Fields} [fields]
+  * @param {(Array<string>|string)} [order_by]
+  *
+  * @return {Promise}
+  */
+	MyOrdersCollection.prototype.fetchAll = function (fields, order_by) {
+		var self = this;
+
+		return MyOrdersCollection.fetchOrders({
+			fields: fields || undefined,
+			offset: 0,
+			length: ServerConnection.MAX_ENTITIES_LENGTH,
+			order_by: order_by || undefined
+		}).then(function (orders) {
+			self.setData(orders);
+
+			return self.__last_pushed;
+		});
+	};
+
+	return MyOrdersCollection;
+}());
 /**
  * @requires ../order/Class.OneOrder.js
  */
@@ -11771,163 +11911,6 @@ ExtendedOrdersCollection = extending(EntitiesCollection, function () {
 	};
 
 	return ExtendedOrdersCollection;
-}());
-/**
- * @requires Class.AbstractEventOrdersCollection.js
- */
-/**
- *
- * @class EventAllOrdersCollection
- * @extends AbstractEventOrdersCollection
- */
-EventAllOrdersCollection = extending(AbstractEventOrdersCollection, function () {
-	/**
-  *
-  * @param {(string|number)} [event_id=0]
-  *
-  * @constructor
-  * @constructs EventAllOrdersCollection
-  *
-  * @property {(string|number)} event_id
-  */
-	function EventAllOrdersCollection(event_id) {
-		AbstractEventOrdersCollection.call(this, event_id);
-	}
-
-	/**
-  *
-  * @param {(string|number)} event_id
-  * @param {AJAXData} [ajax_data]
-  * @param {AJAXCallback} [success]
-  *
-  * @return {Promise}
-  */
-	EventAllOrdersCollection.fetchOrders = function (event_id, ajax_data, success) {
-		return __APP.SERVER.getData('/api/v1/statistics/events/' + event_id + '/orders', ajax_data, success);
-	};
-	/**
-  *
-  * @param {ServerExports.EXPORT_EXTENSION} [format=xlsx]
-  *
-  * @return {Promise}
-  */
-	EventAllOrdersCollection.prototype.export = function (format) {
-
-		return new ServerExports().eventOrders(this.event_id, format);
-	};
-
-	return EventAllOrdersCollection;
-}());
-/**
- * @requires Class.AbstractEventOrdersCollection.js
- */
-/**
- *
- * @class EventMyOrdersCollection
- * @extends AbstractEventOrdersCollection
- */
-EventMyOrdersCollection = extending(AbstractEventOrdersCollection, function () {
-	/**
-  *
-  * @param {(string|number)} [event_id=0]
-  *
-  * @constructor
-  * @constructs EventMyOrdersCollection
-  *
-  * @property {(string|number)} event_id
-  */
-	function EventMyOrdersCollection(event_id) {
-		AbstractEventOrdersCollection.call(this, event_id);
-	}
-
-	/**
-  *
-  * @param {(string|number)} event_id
-  * @param {AJAXData} [ajax_data]
-  * @param {AJAXCallback} [success]
-  *
-  * @return {Promise}
-  */
-	EventMyOrdersCollection.fetchOrders = function (event_id, ajax_data, success) {
-
-		return __APP.SERVER.getData('/api/v1/events/' + event_id + '/orders', ajax_data, success);
-	};
-
-	return EventMyOrdersCollection;
-}());
-/**
- * @requires Class.OrdersCollection.js
- */
-/**
- *
- * @class MyOrdersCollection
- * @extends OrdersCollection
- */
-MyOrdersCollection = extending(OrdersCollection, function () {
-	/**
-  *
-  * @constructor
-  * @constructs MyOrdersCollection
-  */
-	function MyOrdersCollection() {
-		ExtendedOrdersCollection.call(this);
-	}
-
-	/**
-  *
-  * @param {AJAXData} ajax_data
-  *
-  * @return {Promise}
-  */
-	MyOrdersCollection.fetchOrders = function (ajax_data) {
-
-		return __APP.SERVER.getData(OrdersCollection.ENDPOINT.ORDER, ajax_data);
-	};
-	/**
-  *
-  * @param {Fields} [fields]
-  * @param {number} [length]
-  * @param {(Array<string>|string)} [order_by]
-  *
-  * @return {Promise}
-  */
-	MyOrdersCollection.prototype.fetch = function (fields, length, order_by) {
-		var self = this;
-
-		return MyOrdersCollection.fetchOrders({
-			fields: fields || undefined,
-			offset: this.length || undefined,
-			length: length || undefined,
-			order_by: order_by || undefined
-		}).then(function (orders) {
-			self.setData(orders);
-
-			return self.__last_pushed;
-		});
-	};
-	/**
-  *
-  * @param {Fields} [fields]
-  * @param {(Array<string>|string)} [order_by]
-  *
-  * @return {Promise}
-  */
-	MyOrdersCollection.prototype.fetchAll = function (fields, order_by) {
-		var self = this;
-
-		return MyOrdersCollection.fetchOrders({
-			fields: fields || undefined,
-			offset: 0,
-			length: ServerConnection.MAX_ENTITIES_LENGTH,
-			order_by: order_by || undefined
-		}).then(function (orders) {
-			self.setData(orders);
-
-			return self.__last_pushed;
-		});
-	};
-
-	return MyOrdersCollection;
 }());
 /**
  * @requires ../../data_models/promocode/Class.PromocodeModel.js
@@ -13243,15 +13226,15 @@ CurrentUser = extending(OneUser, function () {
   * @returns {Promise}
   */
 	CurrentUser.prototype.fetchFriends = function (ajax_data, success) {
-		var _this32 = this;
+		var _this31 = this;
 
 		return CurrentUser.fetchFriends(_extends({}, ajax_data, { offset: this.friends.length })).then(function (data) {
-			_this32.friends.setData(data);
+			_this31.friends.setData(data);
 			if (isFunction(success)) {
-				success.call(_this32, _this32.friends.__last_pushed);
+				success.call(_this31, _this31.friends.__last_pushed);
 			}
 
-			return _this32.friends.__last_pushed;
+			return _this31.friends.__last_pushed;
 		});
 	};
 	/**
@@ -15912,28 +15895,28 @@ var AvatarCollectionContextProvider = function (_React$Component) {
 	function AvatarCollectionContextProvider(props) {
 		_classCallCheck(this, AvatarCollectionContextProvider);
 
-		var _this33 = _possibleConstructorReturn(this, (AvatarCollectionContextProvider.__proto__ || Object.getPrototypeOf(AvatarCollectionContextProvider)).call(this, props));
+		var _this32 = _possibleConstructorReturn(this, (AvatarCollectionContextProvider.__proto__ || Object.getPrototypeOf(AvatarCollectionContextProvider)).call(this, props));
 
-		_this33.state = {
+		_this32.state = {
 			is_subscribed: props.isSubscribed
 		};
-		return _this33;
+		return _this32;
 	}
 
 	_createClass(AvatarCollectionContextProvider, [{
 		key: 'getChildContext',
 		value: function getChildContext() {
-			var _this34 = this;
+			var _this33 = this;
 
 			return _defineProperty({}, AvatarCollectionContextProvider.CONTEXT_NAME, {
 				isSubscribed: this.state.is_subscribed,
 				subscribe: function subscribe() {
-					_this34.setState({
+					_this33.setState({
 						is_subscribed: true
 					});
 				},
 				unsubscribe: function unsubscribe() {
-					_this34.setState({
+					_this33.setState({
 						is_subscribed: false
 					});
 				}
@@ -15975,12 +15958,12 @@ var AvatarCollection = function (_React$Component2) {
 
 		var left = props.maxCount;
 
-		var _this35 = _possibleConstructorReturn(this, (AvatarCollection.__proto__ || Object.getPrototypeOf(AvatarCollection)).call(this, props, context));
+		var _this34 = _possibleConstructorReturn(this, (AvatarCollection.__proto__ || Object.getPrototypeOf(AvatarCollection)).call(this, props, context));
 
-		_this35.avatars = [__APP.USER].concat(_toConsumableArray(props.users.filter(function (user) {
+		_this34.avatars = [__APP.USER].concat(_toConsumableArray(props.users.filter(function (user) {
 			return __APP.USER.id !== parseInt(user.id) && left-- > 0;
 		})));
-		return _this35;
+		return _this34;
 	}
 
 	_createClass(AvatarCollection, [{
@@ -16203,30 +16186,30 @@ function componentsContainer(Component, _ref14) {
 		function ComponentsContainer(props) {
 			_classCallCheck(this, ComponentsContainer);
 
-			var _this36 = _possibleConstructorReturn(this, (ComponentsContainer.__proto__ || Object.getPrototypeOf(ComponentsContainer)).call(this, props));
+			var _this35 = _possibleConstructorReturn(this, (ComponentsContainer.__proto__ || Object.getPrototypeOf(ComponentsContainer)).call(this, props));
 
-			_this36.state = {
-				length: _this36.props[entities_name].length,
+			_this35.state = {
+				length: _this35.props[entities_name].length,
 				is_loading: false
 			};
-			return _this36;
+			return _this35;
 		}
 
 		_createClass(ComponentsContainer, [{
 			key: 'fetch',
 			value: function fetch() {
-				var _this37 = this;
+				var _this36 = this;
 
 				if (!isVoid(CollectionClass) && this.props[entities_name] instanceof CollectionClass) {
 					var _props$entities_name;
 
 					this.setLoadingState();
 					return (_props$entities_name = this.props[entities_name]).fetch.apply(_props$entities_name, arguments).then(function (entities) {
-						_this37.unsetLoadingState().update();
+						_this36.unsetLoadingState().update();
 
 						return entities;
 					}).catch(function () {
-						_this37.unsetLoadingState();
+						_this36.unsetLoadingState();
 					});
 				}
 
@@ -16298,9 +16281,9 @@ var Dropdown = function (_React$Component4) {
 	function Dropdown(props) {
 		_classCallCheck(this, Dropdown);
 
-		var _this38 = _possibleConstructorReturn(this, (Dropdown.__proto__ || Object.getPrototypeOf(Dropdown)).call(this, props));
+		var _this37 = _possibleConstructorReturn(this, (Dropdown.__proto__ || Object.getPrototypeOf(Dropdown)).call(this, props));
 
-		_this38.state = {
+		_this37.state = {
 			click_pos: {
 				X: 0,
 				Y: 0
@@ -16308,10 +16291,10 @@ var Dropdown = function (_React$Component4) {
 			opened: false
 		};
 
-		_this38.open = _this38.open.bind(_this38);
-		_this38.close = _this38.close.bind(_this38);
-		_this38.handleClickOutside = _this38.handleClickOutside.bind(_this38);
-		return _this38;
+		_this37.open = _this37.open.bind(_this37);
+		_this37.close = _this37.close.bind(_this37);
+		_this37.handleClickOutside = _this37.handleClickOutside.bind(_this37);
+		return _this37;
 	}
 
 	_createClass(Dropdown, [{
@@ -16329,7 +16312,7 @@ var Dropdown = function (_React$Component4) {
 	}, {
 		key: 'open',
 		value: function open(e) {
-			var _this39 = this;
+			var _this38 = this;
 
 			this.setState({
 				opened: true,
@@ -16338,19 +16321,19 @@ var Dropdown = function (_React$Component4) {
 					Y: e.pageY
 				}
 			}, function () {
-				_this39.bindClickOutside();
+				_this38.bindClickOutside();
 			});
 		}
 	}, {
 		key: 'close',
 		value: function close(e) {
-			var _this40 = this;
+			var _this39 = this;
 
 			this.setState({
 				opened: false
 			}, function () {
-				_this40.unbindClickOutside();
-				_this40.setState({
+				_this39.unbindClickOutside();
+				_this39.setState({
 					click_pos: {
 						X: 0,
 						Y: 0
@@ -16411,7 +16394,7 @@ var Dropdown = function (_React$Component4) {
 	}, {
 		key: 'render',
 		value: function render() {
-			var _this41 = this;
+			var _this40 = this;
 
 			var _props4 = this.props,
 			    renderControl = _props4.renderControl,
@@ -16430,7 +16413,7 @@ var Dropdown = function (_React$Component4) {
 					{
 						className: 'dropdown_box ' + (opened ? '-show' : ''),
 						ref: function ref(node) {
-							return _this41.dropdown = node;
+							return _this40.dropdown = node;
 						},
 						style: this.getPos()
 					},
@@ -16452,7 +16435,7 @@ Dropdown.propTypes = {
  * @requires componentsContainer.js
  */
 function EventBlock(_ref15) {
-	var _this42 = this;
+	var _this41 = this;
 
 	var event = _ref15.event,
 	    date = _ref15.date,
@@ -16525,10 +16508,10 @@ function EventBlock(_ref15) {
 									counterClasses: [__C.CLASSES.SIZES.X30, __C.CLASSES.UNIVERSAL_STATES.BORDERED, __C.CLASSES.COLORS.MARGINAL, __C.CLASSES.HOOKS.ADD_AVATAR.STATES.CASTABLE],
 									overallAvatarsCount: event.favored_users_count,
 									onClick: function onClick() {
-										if (!_this42.favored_modal) {
-											_this42.favored_modal = new FavoredModal(event.id);
+										if (!_this41.favored_modal) {
+											_this41.favored_modal = new FavoredModal(event.id);
 										}
-										_this42.favored_modal.show();
+										_this41.favored_modal.show();
 									}
 								})
 							),
@@ -16672,14 +16655,14 @@ var Tabs = function (_React$Component5) {
 	function Tabs(props) {
 		_classCallCheck(this, Tabs);
 
-		var _this43 = _possibleConstructorReturn(this, (Tabs.__proto__ || Object.getPrototypeOf(Tabs)).call(this, props));
+		var _this42 = _possibleConstructorReturn(this, (Tabs.__proto__ || Object.getPrototypeOf(Tabs)).call(this, props));
 
-		_this43.state = {
+		_this42.state = {
 			selected_tab: props.selectedTab || null
 		};
 
-		_this43.changeTab = _this43.changeTab.bind(_this43);
-		return _this43;
+		_this42.changeTab = _this42.changeTab.bind(_this42);
+		return _this42;
 	}
 
 	_createClass(Tabs, [{
@@ -16699,7 +16682,7 @@ var Tabs = function (_React$Component5) {
 	}, {
 		key: 'render',
 		value: function render() {
-			var _this44 = this;
+			var _this43 = this;
 
 			var _props6 = this.props,
 			    className = _props6.className,
@@ -16720,9 +16703,9 @@ var Tabs = function (_React$Component5) {
 							'span',
 							{
 								key: child.props.name,
-								className: 'tab Tab ' + (child.props.name === _this44.state.selected_tab ? '-active' : ''),
+								className: 'tab Tab ' + (child.props.name === _this43.state.selected_tab ? '-active' : ''),
 								onClick: function onClick() {
-									return _this44.changeTab(child.props.name);
+									return _this43.changeTab(child.props.name);
 								}
 							},
 							child.props.title
@@ -16735,7 +16718,7 @@ var Tabs = function (_React$Component5) {
 					children.map(function (child) {
 						return React.createElement(
 							'div',
-							{ className: 'tab_body TabsBody ' + (child.props.name === _this44.state.selected_tab ? '-active' : ''), key: child.props.name },
+							{ className: 'tab_body TabsBody ' + (child.props.name === _this43.state.selected_tab ? '-active' : ''), key: child.props.name },
 							child.props.children
 						);
 					})
@@ -16949,18 +16932,18 @@ var CreateNetworkingRequestModal = function (_React$Component7) {
 	function CreateNetworkingRequestModal(props) {
 		_classCallCheck(this, CreateNetworkingRequestModal);
 
-		var _this46 = _possibleConstructorReturn(this, (CreateNetworkingRequestModal.__proto__ || Object.getPrototypeOf(CreateNetworkingRequestModal)).call(this, props));
+		var _this45 = _possibleConstructorReturn(this, (CreateNetworkingRequestModal.__proto__ || Object.getPrototypeOf(CreateNetworkingRequestModal)).call(this, props));
 
-		_this46.state = {
+		_this45.state = {
 			with_message: false,
 			fade_in: true
 		};
-		_this46.inputs = [];
-		_this46.modal = null;
-		_this46.modal_wrapper = $('.ModalsWrapper').get(0);
+		_this45.inputs = [];
+		_this45.modal = null;
+		_this45.modal_wrapper = $('.ModalsWrapper').get(0);
 
-		_this46.handleClickOutside = _this46.handleClickOutside.bind(_this46);
-		return _this46;
+		_this45.handleClickOutside = _this45.handleClickOutside.bind(_this45);
+		return _this45;
 	}
 
 	_createClass(CreateNetworkingRequestModal, [{
@@ -17008,7 +16991,7 @@ var CreateNetworkingRequestModal = function (_React$Component7) {
 	}, {
 		key: 'render',
 		value: function render() {
-			var _this47 = this;
+			var _this46 = this;
 
 			var profile = this.props.profile,
 			    with_message = this.state.with_message;
@@ -17019,7 +17002,7 @@ var CreateNetworkingRequestModal = function (_React$Component7) {
 				{
 					className: 'modal_unit material -floating_material ' + (this.state.fade_in ? '-faded' : ''),
 					ref: function ref(node) {
-						return _this47.modal = node;
+						return _this46.modal = node;
 					},
 					style: { width: 370 }
 				},
@@ -17034,7 +17017,7 @@ var CreateNetworkingRequestModal = function (_React$Component7) {
 					React.createElement(
 						RippleButton,
 						{ className: 'modal_destroy_button CloseModal', onClick: function onClick(e) {
-								_this47.props.hideModalHandler();
+								_this46.props.hideModalHandler();
 							} },
 						'\xD7'
 					)
@@ -17086,7 +17069,7 @@ var CreateNetworkingRequestModal = function (_React$Component7) {
 								{
 									className: 'fa_icon fa-commenting',
 									onClick: function onClick(e) {
-										_this47.setState({
+										_this46.setState({
 											with_message: true
 										});
 									}
@@ -17106,9 +17089,9 @@ var CreateNetworkingRequestModal = function (_React$Component7) {
 											event_id: profile.event_id,
 											user_id: profile.user_id,
 											sender_user_id: __APP.USER.id,
-											message: with_message ? _this47.refs.message.value : null
+											message: with_message ? _this46.refs.message.value : null
 										}).then(function (data) {
-											_this47.props.hideModalHandler();
+											_this46.props.hideModalHandler();
 
 											return data;
 										});
@@ -17170,23 +17153,23 @@ _ref20, PageClass) {
 		function AsyncPageAdapter(props) {
 			_classCallCheck(this, AsyncPageAdapter);
 
-			var _this48 = _possibleConstructorReturn(this, (AsyncPageAdapter.__proto__ || Object.getPrototypeOf(AsyncPageAdapter)).call(this, props));
+			var _this47 = _possibleConstructorReturn(this, (AsyncPageAdapter.__proto__ || Object.getPrototypeOf(AsyncPageAdapter)).call(this, props));
 
 			__APP.HISTORY = props.history;
-			__APP.CURRENT_REACT_PAGE = _this48;
-			_this48.pageProps = _extends({}, props.match.params, constructPage.call(_this48, props.match.params));
-			_this48.origin_page = null;
-			_this48.state = {
+			__APP.CURRENT_REACT_PAGE = _this47;
+			_this47.pageProps = _extends({}, props.match.params, constructPage.call(_this47, props.match.params));
+			_this47.origin_page = null;
+			_this47.state = {
 				is_data_fetching: !(is_auth_required && __APP.USER.isLoggedOut()),
 				fetched_data: null
 			};
-			return _this48;
+			return _this47;
 		}
 
 		_createClass(AsyncPageAdapter, [{
 			key: 'componentWillMount',
 			value: function componentWillMount() {
-				var _this49 = this;
+				var _this48 = this;
 
 				__APP.SERVER.abortAllConnections();
 				__APP.SIDEBAR.activateNavItem(window.location.pathname);
@@ -17222,9 +17205,9 @@ _ref20, PageClass) {
 				}
 
 				fetchData.call({ props: this.pageProps }, this.pageProps).then(function (data) {
-					__APP.changeTitle(isFunction(pageTitle) ? pageTitle.call(_this49.pageProps, _this49.pageProps) : pageTitle);
+					__APP.changeTitle(isFunction(pageTitle) ? pageTitle.call(_this48.pageProps, _this48.pageProps) : pageTitle);
 
-					_this49.setState({
+					_this48.setState({
 						is_data_fetching: false,
 						fetched_data: data
 					});
@@ -17240,7 +17223,7 @@ _ref20, PageClass) {
 		}, {
 			key: 'render',
 			value: function render() {
-				var _this50 = this;
+				var _this49 = this;
 
 				var _state = this.state,
 				    is_data_fetching = _state.is_data_fetching,
@@ -17267,7 +17250,7 @@ _ref20, PageClass) {
 					fetched_data: fetched_data
 				}, this.pageProps), {
 					ref: function ref(component) {
-						return _this50.origin_page = component;
+						return _this49.origin_page = component;
 					}
 				}));
 			}
@@ -17409,17 +17392,17 @@ var UserPage = asyncPage({
 	}]);
 
 	function UserPage(props) {
-		var _this51$disable_uploa, _this51$block_scroll;
+		var _this50$disable_uploa, _this50$block_scroll;
 
 		_classCallCheck(this, UserPage);
 
-		var _this51 = _possibleConstructorReturn(this, (UserPage.__proto__ || Object.getPrototypeOf(UserPage)).call(this, props));
+		var _this50 = _possibleConstructorReturn(this, (UserPage.__proto__ || Object.getPrototypeOf(UserPage)).call(this, props));
 
-		_this51.disable_uploads = (_this51$disable_uploa = {}, _defineProperty(_this51$disable_uploa, __C.ENTITIES.EVENT, false), _defineProperty(_this51$disable_uploa, __C.ENTITIES.ACTIVITY, false), _this51$disable_uploa);
-		_this51.block_scroll = (_this51$block_scroll = {}, _defineProperty(_this51$block_scroll, __C.ENTITIES.EVENT, false), _defineProperty(_this51$block_scroll, __C.ENTITIES.ACTIVITY, false), _this51$block_scroll);
+		_this50.disable_uploads = (_this50$disable_uploa = {}, _defineProperty(_this50$disable_uploa, __C.ENTITIES.EVENT, false), _defineProperty(_this50$disable_uploa, __C.ENTITIES.ACTIVITY, false), _this50$disable_uploa);
+		_this50.block_scroll = (_this50$block_scroll = {}, _defineProperty(_this50$block_scroll, __C.ENTITIES.EVENT, false), _defineProperty(_this50$block_scroll, __C.ENTITIES.ACTIVITY, false), _this50$block_scroll);
 
-		_this51.active_tab = __C.ENTITIES.EVENT;
-		_this51.favored_fetch_data = {
+		_this50.active_tab = __C.ENTITIES.EVENT;
+		_this50.favored_fetch_data = {
 			fields: new Fields('image_horizontal_medium_url', 'favored_users_count', 'is_favorite', 'is_registered', 'registration_locally', 'registration_available', 'ticketing_locally', 'ticketing_available', 'dates', {
 				favored: {
 					length: 5
@@ -17428,13 +17411,13 @@ var UserPage = asyncPage({
 			order_by: 'nearest_event_date,-first_event_date',
 			length: 10
 		};
-		return _this51;
+		return _this50;
 	}
 
 	_createClass(UserPage, [{
 		key: 'componentDidMount',
 		value: function componentDidMount() {
-			var _this52 = this;
+			var _this51 = this;
 
 			var user = this.props.user,
 			    promises = [];
@@ -17450,7 +17433,7 @@ var UserPage = asyncPage({
 
 			if (promises.length) {
 				Promise.race(promises).then(function () {
-					_this52.bindScrollEvents();
+					_this51.bindScrollEvents();
 				});
 			} else {
 				this.bindScrollEvents();
@@ -17496,7 +17479,7 @@ var UserPage = asyncPage({
    * @returns {Promise}
    */
 		value: function uploadEntities(type) {
-			var _this53 = this;
+			var _this52 = this;
 
 			var is_upload_disabled = this.disable_uploads[type],
 			    is_scroll_blocked = this.block_scroll[type];
@@ -17531,22 +17514,22 @@ var UserPage = asyncPage({
 			this.block_scroll[type] = true;
 
 			return fetch_promise.then(function (entities) {
-				_this53.block_scroll[type] = false;
+				_this52.block_scroll[type] = false;
 
 				if (!entities.length) {
-					_this53.disable_uploads[type] = true;
+					_this52.disable_uploads[type] = true;
 				}
 
 				switch (type) {
 					case __C.ENTITIES.EVENT:
 						{
 
-							return _this53.favored_events.unsetLoadingState().update();
+							return _this52.favored_events.unsetLoadingState().update();
 						}
 					case __C.ENTITIES.ACTIVITY:
 						{
 
-							return _this53.activities.unsetLoadingState().update();
+							return _this52.activities.unsetLoadingState().update();
 						}
 				}
 
@@ -17563,7 +17546,7 @@ var UserPage = asyncPage({
 	}, {
 		key: 'bindScrollEvents',
 		value: function bindScrollEvents() {
-			var _this54 = this;
+			var _this53 = this;
 
 			var $window = $(window);
 
@@ -17579,7 +17562,7 @@ var UserPage = asyncPage({
 
 						$window.on('scroll.uploadEntities', function () {
 							if (isScrollRemain(1000)) {
-								_this54.uploadEntities(_this54.tabs.state.selected_tab);
+								_this53.uploadEntities(_this53.tabs.state.selected_tab);
 							}
 						});
 					}
@@ -17593,7 +17576,7 @@ var UserPage = asyncPage({
 	}, {
 		key: 'render',
 		value: function render() {
-			var _this55 = this;
+			var _this54 = this;
 
 			var user = this.props.user,
 			    SidebarWrapper = UserPage.SidebarWrapper,
@@ -17650,7 +17633,7 @@ var UserPage = asyncPage({
 					Tabs,
 					{
 						ref: function ref(component) {
-							return _this55.tabs = component;
+							return _this54.tabs = component;
 						},
 						className: 'page user_page_content',
 						headerClasses: 'user_page_content_header -color_accent',
@@ -17660,14 +17643,14 @@ var UserPage = asyncPage({
 						Tab,
 						{ title: i18n(__S.ACTIVITY, 1), name: 'activity' },
 						React.createElement(UserActivities, { ref: function ref(component) {
-								return _this55.activities = component;
+								return _this54.activities = component;
 							}, user: user, activities: user.actions })
 					),
 					React.createElement(
 						Tab,
 						{ title: i18n(__S.FAVORED_EVENT, 2), name: 'event' },
 						React.createElement(EventBlocks, { ref: function ref(component) {
-								return _this55.favored_events = component;
+								return _this54.favored_events = component;
 							}, events: user.favored })
 					)
 				)
@@ -17707,10 +17690,10 @@ var MyProfilePage = asyncPage({
 	function MyProfilePage(props) {
 		_classCallCheck(this, MyProfilePage);
 
-		var _this56 = _possibleConstructorReturn(this, (MyProfilePage.__proto__ || Object.getPrototypeOf(MyProfilePage)).call(this, props));
+		var _this55 = _possibleConstructorReturn(this, (MyProfilePage.__proto__ || Object.getPrototypeOf(MyProfilePage)).call(this, props));
 
-		_this56.favored_fetch_data.fields.push('is_favorite');
-		return _this56;
+		_this55.favored_fetch_data.fields.push('is_favorite');
+		return _this55;
 	}
 
 	return MyProfilePage;
@@ -17760,6 +17743,131 @@ var NoReactPage = function (_React$Component10) {
  */
 
 
+AbstractSidebar = function () {
+	/**
+  *
+  * @constructor
+  * @constructs AbstractSidebar
+  */
+	function AbstractSidebar() {
+		this.$sidebar = $('#main_sidebar');
+		this.$subscribed_orgs = this.$sidebar.find('.SidebarOrganizationsList');
+		this.$nav_items = this.$sidebar.find('.SidebarNavItem');
+	}
+
+	AbstractSidebar.prototype.init = function () {
+		this.$sidebar.find('.SidebarNav').addClass('-items_' + this.$nav_items.not('.-hidden').length);
+		this.$sidebar.find('.SidebarScroll').scrollbar();
+	};
+
+	AbstractSidebar.prototype.updateSubscriptions = function () {};
+	/**
+  *
+  * @param {string} [pathname]
+  */
+	AbstractSidebar.prototype.activateNavItem = function (pathname) {
+		pathname = pathname || window.location.pathname;
+
+		this.$nav_items.removeClass(__C.CLASSES.ACTIVE).filter(function () {
+
+			return pathname.indexOf(this.getAttribute('href')) === 0;
+		}).addClass(__C.CLASSES.ACTIVE);
+	};
+
+	return AbstractSidebar;
+}();
+/**
+ * @requires Class.AbstractSidebar.js
+ */
+/**
+ * @class
+ * @extends AbstractSidebar
+ */
+Sidebar = extending(AbstractSidebar, function () {
+	/**
+  *
+  * @constructor
+  * @construct Sidebar
+  */
+	function Sidebar() {
+		AbstractSidebar.call(this);
+	}
+
+	Sidebar.prototype.init = function () {
+		var self = this;
+		self.updateSubscriptions();
+		$(window).on('subscribe unsubscribe', function () {
+			self.updateSubscriptions();
+		});
+
+		AbstractSidebar.prototype.init.call(this);
+	};
+
+	Sidebar.prototype.updateSubscriptions = function () {
+		var $subscribed_orgs = this.$subscribed_orgs,
+		    timing = 0,
+		    current_menu_items = $.map($subscribed_orgs.children(), function (el) {
+			return $(el).data('organization_id');
+		}),
+		    to_add = __APP.USER.subscriptions.filter(function (item) {
+			return current_menu_items.indexOf(item.id) === -1;
+		}),
+		    to_remove = current_menu_items.filter(function (item) {
+			return !__APP.USER.subscriptions.has(item);
+		});
+
+		if (to_add.length) {
+			__APP.BUILD.organizationItems(to_add, {
+				block_classes: ['animated'],
+				avatar_classes: ['-size_30x30']
+			})[$subscribed_orgs.length ? 'prependTo' : 'appendTo']($subscribed_orgs).each(function (i, org_block) {
+				setTimeout(function () {
+					$(org_block).addClass('-show');
+				}, timing += 100);
+			});
+
+			bindPageLinks($subscribed_orgs);
+		}
+		if (to_remove.length) {
+			to_remove.forEach(function (id) {
+				var $organization_item = $subscribed_orgs.find('.organization_item[data-organization_id="' + id + '"]').removeClass('-show');
+				setTimeout(function () {
+					$organization_item.remove();
+				}, 500);
+			});
+		}
+	};
+
+	return Sidebar;
+}());
+/**
+ * @requires Class.AbstractSidebar.js
+ */
+/**
+ * @class
+ * @extends AbstractSidebar
+ */
+SidebarNoAuth = extending(AbstractSidebar, function () {
+	/**
+  *
+  * @constructor
+  * @constructs SidebarNoAuth
+  */
+	function SidebarNoAuth() {
+		AbstractSidebar.call(this);
+	}
+
+	SidebarNoAuth.prototype.init = function () {
+		this.$sidebar.find('.SidebarOrganizationsScroll').addClass(__C.CLASSES.HIDDEN);
+		AbstractSidebar.prototype.init.call(this);
+	};
+
+	return SidebarNoAuth;
+}());
+/**
+ * @abstract
+ * @class
+ */
 AbstractTopBar = function () {
 	/**
   *
@@ -17946,131 +18054,6 @@ TopBarNoAuth = extending(AbstractTopBar, function () {
 	return TopBarNoAuth;
 }());
 /**
- * @abstract
- * @class
- */
-AbstractSidebar = function () {
-	/**
-  *
-  * @constructor
-  * @constructs AbstractSidebar
-  */
-	function AbstractSidebar() {
-		this.$sidebar = $('#main_sidebar');
-		this.$subscribed_orgs = this.$sidebar.find('.SidebarOrganizationsList');
-		this.$nav_items = this.$sidebar.find('.SidebarNavItem');
-	}
-
-	AbstractSidebar.prototype.init = function () {
-		this.$sidebar.find('.SidebarNav').addClass('-items_' + this.$nav_items.not('.-hidden').length);
-		this.$sidebar.find('.SidebarScroll').scrollbar();
-	};
-
-	AbstractSidebar.prototype.updateSubscriptions = function () {};
-	/**
-  *
-  * @param {string} [pathname]
-  */
-	AbstractSidebar.prototype.activateNavItem = function (pathname) {
-		pathname = pathname || window.location.pathname;
-
-		this.$nav_items.removeClass(__C.CLASSES.ACTIVE).filter(function () {
-
-			return pathname.indexOf(this.getAttribute('href')) === 0;
-		}).addClass(__C.CLASSES.ACTIVE);
-	};
-
-	return AbstractSidebar;
-}();
-/**
- * @requires Class.AbstractSidebar.js
- */
-/**
- * @class
- * @extends AbstractSidebar
- */
-Sidebar = extending(AbstractSidebar, function () {
-	/**
-  *
-  * @constructor
-  * @construct Sidebar
-  */
-	function Sidebar() {
-		AbstractSidebar.call(this);
-	}
-
-	Sidebar.prototype.init = function () {
-		var self = this;
-		self.updateSubscriptions();
-		$(window).on('subscribe unsubscribe', function () {
-			self.updateSubscriptions();
-		});
-
-		AbstractSidebar.prototype.init.call(this);
-	};
-
-	Sidebar.prototype.updateSubscriptions = function () {
-		var $subscribed_orgs = this.$subscribed_orgs,
-		    timing = 0,
-		    current_menu_items = $.map($subscribed_orgs.children(), function (el) {
-			return $(el).data('organization_id');
-		}),
-		    to_add = __APP.USER.subscriptions.filter(function (item) {
-			return current_menu_items.indexOf(item.id) === -1;
-		}),
-		    to_remove = current_menu_items.filter(function (item) {
-			return !__APP.USER.subscriptions.has(item);
-		});
-
-		if (to_add.length) {
-			__APP.BUILD.organizationItems(to_add, {
-				block_classes: ['animated'],
-				avatar_classes: ['-size_30x30']
-			})[$subscribed_orgs.length ? 'prependTo' : 'appendTo']($subscribed_orgs).each(function (i, org_block) {
-				setTimeout(function () {
-					$(org_block).addClass('-show');
-				}, timing += 100);
-			});
-
-			bindPageLinks($subscribed_orgs);
-		}
-		if (to_remove.length) {
-			to_remove.forEach(function (id) {
-				var $organization_item = $subscribed_orgs.find('.organization_item[data-organization_id="' + id + '"]').removeClass('-show');
-				setTimeout(function () {
-					$organization_item.remove();
-				}, 500);
-			});
-		}
-	};
-
-	return Sidebar;
-}());
-/**
- * @requires Class.AbstractSidebar.js
- */
-/**
- * @class
- * @extends AbstractSidebar
- */
-SidebarNoAuth = extending(AbstractSidebar, function () {
-	/**
-  *
-  * @constructor
-  * @constructs SidebarNoAuth
-  */
-	function SidebarNoAuth() {
-		AbstractSidebar.call(this);
-	}
-
-	SidebarNoAuth.prototype.init = function () {
-		this.$sidebar.find('.SidebarOrganizationsScroll').addClass(__C.CLASSES.HIDDEN);
-		AbstractSidebar.prototype.init.call(this);
-	};
-
-	return SidebarNoAuth;
-}());
-/**
  * @class ReactActionButton
  * @extends React.Component
  *
@@ -18094,24 +18077,24 @@ var ReactActionButton = function (_React$Component11) {
 	function ReactActionButton(props, context) {
 		_classCallCheck(this, ReactActionButton);
 
-		var _this58 = _possibleConstructorReturn(this, (ReactActionButton.__proto__ || Object.getPrototypeOf(ReactActionButton)).call(this, props, context));
+		var _this57 = _possibleConstructorReturn(this, (ReactActionButton.__proto__ || Object.getPrototypeOf(ReactActionButton)).call(this, props, context));
 
-		_this58.state = {
+		_this57.state = {
 			is_checked: props.isChecked,
 			is_hovered: false
 		};
 
-		_this58.labels = props.labels === null ? ReactActionButton.DEFAULTS.labels : _extends({}, _this58.constructor.DEFAULTS.labels, props.labels);
-		_this58.colors = props.colors === null ? ReactActionButton.DEFAULTS.colors : _extends({}, _this58.constructor.DEFAULTS.colors, props.colors);
-		_this58.icons = props.icons === null ? ReactActionButton.DEFAULTS.icons : _extends({}, _this58.constructor.DEFAULTS.icons, props.icons);
+		_this57.labels = props.labels === null ? ReactActionButton.DEFAULTS.labels : _extends({}, _this57.constructor.DEFAULTS.labels, props.labels);
+		_this57.colors = props.colors === null ? ReactActionButton.DEFAULTS.colors : _extends({}, _this57.constructor.DEFAULTS.colors, props.colors);
+		_this57.icons = props.icons === null ? ReactActionButton.DEFAULTS.icons : _extends({}, _this57.constructor.DEFAULTS.icons, props.icons);
 
-		_this58.mouseHoverHandler = _this58.mouseHoverHandler.bind(_this58);
-		_this58.mouseLeaveHandler = _this58.mouseLeaveHandler.bind(_this58);
-		_this58.checkedStateChange = _this58.checkedStateChange.bind(_this58);
-		_this58.onClickHandler = _this58.onClickHandler.bind(_this58);
-		_this58.clickAction = _this58.clickAction.bind(_this58);
+		_this57.mouseHoverHandler = _this57.mouseHoverHandler.bind(_this57);
+		_this57.mouseLeaveHandler = _this57.mouseLeaveHandler.bind(_this57);
+		_this57.checkedStateChange = _this57.checkedStateChange.bind(_this57);
+		_this57.onClickHandler = _this57.onClickHandler.bind(_this57);
+		_this57.clickAction = _this57.clickAction.bind(_this57);
 
-		Object.defineProperties(_this58, {
+		Object.defineProperties(_this57, {
 			classes: {
 				get: function get() {
 					var classes = new HtmlClassesArray(this.props.className);
@@ -18155,7 +18138,7 @@ var ReactActionButton = function (_React$Component11) {
 				}
 			}
 		});
-		return _this58;
+		return _this57;
 	}
 
 	_createClass(ReactActionButton, [{
@@ -18279,13 +18262,13 @@ var ReactAddToFavoriteButton = function (_ReactActionButton) {
 	function ReactAddToFavoriteButton(props, context) {
 		_classCallCheck(this, ReactAddToFavoriteButton);
 
-		var _this59 = _possibleConstructorReturn(this, (ReactAddToFavoriteButton.__proto__ || Object.getPrototypeOf(ReactAddToFavoriteButton)).call(this, props, context));
+		var _this58 = _possibleConstructorReturn(this, (ReactAddToFavoriteButton.__proto__ || Object.getPrototypeOf(ReactAddToFavoriteButton)).call(this, props, context));
 
-		_this59.event = props.event;
+		_this58.event = props.event;
 		if (!isVoid(context[AvatarCollectionContextProvider.CONTEXT_NAME])) {
-			_this59.state.is_checked = context[AvatarCollectionContextProvider.CONTEXT_NAME].isSubscribed;
+			_this58.state.is_checked = context[AvatarCollectionContextProvider.CONTEXT_NAME].isSubscribed;
 		}
-		return _this59;
+		return _this58;
 	}
 
 	_createClass(ReactAddToFavoriteButton, [{
@@ -18309,13 +18292,13 @@ var ReactAddToFavoriteButton = function (_ReactActionButton) {
 	}, {
 		key: 'clickAction',
 		value: function clickAction() {
-			var _this60 = this;
+			var _this59 = this;
 
 			if (this.state.is_checked) {
 
 				return this.event.unfavour().then(function (data) {
-					if (!isVoid(_this60.context[AvatarCollectionContextProvider.CONTEXT_NAME])) {
-						_this60.context[AvatarCollectionContextProvider.CONTEXT_NAME].unsubscribe();
+					if (!isVoid(_this59.context[AvatarCollectionContextProvider.CONTEXT_NAME])) {
+						_this59.context[AvatarCollectionContextProvider.CONTEXT_NAME].unsubscribe();
 					}
 
 					return data;
@@ -18323,8 +18306,8 @@ var ReactAddToFavoriteButton = function (_ReactActionButton) {
 			} else {
 
 				return this.event.favour().then(function (data) {
-					if (!isVoid(_this60.context[AvatarCollectionContextProvider.CONTEXT_NAME])) {
-						_this60.context[AvatarCollectionContextProvider.CONTEXT_NAME].subscribe();
+					if (!isVoid(_this59.context[AvatarCollectionContextProvider.CONTEXT_NAME])) {
+						_this59.context[AvatarCollectionContextProvider.CONTEXT_NAME].subscribe();
 					}
 
 					return data;
@@ -18563,20 +18546,20 @@ var EventNetworkingMyProfilePage = asyncPage({
 	function EventNetworkingMyProfilePage(props) {
 		_classCallCheck(this, EventNetworkingMyProfilePage);
 
-		var _this63 = _possibleConstructorReturn(this, (EventNetworkingMyProfilePage.__proto__ || Object.getPrototypeOf(EventNetworkingMyProfilePage)).call(this, props));
+		var _this62 = _possibleConstructorReturn(this, (EventNetworkingMyProfilePage.__proto__ || Object.getPrototypeOf(EventNetworkingMyProfilePage)).call(this, props));
 
-		_this63.state = {
+		_this62.state = {
 			redirect_to: null
 		};
 
-		_this63.saveHandler = _this63.saveHandler.bind(_this63);
-		return _this63;
+		_this62.saveHandler = _this62.saveHandler.bind(_this62);
+		return _this62;
 	}
 
 	_createClass(EventNetworkingMyProfilePage, [{
 		key: 'saveHandler',
 		value: function saveHandler() {
-			var _this64 = this;
+			var _this63 = this;
 
 			this.props.my_profile.update({
 				first_name: this.refs.first_name.value,
@@ -18591,9 +18574,9 @@ var EventNetworkingMyProfilePage = asyncPage({
 				instagram_url: this.refs.instagram_url.value,
 				github_url: this.refs.github_url.value
 			}).then(function (data) {
-				_this64.props.my_profile.signed_up = true;
-				_this64.setState({
-					redirect_to: _this64.props.match.url.replace('profile', 'participants')
+				_this63.props.my_profile.signed_up = true;
+				_this63.setState({
+					redirect_to: _this63.props.match.url.replace('profile', 'participants')
 				});
 
 				return data;
@@ -18828,7 +18811,7 @@ var EventNetworkingPage = asyncPage({
 	_createClass(EventNetworkingPage, [{
 		key: 'render',
 		value: function render() {
-			var _this66 = this;
+			var _this65 = this;
 
 			var _ReactRouter2 = ReactRouter,
 			    Switch = _ReactRouter2.Switch,
@@ -18848,7 +18831,7 @@ var EventNetworkingPage = asyncPage({
 				React.createElement(Route, { exact: true, path: '/event/:event_id/networking/requests', component: EventNetworkingRequestsPage }),
 				React.createElement(Route, { exact: true, path: '/event/:event_id/networking/contacts', component: EventNetworkingContactsPage }),
 				React.createElement(Route, { exact: true, path: '/event/:event_id/networking/profile', component: function component(props) {
-						return React.createElement(EventNetworkingMyProfilePage, _extends({}, props, { myProfile: _this66.props.my_profile }));
+						return React.createElement(EventNetworkingMyProfilePage, _extends({}, props, { myProfile: _this65.props.my_profile }));
 					} }),
 				React.createElement(Redirect, { strict: true, from: '/event/:event_id/networking', to: this.props.match.url + '/participants' })
 			);
@@ -18929,18 +18912,18 @@ var EventNetworkingParticipantsPage = asyncPage({
 	function EventNetworkingParticipantsPage(props) {
 		_classCallCheck(this, EventNetworkingParticipantsPage);
 
-		var _this67 = _possibleConstructorReturn(this, (EventNetworkingParticipantsPage.__proto__ || Object.getPrototypeOf(EventNetworkingParticipantsPage)).call(this, props));
+		var _this66 = _possibleConstructorReturn(this, (EventNetworkingParticipantsPage.__proto__ || Object.getPrototypeOf(EventNetworkingParticipantsPage)).call(this, props));
 
-		_this67.state = {
+		_this66.state = {
 			is_fetching: false,
 			current_modal: null,
 			modal_props: null
 		};
 
-		_this67.disable_upload = false;
+		_this66.disable_upload = false;
 
-		_this67.hideModal = _this67.hideModal.bind(_this67);
-		return _this67;
+		_this66.hideModal = _this66.hideModal.bind(_this66);
+		return _this66;
 	}
 
 	_createClass(EventNetworkingParticipantsPage, [{
@@ -18963,7 +18946,7 @@ var EventNetworkingParticipantsPage = asyncPage({
 	}, {
 		key: 'bindScrollEvents',
 		value: function bindScrollEvents() {
-			var _this68 = this;
+			var _this67 = this;
 
 			var $window = $(window);
 
@@ -18975,14 +18958,14 @@ var EventNetworkingParticipantsPage = asyncPage({
 
 			$window.on('scroll.uploadEntities', function () {
 				if (isScrollRemain(1000)) {
-					_this68.uploadEntities();
+					_this67.uploadEntities();
 				}
 			});
 		}
 	}, {
 		key: 'uploadEntities',
 		value: function uploadEntities() {
-			var _this69 = this;
+			var _this68 = this;
 
 			if (!this.disable_upload) {
 				this.disable_upload = true;
@@ -18991,9 +18974,9 @@ var EventNetworkingParticipantsPage = asyncPage({
 				});
 				this.props.profiles.fetch(this.props.profiles_fields).then(function (data) {
 					if (data.length) {
-						_this69.disable_upload = false;
+						_this68.disable_upload = false;
 					}
-					_this69.setState({
+					_this68.setState({
 						is_fetching: false
 					});
 
@@ -19012,7 +18995,7 @@ var EventNetworkingParticipantsPage = asyncPage({
 	}, {
 		key: 'render',
 		value: function render() {
-			var _this70 = this;
+			var _this69 = this;
 
 			var CurrentModal = this.state.current_modal;
 
@@ -19069,7 +19052,7 @@ var EventNetworkingParticipantsPage = asyncPage({
 								Action,
 								{
 									onClick: function onClick(e) {
-										_this70.setState({
+										_this69.setState({
 											current_modal: CreateNetworkingRequestModal,
 											modal_props: { profile: profile }
 										});
@@ -19121,20 +19104,20 @@ var EventNetworkingRequestsPage = asyncPage({
 	function EventNetworkingRequestsPage(props) {
 		_classCallCheck(this, EventNetworkingRequestsPage);
 
-		var _this71 = _possibleConstructorReturn(this, (EventNetworkingRequestsPage.__proto__ || Object.getPrototypeOf(EventNetworkingRequestsPage)).call(this, props));
+		var _this70 = _possibleConstructorReturn(this, (EventNetworkingRequestsPage.__proto__ || Object.getPrototypeOf(EventNetworkingRequestsPage)).call(this, props));
 
-		_this71.state = {
+		_this70.state = {
 			pending: props.pending_requests_profiles.length,
 			accepted: props.accepted_requests_profiles.length,
 			rejected: props.rejected_requests_profiles.length
 		};
-		return _this71;
+		return _this70;
 	}
 
 	_createClass(EventNetworkingRequestsPage, [{
 		key: 'render',
 		value: function render() {
-			var _this72 = this;
+			var _this71 = this;
 
 			var _props9 = this.props,
 			    pending_requests_profiles = _props9.pending_requests_profiles,
@@ -19203,7 +19186,7 @@ var EventNetworkingRequestsPage = asyncPage({
 											onClick: function onClick(e) {
 												profile.request.acceptRequest().then(function (data) {
 													accepted_requests_profiles.push(pending_requests_profiles.pull(profile.user_id));
-													_this72.setState({
+													_this71.setState({
 														pending: pending_requests_profiles.length,
 														accepted: accepted_requests_profiles.length
 													});
@@ -19225,7 +19208,7 @@ var EventNetworkingRequestsPage = asyncPage({
 											onClick: function onClick(e) {
 												profile.request.cancelRequest().then(function (data) {
 													rejected_requests_profiles.push(pending_requests_profiles.pull(profile.user_id));
-													_this72.setState({
+													_this71.setState({
 														pending: pending_requests_profiles.length,
 														rejected: rejected_requests_profiles.length
 													});
@@ -22778,13 +22761,13 @@ SubscriptionsListModal = extending(AbstractListModal, function () {
   * @return {Promise}
   */
 	SubscriptionsListModal.prototype.uploadEntities = function () {
-		var _this73 = this;
+		var _this72 = this;
 
 		return this.entity.fetchSubscriptions({ length: 20 }).then(function (organizations) {
 			if (organizations.length) {
-				_this73.content.append(_this73.buildEntities(organizations));
+				_this72.content.append(_this72.buildEntities(organizations));
 			} else {
-				_this73.is_upload_disabled = true;
+				_this72.is_upload_disabled = true;
 			}
 		});
 	};
@@ -24644,91 +24627,6 @@ AdminOrganizationsPage = extending(AdminPage, function () {
 	};
 
 	return AdminOrganizationsPage;
-}());
-/**
- * @requires ../Class.Page.js
- */
-/**
- *
- * @class OnboardingPage
- * @extends Page
- */
-OnboardingPage = extending(Page, function () {
-	/**
-  *
-  * @constructor
-  * @constructs OnboardingPage
-  */
-	function OnboardingPage() {
-		Page.apply(this, arguments);
-		this.ajax_data = {
-			length: 30,
-			offset: 0,
-			fields: 'img_small_url'
-		};
-		this.state_name = 'onboarding_page';
-		this.is_upload_disabled = false;
-		this.block_scroll = true;
-	}
-
-	OnboardingPage.prototype.init = function () {
-		bindRippleEffect(this.$wrapper);
-		bindPageLinks(this.$wrapper);
-		this.$wrapper.find('.Link').on('click', function () {
-			if ($(this).is('.SkipOnboarding')) {
-				cookies.setItem('skip_onboarding', 1, moment().add(7, 'd')._d);
-			}
-			__APP.SIDEBAR.updateSubscriptions();
-		});
-	};
-
-	OnboardingPage.prototype.bindSubscriptions = function () {
-		this.$wrapper.find(".OnboardingOrgItem").not('.-Handled_OnboardingOrgItem').on('click', function () {
-			var $this = $(this);
-			if ($this.hasClass(__C.CLASSES.ACTIVE)) {
-				__APP.USER.unsubscribeFromOrganization($this.data("organization_id"));
-			} else {
-				__APP.USER.subscribeToOrganization($this.data("organization_id"));
-			}
-			$this.toggleClass(__C.CLASSES.ACTIVE);
-		}).addClass('-Handled_OnboardingOrgItem');
-	};
-
-	OnboardingPage.prototype.render = function () {
-		var PAGE = this,
-		    $loader = tmpl('loader', {});
-
-		if (__APP.USER.id === -1) {
-			__APP.changeState('/feed/actual', true, true);
-			return null;
-		}
-		function appendRecommendations(organizations) {
-			$loader.detach();
-			if (organizations.length) {
-				PAGE.$wrapper.find(".RecommendationsWrapper").last().append(tmpl("onboarding-recommendation", organizations));
-				PAGE.bindSubscriptions();
-				PAGE.block_scroll = false;
-			} else {
-				PAGE.is_upload_disabled = true;
-			}
-		}
-
-		PAGE.$wrapper.html(tmpl("onboarding-main", {}));
-		PAGE.init();
-		PAGE.$wrapper.find('.RecommendationsWrapper').last().append($loader);
-		OrganizationsCollection.fetchRecommendations(PAGE.ajax_data, appendRecommendations);
-		PAGE.$wrapper.find(".RecommendationsScrollbar").scrollbar({
-			onScroll: function onScroll(y, x) {
-				if (y.scroll == y.maxScroll && !PAGE.is_upload_disabled && !PAGE.block_scroll) {
-					PAGE.block_scroll = true;
-					PAGE.$wrapper.find('.RecommendationsWrapper').last().append($loader);
-					OrganizationsCollection.fetchRecommendations(PAGE.ajax_data, appendRecommendations);
-				}
-			}
-		});
-	};
-
-	return OnboardingPage;
 }());
 /**
  * @requires ../Class.Page.js
@@ -27406,6 +27304,91 @@ EventPage = extending(Page, function () {
  */
 /**
  *
+ * @class OnboardingPage
+ * @extends Page
+ */
+OnboardingPage = extending(Page, function () {
+	/**
+  *
+  * @constructor
+  * @constructs OnboardingPage
+  */
+	function OnboardingPage() {
+		Page.apply(this, arguments);
+		this.ajax_data = {
+			length: 30,
+			offset: 0,
+			fields: 'img_small_url'
+		};
+		this.state_name = 'onboarding_page';
+		this.is_upload_disabled = false;
+		this.block_scroll = true;
+	}
+
+	OnboardingPage.prototype.init = function () {
+		bindRippleEffect(this.$wrapper);
+		bindPageLinks(this.$wrapper);
+		this.$wrapper.find('.Link').on('click', function () {
+			if ($(this).is('.SkipOnboarding')) {
+				cookies.setItem('skip_onboarding', 1, moment().add(7, 'd')._d);
+			}
+			__APP.SIDEBAR.updateSubscriptions();
+		});
+	};
+
+	OnboardingPage.prototype.bindSubscriptions = function () {
+		this.$wrapper.find(".OnboardingOrgItem").not('.-Handled_OnboardingOrgItem').on('click', function () {
+			var $this = $(this);
+			if ($this.hasClass(__C.CLASSES.ACTIVE)) {
+				__APP.USER.unsubscribeFromOrganization($this.data("organization_id"));
+			} else {
+				__APP.USER.subscribeToOrganization($this.data("organization_id"));
+			}
+			$this.toggleClass(__C.CLASSES.ACTIVE);
+		}).addClass('-Handled_OnboardingOrgItem');
+	};
+
+	OnboardingPage.prototype.render = function () {
+		var PAGE = this,
+		    $loader = tmpl('loader', {});
+
+		if (__APP.USER.id === -1) {
+			__APP.changeState('/feed/actual', true, true);
+			return null;
+		}
+		function appendRecommendations(organizations) {
+			$loader.detach();
+			if (organizations.length) {
+				PAGE.$wrapper.find(".RecommendationsWrapper").last().append(tmpl("onboarding-recommendation", organizations));
+				PAGE.bindSubscriptions();
+				PAGE.block_scroll = false;
+			} else {
+				PAGE.is_upload_disabled = true;
+			}
+		}
+
+		PAGE.$wrapper.html(tmpl("onboarding-main", {}));
+		PAGE.init();
+		PAGE.$wrapper.find('.RecommendationsWrapper').last().append($loader);
+		OrganizationsCollection.fetchRecommendations(PAGE.ajax_data, appendRecommendations);
+		PAGE.$wrapper.find(".RecommendationsScrollbar").scrollbar({
+			onScroll: function onScroll(y, x) {
+				if (y.scroll == y.maxScroll && !PAGE.is_upload_disabled && !PAGE.block_scroll) {
+					PAGE.block_scroll = true;
+					PAGE.$wrapper.find('.RecommendationsWrapper').last().append($loader);
+					OrganizationsCollection.fetchRecommendations(PAGE.ajax_data, appendRecommendations);
+				}
+			}
+		});
+	};
+
+	return OnboardingPage;
+}());
+/**
+ * @requires ../Class.Page.js
+ */
+/**
+ *
  * @class OrderPage
  */
 OrderPage = extending(Page, function () {
@@ -28534,6 +28517,171 @@ NotAvailableOrderPage = extending(AbstractFeedbackPage, function () {
  */
 /**
  *
+ * @class SearchPage
+ * @extends Page
+ */
+SearchPage = extending(Page, function () {
+	/**
+  *
+  * @param {string} search
+  * @constructor
+  * @constructs SearchPage
+  */
+	function SearchPage(search) {
+		Page.call(this);
+
+		this.page_title = 'Поиск';
+		this.$search_bar_input = $('#search_bar_input');
+		this.search_string = decodeURIComponent(search);
+		this.events_ajax_data = {
+			length: 10,
+			fields: FeedPage.fields.copy(),
+			order_by: 'nearest_event_date,-first_event_date'
+		};
+		this.organizations_ajax_data = {
+			length: 30,
+			fields: new Fields(['subscribed_count', 'img_small_url'])
+		};
+		this.past_events = false;
+		this.search_results = new SearchResults(this.search_string);
+	}
+	/**
+  *
+  * @param {(OneOrganization|Array<OneOrganization>|OrganizationsCollection)} organizations
+  * @returns {jQuery}
+  */
+	SearchPage.buildOrganizationItems = function (organizations) {
+		return __APP.BUILD.organizationItems(organizations, {
+			block_classes: ['-show'],
+			avatar_classes: ['-size_50x50', '-rounded'],
+			counter_classes: [__C.CLASSES.HIDDEN]
+		});
+	};
+	/**
+  *
+  * @param {(OneEvent|Array<OneEvent>|EventsCollection)} events
+  * @returns {jQuery}
+  */
+	SearchPage.buildEventCards = function (events) {
+		var $events = $();
+		if (events.length == 0) {
+			$events = tmpl('search-no-events', {});
+		} else {
+			events.forEach(function (event) {
+				if (event.nearest_event_date == undefined && !this.past_events) {
+					$events = $events.add(tmpl('divider', { title: 'Прошедшие события' }));
+					this.past_events = true;
+				}
+				$events = $events.add(__APP.BUILD.eventCards(event));
+			});
+		}
+		return $events;
+	};
+
+	SearchPage.prototype.fetchData = function () {
+		return this.fetching_data_defer = this.search_results.fetchEventsAndOrganizations(this.events_ajax_data, this.organizations_ajax_data);
+	};
+
+	SearchPage.prototype.init = function () {
+		var PAGE = this,
+		    $window = $(window),
+		    $organizations_scrollbar;
+
+		function bindFeedEvents($parent) {
+			trimAvatarsCollection($parent);
+			bindRippleEffect($parent);
+			__APP.MODALS.bindCallModal($parent);
+			bindPageLinks($parent);
+
+			$parent.find('.HideEvent').remove();
+		}
+
+		$organizations_scrollbar = this.$wrapper.find('.SearchOrganizationsScrollbar').scrollbar({
+			disableBodyScroll: true,
+			onScroll: function onScroll(y) {
+				if (y.scroll == y.maxScroll) {
+					PAGE.search_results.fetchOrganizations(PAGE.organizations_ajax_data, function (organizations) {
+						if (organizations.length) {
+							$organizations_scrollbar.append(SearchPage.buildOrganizationItems(organizations));
+						} else {
+							$organizations_scrollbar.off('scroll.onScroll');
+						}
+						bindPageLinks($organizations_scrollbar);
+					});
+				}
+			}
+		});
+		$window.off('scroll.upload' + PAGE.constructor.name);
+		$window.on('scroll.upload' + PAGE.constructor.name, function () {
+			if ($window.height() + $window.scrollTop() + 200 >= $(document).height() && !PAGE.block_scroll) {
+				PAGE.block_scroll = true;
+				PAGE.search_results.fetchEvents(PAGE.events_ajax_data, function (events) {
+					var $events;
+					if (events.length) {
+						$events = SearchPage.buildEventCards(PAGE.search_results.events.__last_pushed);
+						PAGE.$wrapper.find('.SearchEvents').append($events);
+						bindFeedEvents($events);
+						PAGE.block_scroll = false;
+					} else {
+						$window.off('scroll.upload' + PAGE.constructor.name);
+					}
+				});
+			}
+		});
+		bindFeedEvents(this.$wrapper);
+	};
+
+	SearchPage.prototype.render = function () {
+		var data = {};
+
+		$('.TopBarOverlay').addClass('-open_search_bar');
+		this.$search_bar_input.val(this.search_string);
+
+		data.events = SearchPage.buildEventCards(this.search_results.events);
+		if (this.search_results.organizations.length == 0) {
+			data.no_organizations = __C.CLASSES.HIDDEN;
+		} else {
+			data.organizations = SearchPage.buildOrganizationItems(this.search_results.organizations);
+		}
+
+		this.$wrapper.append(tmpl('search-wrapper', data));
+		this.init();
+	};
+
+	SearchPage.prototype.destroy = function () {
+		$('.TopBarOverlay').removeClass('-open_search_bar');
+		this.$search_bar_input.val('');
+	};
+
+	return SearchPage;
+}());
+/**
+ * @requires Class.SearchPage.js
+ */
+/**
+ *
+ * @class SearchByTagPage
+ * @extends SearchPage
+ */
+SearchByTagPage = extending(SearchPage, function () {
+	/**
+  *
+  * @constructor
+  * @constructs SearchByTagPage
+  */
+	function SearchByTagPage(search) {
+		SearchPage.call(this, search);
+		this.search_string = '#' + decodeURIComponent(search);
+		this.search_results = new SearchResults(this.search_string);
+	}
+
+	return SearchByTagPage;
+}());
+/**
+ * @requires ../Class.Page.js
+ */
+/**
+ *
  * @class AbstractEditOrganizationPage
  * @extends Page
  */
@@ -29367,171 +29515,6 @@ OrganizationPage = extending(Page, function () {
 	return OrganizationPage;
 }());
 /**
- * @requires ../Class.Page.js
- */
-/**
- *
- * @class SearchPage
- * @extends Page
- */
-SearchPage = extending(Page, function () {
-	/**
-  *
-  * @param {string} search
-  * @constructor
-  * @constructs SearchPage
-  */
-	function SearchPage(search) {
-		Page.call(this);
-
-		this.page_title = 'Поиск';
-		this.$search_bar_input = $('#search_bar_input');
-		this.search_string = decodeURIComponent(search);
-		this.events_ajax_data = {
-			length: 10,
-			fields: FeedPage.fields.copy(),
-			order_by: 'nearest_event_date,-first_event_date'
-		};
-		this.organizations_ajax_data = {
-			length: 30,
-			fields: new Fields(['subscribed_count', 'img_small_url'])
-		};
-		this.past_events = false;
-		this.search_results = new SearchResults(this.search_string);
-	}
-	/**
-  *
-  * @param {(OneOrganization|Array<OneOrganization>|OrganizationsCollection)} organizations
-  * @returns {jQuery}
-  */
-	SearchPage.buildOrganizationItems = function (organizations) {
-		return __APP.BUILD.organizationItems(organizations, {
-			block_classes: ['-show'],
-			avatar_classes: ['-size_50x50', '-rounded'],
-			counter_classes: [__C.CLASSES.HIDDEN]
-		});
-	};
-	/**
-  *
-  * @param {(OneEvent|Array<OneEvent>|EventsCollection)} events
-  * @returns {jQuery}
-  */
-	SearchPage.buildEventCards = function (events) {
-		var $events = $();
-		if (events.length == 0) {
-			$events = tmpl('search-no-events', {});
-		} else {
-			events.forEach(function (event) {
-				if (event.nearest_event_date == undefined && !this.past_events) {
-					$events = $events.add(tmpl('divider', { title: 'Прошедшие события' }));
-					this.past_events = true;
-				}
-				$events = $events.add(__APP.BUILD.eventCards(event));
-			});
-		}
-		return $events;
-	};
-
-	SearchPage.prototype.fetchData = function () {
-		return this.fetching_data_defer = this.search_results.fetchEventsAndOrganizations(this.events_ajax_data, this.organizations_ajax_data);
-	};
-
-	SearchPage.prototype.init = function () {
-		var PAGE = this,
-		    $window = $(window),
-		    $organizations_scrollbar;
-
-		function bindFeedEvents($parent) {
-			trimAvatarsCollection($parent);
-			bindRippleEffect($parent);
-			__APP.MODALS.bindCallModal($parent);
-			bindPageLinks($parent);
-
-			$parent.find('.HideEvent').remove();
-		}
-
-		$organizations_scrollbar = this.$wrapper.find('.SearchOrganizationsScrollbar').scrollbar({
-			disableBodyScroll: true,
-			onScroll: function onScroll(y) {
-				if (y.scroll == y.maxScroll) {
-					PAGE.search_results.fetchOrganizations(PAGE.organizations_ajax_data, function (organizations) {
-						if (organizations.length) {
-							$organizations_scrollbar.append(SearchPage.buildOrganizationItems(organizations));
-						} else {
-							$organizations_scrollbar.off('scroll.onScroll');
-						}
-						bindPageLinks($organizations_scrollbar);
-					});
-				}
-			}
-		});
-		$window.off('scroll.upload' + PAGE.constructor.name);
-		$window.on('scroll.upload' + PAGE.constructor.name, function () {
-			if ($window.height() + $window.scrollTop() + 200 >= $(document).height() && !PAGE.block_scroll) {
-				PAGE.block_scroll = true;
-				PAGE.search_results.fetchEvents(PAGE.events_ajax_data, function (events) {
-					var $events;
-					if (events.length) {
-						$events = SearchPage.buildEventCards(PAGE.search_results.events.__last_pushed);
-						PAGE.$wrapper.find('.SearchEvents').append($events);
-						bindFeedEvents($events);
-						PAGE.block_scroll = false;
-					} else {
-						$window.off('scroll.upload' + PAGE.constructor.name);
-					}
-				});
-			}
-		});
-		bindFeedEvents(this.$wrapper);
-	};
-
-	SearchPage.prototype.render = function () {
-		var data = {};
-
-		$('.TopBarOverlay').addClass('-open_search_bar');
-		this.$search_bar_input.val(this.search_string);
-
-		data.events = SearchPage.buildEventCards(this.search_results.events);
-		if (this.search_results.organizations.length == 0) {
-			data.no_organizations = __C.CLASSES.HIDDEN;
-		} else {
-			data.organizations = SearchPage.buildOrganizationItems(this.search_results.organizations);
-		}
-
-		this.$wrapper.append(tmpl('search-wrapper', data));
-		this.init();
-	};
-
-	SearchPage.prototype.destroy = function () {
-		$('.TopBarOverlay').removeClass('-open_search_bar');
-		this.$search_bar_input.val('');
-	};
-
-	return SearchPage;
-}());
-/**
- * @requires Class.SearchPage.js
- */
-/**
- *
- * @class SearchByTagPage
- * @extends SearchPage
- */
-SearchByTagPage = extending(SearchPage, function () {
-	/**
-  *
-  * @constructor
-  * @constructs SearchByTagPage
-  */
-	function SearchByTagPage(search) {
-		SearchPage.call(this, search);
-		this.search_string = '#' + decodeURIComponent(search);
-		this.search_results = new SearchResults(this.search_string);
-	}
-
-	return SearchByTagPage;
-}());
-/**
  *
  * @class TicketPage
  * @extends Page
@@ -29872,21 +29855,21 @@ var OldUserPage = function (_Page) {
   * @constructs OldUserPage
   */
 	function OldUserPage(user_id) {
-		var _this74$disable_uploa, _this74$block_scroll;
+		var _this73$disable_uploa, _this73$block_scroll;
 
 		_classCallCheck(this, OldUserPage);
 
-		var _this74 = _possibleConstructorReturn(this, (OldUserPage.__proto__ || Object.getPrototypeOf(OldUserPage)).call(this));
+		var _this73 = _possibleConstructorReturn(this, (OldUserPage.__proto__ || Object.getPrototypeOf(OldUserPage)).call(this));
 
-		_this74.user_id = user_id;
-		_this74.user = new OneUser(user_id);
-		_this74.events_metadata = { last_date: '' };
+		_this73.user_id = user_id;
+		_this73.user = new OneUser(user_id);
+		_this73.events_metadata = { last_date: '' };
 
-		_this74.disable_uploads = (_this74$disable_uploa = {}, _defineProperty(_this74$disable_uploa, __C.ENTITIES.EVENT, false), _defineProperty(_this74$disable_uploa, __C.ENTITIES.ACTIVITY, false), _this74$disable_uploa);
-		_this74.block_scroll = (_this74$block_scroll = {}, _defineProperty(_this74$block_scroll, __C.ENTITIES.EVENT, false), _defineProperty(_this74$block_scroll, __C.ENTITIES.ACTIVITY, false), _this74$block_scroll);
+		_this73.disable_uploads = (_this73$disable_uploa = {}, _defineProperty(_this73$disable_uploa, __C.ENTITIES.EVENT, false), _defineProperty(_this73$disable_uploa, __C.ENTITIES.ACTIVITY, false), _this73$disable_uploa);
+		_this73.block_scroll = (_this73$block_scroll = {}, _defineProperty(_this73$block_scroll, __C.ENTITIES.EVENT, false), _defineProperty(_this73$block_scroll, __C.ENTITIES.ACTIVITY, false), _this73$block_scroll);
 
-		_this74.active_tab = __C.ENTITIES.EVENT;
-		_this74.favored_fetch_data = {
+		_this73.active_tab = __C.ENTITIES.EVENT;
+		_this73.favored_fetch_data = {
 			fields: new Fields('image_horizontal_medium_url', 'favored_users_count', 'is_favorite', 'is_registered', 'registration_locally', 'registration_available', 'ticketing_locally', 'ticketing_available', 'dates', {
 				favored: {
 					length: 5
@@ -29895,11 +29878,11 @@ var OldUserPage = function (_Page) {
 			order_by: 'nearest_event_date,-first_event_date',
 			length: 10
 		};
-		_this74.pageTitle = function () {
+		_this73.pageTitle = function () {
 
-			return _this74.user.full_name;
+			return _this73.user.full_name;
 		};
-		return _this74;
+		return _this73;
 	}
 
 	_createClass(OldUserPage, [{
@@ -29948,10 +29931,10 @@ var OldUserPage = function (_Page) {
 	}, {
 		key: 'buildActivities',
 		value: function buildActivities(activities) {
-			var _this75 = this;
+			var _this74 = this;
 
 			return __APP.BUILD.activity(activities.map(function (activity) {
-				activity.user = _this75.user;
+				activity.user = _this74.user;
 
 				return activity;
 			}));
@@ -29973,7 +29956,7 @@ var OldUserPage = function (_Page) {
    * @returns {Promise}
    */
 		value: function uploadEntities(type) {
-			var _this76 = this;
+			var _this75 = this;
 
 			var is_upload_disabled = this.disable_uploads[type],
 			    is_scroll_blocked = this.block_scroll[type];
@@ -30005,7 +29988,7 @@ var OldUserPage = function (_Page) {
 				$loader = __APP.BUILD.loaderBlock($wrapper);
 
 				return fetch_promise.then(function (entities) {
-					_this76.block_scroll[type] = false;
+					_this75.block_scroll[type] = false;
 					$loader.remove();
 
 					if (entities.length) {
@@ -30015,11 +29998,11 @@ var OldUserPage = function (_Page) {
 							case __C.ENTITIES.EVENT:
 								{
 
-									return _this76.page_component.favored_events.appendEvents(entities);
+									return _this75.page_component.favored_events.appendEvents(entities);
 								}
 							case __C.ENTITIES.ACTIVITY:
 								{
-									$entities = _this76.buildActivities(entities);
+									$entities = _this75.buildActivities(entities);
 									break;
 								}
 						}
@@ -30029,7 +30012,7 @@ var OldUserPage = function (_Page) {
 					} else {
 						if (!$wrapper.children().length) {
 							$wrapper.append(__APP.BUILD.cap('Активности нет'));
-							_this76.disable_uploads[type] = true;
+							_this75.disable_uploads[type] = true;
 						}
 					}
 				});
@@ -30055,7 +30038,7 @@ var OldUserPage = function (_Page) {
 	}, {
 		key: 'init',
 		value: function init() {
-			var _this77 = this;
+			var _this76 = this;
 
 			var $wrapper = this.$wrapper;
 
@@ -30064,15 +30047,15 @@ var OldUserPage = function (_Page) {
 			OldUserPage.bindEvents($wrapper);
 
 			$wrapper.find('.Tabs').on('tabs:change', function () {
-				_this77.active_tab = $wrapper.find('.TabsBody').filter('.' + __C.CLASSES.ACTIVE).data('tab_body_type');
-				_this77.bindScrollEvents();
+				_this76.active_tab = $wrapper.find('.TabsBody').filter('.' + __C.CLASSES.ACTIVE).data('tab_body_type');
+				_this76.bindScrollEvents();
 			});
 		}
 	}, {
 		key: 'bindScrollEvents',
 		value: function bindScrollEvents() {
 			var _event_names,
-			    _this78 = this;
+			    _this77 = this;
 
 			var $window = $(window),
 			    event_names = (_event_names = {}, _defineProperty(_event_names, __C.ENTITIES.EVENT, 'scroll.uploadEvents'), _defineProperty(_event_names, __C.ENTITIES.ACTIVITY, 'scroll.uploadActivities'), _event_names);
@@ -30089,9 +30072,9 @@ var OldUserPage = function (_Page) {
 						}
 
 						return new Promise(function (resolve) {
-							$window.on(event_names[_this78.active_tab], function () {
+							$window.on(event_names[_this77.active_tab], function () {
 								if (isScrollRemain(1000)) {
-									resolve(_this78.uploadEntities(_this78.active_tab));
+									resolve(_this77.uploadEntities(_this77.active_tab));
 								}
 							});
 						});
@@ -30106,7 +30089,7 @@ var OldUserPage = function (_Page) {
 	}, {
 		key: 'render',
 		value: function render() {
-			var _this79 = this;
+			var _this78 = this;
 
 			var user = this.user,
 			    is_another_user = this instanceof OldMyProfilePage === false,
@@ -30145,7 +30128,7 @@ var OldUserPage = function (_Page) {
 
 			if (promises.length) {
 				Promise.race(promises).then(function () {
-					_this79.bindScrollEvents();
+					_this78.bindScrollEvents();
 				});
 			} else {
 				this.bindScrollEvents();
@@ -30253,7 +30236,7 @@ var OldUserPage = function (_Page) {
 	}, {
 		key: 'PageComponent',
 		value: function PageComponent(_ref34) {
-			var _this80 = this;
+			var _this79 = this;
 
 			var user = _ref34.user;
 			var SidebarWrapper = OldUserPage.SidebarWrapper,
@@ -30327,7 +30310,7 @@ var OldUserPage = function (_Page) {
 							'div',
 							{ className: 'tab_body TabsBody -active', 'data-tab_body_type': 'event' },
 							React.createElement(EventBlocks, { ref: function ref(component) {
-									return _this80.favored_events = component;
+									return _this79.favored_events = component;
 								}, events: user.favored })
 						)
 					)
@@ -30349,12 +30332,12 @@ var OldMyProfilePage = function (_OldUserPage) {
 	function OldMyProfilePage() {
 		_classCallCheck(this, OldMyProfilePage);
 
-		var _this81 = _possibleConstructorReturn(this, (OldMyProfilePage.__proto__ || Object.getPrototypeOf(OldMyProfilePage)).call(this, __APP.USER.id));
+		var _this80 = _possibleConstructorReturn(this, (OldMyProfilePage.__proto__ || Object.getPrototypeOf(OldMyProfilePage)).call(this, __APP.USER.id));
 
-		_this81.favored_fetch_data.fields.push('is_favorite');
-		_this81.user = __APP.USER;
-		_this81.page_title = 'Мой профиль';
-		return _this81;
+		_this80.favored_fetch_data.fields.push('is_favorite');
+		_this80.user = __APP.USER;
+		_this80.page_title = 'Мой профиль';
+		return _this80;
 	}
 
 	_createClass(OldMyProfilePage, [{
@@ -34318,14 +34301,14 @@ var EvendateApplication = function (_AbstractEvendateAppl) {
 	function EvendateApplication() {
 		_classCallCheck(this, EvendateApplication);
 
-		var _this82 = _possibleConstructorReturn(this, (EvendateApplication.__proto__ || Object.getPrototypeOf(EvendateApplication)).call(this));
+		var _this81 = _possibleConstructorReturn(this, (EvendateApplication.__proto__ || Object.getPrototypeOf(EvendateApplication)).call(this));
 
-		_this82.EXPORT = new ServerExports();
-		_this82.TOP_BAR = new AbstractTopBar();
-		_this82.SIDEBAR = new AbstractSidebar();
-		_this82.IS_WIDGET = false;
-		_this82.POST_MESSAGE = new AppPostMessageConnection(window);
-		_this82.ROUTING = {
+		_this81.EXPORT = new ServerExports();
+		_this81.TOP_BAR = new AbstractTopBar();
+		_this81.SIDEBAR = new AbstractSidebar();
+		_this81.IS_WIDGET = false;
+		_this81.POST_MESSAGE = new AppPostMessageConnection(window);
+		_this81.ROUTING = {
 			'admin': {
 				'organization': {
 					'^([0-9]+)': {
@@ -34461,7 +34444,7 @@ var EvendateApplication = function (_AbstractEvendateAppl) {
 			},
 			'': ActualEventsPage
 		};
-		return _this82;
+		return _this81;
 	}
 	/**
   *
@@ -34474,13 +34457,13 @@ var EvendateApplication = function (_AbstractEvendateAppl) {
 	_createClass(EvendateApplication, [{
 		key: 'repaint',
 		value: function repaint(colors) {
-			var _this83 = this;
+			var _this82 = this;
 
 			AbstractEvendateApplication.prototype.repaint.call(this, colors);
 
 			if (colors.header) {
 				(function (hex) {
-					var main_header_style = _this83.TOP_BAR.$main_header.get(0).style,
+					var main_header_style = _this82.TOP_BAR.$main_header.get(0).style,
 					    contrast_hex = getContrastColor(hex);
 
 					main_header_style.setProperty('--color_primary', hex);
