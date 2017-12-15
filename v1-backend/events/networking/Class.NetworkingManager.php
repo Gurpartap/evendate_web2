@@ -63,6 +63,7 @@ class NetworkingManager
 				'status' => true
 			))
 			->onConflictUpdate(array('event_id', 'user_id'), array('status' => true));
+		$this->db->prepareExecute($q_ins_access);
 
 		return true;
 	}
