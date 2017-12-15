@@ -554,25 +554,26 @@ class HtmlClassesArray extends Array {
 	}
 }
 
-
-+function(PropTypes) {
-	const momentChecker = (isRequired, props, propName, componentName) => {
-		if (props[propName].constructor && props[propName].constructor.name !== 'Moment') {
-			const err = `Invalid prop '${propName}' supplied to '${componentName}'. Validation failed.`;
-			
-			if (isRequired) {
+if (window.PropTypes) {
+	+function(PropTypes) {
+		const momentChecker = (isRequired, props, propName, componentName) => {
+			if (props[propName].constructor && props[propName].constructor.name !== 'Moment') {
+				const err = `Invalid prop '${propName}' supplied to '${componentName}'. Validation failed.`;
 				
-				return new Error(err);
-			} {
-				console.warn(err);
+				if (isRequired) {
+					
+					return new Error(err);
+				} {
+					console.warn(err);
+				}
 			}
-		}
-	};
-	
-	
-	PropTypes.moment = momentChecker.bind(null, false);
-	PropTypes.moment.isRequired = momentChecker.bind(null, true);
-}(PropTypes);
+		};
+		
+		
+		PropTypes.moment = momentChecker.bind(null, false);
+		PropTypes.moment.isRequired = momentChecker.bind(null, true);
+	}(PropTypes);
+}
 
 classEscalation(Array, function() {
 	/**
