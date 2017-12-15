@@ -36,7 +36,7 @@ EditOrganizationPage = extending(AbstractEditOrganizationPage, (function() {
 			additional_fields;
 		
 		if (this.organization.role === OneUser.ROLE.USER) {
-			debugger;
+			
 			return __APP.changeState('/', true, true);
 		}
 		
