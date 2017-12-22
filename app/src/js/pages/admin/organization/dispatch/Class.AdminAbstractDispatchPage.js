@@ -121,7 +121,16 @@ AdminAbstractDispatchPage = extending(AdminPage, (function() {
 		});
 		
 		bindControlSwitch(this.$wrapper);
-		initWysiwyg(this.$wrapper);
+		initWysiwyg(this.$wrapper, {
+            btnsDef: {
+                dropdownButtonName: {
+                    dropdown: ['Фамилия', 'Имя'],
+                    title: 'Добавить персонализацию',
+                    ico: 'iconName',
+                    hasIcon: екгу
+                }
+            }
+        });
 	};
 	
 	

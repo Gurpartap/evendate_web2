@@ -1,22 +1,4 @@
-var _extends = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; };
-
-var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
-
-var _slicedToArray = function () { function sliceIterator(arr, i) { var _arr = []; var _n = true; var _d = false; var _e = undefined; try { for (var _i = arr[Symbol.iterator](), _s; !(_n = (_s = _i.next()).done); _n = true) { _arr.push(_s.value); if (i && _arr.length === i) break; } } catch (err) { _d = true; _e = err; } finally { try { if (!_n && _i["return"]) _i["return"](); } finally { if (_d) throw _e; } } return _arr; } return function (arr, i) { if (Array.isArray(arr)) { return arr; } else if (Symbol.iterator in Object(arr)) { return sliceIterator(arr, i); } else { throw new TypeError("Invalid attempt to destructure non-iterable instance"); } }; }();
-
-var _values2, _values3, _values4, _values5, _values6, _UserActivity$AVATAR_, _UserActivity$ACTION_, _labels, _colors, _icons, _labels2, _colors2, _icons2;
-
 var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) { return typeof obj; } : function (obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; };
-
-function _objectWithoutProperties(obj, keys) { var target = {}; for (var i in obj) { if (keys.indexOf(i) >= 0) continue; if (!Object.prototype.hasOwnProperty.call(obj, i)) continue; target[i] = obj[i]; } return target; }
-
-function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
-
-function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
-
-function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
-
-function _toConsumableArray(arr) { if (Array.isArray(arr)) { for (var i = 0, arr2 = Array(arr.length); i < arr.length; i++) { arr2[i] = arr[i]; } return arr2; } else { return Array.from(arr); } }
 
 function _defineProperty(obj, key, value) { if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
 
@@ -30,225 +12,226 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
  * @property {Object<string, string>} ENTITIES
  */
 var __C = {
-	API_TOKENS: {
-		DADATA: '7f2a3dad57bdaefebcb6e26ef7600b62b9658467'
-	},
-	CLASSES: {
-		MATERIAL: 'material',
-		FLOATING_MATERIAL: 'material -floating_material',
-		IMG_HOLDER: 'img_holder',
-		COMPONENT: {
-			LINK: 'link',
-			ACTION: 'action',
-			BUTTON: 'button'
-		},
-		TEXT_COLORS: {
-			ACCENT: '-text_color_accent',
-			FRANKLIN: '-text_color_franklin',
-			MUTED_80: '-text_color_primary_80',
-			MUTED_50: '-text_color_primary_50'
-		},
-		TEXT_WEIGHT: {
-			BOLD: '-font_weight_bold',
-			BOLDER: '-font_weight_bolder',
-			LIGHTER: '-font_weight_lighter'
-		},
-		COLORS: {
-			ACCENT: '-color_accent',
-			FRANKLIN: '-color_franklin',
-			BUBBLEGUM: '-color_bubblegum',
-			PRIMARY: '-color_primary',
-			DEFAULT: '-color_default',
-			NEUTRAL: '-color_neutral',
-			NEUTRAL_ACCENT: '-color_neutral_accent',
-			MUTED: '-color_muted',
-			MARGINAL: '-color_marginal',
-			MARGINAL_ACCENT: '-color_marginal_accent',
-			MARGINAL_PRIMARY: '-color_marginal_primary',
-			MARGINAL_FRANKLIN: '-color_marginal_franklin',
-			MARGINAL_BUBBLEGUM: '-color_marginal_bubble_gum',
+    API_TOKENS: {
+        DADATA: '7f2a3dad57bdaefebcb6e26ef7600b62b9658467'
+    },
+    CLASSES: {
+        MATERIAL: 'material',
+        FLOATING_MATERIAL: 'material -floating_material',
+        IMG_HOLDER: 'img_holder',
+        COMPONENT: {
+            LINK: 'link',
+            ACTION: 'action',
+            BUTTON: 'button'
+        },
+        TEXT_COLORS: {
+            ACCENT: '-text_color_accent',
+            FRANKLIN: '-text_color_franklin',
+            MUTED_80: '-text_color_primary_80',
+            MUTED_50: '-text_color_primary_50'
+        },
+        TEXT_WEIGHT: {
+            BOLD: '-font_weight_bold',
+            BOLDER: '-font_weight_bolder',
+            LIGHTER: '-font_weight_lighter'
+        },
+        COLORS: {
+            ACCENT: '-color_accent',
+            FRANKLIN: '-color_franklin',
+            BUBBLEGUM: '-color_bubblegum',
+            PRIMARY: '-color_primary',
+            DEFAULT: '-color_default',
+            NEUTRAL: '-color_neutral',
+            NEUTRAL_ACCENT: '-color_neutral_accent',
+            MUTED: '-color_muted',
+            MARGINAL: '-color_marginal',
+            MARGINAL_ACCENT: '-color_marginal_accent',
+            MARGINAL_PRIMARY: '-color_marginal_primary',
+            MARGINAL_FRANKLIN: '-color_marginal_franklin',
+            MARGINAL_BUBBLEGUM: '-color_marginal_bubble_gum',
 
-			YANDEX: '-color_yandex'
-		},
-		ALIGN: {
-			LEFT: '-align_left',
-			CENTER: '-align_center',
-			RIGHT: '-align_right'
-		},
-		UNIVERSAL_STATES: {
-			CLICKABLE: '-clickable',
-			EMPTY: '-empty',
-			SLIGHTLY_ROUNDED: '-slightly_rounded',
-			ROUNDED: '-rounded',
-			SHADOWED: '-shadowed',
-			BORDERED: '-bordered',
-			UPPERCASE: '-transform_uppercase',
-			NO_UPPERCASE: '-no_uppercase',
-			LINE_THROUGH: '-line_through'
-		},
-		STATUS: {
-			SUCCESS: '-status_success',
-			WARNING: '-status_warning',
-			PENDING: '-status_pending',
-			ERROR: '-status_error',
-			DISABLED: '-status_disabled'
-		},
-		SIZES: {
-			X30: '-size_30x30',
-			X40: '-size_40x40',
-			X50: '-size_50x50',
-			X55: '-size_55x55',
-			HUGE: '-size_huge',
-			BIG: '-size_big',
-			LOW: '-size_low',
-			WIDE: '-size_wide',
-			SMALL: '-size_small'
-		},
-		MODAL_STATES: {
-			FIXED: '-fixed',
-			NO_PADDING: '-no_padding',
-			SIZE: {
-				WIDE: '-size_wide',
-				NARROW: '-size_narrow',
-				TINY: '-size_tiny',
-				RESPONSIVE: '-size_responsive'
-			}
-		},
-		HOOKS: {
-			HANDLED: '-Handled_',
-			RIPPLE: 'RippleEffect',
-			ADD_STAFF: 'AddStaff',
-			ADD_TO_FAVORITES: 'AddToFavorites',
-			TEXT: 'Text',
-			LINK: 'Link',
-			CALL_MODAL: 'CallModal',
-			CLOSE_MODAL: 'CloseModal',
-			DROPDOWN_BUTTON: 'DropdownButton',
-			ADD_AVATAR: {
-				ANCESTOR: 'AddAvatarWrapper',
-				COLLECTION: 'AvatarsCollection',
-				QUANTITY: 'FavoredCount',
-				STATES: {
-					CAST: '-cast',
-					CASTABLE: '-castable',
-					SHIFT: '-shift',
-					SHIFTED: '-shifted'
-				}
-			}
-		},
-		ACTIVE: '-active',
-		DISABLED: '-disabled',
-		HIDDEN: '-hidden',
-		SHOW: '-show',
-		ICONS: {
-			STAR: 'fa-star',
-			STAR_O: 'fa-star-o',
-			BELL: 'fa-bell',
-			BELL_O: 'fa-bell-o',
-			TIMES: 'fa-times',
-			TIMES_CIRCLE: 'fa-times-circle',
-			ENVELOPE: 'fa-envelope',
-			PLUS: 'fa-plus',
-			MINUS: 'fa-minus',
-			CHECK: 'fa-check',
-			PENCIL: 'fa-pencil',
-			EYE: 'fa-eye',
-			EYE_CLOSE: 'fa-eye-slash',
-			TICKET: 'fa-ticket',
-			DOWNLOAD: 'fa-download',
-			USER_PLUS: 'fa-user-plus'
-		},
-		ICON_CLASS: 'fa_icon'
-	},
-	SOCICON_CLASSES: {
-		'vk': 'fa-vk',
-		'google': 'fa-google-plus',
-		'facebook': 'fa-facebook-official'
-	},
-	DATE_FORMAT: 'YYYY-MM-DD',
-	TIME_FORMAT: 'HH:mm',
-	MODAL_TYPES: {
-		FAVORS: 'favors',
-		SUBSCRIBERS: 'subscribers',
-		EDITORS: 'editors',
-		MAP: 'map',
-		MEDIA: 'media',
-		CROPPER: 'cropper',
-		FRIENDS_LIST: 'friends_list',
-		SUBSCRIBERS_LIST: 'subscribers_list',
-		TICKET: 'tickets',
-		ADD_STAFF: 'add_staff'
-	},
-	COLORS: {
-		PRIMARY: '#2e3b50',
-		MUTED: '#3e4d66',
-		MUTED_80: '#657184',
-		MUTED_50: '#9fa6b3',
-		MUTED_30: '#c5c9d1',
-		TEXT: '#4a4a4a',
-		ACCENT: '#f82969',
-		ACCENT_ALT: '#ff5f9e',
-		FRANKLIN: '#28be84',
-		FRANKLIN_ALT: '#23d792'
-	},
-	STATS: {
-		EVENT_VIEW: 'view',
-		EVENT_VIEW_DETAIL: 'view_detail',
-		EVENT_OPEN_SITE: 'open_site',
-		EVENT_OPEN_MAP: 'open_map',
-		ORGANIZATION_OPEN_SITE: 'open_site',
-		EVENT_ENTITY: 'event',
-		ORGANIZATION_ENTITY: 'organization'
-	},
-	/**
-  * @enum {string}
-  */
-	SOCIAL_NETWORKS: {
-		VK: 'vk',
-		TWITTER: 'twitter',
-		GOOGLE: 'google',
-		FACEBOOK: 'facebook'
-	},
+            YANDEX: '-color_yandex'
+        },
+        ALIGN: {
+            LEFT: '-align_left',
+            CENTER: '-align_center',
+            RIGHT: '-align_right'
+        },
+        UNIVERSAL_STATES: {
+            CLICKABLE: '-clickable',
+            EMPTY: '-empty',
+            SLIGHTLY_ROUNDED: '-slightly_rounded',
+            ROUNDED: '-rounded',
+            SHADOWED: '-shadowed',
+            BORDERED: '-bordered',
+            UPPERCASE: '-transform_uppercase',
+            NO_UPPERCASE: '-no_uppercase',
+            LINE_THROUGH: '-line_through'
+        },
+        STATUS: {
+            SUCCESS: '-status_success',
+            WARNING: '-status_warning',
+            PENDING: '-status_pending',
+            ERROR: '-status_error',
+            DISABLED: '-status_disabled'
+        },
+        SIZES: {
+            X30: '-size_30x30',
+            X40: '-size_40x40',
+            X50: '-size_50x50',
+            X55: '-size_55x55',
+            HUGE: '-size_huge',
+            BIG: '-size_big',
+            LOW: '-size_low',
+            WIDE: '-size_wide',
+            SMALL: '-size_small'
+        },
+        MODAL_STATES: {
+            FIXED: '-fixed',
+            NO_PADDING: '-no_padding',
+            SIZE: {
+                WIDE: '-size_wide',
+                NARROW: '-size_narrow',
+                TINY: '-size_tiny',
+                RESPONSIVE: '-size_responsive'
+            }
+        },
+        HOOKS: {
+            HANDLED: '-Handled_',
+            RIPPLE: 'RippleEffect',
+            ADD_STAFF: 'AddStaff',
+            ADD_TO_FAVORITES: 'AddToFavorites',
+            TEXT: 'Text',
+            LINK: 'Link',
+            CALL_MODAL: 'CallModal',
+            CLOSE_MODAL: 'CloseModal',
+            DROPDOWN_BUTTON: 'DropdownButton',
+            ADD_AVATAR: {
+                ANCESTOR: 'AddAvatarWrapper',
+                COLLECTION: 'AvatarsCollection',
+                QUANTITY: 'FavoredCount',
+                STATES: {
+                    CAST: '-cast',
+                    CASTABLE: '-castable',
+                    SHIFT: '-shift',
+                    SHIFTED: '-shifted'
+                }
+            }
+        },
+        ACTIVE: '-active',
+        DISABLED: '-disabled',
+        HIDDEN: '-hidden',
+        SHOW: '-show',
+        ICONS: {
+            STAR: 'fa-star',
+            STAR_O: 'fa-star-o',
+            BELL: 'fa-bell',
+            BELL_O: 'fa-bell-o',
+            TIMES: 'fa-times',
+            TIMES_CIRCLE: 'fa-times-circle',
+            ENVELOPE: 'fa-envelope',
+            PLUS: 'fa-plus',
+            MINUS: 'fa-minus',
+            CHECK: 'fa-check',
+            PENCIL: 'fa-pencil',
+            EYE: 'fa-eye',
+            EYE_CLOSE: 'fa-eye-slash',
+            TICKET: 'fa-ticket',
+            DOWNLOAD: 'fa-download',
+            USER_PLUS: 'fa-user-plus'
+        },
+        ICON_CLASS: 'fa_icon'
+    },
+    SOCICON_CLASSES: {
+        'vk': 'fa-vk',
+        'google': 'fa-google-plus',
+        'facebook': 'fa-facebook-official'
+    },
+    DATE_FORMAT: 'YYYY-MM-DD',
+    TIME_FORMAT: 'HH:mm',
+    MODAL_TYPES: {
+        FAVORS: 'favors',
+        SUBSCRIBERS: 'subscribers',
+        EDITORS: 'editors',
+        MAP: 'map',
+        MEDIA: 'media',
+        CROPPER: 'cropper',
+        FRIENDS_LIST: 'friends_list',
+        SUBSCRIBERS_LIST: 'subscribers_list',
+        TICKET: 'tickets',
+        ADD_STAFF: 'add_staff'
+    },
+    COLORS: {
+        PRIMARY: '#2e3b50',
+        MUTED: '#3e4d66',
+        MUTED_80: '#657184',
+        MUTED_50: '#9fa6b3',
+        MUTED_30: '#c5c9d1',
+        TEXT: '#4a4a4a',
+        ACCENT: '#f82969',
+        ACCENT_ALT: '#ff5f9e',
+        FRANKLIN: '#28be84',
+        FRANKLIN_ALT: '#23d792'
+    },
+    STATS: {
+        EVENT_VIEW: 'view',
+        EVENT_VIEW_DETAIL: 'view_detail',
+        EVENT_OPEN_SITE: 'open_site',
+        EVENT_OPEN_MAP: 'open_map',
+        ORGANIZATION_OPEN_SITE: 'open_site',
+        EVENT_ENTITY: 'event',
+        ORGANIZATION_ENTITY: 'organization'
+    },
+    /**
+     * @enum {string}
+     */
+    SOCIAL_NETWORKS: {
+        VK: 'vk',
+        TWITTER: 'twitter',
+        GOOGLE: 'google',
+        FACEBOOK: 'facebook'
+    },
 
-	SHARE_LINK: {
-		VK: 'https://vk.com/share.php?url={url}&title={title}&image={image_url}&noparse=false',
-		TWITTER: 'https://twitter.com/intent/tweet?url={url}&text={title}&via=evendate&hashtags=evendate',
-		GOOGLE: 'https://plus.google.com/share?url={url}&hl=ru',
-		FACEBOOK: 'https://www.facebook.com/dialog/share?app_id=1692270867652630&display=popup&title={title}&href={url}&redirect_uri={url}image[0][url]={image_url}&image[0][user_generated]=true'
-	},
-	/**
-  * @enum {string}
-  */
-	ENTITIES: {
-		USER: 'user',
-		EVENT: 'event',
-		ORGANIZATION: 'organization',
-		ACTIVITY: 'activity'
-	},
-	/**
-  * @enum {string}
-  */
-	DEFERRED_STATES: {
-		PENDING: 'pending',
-		RESOLVED: 'resolved',
-		REJECTED: 'rejected'
-	},
-	/**
-  * @enum {number}
-  */
-	KEY_CODES: {
-		ENTER: 13,
-		ESC: 27
-	},
+    SHARE_LINK: {
+        VK: 'https://vk.com/share.php?url={url}&title={title}&image={image_url}&noparse=false',
+        TWITTER: 'https://twitter.com/intent/tweet?url={url}&text={title}&via=evendate&hashtags=evendate',
+        GOOGLE: 'https://plus.google.com/share?url={url}&hl=ru',
+        FACEBOOK: 'https://www.facebook.com/dialog/share?app_id=1692270867652630&display=popup&title={title}&href={url}&redirect_uri={url}image[0][url]={image_url}&image[0][user_generated]=true'
+    },
+    /**
+     * @enum {string}
+     */
+    ENTITIES: {
+        USER: 'user',
+        EVENT: 'event',
+        ORGANIZATION: 'organization',
+        ACTIVITY: 'activity'
+    },
+    /**
+     * @enum {string}
+     */
+    DEFERRED_STATES: {
+        PENDING: 'pending',
+        RESOLVED: 'resolved',
+        REJECTED: 'rejected'
+    },
+    /**
+     * @enum {number}
+     */
+    KEY_CODES: {
+        ENTER: 13,
+        ESC: 27
+    },
 
-	MOMENTJS_CALENDAR: {
-		DAY: 'D',
-		MONTH: 'MMMM',
-		YEAR: 'YYYY',
-		DATE_AND_MONTH: 'D MMMM',
-		HOURS_AND_MINUTES: 'HH:mm'
-	}
+    MOMENTJS_CALENDAR: {
+        DAY: 'D',
+        MONTH: 'MMMM',
+        YEAR: 'YYYY',
+        DATE_AND_MONTH: 'D MMMM',
+        HOURS_AND_MINUTES: 'HH:mm'
+    }
 };
+
 /**
  * Extending class
  *
@@ -257,20 +240,21 @@ var __C = {
  * @return {Function}
  */
 function extending() /**...parents, children*/{
-	var children = Array.prototype.pop.call(arguments),
-	    parents = Array.prototype.slice.call(arguments);
+    var children = Array.prototype.pop.call(arguments),
+        parents = Array.prototype.slice.call(arguments);
 
-	parents.forEach(function (parent) {
-		children.prototype = $.extend(Object.create(parent.prototype), children.prototype, Object.getOwnPropertyNames(children.prototype).reduce(function (child_prototype, name) {
-			child_prototype[name] = children.prototype[name];
+    parents.forEach(function (parent) {
+        children.prototype = $.extend(Object.create(parent.prototype), children.prototype, Object.getOwnPropertyNames(children.prototype).reduce(function (child_prototype, name) {
+            child_prototype[name] = children.prototype[name];
 
-			return child_prototype;
-		}, {}));
-	});
-	children.prototype.constructor = children;
+            return child_prototype;
+        }, {}));
+    });
+    children.prototype.constructor = children;
 
-	return children;
+    return children;
 }
+
 /**
  * Extending jQuery object
  *
@@ -278,17 +262,17 @@ function extending() /**...parents, children*/{
  * @return {Function}
  */
 function extendingJQuery(children) {
-	children.prototype = $.extend(Object.create(jQuery.prototype), children.prototype);
-	children.prototype.constructor = children;
+    children.prototype = $.extend(Object.create(jQuery.prototype), children.prototype);
+    children.prototype.constructor = children;
 
-	children.prototype.pushStack = function (elems) {
-		var ret = jQuery.merge(this.get(0) == elems ? new this.constructor() : $(), elems);
-		ret.prevObject = this;
-		ret.context = this.context;
-		return ret;
-	};
+    children.prototype.pushStack = function (elems) {
+        var ret = jQuery.merge(this.get(0) == elems ? new this.constructor() : $(), elems);
+        ret.prevObject = this;
+        ret.context = this.context;
+        return ret;
+    };
 
-	return children;
+    return children;
 }
 
 /**
@@ -299,14 +283,14 @@ function extendingJQuery(children) {
  * @return {void}
  */
 function classEscalation(Class, methods) {
-	methods = isFunction(methods) ? methods() : methods;
+    methods = isFunction(methods) ? methods() : methods;
 
-	return Object.keys(methods).forEach(function (method_name) {
-		Object.defineProperty(Class.prototype, method_name, {
-			value: methods[method_name],
-			configurable: true
-		});
-	});
+    return Object.keys(methods).forEach(function (method_name) {
+        Object.defineProperty(Class.prototype, method_name, {
+            value: methods[method_name],
+            configurable: true
+        });
+    });
 }
 
 /**
@@ -318,19 +302,19 @@ function classEscalation(Class, methods) {
  */
 function isDirectInstance(instance, Class) {
 
-	return instance.constructor === Class;
+    return instance.constructor === Class;
 }
 
 Function.getStaticMethods = function (Class) {
 
-	return Object.getOwnPropertyNames(Class).reduce(function (methods, prop_name) {
-		if (typeof Class[prop_name] === 'function' && prop_name !== prop_name.capitalize()) {
+    return Object.getOwnPropertyNames(Class).reduce(function (methods, prop_name) {
+        if (typeof Class[prop_name] === 'function' && prop_name !== prop_name.capitalize()) {
 
-			return methods.concat(_defineProperty({}, prop_name, Class[prop_name]));
-		}
+            return methods.concat(_defineProperty({}, prop_name, Class[prop_name]));
+        }
 
-		return methods;
-	}, []);
+        return methods;
+    }, []);
 };
 /**
  * Returns capitalized string
@@ -338,7 +322,7 @@ Function.getStaticMethods = function (Class) {
  * @return {string}
  */
 String.prototype.capitalize = function () {
-	return this.charAt(0).toUpperCase() + this.slice(1);
+    return this.charAt(0).toUpperCase() + this.slice(1);
 };
 /**
  * Checks if string contains some substring
@@ -347,7 +331,7 @@ String.prototype.capitalize = function () {
  * @return {boolean}
  */
 String.prototype.contains = function (it) {
-	return this.search(it) !== -1;
+    return this.search(it) !== -1;
 };
 /**
  * Works like printf. Variables must be inside the {braces}. Returns formatted string
@@ -356,9 +340,9 @@ String.prototype.contains = function (it) {
  * @return {string}
  */
 String.prototype.format = function (fields) {
-	return this.replace(/\{(\w+)\}/g, function (m, n) {
-		return fields[n] != null ? fields[n] : '';
-	});
+    return this.replace(/\{(\w+)\}/g, function (m, n) {
+        return fields[n] != null ? fields[n] : '';
+    });
 };
 /**
  * Converts {delimiter}-separated string into CamelCase
@@ -367,9 +351,9 @@ String.prototype.format = function (fields) {
  * @return {string}
  */
 String.prototype.toCamelCase = function (delimiter) {
-	return this.split(delimiter ? delimiter : ' ').map(function (part) {
-		return part.capitalize();
-	}).join('');
+    return this.split(delimiter ? delimiter : ' ').map(function (part) {
+        return part.capitalize();
+    }).join('');
 };
 /**
  * Makes CamelCase to_underscore
@@ -377,9 +361,9 @@ String.prototype.toCamelCase = function (delimiter) {
  * @return {string}
  */
 String.prototype.toUnderscore = function () {
-	return (this.charAt(0).toLowerCase() + this.slice(1)).replace(/([A-Z])/g, function ($1) {
-		return "_" + $1.toLowerCase();
-	});
+    return (this.charAt(0).toLowerCase() + this.slice(1)).replace(/([A-Z])/g, function ($1) {
+        return "_" + $1.toLowerCase();
+    });
 };
 /**
  *
@@ -390,7 +374,7 @@ String.prototype.toUnderscore = function () {
  */
 String.prototype.replaceSeparator = function (current_separator, new_separator) {
 
-	return this.replace(current_separator, new_separator);
+    return this.replace(current_separator, new_separator);
 };
 /**
  * Returns formatted string for fields AJAX data
@@ -398,10 +382,10 @@ String.prototype.replaceSeparator = function (current_separator, new_separator) 
  * @return {string}
  */
 String.prototype.appendAjaxData = function (data) {
-	if (data.fields && data.fields instanceof Array) {
-		data.fields = data.fields.join(',');
-	}
-	return this + JSON.stringify(data);
+    if (data.fields && data.fields instanceof Array) {
+        data.fields = data.fields.join(',');
+    }
+    return this + JSON.stringify(data);
 };
 /**
  * Returns array of objects` own properties
@@ -410,9 +394,9 @@ String.prototype.appendAjaxData = function (data) {
  * @return {Array}
  */
 Object.props = function (obj) {
-	return Object.keys(obj).filter(function (prop) {
-		return typeof obj[prop] !== 'function';
-	});
+    return Object.keys(obj).filter(function (prop) {
+        return typeof obj[prop] !== 'function';
+    });
 };
 /**
  * Returns objects` own properties
@@ -421,13 +405,13 @@ Object.props = function (obj) {
  * @return {object}
  */
 Object.getProps = function (obj) {
-	var props = {};
-	$.each(obj, function (key, value) {
-		if (typeof value !== 'function') {
-			props[key] = value;
-		}
-	});
-	return props;
+    var props = {};
+    $.each(obj, function (key, value) {
+        if (typeof value !== 'function') {
+            props[key] = value;
+        }
+    });
+    return props;
 };
 /**
  * Returns objects` own methods
@@ -436,15 +420,15 @@ Object.getProps = function (obj) {
  * @return {object}
  */
 Object.getMethods = function (obj) {
-	var methods = {};
+    var methods = {};
 
-	$.each(obj, function (key, value) {
-		if (typeof value === 'function') {
-			methods[key] = value;
-		}
-	});
+    $.each(obj, function (key, value) {
+        if (typeof value === 'function') {
+            methods[key] = value;
+        }
+    });
 
-	return methods;
+    return methods;
 };
 /**
  * Returns array of objects` own methods
@@ -453,31 +437,31 @@ Object.getMethods = function (obj) {
  * @return {Array}
  */
 Object.methods = function (obj) {
-	var methods = [];
-	Object.keys(obj).forEach(function (prop) {
-		if (typeof obj[prop] === 'function') {
-			methods.push(prop);
-		}
-	});
-	return methods;
+    var methods = [];
+    Object.keys(obj).forEach(function (prop) {
+        if (typeof obj[prop] === 'function') {
+            methods.push(prop);
+        }
+    });
+    return methods;
 };
 
 if (typeof Object.values !== 'function') {
-	/**
-  * Returns array of objects` own properties` values
-  *
-  * @param {object} obj
-  * @return {Array}
-  */
-	Object.values = function (obj) {
-		var vals = [];
-		for (var key in obj) {
-			if (obj.hasOwnProperty(key) && obj.propertyIsEnumerable(key)) {
-				vals.push(obj[key]);
-			}
-		}
-		return vals;
-	};
+    /**
+     * Returns array of objects` own properties` values
+     *
+     * @param {object} obj
+     * @return {Array}
+     */
+    Object.values = function (obj) {
+        var vals = [];
+        for (var key in obj) {
+            if (obj.hasOwnProperty(key) && obj.propertyIsEnumerable(key)) {
+                vals.push(obj[key]);
+            }
+        }
+        return vals;
+    };
 }
 /**
  * Converts object into string of html data set
@@ -485,12 +469,12 @@ if (typeof Object.values !== 'function') {
  * @return {string}
  */
 Object.toHtmlDataSet = function () {
-	var dataset = [],
-	    obj = this;
-	Object.props(obj).forEach(function (prop) {
-		dataset.push((prop.indexOf('data-') != 0 ? 'data-' + prop : prop) + '="' + obj[prop] + '"');
-	});
-	return dataset.join(' ');
+    var dataset = [],
+        obj = this;
+    Object.props(obj).forEach(function (prop) {
+        dataset.push((prop.indexOf('data-') != 0 ? 'data-' + prop : prop) + '="' + obj[prop] + '"');
+    });
+    return dataset.join(' ');
 };
 /**
  * Converts object into string of html attributes
@@ -498,12 +482,12 @@ Object.toHtmlDataSet = function () {
  * @return {string}
  */
 Object.toHtmlAttributes = function () {
-	var attributes = [],
-	    obj = this;
-	Object.props(obj).forEach(function (prop) {
-		attributes.push(prop + '="' + obj[prop] + '"');
-	});
-	return attributes.join(' ');
+    var attributes = [],
+        obj = this;
+    Object.props(obj).forEach(function (prop) {
+        attributes.push(prop + '="' + obj[prop] + '"');
+    });
+    return attributes.join(' ');
 };
 /**
  * Returns copy of original array and appends additional_values
@@ -513,39 +497,39 @@ Object.toHtmlAttributes = function () {
  * @return {Array}
  */
 Array.newFrom = function (original, additional_values) {
-	var new_array = original.slice(0),
-	    arg,
-	    i;
-	if (arguments.length > 1) {
-		for (i = 1; i < arguments.length; i++) {
-			arg = arguments[i];
-			switch (typeof arg === 'undefined' ? 'undefined' : _typeof(arg)) {
-				case 'number':
-				case 'string':
-				case 'boolean':
-					{
-						$.merge(new_array, [arg]);
-						break;
-					}
-				case 'object':
-					{
-						if (arg instanceof Array) {
-							$.merge(new_array, arg);
-						} else {
-							$.merge(new_array, Object.keys(arg).map(function (key) {
-								return arg[key];
-							}));
-						}
-						break;
-					}
-				default:
-					{
-						console.error('');
-					}
-			}
-		}
-	}
-	return new_array;
+    var new_array = original.slice(0),
+        arg,
+        i;
+    if (arguments.length > 1) {
+        for (i = 1; i < arguments.length; i++) {
+            arg = arguments[i];
+            switch (typeof arg === 'undefined' ? 'undefined' : _typeof(arg)) {
+                case 'number':
+                case 'string':
+                case 'boolean':
+                    {
+                        $.merge(new_array, [arg]);
+                        break;
+                    }
+                case 'object':
+                    {
+                        if (arg instanceof Array) {
+                            $.merge(new_array, arg);
+                        } else {
+                            $.merge(new_array, Object.keys(arg).map(function (key) {
+                                return arg[key];
+                            }));
+                        }
+                        break;
+                    }
+                default:
+                    {
+                        console.error('');
+                    }
+            }
+        }
+    }
+    return new_array;
 };
 /**
  * Returns string of elements, separated by space
@@ -553,148 +537,149 @@ Array.newFrom = function (original, additional_values) {
  * @return {string}
  */
 Array.toSpaceSeparatedString = function () {
-	return this.join(' ');
+    return this.join(' ');
 };
 
 HtmlClassesArray = extending(Array, function () {
-	function HtmlClassesArray(arg) {
-		if (arguments.length > 1) {
-			this.push.apply(this, arguments);
-		} else if (arg instanceof Array) {
-			this.push.apply(this, arg);
-		} else if (typeof arg === 'string') {
-			this.push.apply(this, arg.split(' '));
-		}
-		this.__proto__ = HtmlClassesArray.prototype;
-		this.__proto__.name = 'HtmlClassesArray';
+    function HtmlClassesArray(arg) {
+        if (arguments.length > 1) {
+            this.push.apply(this, arguments);
+        } else if (arg instanceof Array) {
+            this.push.apply(this, arg);
+        } else if (typeof arg === 'string') {
+            this.push.apply(this, arg.split(' '));
+        }
+        this.__proto__ = HtmlClassesArray.prototype;
+        this.__proto__.name = 'HtmlClassesArray';
 
-		return this;
-	}
+        return this;
+    }
 
-	Object.defineProperty(HtmlClassesArray.prototype, 'toString', {
-		value: function value() {
+    Object.defineProperty(HtmlClassesArray.prototype, 'toString', {
+        value: function value() {
 
-			return this.unique().join(' ');
-		}
-	});
+            return this.unique().join(' ');
+        }
+    });
 
-	return HtmlClassesArray;
+    return HtmlClassesArray;
 }());
 
 if (window.PropTypes) {
-	+function (PropTypes) {
-		var momentChecker = function momentChecker(isRequired, props, propName, componentName) {
-			if (props[propName].constructor && props[propName].constructor.name !== 'Moment') {
-				var err = 'Invalid prop \'' + propName + '\' supplied to \'' + componentName + '\'. Validation failed.';
+    +function (PropTypes) {
+        var momentChecker = function momentChecker(isRequired, props, propName, componentName) {
+            if (props[propName].constructor && props[propName].constructor.name !== 'Moment') {
+                var err = 'Invalid prop \'' + propName + '\' supplied to \'' + componentName + '\'. Validation failed.';
 
-				if (isRequired) {
+                if (isRequired) {
 
-					return new Error(err);
-				}{
-					console.warn(err);
-				}
-			}
-		};
+                    return new Error(err);
+                }
+                {
+                    console.warn(err);
+                }
+            }
+        };
 
-		PropTypes.moment = momentChecker.bind(null, false);
-		PropTypes.moment.isRequired = momentChecker.bind(null, true);
-	}(PropTypes);
+        PropTypes.moment = momentChecker.bind(null, false);
+        PropTypes.moment.isRequired = momentChecker.bind(null, true);
+    }(PropTypes);
 }
 
 classEscalation(Array, function () {
-	/**
-  *
-  * @lends Array.prototype
-  */
-	var methods = {
-		/**
-   * Cleans array from specific values. If no delete_value is passed, deletes undefined values,
-   *
-   * @param {*} [delete_value]
-   *
-   * @return {Array}
-   */
-		clean: function clean(delete_value) {
-			for (var i = 0; i < this.length; i++) {
-				if (this[i] == delete_value) {
-					this.splice(i, 1);
-					i--;
-				}
-			}
-			return this;
-		},
-		/**
-   * Merges arrays without duplicates
-   *
-   * @param {...Array} array
-   * @return {Array}
-   */
-		merge: function merge(array) {
-			var args = Array.prototype.slice.call(arguments),
-			    hash = {},
-			    arr = [],
-			    i = 0,
-			    j = 0;
-			args.unshift(this);
-			for (i = 0; i < args.length; i++) {
-				for (j = 0; j < args[i].length; j++) {
-					if (hash[args[i][j]] !== true) {
-						arr[arr.length] = args[i][j];
-						hash[args[i][j]] = true;
-					}
-				}
-			}
-			return arr;
-		},
-		/**
-   * Checks if array contains some element
-   *
-   * @param {*} it
-   * @return {boolean}
-   */
-		contains: function contains(it) {
-			return this.indexOf(it) !== -1;
-		}
-	};
+    /**
+     *
+     * @lends Array.prototype
+     */
+    var methods = {
+        /**
+         * Cleans array from specific values. If no delete_value is passed, deletes undefined values,
+         *
+         * @param {*} [delete_value]
+         *
+         * @return {Array}
+         */
+        clean: function clean(delete_value) {
+            for (var i = 0; i < this.length; i++) {
+                if (this[i] == delete_value) {
+                    this.splice(i, 1);
+                    i--;
+                }
+            }
+            return this;
+        },
+        /**
+         * Merges arrays without duplicates
+         *
+         * @param {...Array} array
+         * @return {Array}
+         */
+        merge: function merge(array) {
+            var args = Array.prototype.slice.call(arguments),
+                hash = {},
+                arr = [],
+                i = 0,
+                j = 0;
+            args.unshift(this);
+            for (i = 0; i < args.length; i++) {
+                for (j = 0; j < args[i].length; j++) {
+                    if (hash[args[i][j]] !== true) {
+                        arr[arr.length] = args[i][j];
+                        hash[args[i][j]] = true;
+                    }
+                }
+            }
+            return arr;
+        },
+        /**
+         * Checks if array contains some element
+         *
+         * @param {*} it
+         * @return {boolean}
+         */
+        contains: function contains(it) {
+            return this.indexOf(it) !== -1;
+        }
+    };
 
-	if (![].includes) {
-		methods.includes = function (searchElement /*, fromIndex*/) {
-			'use strict';
+    if (![].includes) {
+        methods.includes = function (searchElement /*, fromIndex*/) {
+            'use strict';
 
-			var O = Object(this);
-			var len = parseInt(O.length) || 0;
-			if (len === 0) {
-				return false;
-			}
-			var n = parseInt(arguments[1]) || 0;
-			var k;
-			if (n >= 0) {
-				k = n;
-			} else {
-				k = len + n;
-				if (k < 0) {
-					k = 0;
-				}
-			}
-			while (k < len) {
-				var currentElement = O[k];
-				if (searchElement === currentElement || searchElement !== searchElement && currentElement !== currentElement) {
-					return true;
-				}
-				k++;
-			}
-			return false;
-		};
-	}
+            var O = Object(this);
+            var len = parseInt(O.length) || 0;
+            if (len === 0) {
+                return false;
+            }
+            var n = parseInt(arguments[1]) || 0;
+            var k;
+            if (n >= 0) {
+                k = n;
+            } else {
+                k = len + n;
+                if (k < 0) {
+                    k = 0;
+                }
+            }
+            while (k < len) {
+                var currentElement = O[k];
+                if (searchElement === currentElement || searchElement !== searchElement && currentElement !== currentElement) {
+                    return true;
+                }
+                k++;
+            }
+            return false;
+        };
+    }
 
-	if (![].unique) {
-		methods.unique = function () {
+    if (![].unique) {
+        methods.unique = function () {
 
-			return Array.from(new Set(this));
-		};
-	}
+            return Array.from(new Set(this));
+        };
+    }
 
-	return methods;
+    return methods;
 });
 
 /**
@@ -705,324 +690,324 @@ classEscalation(Array, function () {
  * @return {number}
  */
 Math.roundTo = function (num, decimals) {
-	var d = Math.pow(10, decimals ? decimals : 0);
-	return Math.round(num * d) / d;
+    var d = Math.pow(10, decimals ? decimals : 0);
+    return Math.round(num * d) / d;
 };
 
 (function ($) {
-	function handleStep(tween) {
-		var target = $(tween.elem),
-		    defaults = {
-			separator: ' ',
-			group_length: 3,
-			suffix: '',
-			prefix: ''
-		},
-		    options,
-		    floored_number,
-		    separated_number;
-		if (tween.elem.nodeType && tween.elem.parentNode) {
-			var extractNumberParts = function extractNumberParts(separated_number, group_length) {
-				var numbers = separated_number.split('').reverse(),
-				    number_parts = [],
-				    current_number_part,
-				    current_index,
-				    q;
+    function handleStep(tween) {
+        var target = $(tween.elem),
+            defaults = {
+            separator: ' ',
+            group_length: 3,
+            suffix: '',
+            prefix: ''
+        },
+            options,
+            floored_number,
+            separated_number;
+        if (tween.elem.nodeType && tween.elem.parentNode) {
+            var extractNumberParts = function extractNumberParts(separated_number, group_length) {
+                var numbers = separated_number.split('').reverse(),
+                    number_parts = [],
+                    current_number_part,
+                    current_index,
+                    q;
 
-				for (var i = 0, l = Math.ceil(separated_number.length / group_length); i < l; i++) {
-					current_number_part = '';
-					for (q = 0; q < group_length; q++) {
-						current_index = i * group_length + q;
-						if (current_index === separated_number.length) {
-							break;
-						}
+                for (var i = 0, l = Math.ceil(separated_number.length / group_length); i < l; i++) {
+                    current_number_part = '';
+                    for (q = 0; q < group_length; q++) {
+                        current_index = i * group_length + q;
+                        if (current_index === separated_number.length) {
+                            break;
+                        }
 
-						current_number_part = current_number_part + numbers[current_index];
-					}
-					number_parts.push(current_number_part);
-				}
+                        current_number_part = current_number_part + numbers[current_index];
+                    }
+                    number_parts.push(current_number_part);
+                }
 
-				return number_parts;
-			};
+                return number_parts;
+            };
 
-			var removePrecendingZeros = function removePrecendingZeros(number_parts) {
-				var last_index = number_parts.length - 1,
-				    last = number_parts[last_index].split('').reverse().join('');
+            var removePrecendingZeros = function removePrecendingZeros(number_parts) {
+                var last_index = number_parts.length - 1,
+                    last = number_parts[last_index].split('').reverse().join('');
 
-				number_parts[last_index] = parseInt(last, 10).toString().split('').reverse().join('');
-				return number_parts;
-			};
+                number_parts[last_index] = parseInt(last, 10).toString().split('').reverse().join('');
+                return number_parts;
+            };
 
-			options = $.extend(true, {}, defaults, target.data());
-			floored_number = Math.floor(tween.now);
-			separated_number = floored_number.toString();
+            options = $.extend(true, {}, defaults, target.data());
+            floored_number = Math.floor(tween.now);
+            separated_number = floored_number.toString();
 
-			if (separated_number.length > options.group_length) {
-				var number_parts = extractNumberParts(separated_number, options.group_length);
-				separated_number = removePrecendingZeros(number_parts).join(options.separator);
-				separated_number = separated_number.split('').reverse().join('');
-			}
-			target.prop('number', tween.now).text(options.prefix + separated_number + options.suffix);
-		}
-	}
+            if (separated_number.length > options.group_length) {
+                var number_parts = extractNumberParts(separated_number, options.group_length);
+                separated_number = removePrecendingZeros(number_parts).join(options.separator);
+                separated_number = separated_number.split('').reverse().join('');
+            }
+            target.prop('number', tween.now).text(options.prefix + separated_number + options.suffix);
+        }
+    }
 
-	if (!$.Tween || !$.Tween.propHooks) {
-		$.fx.step.number = handleStep;
-	} else {
-		$.Tween.propHooks.number = {
-			set: handleStep
-		};
-	}
+    if (!$.Tween || !$.Tween.propHooks) {
+        $.fx.step.number = handleStep;
+    } else {
+        $.Tween.propHooks.number = {
+            set: handleStep
+        };
+    }
 })(window.jQuery);
 
 $.fn.extend({
-	/**
-  *
-  * @memberOf jQuery#
-  * @param {string} statuses
-  * @return {jQuery}
-  */
-	toggleStatus: function toggleStatus(statuses) {
-		var $this = this;
+    /**
+     *
+     * @memberOf jQuery#
+     * @param {string} statuses
+     * @return {jQuery}
+     */
+    toggleStatus: function toggleStatus(statuses) {
+        var $this = this;
 
-		if ($this.is('.form_unit')) {
-			statuses.split(' ').forEach(function (status) {
-				var $form_elements = $this.find('input, select, textarea, button');
-				if (status === 'disabled') {
-					if ($this.hasClass('-status_disabled')) {
-						$form_elements.removeAttr('disabled');
-					} else {
-						$form_elements.attr('disabled', true);
-					}
-				}
-				$this.toggleClass('-status_' + status);
-			});
-		} else if ($this.is('input, textarea, select, button')) {
-			$this.closest('.form_unit').toggleStatus(statuses);
-		} else if ($this.length) {
-			$this.find('.form_unit').toggleStatus(statuses);
-		}
+        if ($this.is('.form_unit')) {
+            statuses.split(' ').forEach(function (status) {
+                var $form_elements = $this.find('input, select, textarea, button');
+                if (status === 'disabled') {
+                    if ($this.hasClass('-status_disabled')) {
+                        $form_elements.removeAttr('disabled');
+                    } else {
+                        $form_elements.attr('disabled', true);
+                    }
+                }
+                $this.toggleClass('-status_' + status);
+            });
+        } else if ($this.is('input, textarea, select, button')) {
+            $this.closest('.form_unit').toggleStatus(statuses);
+        } else if ($this.length) {
+            $this.find('.form_unit').toggleStatus(statuses);
+        }
 
-		return this;
-	},
+        return this;
+    },
 
-	/**
-  * Сбор данных с формы
-  * Метод возвращает javaScript объект, состоящий из атрибутов name и value элементов формы.
-  * Если output_type стоит на array, то возвращается массив из объектов с полями name и value (аналогично с serializeArray).
-  *
-  * @memberOf jQuery#
-  * @param {string} [output_type=object]
-  * @returns {(Array|Object)}
-  */
-	serializeForm: function serializeForm(output_type) {
-		var zb = /^(?:input|select|textarea|keygen)/i,
-		    yb = /^(?:submit|button|image|reset|file)$/i,
-		    T = /^(?:checkbox|radio)$/i,
-		    xb = /\r?\n/g,
-		    $elements = this.find('input,select,textarea,keygen,button');
+    /**
+     * Сбор данных с формы
+     * Метод возвращает javaScript объект, состоящий из атрибутов name и value элементов формы.
+     * Если output_type стоит на array, то возвращается массив из объектов с полями name и value (аналогично с serializeArray).
+     *
+     * @memberOf jQuery#
+     * @param {string} [output_type=object]
+     * @returns {(Array|Object)}
+     */
+    serializeForm: function serializeForm(output_type) {
+        var zb = /^(?:input|select|textarea|keygen)/i,
+            yb = /^(?:submit|button|image|reset|file)$/i,
+            T = /^(?:checkbox|radio)$/i,
+            xb = /\r?\n/g,
+            $elements = this.find('input,select,textarea,keygen,button');
 
-		switch (output_type) {
-			case 'array':
-				{
-					var $checkboxes,
-					    array = [],
-					    lookup = {};
+        switch (output_type) {
+            case 'array':
+                {
+                    var $checkboxes,
+                        array = [],
+                        lookup = {};
 
-					$checkboxes = $elements.filter(function () {
+                    $checkboxes = $elements.filter(function () {
 
-						return this.name && !$(this).is(":disabled") && this.type === 'checkbox';
-					});
+                        return this.name && !$(this).is(":disabled") && this.type === 'checkbox';
+                    });
 
-					$checkboxes.each(function () {
-						if (lookup[this.name]) {
-							lookup[this.name] = lookup[this.name].add(this);
-						} else {
-							lookup[this.name] = $(this);
-						}
-					});
+                    $checkboxes.each(function () {
+                        if (lookup[this.name]) {
+                            lookup[this.name] = lookup[this.name].add(this);
+                        } else {
+                            lookup[this.name] = $(this);
+                        }
+                    });
 
-					$.each(lookup, function (name, $checkboxes) {
-						var values;
+                    $.each(lookup, function (name, $checkboxes) {
+                        var values;
 
-						if ($checkboxes.length === 1) {
-							values = $checkboxes.val() === 'on' ? $checkboxes.prop('checked') : $checkboxes.val();
-						} else {
-							values = [];
+                        if ($checkboxes.length === 1) {
+                            values = $checkboxes.val() === 'on' ? $checkboxes.prop('checked') : $checkboxes.val();
+                        } else {
+                            values = [];
 
-							$checkboxes.filter(':checked').each(function () {
-								values.push(this.value === 'on' ? this.checked : this.value);
-							});
-						}
+                            $checkboxes.filter(':checked').each(function () {
+                                values.push(this.value === 'on' ? this.checked : this.value);
+                            });
+                        }
 
-						array.push({
-							name: name,
-							value: values
-						});
-					});
+                        array.push({
+                            name: name,
+                            value: values
+                        });
+                    });
 
-					$elements.not($checkboxes).filter(function () {
-						var a = this.type;
+                    $elements.not($checkboxes).filter(function () {
+                        var a = this.type;
 
-						return this.name && !$(this).is(":disabled") && zb.test(this.nodeName) && !yb.test(a) && (this.checked && this.value != "on" || a != "radio") && (this.checked && this.value != "on" || this.value == "on" || a != "checkbox");
-					}).each(function (a, b) {
-						var c = $(this).val(),
-						    std = "";
-						switch (this.type) {
-							case "radio":
-							case "checkbox":
-								{
-									std = c == "on" ? this.checked ? 1 : 0 : c;
-									break;
-								}
-							default:
-								{
-									if (c === null) {
-										break;
-									}
-									std = c.replace(xb, "\r\n");
-								}
-						}
-						if (null != c) {
-							array.push({
-								name: b.name,
-								value: std
-							});
-						}
-					});
+                        return this.name && !$(this).is(":disabled") && zb.test(this.nodeName) && !yb.test(a) && (this.checked && this.value != "on" || a != "radio") && (this.checked && this.value != "on" || this.value == "on" || a != "checkbox");
+                    }).each(function (a, b) {
+                        var c = $(this).val(),
+                            std = "";
+                        switch (this.type) {
+                            case "radio":
+                            case "checkbox":
+                                {
+                                    std = c == "on" ? this.checked ? 1 : 0 : c;
+                                    break;
+                                }
+                            default:
+                                {
+                                    if (c === null) {
+                                        break;
+                                    }
+                                    std = c.replace(xb, "\r\n");
+                                }
+                        }
+                        if (null != c) {
+                            array.push({
+                                name: b.name,
+                                value: std
+                            });
+                        }
+                    });
 
-					return array;
-				}
-			case 'object':
-			default:
-				{
-					var output = {};
+                    return array;
+                }
+            case 'object':
+            default:
+                {
+                    var output = {};
 
-					$elements.filter(function () {
+                    $elements.filter(function () {
 
-						return this.name && !$(this).is(':disabled') && zb.test(this.nodeName) && !yb.test(this.type) && !T.test(this.type);
-					}).each(function (i, el) {
-						var $element = $(el),
-						    name = el.name,
-						    value = $element.val(),
-						    hasSameName = function hasSameName(i, el) {
-							var $el = $(el);
+                        return this.name && !$(this).is(':disabled') && zb.test(this.nodeName) && !yb.test(this.type) && !T.test(this.type);
+                    }).each(function (i, el) {
+                        var $element = $(el),
+                            name = el.name,
+                            value = $element.val(),
+                            hasSameName = function hasSameName(i, el) {
+                            var $el = $(el);
 
-							return $el.is(':enabled') && $el.is('[name="' + name + '"]');
-						};
+                            return $el.is(':enabled') && $el.is('[name="' + name + '"]');
+                        };
 
-						if ($elements.filter(hasSameName).length > 1) {
-							output[name] = typeof output[name] === "undefined" ? [] : output[name];
-							output[name].push(value ? value.replace(xb, "\r\n") : value);
-						} else if ($element.attr('type') === 'hidden' && value.indexOf('data.') === 0) {
-							var data_names = value.split('.'),
-							    data = $element.data(data_names[1]),
-							    n = 2;
-							while (data_names[n]) {
-								data = data[data_names[n]];
-								n++;
-							}
-							output[name] = data;
-						} else {
-							output[name] = value || value === 0 ? value.replace(xb, "\r\n") : null;
-						}
-					});
-					$elements.filter(function () {
+                        if ($elements.filter(hasSameName).length > 1) {
+                            output[name] = typeof output[name] === "undefined" ? [] : output[name];
+                            output[name].push(value ? value.replace(xb, "\r\n") : value);
+                        } else if ($element.attr('type') === 'hidden' && value.indexOf('data.') === 0) {
+                            var data_names = value.split('.'),
+                                data = $element.data(data_names[1]),
+                                n = 2;
+                            while (data_names[n]) {
+                                data = data[data_names[n]];
+                                n++;
+                            }
+                            output[name] = data;
+                        } else {
+                            output[name] = value || value === 0 ? value.replace(xb, "\r\n") : null;
+                        }
+                    });
+                    $elements.filter(function () {
 
-						return this.name && !$(this).is(":disabled") && T.test(this.type) && (this.checked && this.value !== "on" || this.value === "on" && this.type === "checkbox");
-					}).each(function (i, el) {
-						var name = el.name,
-						    value = el.value;
+                        return this.name && !$(this).is(":disabled") && T.test(this.type) && (this.checked && this.value !== "on" || this.value === "on" && this.type === "checkbox");
+                    }).each(function (i, el) {
+                        var name = el.name,
+                            value = el.value;
 
-						switch (el.type) {
-							case 'radio':
-								{
-									output[name] = value;
-									break;
-								}
-							case 'checkbox':
-								{
-									if ($elements.filter("[name='" + name + "']").length > 1 && value !== "on") {
-										output[name] = typeof output[name] === "undefined" ? [] : output[name];
-										output[name].push(value);
-									} else if (value !== "on") output[name] = value;else output[name] = !!el.checked;
-									break;
-								}
-						}
-					});
+                        switch (el.type) {
+                            case 'radio':
+                                {
+                                    output[name] = value;
+                                    break;
+                                }
+                            case 'checkbox':
+                                {
+                                    if ($elements.filter("[name='" + name + "']").length > 1 && value !== "on") {
+                                        output[name] = typeof output[name] === "undefined" ? [] : output[name];
+                                        output[name].push(value);
+                                    } else if (value !== "on") output[name] = value;else output[name] = !!el.checked;
+                                    break;
+                                }
+                        }
+                    });
 
-					return output;
-				}
-		}
-	},
+                    return output;
+                }
+        }
+    },
 
-	animateNumber: function animateNumber(options) {
-		var args = [options];
+    animateNumber: function animateNumber(options) {
+        var args = [options];
 
-		for (var i = 1, l = arguments.length; i < l; i++) {
-			args.push(arguments[i]);
-		}
-		this.data(options);
+        for (var i = 1, l = arguments.length; i < l; i++) {
+            args.push(arguments[i]);
+        }
+        this.data(options);
 
-		return this.animate.apply(this, args);
-	},
-	/**
-  * jQuery adapter for Tablesort
-  *
-  * @memberOf jQuery#
-  * @param {object} [options]
-  *
-  * @return {(Tablesort|null)}
-  */
-	tablesort: function tablesort(options) {
-		options = setDefaultValue(options, {});
-		var table = this.get(0),
-		    instance = null,
-		    observer;
+        return this.animate.apply(this, args);
+    },
+    /**
+     * jQuery adapter for Tablesort
+     *
+     * @memberOf jQuery#
+     * @param {object} [options]
+     *
+     * @return {(Tablesort|null)}
+     */
+    tablesort: function tablesort(options) {
+        options = setDefaultValue(options, {});
+        var table = this.get(0),
+            instance = null,
+            observer;
 
-		if (Tablesort && typeof Tablesort === 'function') {
-			instance = new Tablesort(table, options);
-			observer = new MutationObserver(function () {
-				instance.refresh();
-			});
+        if (Tablesort && typeof Tablesort === 'function') {
+            instance = new Tablesort(table, options);
+            observer = new MutationObserver(function () {
+                instance.refresh();
+            });
 
-			observer.observe(table, {
-				attributes: true,
-				childList: true
-			});
+            observer.observe(table, {
+                attributes: true,
+                childList: true
+            });
 
-			this.data({
-				tablesort_instance: instance,
-				mutation_observer_instance: observer
-			});
-		} else {
-			console.error('Tablesort is not defined');
-		}
-		return instance;
-	},
-	/**
-  * Resolving instance from element
-  *
-  * @memberOf jQuery#
-  * @return {*}
-  */
-	resolveInstance: function resolveInstance() {
-		var instance = this.data('instance');
-		return instance ? instance : this;
-	},
-	/**
-  * Getting outer HTML string from jQuery collection
-  *
-  * @memberOf jQuery#
-  * @return {string}
-  */
-	outerHTML: function outerHTML() {
-		var str = '';
-		this.each(function (i, el) {
-			str += el.outerHTML;
-		});
-		return str;
-	}
+            this.data({
+                tablesort_instance: instance,
+                mutation_observer_instance: observer
+            });
+        } else {
+            console.error('Tablesort is not defined');
+        }
+        return instance;
+    },
+    /**
+     * Resolving instance from element
+     *
+     * @memberOf jQuery#
+     * @return {*}
+     */
+    resolveInstance: function resolveInstance() {
+        var instance = this.data('instance');
+        return instance ? instance : this;
+    },
+    /**
+     * Getting outer HTML string from jQuery collection
+     *
+     * @memberOf jQuery#
+     * @return {string}
+     */
+    outerHTML: function outerHTML() {
+        var str = '';
+        this.each(function (i, el) {
+            str += el.outerHTML;
+        });
+        return str;
+    }
 });
 /**
  * Makes jQuery collection from the genuine array of HTML elements or jQuery objects
@@ -1031,9 +1016,9 @@ $.fn.extend({
  * @return {jQuery}
  */
 jQuery.makeSet = function (array) {
-	return $($.map(array, function (el) {
-		return el.get();
-	}));
+    return $($.map(array, function (el) {
+        return el.get();
+    }));
 };
 
 /**
@@ -1043,171 +1028,171 @@ jQuery.makeSet = function (array) {
  */
 (function ($, window, document) {
 
-	var containers = {},
-	    messages = {},
-	    notify = function notify(options) {
+    var containers = {},
+        messages = {},
+        notify = function notify(options) {
 
-		if ($.type(options) == 'string') {
-			options = { message: options };
-		}
+        if ($.type(options) == 'string') {
+            options = { message: options };
+        }
 
-		if (arguments[1]) {
-			options = $.extend(options, $.type(arguments[1]) == 'string' ? { status: arguments[1] } : arguments[1]);
-		}
+        if (arguments[1]) {
+            options = $.extend(options, $.type(arguments[1]) == 'string' ? { status: arguments[1] } : arguments[1]);
+        }
 
-		return new Message(options).show();
-	},
-	    closeAll = function closeAll(group, instantly) {
-		if (group) {
-			for (var id in messages) {
-				if (group === messages[id].group) messages[id].close(instantly);
-			}
-		} else {
-			for (var id in messages) {
-				messages[id].close(instantly);
-			}
-		}
-	};
+        return new Message(options).show();
+    },
+        closeAll = function closeAll(group, instantly) {
+        if (group) {
+            for (var id in messages) {
+                if (group === messages[id].group) messages[id].close(instantly);
+            }
+        } else {
+            for (var id in messages) {
+                messages[id].close(instantly);
+            }
+        }
+    };
 
-	var Message = function Message(options) {
+    var Message = function Message(options) {
 
-		var $this = this;
+        var $this = this;
 
-		this.options = $.extend({}, Message.defaults, options);
+        this.options = $.extend({}, Message.defaults, options);
 
-		this.uuid = "ID" + new Date().getTime() + "RAND" + Math.ceil(Math.random() * 100000);
-		this.element = $([
-		// alert-dismissable enables bs close icon
-		'<div class="uk-notify-message alert-dismissable">', '<a class="close">&times;</a>', '<div>' + this.options.message + '</div>', '</div>'].join('')).data("notifyMessage", this);
+        this.uuid = "ID" + new Date().getTime() + "RAND" + Math.ceil(Math.random() * 100000);
+        this.element = $([
+        // alert-dismissable enables bs close icon
+        '<div class="uk-notify-message alert-dismissable">', '<a class="close">&times;</a>', '<div>' + this.options.message + '</div>', '</div>'].join('')).data("notifyMessage", this);
 
-		// status
-		if (this.options.status) {
-			this.element.addClass('alert alert-' + this.options.status);
-			this.currentstatus = this.options.status;
-		}
+        // status
+        if (this.options.status) {
+            this.element.addClass('alert alert-' + this.options.status);
+            this.currentstatus = this.options.status;
+        }
 
-		this.group = this.options.group;
+        this.group = this.options.group;
 
-		messages[this.uuid] = this;
+        messages[this.uuid] = this;
 
-		if (!containers[this.options.pos]) {
-			containers[this.options.pos] = $('<div class="uk-notify uk-notify-' + this.options.pos + '"></div>').appendTo('body').on("click", ".uk-notify-message", function () {
-				$(this).data("notifyMessage").close();
-			});
-		}
-	};
+        if (!containers[this.options.pos]) {
+            containers[this.options.pos] = $('<div class="uk-notify uk-notify-' + this.options.pos + '"></div>').appendTo('body').on("click", ".uk-notify-message", function () {
+                $(this).data("notifyMessage").close();
+            });
+        }
+    };
 
-	$.extend(Message.prototype, {
+    $.extend(Message.prototype, {
 
-		uuid: false,
-		element: false,
-		timout: false,
-		currentstatus: "",
-		group: false,
+        uuid: false,
+        element: false,
+        timout: false,
+        currentstatus: "",
+        group: false,
 
-		show: function show() {
+        show: function show() {
 
-			if (this.element.is(":visible")) return;
+            if (this.element.is(":visible")) return;
 
-			var $this = this;
+            var $this = this;
 
-			containers[this.options.pos].show().prepend(this.element);
+            containers[this.options.pos].show().prepend(this.element);
 
-			var marginbottom = parseInt(this.element.css("margin-bottom"), 10);
+            var marginbottom = parseInt(this.element.css("margin-bottom"), 10);
 
-			this.element.css({
-				"opacity": 0,
-				"margin-top": -1 * this.element.outerHeight(),
-				"margin-bottom": 0
-			}).animate({ "opacity": 1, "margin-top": 0, "margin-bottom": marginbottom }, function () {
+            this.element.css({
+                "opacity": 0,
+                "margin-top": -1 * this.element.outerHeight(),
+                "margin-bottom": 0
+            }).animate({ "opacity": 1, "margin-top": 0, "margin-bottom": marginbottom }, function () {
 
-				if ($this.options.timeout) {
+                if ($this.options.timeout) {
 
-					var closefn = function closefn() {
-						$this.close();
-					};
+                    var closefn = function closefn() {
+                        $this.close();
+                    };
 
-					$this.timeout = setTimeout(closefn, $this.options.timeout);
+                    $this.timeout = setTimeout(closefn, $this.options.timeout);
 
-					$this.element.hover(function () {
-						clearTimeout($this.timeout);
-					}, function () {
-						$this.timeout = setTimeout(closefn, $this.options.timeout);
-					});
-				}
-			});
+                    $this.element.hover(function () {
+                        clearTimeout($this.timeout);
+                    }, function () {
+                        $this.timeout = setTimeout(closefn, $this.options.timeout);
+                    });
+                }
+            });
 
-			return this;
-		},
+            return this;
+        },
 
-		close: function close(instantly) {
+        close: function close(instantly) {
 
-			var $this = this,
-			    finalize = function finalize() {
-				$this.element.remove();
+            var $this = this,
+                finalize = function finalize() {
+                $this.element.remove();
 
-				if (!containers[$this.options.pos].children().length) {
-					containers[$this.options.pos].hide();
-				}
+                if (!containers[$this.options.pos].children().length) {
+                    containers[$this.options.pos].hide();
+                }
 
-				delete messages[$this.uuid];
-			};
+                delete messages[$this.uuid];
+            };
 
-			if (this.timeout) clearTimeout(this.timeout);
+            if (this.timeout) clearTimeout(this.timeout);
 
-			if (instantly) {
-				finalize();
-			} else {
-				this.element.animate({
-					"opacity": 0,
-					"margin-top": -1 * this.element.outerHeight(),
-					"margin-bottom": 0
-				}, function () {
-					finalize();
-				});
-			}
-		},
+            if (instantly) {
+                finalize();
+            } else {
+                this.element.animate({
+                    "opacity": 0,
+                    "margin-top": -1 * this.element.outerHeight(),
+                    "margin-bottom": 0
+                }, function () {
+                    finalize();
+                });
+            }
+        },
 
-		content: function content(html) {
+        content: function content(html) {
 
-			var container = this.element.find(">div");
+            var container = this.element.find(">div");
 
-			if (!html) {
-				return container.html();
-			}
+            if (!html) {
+                return container.html();
+            }
 
-			container.html(html);
+            container.html(html);
 
-			return this;
-		},
+            return this;
+        },
 
-		status: function status(_status) {
+        status: function status(_status) {
 
-			if (!_status) {
-				return this.currentstatus;
-			}
+            if (!_status) {
+                return this.currentstatus;
+            }
 
-			this.element.removeClass('alert alert-' + this.currentstatus).addClass('alert alert-' + _status);
+            this.element.removeClass('alert alert-' + this.currentstatus).addClass('alert alert-' + _status);
 
-			this.currentstatus = _status;
+            this.currentstatus = _status;
 
-			return this;
-		}
-	});
+            return this;
+        }
+    });
 
-	Message.defaults = {
-		message: "",
-		status: "normal",
-		timeout: 5000,
-		group: null,
-		pos: 'top-center'
-	};
+    Message.defaults = {
+        message: "",
+        status: "normal",
+        timeout: 5000,
+        group: null,
+        pos: 'top-center'
+    };
 
-	$["notify"] = notify;
-	$["notify"].message = Message;
-	$["notify"].closeAll = closeAll;
+    $["notify"] = notify;
+    $["notify"].message = Message;
+    $["notify"].closeAll = closeAll;
 
-	return notify;
+    return notify;
 })(jQuery, window, document);
 
 /**===========================================================
@@ -1223,90 +1208,90 @@ jQuery.makeSet = function (array) {
  * http://www.gnu.org/licenses/gpl-3.0-standalone.html
  */
 (function (window) {
-	/**
-  *
-  * @lends cookies
-  */
-	window.cookies = {
-		/**
-   * @param {string} name
-   * @return {(string|null)}
-   */
-		getItem: function getItem(name) {
-			if (!name) {
-				return null;
-			}
-			return decodeURIComponent(document.cookie.replace(new RegExp("(?:(?:^|.*;)\\s*" + encodeURIComponent(name).replace(/[\-\.\+\*]/g, "\\$&") + "\\s*\\=\\s*([^;]*).*$)|^.*$"), "$1")) || null;
-		},
-		/**
-   *
-   * @param {string} name
-   * @param {*} value
-   * @param {(string|number|Date)} [end] - max-age in seconds, Infinity, or the expires date in GMTString format or as Date object
-   * @param {string} [path]
-   * @param {string} [domain]
-   * @param {boolean} [is_secure]
-   * @return {boolean}
-   */
-		setItem: function setItem(name, value, end, path, domain, is_secure) {
-			var expires = "";
-			if (!name || /^(?:expires|max\-age|path|domain|secure)$/i.test(name)) {
-				return false;
-			}
-			if (end) {
-				switch (end.constructor) {
-					case Number:
-						expires = end === Infinity ? "; expires=Fri, 31 Dec 9999 23:59:59 GMT" : "; max-age=" + end;
-						break;
-					case String:
-						expires = "; expires=" + end;
-						break;
-					case Date:
-						expires = "; expires=" + end.toUTCString();
-						break;
-				}
-			}
-			document.cookie = encodeURIComponent(name) + "=" + encodeURIComponent(value) + expires + (domain ? "; domain=" + domain : "") + (path ? "; path=" + path : "") + (is_secure ? "; secure" : "");
-			return true;
-		},
-		/**
-   *
-   * @param {string} name
-   * @param {string} [path]
-   * @param {string} [domain]
-   * @return {boolean}
-   */
-		removeItem: function removeItem(name, path, domain) {
-			if (!this.hasItem(name)) {
-				return false;
-			}
-			document.cookie = encodeURIComponent(name) + "=; expires=Thu, 01 Jan 1970 00:00:00 GMT" + (domain ? "; domain=" + domain : "") + (path ? "; path=" + path : "");
-			return true;
-		},
-		/**
-   *
-   * @param {string} name
-   * @return {boolean}
-   */
-		hasItem: function hasItem(name) {
-			if (!name) {
-				return false;
-			}
-			return new RegExp("(?:^|;\\s*)" + encodeURIComponent(name).replace(/[\-\.\+\*]/g, "\\$&") + "\\s*\\=").test(document.cookie);
-		},
-		/**
-   *
-   * @return {Array}
-   */
-		keys: function keys() {
-			var keys = document.cookie.replace(/((?:^|\s*;)[^\=]+)(?=;|$)|^\s*|\s*(?:\=[^;]*)?(?:\1|$)/g, "").split(/\s*(?:\=[^;]*)?;\s*/),
-			    length = keys.length;
-			for (var i = 0; i < length; i++) {
-				keys[i] = decodeURIComponent(keys[i]);
-			}
-			return keys;
-		}
-	};
+    /**
+     *
+     * @lends cookies
+     */
+    window.cookies = {
+        /**
+         * @param {string} name
+         * @return {(string|null)}
+         */
+        getItem: function getItem(name) {
+            if (!name) {
+                return null;
+            }
+            return decodeURIComponent(document.cookie.replace(new RegExp("(?:(?:^|.*;)\\s*" + encodeURIComponent(name).replace(/[\-\.\+\*]/g, "\\$&") + "\\s*\\=\\s*([^;]*).*$)|^.*$"), "$1")) || null;
+        },
+        /**
+         *
+         * @param {string} name
+         * @param {*} value
+         * @param {(string|number|Date)} [end] - max-age in seconds, Infinity, or the expires date in GMTString format or as Date object
+         * @param {string} [path]
+         * @param {string} [domain]
+         * @param {boolean} [is_secure]
+         * @return {boolean}
+         */
+        setItem: function setItem(name, value, end, path, domain, is_secure) {
+            var expires = "";
+            if (!name || /^(?:expires|max\-age|path|domain|secure)$/i.test(name)) {
+                return false;
+            }
+            if (end) {
+                switch (end.constructor) {
+                    case Number:
+                        expires = end === Infinity ? "; expires=Fri, 31 Dec 9999 23:59:59 GMT" : "; max-age=" + end;
+                        break;
+                    case String:
+                        expires = "; expires=" + end;
+                        break;
+                    case Date:
+                        expires = "; expires=" + end.toUTCString();
+                        break;
+                }
+            }
+            document.cookie = encodeURIComponent(name) + "=" + encodeURIComponent(value) + expires + (domain ? "; domain=" + domain : "") + (path ? "; path=" + path : "") + (is_secure ? "; secure" : "");
+            return true;
+        },
+        /**
+         *
+         * @param {string} name
+         * @param {string} [path]
+         * @param {string} [domain]
+         * @return {boolean}
+         */
+        removeItem: function removeItem(name, path, domain) {
+            if (!this.hasItem(name)) {
+                return false;
+            }
+            document.cookie = encodeURIComponent(name) + "=; expires=Thu, 01 Jan 1970 00:00:00 GMT" + (domain ? "; domain=" + domain : "") + (path ? "; path=" + path : "");
+            return true;
+        },
+        /**
+         *
+         * @param {string} name
+         * @return {boolean}
+         */
+        hasItem: function hasItem(name) {
+            if (!name) {
+                return false;
+            }
+            return new RegExp("(?:^|;\\s*)" + encodeURIComponent(name).replace(/[\-\.\+\*]/g, "\\$&") + "\\s*\\=").test(document.cookie);
+        },
+        /**
+         *
+         * @return {Array}
+         */
+        keys: function keys() {
+            var keys = document.cookie.replace(/((?:^|\s*;)[^\=]+)(?=;|$)|^\s*|\s*(?:\=[^;]*)?(?:\1|$)/g, "").split(/\s*(?:\=[^;]*)?;\s*/),
+                length = keys.length;
+            for (var i = 0; i < length; i++) {
+                keys[i] = decodeURIComponent(keys[i]);
+            }
+            return keys;
+        }
+    };
 })(window);
 
 /**===========================================================
@@ -1319,100 +1304,100 @@ jQuery.makeSet = function (array) {
  * @returns {jQuery}
  */
 function tmpl(template_type, items, addTo, direction) {
-	items = items ? items : {};
-	addTo = addTo instanceof Element ? $(addTo) : addTo;
-	var $tmpl = $('#tmpl-' + template_type),
-	    wrapMap = {
-		thead: [1, "<table>", "</table>"],
-		col: [2, "<table><colgroup>", "</colgroup></table>"],
-		tr: [2, "<table><tbody>", "</tbody></table>"],
-		td: [3, "<table><tbody><tr>", "</tr></tbody></table>"],
-		_default: [1, "<div>", "</div>"]
-	},
-	    result = $(),
-	    html_val;
+    items = items ? items : {};
+    addTo = addTo instanceof Element ? $(addTo) : addTo;
+    var $tmpl = $('#tmpl-' + template_type),
+        wrapMap = {
+        thead: [1, "<table>", "</table>"],
+        col: [2, "<table><colgroup>", "</colgroup></table>"],
+        tr: [2, "<table><tbody>", "</tbody></table>"],
+        td: [3, "<table><tbody><tr>", "</tr></tbody></table>"],
+        _default: [1, "<div>", "</div>"]
+    },
+        result = $(),
+        html_val;
 
-	wrapMap.tbody = wrapMap.tfoot = wrapMap.colgroup = wrapMap.caption = wrapMap.thead;
-	wrapMap.th = wrapMap.td;
+    wrapMap.tbody = wrapMap.tfoot = wrapMap.colgroup = wrapMap.caption = wrapMap.thead;
+    wrapMap.th = wrapMap.td;
 
-	if (!$tmpl.length) {
-		console.group('tmpl_error');
-		console.log('error in ' + template_type);
-		console.log('items', items);
-		console.log('addTo', addTo);
-		console.log('inputs', { template_type: template_type, items: items, addTo: addTo, direction: direction });
-		console.groupEnd();
-		return $();
-	}
+    if (!$tmpl.length) {
+        console.group('tmpl_error');
+        console.log('error in ' + template_type);
+        console.log('items', items);
+        console.log('addTo', addTo);
+        console.log('inputs', { template_type: template_type, items: items, addTo: addTo, direction: direction });
+        console.groupEnd();
+        return $();
+    }
 
-	function htmlEntities(str) {
-		return String(str + '').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
-	}
+    function htmlEntities(str) {
+        return String(str + '').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+    }
 
-	function replaceTags(html, object) {
-		var jQuery_pairs = {},
-		    keys = {},
-		    wrap = wrapMap[(/<([\w:]+)/.exec(html) || ["", ""])[1].toLowerCase()] || wrapMap._default,
-		    j = wrap[0];
+    function replaceTags(html, object) {
+        var jQuery_pairs = {},
+            keys = {},
+            wrap = wrapMap[(/<([\w:]+)/.exec(html) || ["", ""])[1].toLowerCase()] || wrapMap._default,
+            j = wrap[0];
 
-		$.each(object, function (key, value) {
-			if ($.type(value) == 'string') {
-				keys[key] = htmlEntities(value);
-			} else if (value instanceof jQuery) {
-				if (value.length) {
-					jQuery_pairs[key] = value;
-					if (value.is('tr')) {
-						keys[key] = '<tbody id="JQ_tmpl_' + key + '"></tbody>';
-					} else if (value.is('span')) {
-						keys[key] = '<span id="JQ_tmpl_' + key + '"></span>';
-					} else if (value.is('option')) {
-						keys[key] = '<optgroup id="JQ_tmpl_' + key + '"></optgroup>';
-					} else {
-						keys[key] = '<div id="JQ_tmpl_' + key + '"></div>';
-					}
-				}
-			} else if (value == null) {
-				keys[key] = '';
-			} else {
-				keys[key] = value;
-			}
-		});
+        $.each(object, function (key, value) {
+            if ($.type(value) == 'string') {
+                keys[key] = htmlEntities(value);
+            } else if (value instanceof jQuery) {
+                if (value.length) {
+                    jQuery_pairs[key] = value;
+                    if (value.is('tr')) {
+                        keys[key] = '<tbody id="JQ_tmpl_' + key + '"></tbody>';
+                    } else if (value.is('span')) {
+                        keys[key] = '<span id="JQ_tmpl_' + key + '"></span>';
+                    } else if (value.is('option')) {
+                        keys[key] = '<optgroup id="JQ_tmpl_' + key + '"></optgroup>';
+                    } else {
+                        keys[key] = '<div id="JQ_tmpl_' + key + '"></div>';
+                    }
+                }
+            } else if (value == null) {
+                keys[key] = '';
+            } else {
+                keys[key] = value;
+            }
+        });
 
-		html = $(html ? wrap[1] + html.format(keys) + wrap[2] : '');
-		$.each(jQuery_pairs, function (key, value) {
-			html.find('#JQ_tmpl_' + key).append(value);
-			if (value.is('tr')) {
-				value.parent('tbody').removeAttr('id');
-			} else {
-				value.unwrap();
-			}
-		});
-		while (j--) {
-			html = html.children();
-		}
-		return html;
-	}
+        html = $(html ? wrap[1] + html.format(keys) + wrap[2] : '');
+        $.each(jQuery_pairs, function (key, value) {
+            html.find('#JQ_tmpl_' + key).append(value);
+            if (value.is('tr')) {
+                value.parent('tbody').removeAttr('id');
+            } else {
+                value.unwrap();
+            }
+        });
+        while (j--) {
+            html = html.children();
+        }
+        return html;
+    }
 
-	html_val = $tmpl.html().replace(/(?:\/\*(?:[\s\S]*?)\*\/)|(?:([\s;])+\/\/(?:.*)$)/gim, '') // comments
-	.replace(/\\s{2,}|\t|\n|\r/gim, '') // spaces, tabs, new lines
-	.trim();
+    html_val = $tmpl.html().replace(/(?:\/\*(?:[\s\S]*?)\*\/)|(?:([\s;])+\/\/(?:.*)$)/gim, '') // comments
+    .replace(/\\s{2,}|\t|\n|\r/gim, '') // spaces, tabs, new lines
+    .trim();
 
-	if (Array.isArray(items)) {
-		result = $.makeSet(items.map(function (item) {
-			return replaceTags(html_val, item);
-		}));
-	} else {
-		result = replaceTags(html_val, items);
-	}
-	if (addTo == null) {
-		return result;
-	}
-	if (direction === 'prepend') {
-		addTo.prepend(result);
-	} else {
-		addTo.append(result);
-	}
-	return result;
+    if (Array.isArray(items)) {
+        result = $.makeSet(items.map(function (item) {
+            return replaceTags(html_val, item);
+        }));
+    } else {
+        result = replaceTags(html_val, items);
+    }
+    if (addTo == null) {
+        return result;
+    }
+    if (direction === 'prepend') {
+        addTo.prepend(result);
+    } else {
+        addTo.append(result);
+    }
+    return result;
 }
 
 /**
@@ -1448,58 +1433,58 @@ function tmpl(template_type, items, addTo, direction) {
  * @return {ParsedUrl}
  */
 function parseUri(str, options) {
-	var o = {
-		strictMode: false,
-		key: ["source", "protocol", "authority", "userInfo", "user", "password", "host", "port", "relative", "path", "directory", "file", "query", "anchor"],
-		q: {
-			name: "queryKey",
-			parser: /(?:^|&)([^&=]*)=?([^&]*)/g
-		},
-		parser: {
-			strict: /^(?:([^:\/?#]+):)?(?:\/\/((?:(([^:@]*)(?::([^:@]*))?)?@)?([^:\/?#]*)(?::(\d*))?))?((((?:[^?#\/]*\/)*)([^?#]*))(?:\?([^#]*))?(?:#(.*))?)/,
-			loose: /^(?:(?![^:@]+:[^:@\/]*@)([^:\/?#.]+):)?(?:\/\/)?((?:(([^:@]*)(?::([^:@]*))?)?@)?([^:\/?#]*)(?::(\d*))?)(((\/(?:[^?#](?![^?#\/]*\.[^?#\/.]+(?:[?#]|$)))*\/?)?([^?#\/]*))(?:\?([^#]*))?(?:#(.*))?)/
-		}
-	},
-	    m = o.parser[o.strictMode ? 'strict' : 'loose'].exec(str),
-	    uri = {},
-	    i = 14;
+    var o = {
+        strictMode: false,
+        key: ["source", "protocol", "authority", "userInfo", "user", "password", "host", "port", "relative", "path", "directory", "file", "query", "anchor"],
+        q: {
+            name: "queryKey",
+            parser: /(?:^|&)([^&=]*)=?([^&]*)/g
+        },
+        parser: {
+            strict: /^(?:([^:\/?#]+):)?(?:\/\/((?:(([^:@]*)(?::([^:@]*))?)?@)?([^:\/?#]*)(?::(\d*))?))?((((?:[^?#\/]*\/)*)([^?#]*))(?:\?([^#]*))?(?:#(.*))?)/,
+            loose: /^(?:(?![^:@]+:[^:@\/]*@)([^:\/?#.]+):)?(?:\/\/)?((?:(([^:@]*)(?::([^:@]*))?)?@)?([^:\/?#]*)(?::(\d*))?)(((\/(?:[^?#](?![^?#\/]*\.[^?#\/.]+(?:[?#]|$)))*\/?)?([^?#\/]*))(?:\?([^#]*))?(?:#(.*))?)/
+        }
+    },
+        m = o.parser[o.strictMode ? 'strict' : 'loose'].exec(str),
+        uri = {},
+        i = 14;
 
-	if (options) {
-		$.extend(o, options);
-	}
+    if (options) {
+        $.extend(o, options);
+    }
 
-	while (i--) {
-		uri[o.key[i]] = m[i] || '';
-	}uri[o.q.name] = {};
-	uri[o.key[12]].replace(o.q.parser, function ($0, $1, $2) {
-		if ($1) uri[o.q.name][$1] = $2;
-	});
+    while (i--) {
+        uri[o.key[i]] = m[i] || '';
+    }uri[o.q.name] = {};
+    uri[o.key[12]].replace(o.q.parser, function ($0, $1, $2) {
+        if ($1) uri[o.q.name][$1] = $2;
+    });
 
-	Object.defineProperties(uri, {
-		wo_path: {
-			get: function get() {
+    Object.defineProperties(uri, {
+        wo_path: {
+            get: function get() {
 
-				return uri[o.key[1]] + '://' + uri[o.key[6]];
-			}
-		},
-		wo_query: {
-			get: function get() {
+                return uri[o.key[1]] + '://' + uri[o.key[6]];
+            }
+        },
+        wo_query: {
+            get: function get() {
 
-				return uri[o.key[1]] + '://' + uri[o.key[6]] + uri[o.key[9]];
-			}
-		}
-	});
+                return uri[o.key[1]] + '://' + uri[o.key[6]] + uri[o.key[9]];
+            }
+        }
+    });
 
-	return uri;
+    return uri;
 }
 
 function storeStat(entity_id, entity_type, event_type) {
-	window.__stats = window.__stats ? window.__stats : [];
-	window.__stats.push({
-		entity_id: entity_id,
-		entity_type: entity_type,
-		event_type: event_type
-	});
+    window.__stats = window.__stats ? window.__stats : [];
+    window.__stats.push({
+        entity_id: entity_id,
+        entity_type: entity_type,
+        event_type: event_type
+    });
 }
 
 /**
@@ -1509,16 +1494,16 @@ function storeStat(entity_id, entity_type, event_type) {
  * @returns {Object<string, string>}
  */
 function gatherUTMTags(uri) {
-	var parsed_uri = parseUri(uri || window.location),
-	    utm = {};
+    var parsed_uri = parseUri(uri || window.location),
+        utm = {};
 
-	for (var key in parsed_uri.queryKey) {
-		if (key.indexOf('utm_') === 0) {
-			utm[key] = parsed_uri.queryKey[key];
-		}
-	}
+    for (var key in parsed_uri.queryKey) {
+        if (key.indexOf('utm_') === 0) {
+            utm[key] = parsed_uri.queryKey[key];
+        }
+    }
 
-	return utm;
+    return utm;
 }
 
 /**
@@ -1529,18 +1514,19 @@ function gatherUTMTags(uri) {
  * @return {String}
  */
 function getUnitsText(num, cases) {
-	num = Math.abs(num);
+    num = Math.abs(num);
 
-	var word = '';
+    var word = '';
 
-	if (num.toString().indexOf('.') > -1) {
-		word = cases.GEN;
-	} else {
-		word = num % 10 == 1 && num % 100 != 11 ? cases.NOM : num % 10 >= 2 && num % 10 <= 4 && (num % 100 < 10 || num % 100 >= 20) ? cases.GEN : cases.PLU;
-	}
+    if (num.toString().indexOf('.') > -1) {
+        word = cases.GEN;
+    } else {
+        word = num % 10 == 1 && num % 100 != 11 ? cases.NOM : num % 10 >= 2 && num % 10 <= 4 && (num % 100 < 10 || num % 100 >= 20) ? cases.GEN : cases.PLU;
+    }
 
-	return word;
+    return word;
 }
+
 /**
  * Возвращает текст с правильным родом
  *
@@ -1552,18 +1538,18 @@ function getUnitsText(num, cases) {
  * }|string)} cases
  */
 function getGenderText(gender, cases) {
-	if (typeof cases === 'string') {
-		return cases;
-	}
-	switch (gender) {
-		default:
-		case OneUser.GENDER.MALE:
-			return cases.MAS;
-		case OneUser.GENDER.FEMALE:
-			return cases.FEM;
-		case OneUser.GENDER.NEUTRAL:
-			return cases.NEU;
-	}
+    if (typeof cases === 'string') {
+        return cases;
+    }
+    switch (gender) {
+        default:
+        case OneUser.GENDER.MALE:
+            return cases.MAS;
+        case OneUser.GENDER.FEMALE:
+            return cases.FEM;
+        case OneUser.GENDER.NEUTRAL:
+            return cases.NEU;
+    }
 }
 
 /**
@@ -1576,177 +1562,178 @@ function getGenderText(gender, cases) {
  * @returns {(Array<string>|Array<Array>|Array<jQuery>|Array<object>)}
  */
 function formatDates(dates, format, is_same_time) {
-	var cur_moment,
-	    prev_moment,
-	    cur_year,
-	    cur_month,
-	    cur_time,
-	    prev_time,
-	    is_with_time = false,
-	    cur_range_of_days = [],
-	    last_index = dates.length - 1,
-	    dates_obj = {},
-	    output = [];
+    var cur_moment,
+        prev_moment,
+        cur_year,
+        cur_month,
+        cur_time,
+        prev_time,
+        is_with_time = false,
+        cur_range_of_days = [],
+        last_index = dates.length - 1,
+        dates_obj = {},
+        output = [];
 
-	function formatString(formatting, days, time, month, year) {
-		var genitive_month_names = ['января', 'февраля', 'марта', 'апреля', 'мая', 'июня', 'июля', 'августа', 'сентября', 'октября', 'ноября', 'декабря'],
-		    format_options = {
-			d: days,
-			D: days,
-			t: time,
-			T: time,
-			M: month + 1,
-			MM: month + 1 > 9 ? month + 1 : "0" + (month + 1),
-			MMM: __LOCALES.ru_RU.DATE.MONTH_SHORT_NAMES[month].toLocaleLowerCase(),
-			MMMM: __LOCALES.ru_RU.DATE.MONTH_NAMES[month].toLocaleLowerCase(),
-			MMMMs: genitive_month_names[month],
-			Y: year,
-			YY: year.substr(2, 2),
-			YYYY: year
-		},
-		    output;
+    function formatString(formatting, days, time, month, year) {
+        var genitive_month_names = ['января', 'февраля', 'марта', 'апреля', 'мая', 'июня', 'июля', 'августа', 'сентября', 'октября', 'ноября', 'декабря'],
+            format_options = {
+            d: days,
+            D: days,
+            t: time,
+            T: time,
+            M: month + 1,
+            MM: month + 1 > 9 ? month + 1 : "0" + (month + 1),
+            MMM: __LOCALES.ru_RU.DATE.MONTH_SHORT_NAMES[month].toLocaleLowerCase(),
+            MMMM: __LOCALES.ru_RU.DATE.MONTH_NAMES[month].toLocaleLowerCase(),
+            MMMMs: genitive_month_names[month],
+            Y: year,
+            YY: year.substr(2, 2),
+            YYYY: year
+        },
+            output;
 
-		if (typeof formatting == 'string') {
-			output = formatting.format(format_options).capitalize();
-		} else if (Array.isArray(formatting)) {
-			output = formatting.map(function (str) {
-				return str.format(format_options).capitalize();
-			});
-		} else if (formatting instanceof jQuery) {
-			output = $();
-			formatting.each(function (key, elem) {
-				var $elem = $(elem).clone();
-				$elem.text(elem.innerText.format(format_options).capitalize());
-				output = output.add($elem);
-			});
-		} else {
-			output = {};
-			$.each(formatting, function (key, str) {
-				output[key] = str.format(format_options).capitalize();
-			});
-		}
+        if (typeof formatting == 'string') {
+            output = formatting.format(format_options).capitalize();
+        } else if (Array.isArray(formatting)) {
+            output = formatting.map(function (str) {
+                return str.format(format_options).capitalize();
+            });
+        } else if (formatting instanceof jQuery) {
+            output = $();
+            formatting.each(function (key, elem) {
+                var $elem = $(elem).clone();
+                $elem.text(elem.innerText.format(format_options).capitalize());
+                output = output.add($elem);
+            });
+        } else {
+            output = {};
+            $.each(formatting, function (key, str) {
+                output[key] = str.format(format_options).capitalize();
+            });
+        }
 
-		return output;
-	}
+        return output;
+    }
 
-	if (!format) {
-		format = {
-			date: '{D} {MMMMs} {YYYY}',
-			time: '{T}'
-		};
-	}
+    if (!format) {
+        format = {
+            date: '{D} {MMMMs} {YYYY}',
+            time: '{T}'
+        };
+    }
 
-	if (typeof format === 'string') {
-		is_with_time = format.contains(/\{T\}|\{t\}/) && dates[0]['start_time'] !== undefined;
-	} else {
-		is_with_time = dates[0]['start_time'] !== undefined;
-		$.each(format, function () {
-			is_with_time = is_with_time || this.contains(/\{T\}|\{t\}/);
-		});
-	}
+    if (typeof format === 'string') {
+        is_with_time = format.contains(/\{T\}|\{t\}/) && dates[0]['start_time'] !== undefined;
+    } else {
+        is_with_time = dates[0]['start_time'] !== undefined;
+        $.each(format, function () {
+            is_with_time = is_with_time || this.contains(/\{T\}|\{t\}/);
+        });
+    }
 
-	if (is_same_time) {
-		if (is_with_time) {
-			cur_time = dates[0].end_time ? displayTimeRange(dates[0].start_time, dates[0].end_time) : displayTimeRange(dates[0].start_time);
-		}
+    if (is_same_time) {
+        if (is_with_time) {
+            cur_time = dates[0].end_time ? displayTimeRange(dates[0].start_time, dates[0].end_time) : displayTimeRange(dates[0].start_time);
+        }
 
-		dates.forEach(function (date, i) {
-			cur_moment = moment.unix(date.event_date);
-			cur_year = cur_moment.year();
-			cur_month = cur_moment.month();
-			if (!dates_obj[cur_year]) dates_obj[cur_year] = {};
-			if (!dates_obj[cur_year][cur_month]) dates_obj[cur_year][cur_month] = [];
+        dates.forEach(function (date, i) {
+            cur_moment = moment.unix(date.event_date);
+            cur_year = cur_moment.year();
+            cur_month = cur_moment.month();
+            if (!dates_obj[cur_year]) dates_obj[cur_year] = {};
+            if (!dates_obj[cur_year][cur_month]) dates_obj[cur_year][cur_month] = [];
 
-			if (prev_moment) {
-				if (cur_month !== prev_moment.month() || prev_moment.diff(cur_moment, 'days') !== -1) {
-					dates_obj[prev_moment.year()][prev_moment.month()].push(cur_range_of_days.join('-'));
-					cur_range_of_days[0] = cur_moment.format('D');
-				} else {
-					cur_range_of_days[1] = cur_moment.format('D');
-				}
-			} else {
-				cur_range_of_days[0] = cur_moment.format('D');
-			}
+            if (prev_moment) {
+                if (cur_month !== prev_moment.month() || prev_moment.diff(cur_moment, 'days') !== -1) {
+                    dates_obj[prev_moment.year()][prev_moment.month()].push(cur_range_of_days.join('-'));
+                    cur_range_of_days[0] = cur_moment.format('D');
+                } else {
+                    cur_range_of_days[1] = cur_moment.format('D');
+                }
+            } else {
+                cur_range_of_days[0] = cur_moment.format('D');
+            }
 
-			if (i === last_index) {
-				dates_obj[cur_year][cur_month].push(cur_range_of_days.join('-'));
-			} else {
-				prev_moment = cur_moment;
-			}
-		});
+            if (i === last_index) {
+                dates_obj[cur_year][cur_month].push(cur_range_of_days.join('-'));
+            } else {
+                prev_moment = cur_moment;
+            }
+        });
 
-		$.each(dates_obj, function (year, months) {
-			$.each(months, function (month, days) {
-				output.push(formatString(format, days.join(', '), is_with_time ? cur_time : '', month, year));
-			});
-		});
-	} else {
-		dates.forEach(function (date, i) {
-			cur_moment = moment.unix(date.event_date);
-			cur_year = cur_moment.year();
-			cur_month = cur_moment.month();
-			cur_time = date.end_time ? displayTimeRange(date.start_time, date.end_time) : displayTimeRange(date.start_time);
-			if (!dates_obj[cur_year]) dates_obj[cur_year] = {};
-			if (!dates_obj[cur_year][cur_month]) dates_obj[cur_year][cur_month] = [];
+        $.each(dates_obj, function (year, months) {
+            $.each(months, function (month, days) {
+                output.push(formatString(format, days.join(', '), is_with_time ? cur_time : '', month, year));
+            });
+        });
+    } else {
+        dates.forEach(function (date, i) {
+            cur_moment = moment.unix(date.event_date);
+            cur_year = cur_moment.year();
+            cur_month = cur_moment.month();
+            cur_time = date.end_time ? displayTimeRange(date.start_time, date.end_time) : displayTimeRange(date.start_time);
+            if (!dates_obj[cur_year]) dates_obj[cur_year] = {};
+            if (!dates_obj[cur_year][cur_month]) dates_obj[cur_year][cur_month] = [];
 
-			if (prev_moment) {
-				if (cur_month !== prev_moment.month() || prev_moment.diff(cur_moment, 'days') !== -1 || prev_time !== cur_time) {
-					dates_obj[prev_moment.year()][prev_moment.month()].push({
-						date: cur_range_of_days.join('-'),
-						time: prev_time
-					});
-					cur_range_of_days = [cur_moment.format('D')];
-				} else {
-					cur_range_of_days[1] = cur_moment.format('D');
-				}
-			} else {
-				cur_range_of_days = [cur_moment.format('D')];
-			}
+            if (prev_moment) {
+                if (cur_month !== prev_moment.month() || prev_moment.diff(cur_moment, 'days') !== -1 || prev_time !== cur_time) {
+                    dates_obj[prev_moment.year()][prev_moment.month()].push({
+                        date: cur_range_of_days.join('-'),
+                        time: prev_time
+                    });
+                    cur_range_of_days = [cur_moment.format('D')];
+                } else {
+                    cur_range_of_days[1] = cur_moment.format('D');
+                }
+            } else {
+                cur_range_of_days = [cur_moment.format('D')];
+            }
 
-			if (i === last_index) {
-				dates_obj[cur_year][cur_month].push({
-					date: cur_range_of_days.join('-'),
-					time: cur_time
-				});
-			} else {
-				prev_moment = cur_moment;
-				prev_time = cur_time;
-			}
-		});
+            if (i === last_index) {
+                dates_obj[cur_year][cur_month].push({
+                    date: cur_range_of_days.join('-'),
+                    time: cur_time
+                });
+            } else {
+                prev_moment = cur_moment;
+                prev_time = cur_time;
+            }
+        });
 
-		$.each(dates_obj, function (year, months) {
-			$.each(months, function (month, days) {
-				var formatted_days = [],
-				    range = [],
-				    prev_time;
-				$.each(days, function (i, day) {
-					if (prev_time) {
-						if (day.time != prev_time) {
-							formatted_days.push({ date: range.join(', '), time: prev_time });
-							range = [day.date];
-						} else {
-							range.push(day.date);
-						}
-					} else {
-						range = [day.date];
-					}
+        $.each(dates_obj, function (year, months) {
+            $.each(months, function (month, days) {
+                var formatted_days = [],
+                    range = [],
+                    prev_time;
+                $.each(days, function (i, day) {
+                    if (prev_time) {
+                        if (day.time != prev_time) {
+                            formatted_days.push({ date: range.join(', '), time: prev_time });
+                            range = [day.date];
+                        } else {
+                            range.push(day.date);
+                        }
+                    } else {
+                        range = [day.date];
+                    }
 
-					if (i === days.length - 1) {
-						formatted_days.push({ date: range.join(', '), time: day.time });
-					} else {
-						prev_time = day.time;
-					}
-				});
+                    if (i === days.length - 1) {
+                        formatted_days.push({ date: range.join(', '), time: day.time });
+                    } else {
+                        prev_time = day.time;
+                    }
+                });
 
-				$.each(formatted_days, function (i, formatted_day) {
-					output.push(formatString(format, formatted_day.date, is_with_time ? formatted_day.time : '', month, year));
-				});
-			});
-		});
-	}
+                $.each(formatted_days, function (i, formatted_day) {
+                    output.push(formatString(format, formatted_day.date, is_with_time ? formatted_day.time : '', month, year));
+                });
+            });
+        });
+    }
 
-	return output;
+    return output;
 }
+
 /**
  * Cutting out seconds in time string
  *
@@ -1754,11 +1741,12 @@ function formatDates(dates, format, is_same_time) {
  * @return {string}
  */
 function trimSeconds(time) {
-	time = time.split(':');
-	if (time.length == 3) time = time.splice(0, 2);
+    time = time.split(':');
+    if (time.length == 3) time = time.splice(0, 2);
 
-	return time.join(':');
+    return time.join(':');
 }
+
 /**
  * Returns formatted range of dates
  *
@@ -1768,25 +1756,26 @@ function trimSeconds(time) {
  * @returns {string}
  */
 function displayDateRange(first_date, last_date) {
-	var m_first = moment.unix(first_date),
-	    m_last = moment.unix(last_date),
-	    m_today = moment();
+    var m_first = moment.unix(first_date),
+        m_last = moment.unix(last_date),
+        m_today = moment();
 
-	if (m_first.isSame(m_last, 'year')) {
-		if (m_first.isSame(m_last, 'month')) {
-			if (m_first.isSame(m_last, 'day')) {
+    if (m_first.isSame(m_last, 'year')) {
+        if (m_first.isSame(m_last, 'month')) {
+            if (m_first.isSame(m_last, 'day')) {
 
-				return m_first.format(m_first.isSame(m_today, 'year') ? 'D MMMM' : 'D MMMM YYYY');
-			}
+                return m_first.format(m_first.isSame(m_today, 'year') ? 'D MMMM' : 'D MMMM YYYY');
+            }
 
-			return m_first.format('D') + '-' + m_last.format(m_first.isSame(m_today, 'year') ? 'D MMMM' : 'D MMMM YYYY');
-		}
+            return m_first.format('D') + '-' + m_last.format(m_first.isSame(m_today, 'year') ? 'D MMMM' : 'D MMMM YYYY');
+        }
 
-		return m_first.format('D MMMM') + ' - ' + m_last.format(m_first.isSame(m_today, 'year') ? 'D MMMM' : 'D MMMM YYYY');
-	}
+        return m_first.format('D MMMM') + ' - ' + m_last.format(m_first.isSame(m_today, 'year') ? 'D MMMM' : 'D MMMM YYYY');
+    }
 
-	return m_first.format('MMMM YYYY') + ' - ' + m_last.format('MMMM YYYY');
+    return m_first.format('MMMM YYYY') + ' - ' + m_last.format('MMMM YYYY');
 }
+
 /**
  * Returns formatted times range
  *
@@ -1796,16 +1785,17 @@ function displayDateRange(first_date, last_date) {
  */
 function displayTimeRange(start_time, end_time) {
 
-	if (end_time) {
-		if (end_time == start_time && (start_time == '00:00:00' || start_time == '00:00')) {
-			return 'Весь день';
-		} else {
-			return trimSeconds(start_time) + ' - ' + trimSeconds(end_time);
-		}
-	} else {
-		return trimSeconds(start_time);
-	}
+    if (end_time) {
+        if (end_time == start_time && (start_time == '00:00:00' || start_time == '00:00')) {
+            return 'Весь день';
+        } else {
+            return trimSeconds(start_time) + ' - ' + trimSeconds(end_time);
+        }
+    } else {
+        return trimSeconds(start_time);
+    }
 }
+
 /**
  *
  * Returns formatted currency
@@ -1818,15 +1808,16 @@ function displayTimeRange(start_time, end_time) {
  * @return {string}
  */
 function formatCurrency(number, separator, decimal_separator, before, after) {
-	number = +number || 0;
-	separator = separator || ' ';
-	decimal_separator = decimal_separator || '.';
-	var numbers_decimals = ('' + number).split('.')[1],
-	    negative = number < 0 ? '-' : '',
-	    integer_part = parseInt(Math.abs(number), 10) + '',
-	    cast_pos = integer_part.length > 3 ? integer_part.length % 3 : 0;
-	return '' + (before ? before + separator : '') + negative + (cast_pos ? integer_part.substr(0, cast_pos) + separator : '') + integer_part.substr(cast_pos).replace(/(\d{3})(?=\d)/g, '$1' + separator) + (numbers_decimals ? decimal_separator + numbers_decimals : '') + (after ? separator + after : '');
+    number = +number || 0;
+    separator = separator || ' ';
+    decimal_separator = decimal_separator || '.';
+    var numbers_decimals = ('' + number).split('.')[1],
+        negative = number < 0 ? '-' : '',
+        integer_part = parseInt(Math.abs(number), 10) + '',
+        cast_pos = integer_part.length > 3 ? integer_part.length % 3 : 0;
+    return '' + (before ? before + separator : '') + negative + (cast_pos ? integer_part.substr(0, cast_pos) + separator : '') + integer_part.substr(cast_pos).replace(/(\d{3})(?=\d)/g, '$1' + separator) + (numbers_decimals ? decimal_separator + numbers_decimals : '') + (after ? separator + after : '');
 }
+
 /**
  * Making ticket number more readable ( 999999999 => 999 999 999 )
  *
@@ -1834,8 +1825,9 @@ function formatCurrency(number, separator, decimal_separator, before, after) {
  * @return {string}
  */
 function formatTicketNumber(number) {
-	return ('' + number).replace(/(\d{3})/g, '$1 ').trim();
+    return ('' + number).replace(/(\d{3})/g, '$1 ').trim();
 }
+
 /**
  *
  * @param {timestamp} timestamp
@@ -1843,8 +1835,9 @@ function formatTicketNumber(number) {
  */
 function unixTimestampToISO(timestamp, format) {
 
-	return moment.unix(timestamp).format(format || __C.DATE_FORMAT);
+    return moment.unix(timestamp).format(format || __C.DATE_FORMAT);
 }
+
 /**
  *
  * @param {string} hex
@@ -1852,37 +1845,39 @@ function unixTimestampToISO(timestamp, format) {
  * @return {string}
  */
 function getContrastColor(hex, threshold) {
-	threshold = threshold || 128;
-	var hRed, hGreen, hBlue;
+    threshold = threshold || 128;
+    var hRed, hGreen, hBlue;
 
-	function cutHex(hex) {
+    function cutHex(hex) {
 
-		return hex.charAt(0) === '#' ? hex.substring(1, 7) : hex;
-	}
+        return hex.charAt(0) === '#' ? hex.substring(1, 7) : hex;
+    }
 
-	hRed = parseInt(cutHex(hex).substring(0, 2), 16);
-	hGreen = parseInt(cutHex(hex).substring(2, 4), 16);
-	hBlue = parseInt(cutHex(hex).substring(4, 6), 16);
+    hRed = parseInt(cutHex(hex).substring(0, 2), 16);
+    hGreen = parseInt(cutHex(hex).substring(2, 4), 16);
+    hBlue = parseInt(cutHex(hex).substring(4, 6), 16);
 
-	if ((hRed * 299 + hGreen * 587 + hBlue * 114) / 1000 > threshold) {
+    if ((hRed * 299 + hGreen * 587 + hBlue * 114) / 1000 > threshold) {
 
-		return '#000';
-	}
+        return '#000';
+    }
 
-	return '#fff';
+    return '#fff';
 }
+
 /**
  * Generates guid-like string (actually, it`s not guid, just randomly compiled string)
  *
  * @return {string}
  */
 function guid() {
-	function s4() {
-		return Math.floor((1 + Math.random()) * 0x10000).toString(16).substring(1);
-	}
+    function s4() {
+        return Math.floor((1 + Math.random()) * 0x10000).toString(16).substring(1);
+    }
 
-	return s4() + s4() + '-' + s4() + '-' + s4() + '-' + s4() + '-' + s4() + s4() + s4();
+    return s4() + s4() + '-' + s4() + '-' + s4() + '-' + s4() + '-' + s4() + s4() + s4();
 }
+
 /**
  *
  * Generates random string with custom length (by default length = 32)
@@ -1892,13 +1887,14 @@ function guid() {
  * @return {string}
  */
 function randomString(length) {
-	var possible = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
+    var possible = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
 
-	return new Array(length || 32).fill('').map(function () {
+    return new Array(length || 32).fill('').map(function () {
 
-		return possible.charAt(Math.floor(Math.random() * possible.length));
-	}).join('');
+        return possible.charAt(Math.floor(Math.random() * possible.length));
+    }).join('');
 }
+
 /**
  * Validating form or fieldset
  *
@@ -1907,57 +1903,64 @@ function randomString(length) {
  * @return {boolean}
  */
 function isFormValid($form) {
-	$form = $form instanceof Element ? $($form) : $form;
-	var is_valid = true,
-	    $elements = $form.find('input, textarea, select'),
-	    $rest = $elements,
-	    lookup = {};
+    $form = $form instanceof Element ? $($form) : $form;
+    var is_valid = true,
+        $elements = $form.find('input, textarea, select'),
+        $rest = $elements,
+        lookup = {};
 
-	if (!$form[0].checkValidity()) {
+    if (!$form[0].checkValidity()) {
 
-		$elements.each(function (i, el) {
-			if (el.name) {
-				lookup[el.name] = lookup[el.name] ? lookup[el.name].add(el) : $(el);
-			}
-		});
+        $elements.each(function (i, el) {
+            if (el.name) {
+                lookup[el.name] = lookup[el.name] ? lookup[el.name].add(el) : $(el);
+            }
+        });
 
-		$.each(lookup, function (name, $elements) {
-			var active_count = 0;
+        $.each(lookup, function (name, $elements) {
+            var active_count = 0;
 
-			if ($elements.length > 1) {
-				active_count = $elements.filter(function (i, el) {
+            if ($elements.length > 1) {
+                active_count = $elements.filter(function (i, el) {
 
-					return !$(el).is(':disabled') && (el.checked && el.value !== 'on' || el.type !== 'radio') && (el.checked && el.value !== 'on' || el.value === 'on' || el.type !== 'checkbox');
-				}).length;
+                    return !$(el).is(':disabled') && (el.checked && el.value !== 'on' || el.type !== 'radio') && (el.checked && el.value !== 'on' || el.value === 'on' || el.type !== 'checkbox');
+                }).length;
 
-				if (!active_count) {
-					handleErrorField($elements);
-					scrollTo($elements, 400, function () {
-						showNotifier({ text: $elements.data('error_message') || 'Заполнены не все обязательные поля', status: false });
-					});
-					is_valid = false;
-				}
+                if (!active_count) {
+                    handleErrorField($elements);
+                    scrollTo($elements, 400, function () {
+                        showNotifier({
+                            text: $elements.data('error_message') || 'Заполнены не все обязательные поля',
+                            status: false
+                        });
+                    });
+                    is_valid = false;
+                }
 
-				$rest = $rest.not($elements);
-			}
-		});
+                $rest = $rest.not($elements);
+            }
+        });
 
-		$rest.each(function (i, el) {
-			if (el.required && (el.value.trim() === '' || !el.checkValidity()) || el.value.trim() !== '' && !el.checkValidity()) {
-				handleErrorField(el);
+        $rest.each(function (i, el) {
+            if (el.required && (el.value.trim() === '' || !el.checkValidity()) || el.value.trim() !== '' && !el.checkValidity()) {
+                handleErrorField(el);
 
-				if (is_valid) {
-					scrollTo(el, 400, function () {
-						showNotifier({ text: $(el).data('error_message') || 'Заполнены не все обязательные поля', status: false });
-					});
-					is_valid = false;
-				}
-			}
-		});
-	}
+                if (is_valid) {
+                    scrollTo(el, 400, function () {
+                        showNotifier({
+                            text: $(el).data('error_message') || 'Заполнены не все обязательные поля',
+                            status: false
+                        });
+                    });
+                    is_valid = false;
+                }
+            }
+        });
+    }
 
-	return is_valid;
+    return is_valid;
 }
+
 /**
  *
  * Gets filename from url, or empty string, if there is no filename in URL
@@ -1966,7 +1969,7 @@ function isFormValid($form) {
  * @returns {string}
  */
 function getFilenameFromURL(url) {
-	return url ? url.split('\\').pop().split('/').pop() : '';
+    return url ? url.split('\\').pop().split('/').pop() : '';
 }
 
 /**
@@ -1982,58 +1985,60 @@ function getFilenameFromURL(url) {
  * @returns {object}
  */
 function mergeObjects(objects, recursive, deep) {
-	var res,
-	    length = arguments.length,
-	    is_recursive,
-	    is_deep,
-	    i,
-	    name,
-	    current_el,
-	    target_el;
+    var res,
+        length = arguments.length,
+        is_recursive,
+        is_deep,
+        i,
+        name,
+        current_el,
+        target_el;
 
-	try {
-		res = Object.create(arguments[0].constructor.prototype);
-	} catch (e) {
-		res = {};
-	}
+    try {
+        res = Object.create(arguments[0].constructor.prototype);
+    } catch (e) {
+        res = {};
+    }
 
-	if (typeof arguments[length - 1] === 'boolean' && typeof arguments[length - 2] === 'boolean') {
-		is_recursive = arguments[length - 2];
-		is_deep = arguments[length - 1];
-		length -= 2;
-	} else if (typeof arguments[length - 1] === 'boolean') {
-		is_recursive = arguments[length - 1];
-		is_deep = false;
-		length--;
-	} else {
-		is_recursive = false;
-		is_deep = false;
-	}
+    if (typeof arguments[length - 1] === 'boolean' && typeof arguments[length - 2] === 'boolean') {
+        is_recursive = arguments[length - 2];
+        is_deep = arguments[length - 1];
+        length -= 2;
+    } else if (typeof arguments[length - 1] === 'boolean') {
+        is_recursive = arguments[length - 1];
+        is_deep = false;
+        length--;
+    } else {
+        is_recursive = false;
+        is_deep = false;
+    }
 
-	for (i = 0; i < length; i++) {
-		for (name in arguments[i]) {
-			if (!is_deep && arguments[i].hasOwnProperty(name) || is_deep) {
-				current_el = arguments[i][name];
-				target_el = res[name];
+    for (i = 0; i < length; i++) {
+        for (name in arguments[i]) {
+            if (!is_deep && arguments[i].hasOwnProperty(name) || is_deep) {
+                current_el = arguments[i][name];
+                target_el = res[name];
 
-				if (typeof current_el === 'undefined' || current_el === res) {
-					continue;
-				}
+                if (typeof current_el === 'undefined' || current_el === res) {
+                    continue;
+                }
 
-				if (is_recursive && (typeof current_el === 'undefined' ? 'undefined' : _typeof(current_el)) === 'object' && (typeof target_el === 'undefined' ? 'undefined' : _typeof(target_el)) === 'object') {
-					res[name] = mergeObjects(is_recursive, target_el, current_el);
-				} else if (!(isVoid(current_el) && !isVoid(res[name]))) {
-					res[name] = current_el;
-				}
-			}
-		}
-	}
+                if (is_recursive && (typeof current_el === 'undefined' ? 'undefined' : _typeof(current_el)) === 'object' && (typeof target_el === 'undefined' ? 'undefined' : _typeof(target_el)) === 'object') {
+                    res[name] = mergeObjects(is_recursive, target_el, current_el);
+                } else if (!(isVoid(current_el) && !isVoid(res[name]))) {
+                    res[name] = current_el;
+                }
+            }
+        }
+    }
 
-	return res;
+    return res;
 }
+
 /**
  * @typedef {Object<(number|string|boolean), (number|string|boolean|PlainObject|PlainArray)>} PlainObject
  */
+
 /**
  * @typedef {Array<(number|string|boolean|PlainObject|PlainArray)>} PlainArray
  */
@@ -2044,21 +2049,21 @@ function mergeObjects(objects, recursive, deep) {
  * @return {PlainObject}
  */
 function toPlainObject(object) {
-	var plain_object = {};
+    var plain_object = {};
 
-	Object.props(object).map(function (field) {
-		var value = object[field];
+    Object.props(object).map(function (field) {
+        var value = object[field];
 
-		if (isSimpleType(value)) {
-			plain_object[field] = value;
-		} else if (!isVoid(value) && (typeof value === 'undefined' ? 'undefined' : _typeof(value)) === 'object') {
-			plain_object[field] = toPlainObject(value);
-		} else if (value instanceof Array) {
-			plain_object[field] = _toPlainArray(value);
-		}
-	});
+        if (isSimpleType(value)) {
+            plain_object[field] = value;
+        } else if (!isVoid(value) && (typeof value === 'undefined' ? 'undefined' : _typeof(value)) === 'object') {
+            plain_object[field] = toPlainObject(value);
+        } else if (value instanceof Array) {
+            plain_object[field] = toPlainArray(value);
+        }
+    });
 
-	return plain_object;
+    return plain_object;
 }
 
 /**
@@ -2067,25 +2072,25 @@ function toPlainObject(object) {
  *
  * @return {PlainArray}
  */
-function _toPlainArray(collection) {
+function toPlainArray(collection) {
 
-	return Array.prototype.filter.call(collection, function (item) {
-		if (typeof item === 'function') {
+    return Array.prototype.filter.call(collection, function (item) {
+        if (typeof item === 'function') {
 
-			return false;
-		}
-	}).map(function (item) {
-		if (isSimpleType(item)) {
+            return false;
+        }
+    }).map(function (item) {
+        if (isSimpleType(item)) {
 
-			return item;
-		} else if (item instanceof Array) {
+            return item;
+        } else if (item instanceof Array) {
 
-			return _toPlainArray(item);
-		} else if (!isVoid(item) && (typeof item === 'undefined' ? 'undefined' : _typeof(item)) === 'object') {
+            return toPlainArray(item);
+        } else if (!isVoid(item) && (typeof item === 'undefined' ? 'undefined' : _typeof(item)) === 'object') {
 
-			return toPlainObject(item);
-		}
-	});
+            return toPlainObject(item);
+        }
+    });
 }
 
 /**
@@ -2096,37 +2101,39 @@ function _toPlainArray(collection) {
  */
 function isSimpleType(variable) {
 
-	return typeof variable === 'number' || typeof variable === 'string' || isVoid(variable);
+    return typeof variable === 'number' || typeof variable === 'string' || isVoid(variable);
 }
+
 /**
  *
  * @param {?string} string
  * @return {?string}
  */
 function escapeHtml(string) {
-	var html_escapes = {
-		'&': '&amp;',
-		'<': '&lt;',
-		'>': '&gt;',
-		'"': '&quot;',
-		"'": '&#x27;',
-		'/': '&#x2F;'
-	};
+    var html_escapes = {
+        '&': '&amp;',
+        '<': '&lt;',
+        '>': '&gt;',
+        '"': '&quot;',
+        "'": '&#x27;',
+        '/': '&#x2F;'
+    };
 
-	// Regex containing the keys listed immediately above.
-	var html_escaper = /[&<>"'\/]/g;
+    // Regex containing the keys listed immediately above.
+    var html_escaper = /[&<>"'\/]/g;
 
-	if (!string) {
+    if (!string) {
 
-		return string;
-	}
+        return string;
+    }
 
-	// Escape a string for HTML interpolation.
-	return ('' + string).replace(html_escaper, function (match) {
+    // Escape a string for HTML interpolation.
+    return ('' + string).replace(html_escaper, function (match) {
 
-		return html_escapes[match];
-	});
+        return html_escapes[match];
+    });
 }
+
 /**
  *
  * @param {string} string
@@ -2134,9 +2141,10 @@ function escapeHtml(string) {
  */
 function isPercentageString(string) {
 
-	return (/^[1-9]\d*%$|^0%$/.search(string) === 0
-	);
+    return (/^[1-9]\d*%$|^0%$/.search(string) === 0
+    );
 }
+
 /**
  *
  * Checks is the argument is base64 encoded string
@@ -2145,8 +2153,9 @@ function isPercentageString(string) {
  * @returns {boolean}
  */
 function isBase64(string) {
-	return string.contains(';base64,');
+    return string.contains(';base64,');
 }
+
 /**
  *
  * Checks is the argument is function
@@ -2155,8 +2164,9 @@ function isBase64(string) {
  * @return {boolean}
  */
 function isFunction(variable) {
-	return variable && typeof variable === 'function';
+    return variable && typeof variable === 'function';
 }
+
 /**
  *
  * @param {Event} event
@@ -2165,8 +2175,9 @@ function isFunction(variable) {
  * @return {boolean}
  */
 function isKeyPressed(event, key) {
-	return event.keyCode === key;
+    return event.keyCode === key;
 }
+
 /**
  *
  * @param {*} variable
@@ -2175,8 +2186,9 @@ function isKeyPressed(event, key) {
  */
 function isVoid(variable) {
 
-	return variable === null || typeof variable === 'undefined';
+    return variable === null || typeof variable === 'undefined';
 }
+
 /**
  *
  * @param {*} variable
@@ -2185,8 +2197,9 @@ function isVoid(variable) {
  */
 function empty(variable) {
 
-	return isVoid(variable) || (typeof variable === 'undefined' ? 'undefined' : _typeof(variable)) === 'object' && $.isEmptyObject(variable) || variable instanceof Array && variable.length === 0;
+    return isVoid(variable) || (typeof variable === 'undefined' ? 'undefined' : _typeof(variable)) === 'object' && $.isEmptyObject(variable) || variable instanceof Array && variable.length === 0;
 }
+
 /**
  *
  * Returns array of the numbers
@@ -2197,13 +2210,13 @@ function empty(variable) {
  * @return {Array}
  */
 function range(end, start, step) {
-	var array = [];
+    var array = [];
 
-	for (start = start ? start : 0, step = step ? step : 1; start !== end; start += step) {
-		array.push(start);
-	}
+    for (start = start ? start : 0, step = step ? step : 1; start !== end; start += step) {
+        array.push(start);
+    }
 
-	return array;
+    return array;
 }
 
 /**
@@ -2218,15 +2231,16 @@ function range(end, start, step) {
  * @return {T|null}
  */
 function getByValue(value, of, from) {
-	for (var prop in of) {
-		if (of.hasOwnProperty(prop) && of[prop] === value) {
+    for (var prop in of) {
+        if (of.hasOwnProperty(prop) && of[prop] === value) {
 
-			return from[prop];
-		}
-	}
+            return from[prop];
+        }
+    }
 
-	return null;
+    return null;
 }
+
 /**
  *
  * @param {string} slug
@@ -2237,8 +2251,9 @@ function getByValue(value, of, from) {
  */
 function localeFromNamespace(slug, namespace, locales) {
 
-	return getByValue(slug, namespace, locales) || '';
+    return getByValue(slug, namespace, locales) || '';
 }
+
 /**
  *
  * @param {jQuery} $element
@@ -2247,23 +2262,24 @@ function localeFromNamespace(slug, namespace, locales) {
  * @return {jQuery}
  */
 function initSelect2($element, options) {
-	var opt = {
-		placeholder: 'Выберите',
-		allowClear: true,
-		containerCssClass: 'form_select2',
-		dropdownCssClass: 'form_select2_drop'
-	};
+    var opt = {
+        placeholder: 'Выберите',
+        allowClear: true,
+        containerCssClass: 'form_select2',
+        dropdownCssClass: 'form_select2_drop'
+    };
 
-	if ($element.hasClass('-Handled_ToSelect2')) {
-		$element.select2('destroy');
-	}
-	if (options) {
-		$.extend(true, opt, options);
-	}
-	$element.select2(opt).addClass('-Handled_ToSelect2');
+    if ($element.hasClass('-Handled_ToSelect2')) {
+        $element.select2('destroy');
+    }
+    if (options) {
+        $.extend(true, opt, options);
+    }
+    $element.select2(opt).addClass('-Handled_ToSelect2');
 
-	return $element;
+    return $element;
 }
+
 /**
  *
  * @param {jQuery} $element
@@ -2272,14 +2288,21 @@ function initSelect2($element, options) {
  * @return {jQuery}
  */
 function initWysiwyg($element, options) {
-	var $wysiwyg = $element.is('.Wysiwyg') ? $element : $element.find('.Wysiwyg');
+    var $wysiwyg = $element.is('.Wysiwyg') ? $element : $element.find('.Wysiwyg');
+    emojify.setConfig({
+        img_dir: 'https://cdnjs.cloudflare.com/ajax/libs/emojify.js/1.1.0/images/basic/'
+    });
 
-	$wysiwyg.not('.-Handled_Wysiwyg').each(function (i, el) {
-		$(el).trumbowyg(empty(options) ? {} : options);
-	}).addClass('-Handled_Wysiwyg');
+    $wysiwyg.not('.-Handled_Wysiwyg').each(function (i, el) {
+        $(el).trumbowyg(empty(options) ? {} : options).on('tbwchange', function () {
+            emojify.run();
+        });
+    }).addClass('-Handled_Wysiwyg');
+    emojify.run();
 
-	return $element;
+    return $element;
 }
+
 /**
  *
  * @param {string} url
@@ -2287,69 +2310,69 @@ function initWysiwyg($element, options) {
  * @param {string} [content_type='application/x-www-form-urlencoded; charset=UTF-8']
  */
 function outerAjax(url, data, content_type) {
-	data = data || {};
-	var jqXHR;
-	if (data.fields instanceof Fields) {
-		data.fields = data.fields.toString();
-	}
-	jqXHR = $.ajax({
-		url: url,
-		data: data,
-		method: 'GET',
-		contentType: content_type || 'application/x-www-form-urlencoded; charset=UTF-8'
-	});
-	return jqXHR.then(function (response, status_text, jqXHR) {
-		return response;
-	});
+    data = data || {};
+    var jqXHR;
+    if (data.fields instanceof Fields) {
+        data.fields = data.fields.toString();
+    }
+    jqXHR = $.ajax({
+        url: url,
+        data: data,
+        method: 'GET',
+        contentType: content_type || 'application/x-www-form-urlencoded; charset=UTF-8'
+    });
+    return jqXHR.then(function (response, status_text, jqXHR) {
+        return response;
+    });
 }
 
 function bindLimitInputSize($parent) {
-	$parent = $parent ? $parent : $('body');
-	$parent.find('.LimitSize').not('.-Handled_LimitSize').each(function (i, e) {
-		var $this = $(e),
-		    $form_unit = $this.closest('.form_unit'),
-		    max = $this.data('maxlength'),
-		    $prompt = $this.siblings('.form_prompt');
-		if (!$prompt.length) {
-			$this.after($('<p>').addClass('form_prompt').text($this.val().length + '/' + max));
-			$prompt = $this.siblings('.form_prompt');
-		} else {
-			$prompt.text($this.val().length + '/' + max);
-		}
-		$this.on('input', function () {
-			var length = $this.val().length;
-			if ($this.is('textarea')) {
-				var crlfs = $this.val().match(/\n/g);
-				length = crlfs ? length + crlfs.length : length;
-			}
-			if (length > max) {
-				$form_unit.addClass('-status_error');
-			} else if ($form_unit.hasClass('-status_error')) {
-				$form_unit.removeClass('-status_error');
-			}
-			$prompt.text(length + '/' + max);
-		});
-	}).addClass('-Handled_LimitSize');
+    $parent = $parent ? $parent : $('body');
+    $parent.find('.LimitSize').not('.-Handled_LimitSize').each(function (i, e) {
+        var $this = $(e),
+            $form_unit = $this.closest('.form_unit'),
+            max = $this.data('maxlength'),
+            $prompt = $this.siblings('.form_prompt');
+        if (!$prompt.length) {
+            $this.after($('<p>').addClass('form_prompt').text($this.val().length + '/' + max));
+            $prompt = $this.siblings('.form_prompt');
+        } else {
+            $prompt.text($this.val().length + '/' + max);
+        }
+        $this.on('input', function () {
+            var length = $this.val().length;
+            if ($this.is('textarea')) {
+                var crlfs = $this.val().match(/\n/g);
+                length = crlfs ? length + crlfs.length : length;
+            }
+            if (length > max) {
+                $form_unit.addClass('-status_error');
+            } else if ($form_unit.hasClass('-status_error')) {
+                $form_unit.removeClass('-status_error');
+            }
+            $prompt.text(length + '/' + max);
+        });
+    }).addClass('-Handled_LimitSize');
 }
 
 function trimAvatarsCollection($parent) {
-	$parent = $parent ? $parent : $('body');
-	$parent.find('.AvatarsCollection').each(function () {
-		var $collection = $(this),
-		    is_shifted = $collection.hasClass('-shifted'),
-		    is_subscribed = $collection.hasClass('-subscribed'),
-		    $avatars = $collection.find('.avatar'),
-		    avatar_width = $avatars.outerWidth(),
-		    amount = $avatars.length,
-		    kink = 6;
+    $parent = $parent ? $parent : $('body');
+    $parent.find('.AvatarsCollection').each(function () {
+        var $collection = $(this),
+            is_shifted = $collection.hasClass('-shifted'),
+            is_subscribed = $collection.hasClass('-subscribed'),
+            $avatars = $collection.find('.avatar'),
+            avatar_width = $avatars.outerWidth(),
+            amount = $avatars.length,
+            kink = 6;
 
-		if ((is_subscribed || is_shifted) && amount < $collection.data('max_amount')) {
-			$collection.width(amount === 1 ? avatar_width * amount : avatar_width * amount - kink * (amount - 1));
-		} else {
-			$collection.width(amount === 1 ? 0 : avatar_width * (amount - 1) - kink * (amount - 2));
-		}
-		$collection.addClass('-trimmed');
-	});
+        if ((is_subscribed || is_shifted) && amount < $collection.data('max_amount')) {
+            $collection.width(amount === 1 ? avatar_width * amount : avatar_width * amount - kink * (amount - 1));
+        } else {
+            $collection.width(amount === 1 ? 0 : avatar_width * (amount - 1) - kink * (amount - 2));
+        }
+        $collection.addClass('-trimmed');
+    });
 }
 
 /**
@@ -2358,525 +2381,527 @@ function trimAvatarsCollection($parent) {
  * @returns {jQuery}
  */
 function bindHelpLink($parent) {
-	$parent = $parent ? $parent : $('body');
-	var $links = $parent.is('.HelpLink') ? $parent : $parent.find('.HelpLink');
+    $parent = $parent ? $parent : $('body');
+    var $links = $parent.is('.HelpLink') ? $parent : $parent.find('.HelpLink');
 
-	$links.not('.-Handled_HelpLink').each(function (i, elem) {
-		var $this = $(elem);
+    $links.not('.-Handled_HelpLink').each(function (i, elem) {
+        var $this = $(elem);
 
-		$this.on('click.openHelpAppInspector', function () {
-			var inspector = $this.data('inspector');
+        $this.on('click.openHelpAppInspector', function () {
+            var inspector = $this.data('inspector');
 
-			if (__APP.IS_WIDGET) {
+            if (__APP.IS_WIDGET) {
 
-				return __APP.POST_MESSAGE.openNewTab('https://evendate.io/help?p=' + $this.data('article_id'));
-			}
+                return __APP.POST_MESSAGE.openNewTab('https://evendate.io/help?p=' + $this.data('article_id'));
+            }
 
-			if (!(inspector instanceof HelpAppInspector)) {
-				inspector = new HelpAppInspector($this.data('article_id'));
-				$this.data('inspector', inspector);
-			}
-			inspector.show();
-		});
-	}).addClass('-Handled_HelpLink');
+            if (!(inspector instanceof HelpAppInspector)) {
+                inspector = new HelpAppInspector($this.data('article_id'));
+                $this.data('inspector', inspector);
+            }
+            inspector.show();
+        });
+    }).addClass('-Handled_HelpLink');
 
-	return $parent;
+    return $parent;
 }
 
 function bindDatePickers($parent) {
-	$parent = $parent ? $parent : $('body');
-	$parent.find('.DatePicker').not('.-Handled_DatePicker').each(function (i, elem) {
-		new DatePicker(elem, $(elem).data()).init();
-	}).addClass('-Handled_DatePicker');
+    $parent = $parent ? $parent : $('body');
+    $parent.find('.DatePicker').not('.-Handled_DatePicker').each(function (i, elem) {
+        new DatePicker(elem, $(elem).data()).init();
+    }).addClass('-Handled_DatePicker');
 }
 
 function bindTabs($parent, is_height_dynamic) {
-	$parent = $parent ? $parent : $('body');
-	is_height_dynamic = typeof is_height_dynamic === 'boolean' ? is_height_dynamic : true;
+    $parent = $parent ? $parent : $('body');
+    is_height_dynamic = typeof is_height_dynamic === 'boolean' ? is_height_dynamic : true;
 
-	$parent.find('.Tabs').not('.-Handled_Tabs').each(function (i, elem) {
-		var $this = $(elem),
-		    tabs_id = $this.data('tabs_id'),
-		    focus_on_change = !!$this.data('focus_on_change'),
-		    mutation_observer = new MutationObserver(function (records) {
-			var $target = $(records[records.length - 1].target),
-			    $wrappers = $target.closest('.TabsBody');
+    $parent.find('.Tabs').not('.-Handled_Tabs').each(function (i, elem) {
+        var $this = $(elem),
+            tabs_id = $this.data('tabs_id'),
+            focus_on_change = !!$this.data('focus_on_change'),
+            mutation_observer = new MutationObserver(function (records) {
+            var $target = $(records[records.length - 1].target),
+                $wrappers = $target.closest('.TabsBody');
 
-			$wrappers = $target.hasClass('TabsBody') ? $wrappers.add($target) : $wrappers;
-			$wrappers.each(function (i, wrapper) {
-				var $wrapper = $(wrapper);
+            $wrappers = $target.hasClass('TabsBody') ? $wrappers.add($target) : $wrappers;
+            $wrappers.each(function (i, wrapper) {
+                var $wrapper = $(wrapper);
 
-				if ($wrapper.hasClass(__C.CLASSES.ACTIVE)) {
-					$this.addClass('-in_progress');
-					$wrapper.parent().height($wrapper.outerHeight());
-				}
-			});
-		}),
-		    $bodies_wrapper,
-		    $bodies,
-		    $header_wrapper,
-		    $tabs;
+                if ($wrapper.hasClass(__C.CLASSES.ACTIVE)) {
+                    $this.addClass('-in_progress');
+                    $wrapper.parent().height($wrapper.outerHeight());
+                }
+            });
+        }),
+            $bodies_wrapper,
+            $bodies,
+            $header_wrapper,
+            $tabs;
 
-		if (tabs_id) {
-			$bodies_wrapper = $this.find('.TabsBodyWrapper[data-tabs_id="' + tabs_id + '"]');
-			$header_wrapper = $this.find('.HeaderTabs[data-tabs_id="' + tabs_id + '"]');
-		} else {
-			$bodies_wrapper = $this.find('.TabsBodyWrapper:first');
-			$header_wrapper = $this.find('.HeaderTabs:first');
-		}
-		$bodies = $bodies_wrapper.children('.TabsBody');
-		$tabs = $header_wrapper.children('.Tab');
+        if (tabs_id) {
+            $bodies_wrapper = $this.find('.TabsBodyWrapper[data-tabs_id="' + tabs_id + '"]');
+            $header_wrapper = $this.find('.HeaderTabs[data-tabs_id="' + tabs_id + '"]');
+        } else {
+            $bodies_wrapper = $this.find('.TabsBodyWrapper:first');
+            $header_wrapper = $this.find('.HeaderTabs:first');
+        }
+        $bodies = $bodies_wrapper.children('.TabsBody');
+        $tabs = $header_wrapper.children('.Tab');
 
-		Object.defineProperties($this, {
-			'currentTabsIndex': {
-				get: function get() {
-					return $tabs.index($tabs.filter('.' + __C.CLASSES.ACTIVE));
-				}
-			},
-			'tabsCount': {
-				get: function get() {
-					return $tabs.length;
-				}
-			}
-		});
+        Object.defineProperties($this, {
+            'currentTabsIndex': {
+                get: function get() {
+                    return $tabs.index($tabs.filter('.' + __C.CLASSES.ACTIVE));
+                }
+            },
+            'tabsCount': {
+                get: function get() {
+                    return $tabs.length;
+                }
+            }
+        });
 
-		$this.setToTab = function (index) {
-			var $setting_tab = $tabs.eq(index),
-			    $setting_body = $bodies.eq(index);
+        $this.setToTab = function (index) {
+            var $setting_tab = $tabs.eq(index),
+                $setting_body = $bodies.eq(index);
 
-			if ($setting_tab.length && !$setting_tab.hasClass(__C.CLASSES.ACTIVE)) {
-				$tabs.removeClass(__C.CLASSES.ACTIVE);
-				$bodies.removeClass(__C.CLASSES.ACTIVE);
-				$setting_tab.addClass(__C.CLASSES.ACTIVE);
-				$setting_body.addClass(__C.CLASSES.ACTIVE);
-				$this.trigger('tabs:change');
-				if (focus_on_change) {
-					scrollTo($setting_body, 400);
-				}
-			}
-		};
+            if ($setting_tab.length && !$setting_tab.hasClass(__C.CLASSES.ACTIVE)) {
+                $tabs.removeClass(__C.CLASSES.ACTIVE);
+                $bodies.removeClass(__C.CLASSES.ACTIVE);
+                $setting_tab.addClass(__C.CLASSES.ACTIVE);
+                $setting_body.addClass(__C.CLASSES.ACTIVE);
+                $this.trigger('tabs:change');
+                if (focus_on_change) {
+                    scrollTo($setting_body, 400);
+                }
+            }
+        };
 
-		$this.nextTab = function () {
-			$this.setToTab($this.currentTabsIndex + 1);
-		};
+        $this.nextTab = function () {
+            $this.setToTab($this.currentTabsIndex + 1);
+        };
 
-		$this.prevTab = function () {
-			$this.setToTab($this.currentTabsIndex - 1);
-		};
+        $this.prevTab = function () {
+            $this.setToTab($this.currentTabsIndex - 1);
+        };
 
-		$this.connectMutationObserver = function () {
-			$bodies.each(function (i, body) {
-				mutation_observer.observe(body, {
-					childList: true,
-					subtree: true,
-					attributes: true,
-					attributeFilter: ['class']
-				});
-			});
-		};
+        $this.connectMutationObserver = function () {
+            $bodies.each(function (i, body) {
+                mutation_observer.observe(body, {
+                    childList: true,
+                    subtree: true,
+                    attributes: true,
+                    attributeFilter: ['class']
+                });
+            });
+        };
 
-		$this.disconnectMutationObserver = function () {
-			mutation_observer.disconnect();
-			$bodies_wrapper.height('auto');
-		};
+        $this.disconnectMutationObserver = function () {
+            mutation_observer.disconnect();
+            $bodies_wrapper.height('auto');
+        };
 
-		if (!$tabs.filter('.' + __C.CLASSES.ACTIVE).length) {
-			$tabs.eq(0).addClass(__C.CLASSES.ACTIVE);
-		}
-		$bodies.removeClass(__C.CLASSES.ACTIVE).eq($this.currentTabsIndex).addClass(__C.CLASSES.ACTIVE);
-		$bodies_wrapper.on('transitionend', function () {
-			$this.removeClass('-in_progress');
-			$this.trigger('progress_end');
-		});
+        if (!$tabs.filter('.' + __C.CLASSES.ACTIVE).length) {
+            $tabs.eq(0).addClass(__C.CLASSES.ACTIVE);
+        }
+        $bodies.removeClass(__C.CLASSES.ACTIVE).eq($this.currentTabsIndex).addClass(__C.CLASSES.ACTIVE);
+        $bodies_wrapper.on('transitionend', function () {
+            $this.removeClass('-in_progress');
+            $this.trigger('progress_end');
+        });
 
-		if (is_height_dynamic) {
-			$bodies_wrapper.height($bodies.filter('.' + __C.CLASSES.ACTIVE).outerHeight());
-			$this.connectMutationObserver();
-		}
+        if (is_height_dynamic) {
+            $bodies_wrapper.height($bodies.filter('.' + __C.CLASSES.ACTIVE).outerHeight());
+            $this.connectMutationObserver();
+        }
 
-		$tabs.on('click', function () {
-			$this.setToTab($tabs.index(this));
-		});
+        $tabs.on('click', function () {
+            $this.setToTab($tabs.index(this));
+        });
 
-		$this.data('instance', $this);
-	}).addClass('-Handled_Tabs');
+        $this.data('instance', $this);
+    }).addClass('-Handled_Tabs');
 }
 
 function bindSelect2($parent) {
-	$parent = $parent ? $parent : $('body');
-	var $selects = $parent.is('.ToSelect2') ? $parent : $parent.find('.ToSelect2');
+    $parent = $parent ? $parent : $('body');
+    var $selects = $parent.is('.ToSelect2') ? $parent : $parent.find('.ToSelect2');
 
-	$selects.not('.-Handled_ToSelect2').each(function (i, el) {
-		initSelect2($(el));
-	}).addClass('-Handled_ToSelect2');
+    $selects.not('.-Handled_ToSelect2').each(function (i, el) {
+        initSelect2($(el));
+    }).addClass('-Handled_ToSelect2');
 
-	return $selects;
+    return $selects;
 }
 
 function bindRippleEffect($parent) {
-	$parent = $parent ? $parent : $('body');
-	var $buttons = $parent.is('.RippleEffect') ? $parent : $parent.find('.RippleEffect');
+    $parent = $parent ? $parent : $('body');
+    var $buttons = $parent.is('.RippleEffect') ? $parent : $parent.find('.RippleEffect');
 
-	$buttons.not('.-Handled_RippleEffect').on('click.RippleEffect', rippleEffectHandler).addClass('-Handled_RippleEffect');
+    $buttons.not('.-Handled_RippleEffect').on('click.RippleEffect', rippleEffectHandler).addClass('-Handled_RippleEffect');
 
-	return $buttons;
+    return $buttons;
 }
 
 function bindDropdown($parent) {
-	$parent = $parent ? $parent : $('body');
-	var $dropdown_buttons = $parent.is('.DropdownButton') ? $parent : $parent.find('.DropdownButton');
+    $parent = $parent ? $parent : $('body');
+    var $dropdown_buttons = $parent.is('.DropdownButton') ? $parent : $parent.find('.DropdownButton');
 
-	$dropdown_buttons.not('.-Handled_DropdownButton').each(function () {
-		var $button = $(this),
-		    instance = $button.resolveInstance(),
-		    data = $button.data(),
-		    $dropbox = $('.DropdownBox').filter(function (i, el) {
+    $dropdown_buttons.not('.-Handled_DropdownButton').each(function () {
+        var $button = $(this),
+            instance = $button.resolveInstance(),
+            data = $button.data(),
+            $dropbox = $('.DropdownBox').filter(function (i, el) {
 
-			return $(el).data('dropdown_id') === data.dropdown;
-		}),
-		    button_pos;
+            return $(el).data('dropdown_id') === data.dropdown;
+        }),
+            button_pos;
 
-		if (instance.initiate) {
-			return instance.initiate();
-		}
+        if (instance.initiate) {
+            return instance.initiate();
+        }
 
-		$dropbox.data($.extend({}, $dropbox.data(), data));
+        $dropbox.data($.extend({}, $dropbox.data(), data));
 
-		$dropbox.closeDropbox = function () {
-			$('body').off('mousedown.CloseDropdown');
-			$(document).off('keyup.CloseDropdown');
-			$dropbox.removeClass('-show');
-			$button.addClass('-dropdown_active');
-		};
+        $dropbox.closeDropbox = function () {
+            $('body').off('mousedown.CloseDropdown');
+            $(document).off('keyup.CloseDropdown');
+            $dropbox.removeClass('-show');
+            $button.addClass('-dropdown_active');
+        };
 
-		if (!empty(data.ddWidth)) {
-			if (data.ddWidth === 'self') {
-				$dropbox.width($button.outerWidth());
-			} else if (isFinite(data.ddWidth) || isPercentageString(data.ddWidth)) {
-				$dropbox.width(data.ddWidth);
-			}
-		}
+        if (!empty(data.ddWidth)) {
+            if (data.ddWidth === 'self') {
+                $dropbox.width($button.outerWidth());
+            } else if (isFinite(data.ddWidth) || isPercentageString(data.ddWidth)) {
+                $dropbox.width(data.ddWidth);
+            }
+        }
 
-		if (!empty(data.ddPosX) || !empty(data.ddPosY)) {
-			button_pos = $button.position();
+        if (!empty(data.ddPosX) || !empty(data.ddPosY)) {
+            button_pos = $button.position();
 
-			if (!empty(data.ddPosX)) {
-				$dropbox.css('left', function () {
+            if (!empty(data.ddPosX)) {
+                $dropbox.css('left', function () {
 
-					if (data.ddPosX === 'self.center') {
+                    if (data.ddPosX === 'self.center') {
 
-						return button_pos.left + $button.outerWidth() / 2 - $dropbox.outerWidth() / 2;
-					} else if (data.ddPosX === 'center') {
+                        return button_pos.left + $button.outerWidth() / 2 - $dropbox.outerWidth() / 2;
+                    } else if (data.ddPosX === 'center') {
 
-						return $dropbox.parent().outerWidth() / 2 - $dropbox.outerWidth() / 2;
-					} else if (isFinite(data.ddPosX)) {
+                        return $dropbox.parent().outerWidth() / 2 - $dropbox.outerWidth() / 2;
+                    } else if (isFinite(data.ddPosX)) {
 
-						return data.ddPosX;
-					}
-				}());
-			}
+                        return data.ddPosX;
+                    }
+                }());
+            }
 
-			if (!empty(data.ddPosY)) {
+            if (!empty(data.ddPosY)) {
 
-				$dropbox.css('top', function () {
-					if (data.ddPosY === 'self.center') {
+                $dropbox.css('top', function () {
+                    if (data.ddPosY === 'self.center') {
 
-						return button_pos.top + $button.outerHeight() / 2 - $dropbox.outerHeight() / 2;
-					} else if (data.ddPosY === 'center') {
+                        return button_pos.top + $button.outerHeight() / 2 - $dropbox.outerHeight() / 2;
+                    } else if (data.ddPosY === 'center') {
 
-						return $dropbox.parent().outerHeight() / 2 - $dropbox.outerHeight() / 2;
-					} else if (isFinite(data.ddPosY)) {
+                        return $dropbox.parent().outerHeight() / 2 - $dropbox.outerHeight() / 2;
+                    } else if (isFinite(data.ddPosY)) {
 
-						return button_pos.top + $button.outerHeight() + data.ddPosY;
-					}
-				}());
-			}
-		}
+                        return button_pos.top + $button.outerHeight() + data.ddPosY;
+                    }
+                }());
+            }
+        }
 
-		$dropbox.find('.CloseDropdown').on('click.CloseDropdown', $dropbox.closeDropbox);
+        $dropbox.find('.CloseDropdown').on('click.CloseDropdown', $dropbox.closeDropbox);
 
-		$button.on('click.OpenDropdown', function () {
-			$dropbox.addClass('-show');
-			$button.addClass('-dropdown_active');
+        $button.on('click.OpenDropdown', function () {
+            $dropbox.addClass('-show');
+            $button.addClass('-dropdown_active');
 
-			$('body').on('mousedown.CloseDropdown', function (e) {
-				if (!$(e.target).closest($dropbox).length) {
-					$dropbox.closeDropbox();
-				}
-			});
+            $('body').on('mousedown.CloseDropdown', function (e) {
+                if (!$(e.target).closest($dropbox).length) {
+                    $dropbox.closeDropbox();
+                }
+            });
 
-			$(document).on('keyup.CloseDropdown', function (e) {
-				if (isKeyPressed(e, __C.KEY_CODES.ESC)) {
-					$dropbox.closeDropbox();
-				}
-			});
-		});
+            $(document).on('keyup.CloseDropdown', function (e) {
+                if (isKeyPressed(e, __C.KEY_CODES.ESC)) {
+                    $dropbox.closeDropbox();
+                }
+            });
+        });
 
-		$button.data('dropdown_box', $dropbox);
-	}).addClass('-Handled_DropdownButton');
+        $button.data('dropdown_box', $dropbox);
+    }).addClass('-Handled_DropdownButton');
 
-	return $dropdown_buttons;
+    return $dropdown_buttons;
 }
 
 function bindFileLoadButton($parent) {
-	$parent = $parent ? $parent : $('body');
-	$parent.find('.FileLoadButton').not('.-Handled_FileLoadButton').click(function (e) {
-		var $this = $(this);
-		$this.children('input').get(0).click();
-	}).addClass('-Handled_FileLoadButton');
+    $parent = $parent ? $parent : $('body');
+    $parent.find('.FileLoadButton').not('.-Handled_FileLoadButton').click(function (e) {
+        var $this = $(this);
+        $this.children('input').get(0).click();
+    }).addClass('-Handled_FileLoadButton');
 }
 
 function bindCollapsing($parent) {
-	$parent = $parent ? $parent : $('body');
-	$parent.find('.CollapsingWrapper').not('.-Handled_Collapsing').each(function () {
-		var $instance = $(this),
-		    $wrapper = $instance,
-		    $collapsing_parent = $wrapper.closest('.Collapsing'),
-		    collapsing_id = $instance.data('collapsing_id'),
-		    mutation_observer = new MutationObserver(function (records) {
-			var $target = $(records[records.length - 1].target),
-			    $contents = $target.parents('.CollapsingContent');
+    $parent = $parent ? $parent : $('body');
+    $parent.find('.CollapsingWrapper').not('.-Handled_Collapsing').each(function () {
+        var $instance = $(this),
+            $wrapper = $instance,
+            $collapsing_parent = $wrapper.closest('.Collapsing'),
+            collapsing_id = $instance.data('collapsing_id'),
+            mutation_observer = new MutationObserver(function (records) {
+            var $target = $(records[records.length - 1].target),
+                $contents = $target.parents('.CollapsingContent');
 
-			$contents = $target.hasClass('CollapsingContent') ? $contents.add($target) : $contents;
-			$contents.each(function (i, content) {
-				var $content = $(content),
-				    $wrapper = $content.parent();
+            $contents = $target.hasClass('CollapsingContent') ? $contents.add($target) : $contents;
+            $contents.each(function (i, content) {
+                var $content = $(content),
+                    $wrapper = $content.parent();
 
-				if ($wrapper.hasClass('-opened')) {
-					$wrapper.addClass('-in_progress').height($content.outerHeight());
-				}
-			});
-		}),
-		    default_height,
-		    $content = $wrapper.children('.CollapsingContent');
+                if ($wrapper.hasClass('-opened')) {
+                    $wrapper.addClass('-in_progress').height($content.outerHeight());
+                }
+            });
+        }),
+            default_height,
+            $content = $wrapper.children('.CollapsingContent');
 
-		$collapsing_parent = $collapsing_parent.length ? $collapsing_parent : $parent;
+        $collapsing_parent = $collapsing_parent.length ? $collapsing_parent : $parent;
 
-		$instance.$trigger = $collapsing_parent.find(collapsing_id ? '.CollapsingTrigger[data-collapsing_id="' + collapsing_id + '"]' : '.CollapsingTrigger:first');
+        $instance.$trigger = $collapsing_parent.find(collapsing_id ? '.CollapsingTrigger[data-collapsing_id="' + collapsing_id + '"]' : '.CollapsingTrigger:first');
 
-		if ($wrapper.hasClass('-fading')) {
-			default_height = $instance.data('defaultHeight') < $content.height() ? $instance.data('defaultHeight') : $content.height();
-			if (!$instance.hasClass(__C.CLASSES.ACTIVE) && $wrapper.height() < default_height) {
-				$wrapper.height(default_height);
-			}
-		} else {
-			default_height = $instance.data('defaultHeight') ? $instance.data('defaultHeight') : 0;
-		}
+        if ($wrapper.hasClass('-fading')) {
+            default_height = $instance.data('defaultHeight') < $content.height() ? $instance.data('defaultHeight') : $content.height();
+            if (!$instance.hasClass(__C.CLASSES.ACTIVE) && $wrapper.height() < default_height) {
+                $wrapper.height(default_height);
+            }
+        } else {
+            default_height = $instance.data('defaultHeight') ? $instance.data('defaultHeight') : 0;
+        }
 
-		function toggleCollapsing() {
-			var parent_Tabs = $wrapper.parents('.Tabs').resolveInstance();
+        function toggleCollapsing() {
+            var parent_Tabs = $wrapper.parents('.Tabs').resolveInstance();
 
-			if (parent_Tabs.length) {
-				parent_Tabs.disconnectMutationObserver();
-			}
-			$wrapper.addClass('-in_progress');
-			if ($instance.hasClass(__C.CLASSES.ACTIVE)) {
-				$wrapper.height(default_height);
-			} else {
-				$wrapper.height($content.outerHeight());
-			}
-			$wrapper.toggleClass('-opened');
-			$instance.toggleClass(__C.CLASSES.ACTIVE);
-			if (parent_Tabs.length) {
-				parent_Tabs.connectMutationObserver();
-			}
-		}
+            if (parent_Tabs.length) {
+                parent_Tabs.disconnectMutationObserver();
+            }
+            $wrapper.addClass('-in_progress');
+            if ($instance.hasClass(__C.CLASSES.ACTIVE)) {
+                $wrapper.height(default_height);
+            } else {
+                $wrapper.height($content.outerHeight());
+            }
+            $wrapper.toggleClass('-opened');
+            $instance.toggleClass(__C.CLASSES.ACTIVE);
+            if (parent_Tabs.length) {
+                parent_Tabs.connectMutationObserver();
+            }
+        }
 
-		function changeProp() {
-			$instance.$trigger.each(function () {
-				var $trigger = $(this);
+        function changeProp() {
+            $instance.$trigger.each(function () {
+                var $trigger = $(this);
 
-				if ($trigger.is(':checkbox')) {
-					$trigger.prop('checked', !$trigger.prop('checked'));
-				}
-			});
-		}
+                if ($trigger.is(':checkbox')) {
+                    $trigger.prop('checked', !$trigger.prop('checked'));
+                }
+            });
+        }
 
-		$instance.toggleCollapsing = function () {
-			changeProp();
-			toggleCollapsing();
-		};
+        $instance.toggleCollapsing = function () {
+            changeProp();
+            toggleCollapsing();
+        };
 
-		$instance.openCollapsing = function () {
-			if (!$instance.hasClass(__C.CLASSES.ACTIVE)) {
-				$instance.toggleCollapsing();
-			}
-		};
+        $instance.openCollapsing = function () {
+            if (!$instance.hasClass(__C.CLASSES.ACTIVE)) {
+                $instance.toggleCollapsing();
+            }
+        };
 
-		$instance.closeCollapsing = function () {
-			if ($instance.hasClass(__C.CLASSES.ACTIVE)) {
-				$instance.toggleCollapsing();
-			}
-		};
+        $instance.closeCollapsing = function () {
+            if ($instance.hasClass(__C.CLASSES.ACTIVE)) {
+                $instance.toggleCollapsing();
+            }
+        };
 
-		$instance.bindTrigger = function ($trigger) {
-			var trigger_event = $trigger.is(':checkbox') || $trigger.is(':radio') ? 'change' : 'click';
+        $instance.bindTrigger = function ($trigger) {
+            var trigger_event = $trigger.is(':checkbox') || $trigger.is(':radio') ? 'change' : 'click';
 
-			if ($trigger) {
-				$trigger.on(trigger_event + '.toggleCollapsing', toggleCollapsing);
-				$instance.$trigger = $instance.$trigger.add($trigger);
-			} else {
-				$instance.$trigger.on(trigger_event + '.toggleCollapsing', toggleCollapsing);
-			}
+            if ($trigger) {
+                $trigger.on(trigger_event + '.toggleCollapsing', toggleCollapsing);
+                $instance.$trigger = $instance.$trigger.add($trigger);
+            } else {
+                $instance.$trigger.on(trigger_event + '.toggleCollapsing', toggleCollapsing);
+            }
 
-			$instance.$trigger.addClass('-Handled_CollapsingTrigger');
-		};
+            $instance.$trigger.addClass('-Handled_CollapsingTrigger');
+        };
 
-		$instance.bindTrigger($instance.$trigger);
+        $instance.bindTrigger($instance.$trigger);
 
-		$wrapper.on('transitionend', function () {
-			$wrapper.removeClass('-in_progress');
-		});
+        $wrapper.on('transitionend', function () {
+            $wrapper.removeClass('-in_progress');
+        });
 
-		if (default_height) {
-			$wrapper.on('click.OpenCollapsing', function () {
-				$instance.openCollapsing();
-			});
-		}
+        if (default_height) {
+            $wrapper.on('click.OpenCollapsing', function () {
+                $instance.openCollapsing();
+            });
+        }
 
-		mutation_observer.observe($wrapper.get(0), {
-			childList: true,
-			subtree: true,
-			attributes: true,
-			attributeFilter: ['class']
-		});
+        mutation_observer.observe($wrapper.get(0), {
+            childList: true,
+            subtree: true,
+            attributes: true,
+            attributeFilter: ['class']
+        });
 
-		$instance.data('instance', $instance);
-	}).addClass('Handled_Collapsing');
+        $instance.data('instance', $instance);
+    }).addClass('Handled_Collapsing');
 }
 
 function bindControlSwitch($parent) {
-	$parent = $parent ? $parent : $('body');
-	$parent.find('.Switch').not('.-Handled_Switch').each(function (i, el) {
-		var $switch = $(el);
+    $parent = $parent ? $parent : $('body');
+    $parent.find('.Switch').not('.-Handled_Switch').each(function (i, el) {
+        var $switch = $(el);
 
-		$switch.switching = $parent.find('.Switching[data-switch_id="' + $switch.data('switch_id') + '"]');
-		$switch.on('change.Switch', function () {
-			$switch.switching.each(function (i, switching) {
-				var $switching = $(switching);
+        $switch.switching = $parent.find('.Switching[data-switch_id="' + $switch.data('switch_id') + '"]');
+        $switch.on('change.Switch', function () {
+            $switch.switching.each(function (i, switching) {
+                var $switching = $(switching);
 
-				if ($switching.is('fieldset')) {
-					$switching.prop('disabled', !$switching.prop('disabled'));
-				} else {
-					$switching.toggleStatus('disabled');
-				}
-			});
-		});
-	}).addClass('-Handled_Switch');
+                if ($switching.is('fieldset')) {
+                    $switching.prop('disabled', !$switching.prop('disabled'));
+                } else {
+                    $switching.toggleStatus('disabled');
+                }
+            });
+        });
+    }).addClass('-Handled_Switch');
 }
+
 /**
  *
  * @param {jQuery} $parent
  * @return {jQuery}
  */
 function bindCallModal($parent) {
-	$parent = $parent ? $parent : $('body');
-	return $parent.find('.' + __C.CLASSES.HOOKS.CALL_MODAL).not('.' + __C.CLASSES.HOOKS.HANDLED + __C.CLASSES.HOOKS.CALL_MODAL).each(function () {
-		var $this = $(this);
+    $parent = $parent ? $parent : $('body');
+    return $parent.find('.' + __C.CLASSES.HOOKS.CALL_MODAL).not('.' + __C.CLASSES.HOOKS.HANDLED + __C.CLASSES.HOOKS.CALL_MODAL).each(function () {
+        var $this = $(this);
 
-		$this.on('click.CallModal', function () {
-			var $this = $(this),
-			    data = $this.data(),
-			    title = data.modal_title,
-			    modal = data.modal,
-			    modal_type = data.modal_type;
+        $this.on('click.CallModal', function () {
+            var $this = $(this),
+                data = $this.data(),
+                title = data.modal_title,
+                modal = data.modal,
+                modal_type = data.modal_type;
 
-			if (!modal) {
-				switch (modal_type) {
-					case __C.MODAL_TYPES.FAVORS:
-						{
-							modal = new FavoredModal(data.modal_event_id, title);
-							break;
-						}
-					case __C.MODAL_TYPES.SUBSCRIBERS:
-						{
-							modal = new SubscribersModal(data.modal_organization_id, title);
-							break;
-						}
-					case __C.MODAL_TYPES.EDITORS:
-						{
-							modal = new EditorsModal(data.modal_organization_id, title, data.modal_specific_role);
-							break;
-						}
-					case __C.MODAL_TYPES.MAP:
-						{
-							modal = new MapModal(data.modal_map_location, title);
-							break;
-						}
-					case __C.MODAL_TYPES.MEDIA:
-						{
-							var type = data.modal_media_type,
-							    url = data.modal_media_url,
-							    parsed_url;
-							if (!url) {
-								if ($this.is('img')) {
-									url = $this.attr('src');
-									type = 'image';
-								} else if ($this.is('video')) {
-									//url = $this.attr('url');
-									type = 'video';
-								} else {
-									var str = $this.css('background-image');
-									if (str !== 'none') {
-										if (str.indexOf('"') != -1) {
-											url = str.slice(str.indexOf('"') + 1, str.indexOf('"', str.indexOf('"') + 1));
-										} else {
-											url = str.slice(str.indexOf('(') + 1, str.indexOf(')'));
-										}
-										type = 'image';
-									}
-								}
-							}
-							modal = new MediaModal(parseUri(decodeURIComponent(url)).wo_query, type);
-							break;
-						}
-					case __C.MODAL_TYPES.CROPPER:
-						{
-							modal = new CropperModal(data.source_img, data);
-							break;
-						}
-					case __C.MODAL_TYPES.FRIENDS_LIST:
-						{
-							modal = new FriendsListModal(data.modal_entity);
-							break;
-						}
-					case __C.MODAL_TYPES.SUBSCRIBERS_LIST:
-						{
-							modal = new SubscriptionsListModal(data.modal_entity);
-							break;
-						}
-					case __C.MODAL_TYPES.TICKET:
-						{
-							modal = new TicketsModal(data.tickets || data.ticket_uuid);
-							break;
-						}
-					case __C.MODAL_TYPES.ADD_STAFF:
-						{
-							modal = new AddStaffModal(data.modal_org_id, data.modal_role);
-							break;
-						}
-					default:
-						{
-							modal = new StdModal(title, data.modal_content, data.modal_style);
-							break;
-						}
-				}
-				$this.data('modal', modal);
-			}
-			modal.show();
-		});
-	}).addClass(__C.CLASSES.HOOKS.HANDLED + __C.CLASSES.HOOKS.CALL_MODAL);
+            if (!modal) {
+                switch (modal_type) {
+                    case __C.MODAL_TYPES.FAVORS:
+                        {
+                            modal = new FavoredModal(data.modal_event_id, title);
+                            break;
+                        }
+                    case __C.MODAL_TYPES.SUBSCRIBERS:
+                        {
+                            modal = new SubscribersModal(data.modal_organization_id, title);
+                            break;
+                        }
+                    case __C.MODAL_TYPES.EDITORS:
+                        {
+                            modal = new EditorsModal(data.modal_organization_id, title, data.modal_specific_role);
+                            break;
+                        }
+                    case __C.MODAL_TYPES.MAP:
+                        {
+                            modal = new MapModal(data.modal_map_location, title);
+                            break;
+                        }
+                    case __C.MODAL_TYPES.MEDIA:
+                        {
+                            var type = data.modal_media_type,
+                                url = data.modal_media_url,
+                                parsed_url;
+                            if (!url) {
+                                if ($this.is('img')) {
+                                    url = $this.attr('src');
+                                    type = 'image';
+                                } else if ($this.is('video')) {
+                                    //url = $this.attr('url');
+                                    type = 'video';
+                                } else {
+                                    var str = $this.css('background-image');
+                                    if (str !== 'none') {
+                                        if (str.indexOf('"') != -1) {
+                                            url = str.slice(str.indexOf('"') + 1, str.indexOf('"', str.indexOf('"') + 1));
+                                        } else {
+                                            url = str.slice(str.indexOf('(') + 1, str.indexOf(')'));
+                                        }
+                                        type = 'image';
+                                    }
+                                }
+                            }
+                            modal = new MediaModal(parseUri(decodeURIComponent(url)).wo_query, type);
+                            break;
+                        }
+                    case __C.MODAL_TYPES.CROPPER:
+                        {
+                            modal = new CropperModal(data.source_img, data);
+                            break;
+                        }
+                    case __C.MODAL_TYPES.FRIENDS_LIST:
+                        {
+                            modal = new FriendsListModal(data.modal_entity);
+                            break;
+                        }
+                    case __C.MODAL_TYPES.SUBSCRIBERS_LIST:
+                        {
+                            modal = new SubscriptionsListModal(data.modal_entity);
+                            break;
+                        }
+                    case __C.MODAL_TYPES.TICKET:
+                        {
+                            modal = new TicketsModal(data.tickets || data.ticket_uuid);
+                            break;
+                        }
+                    case __C.MODAL_TYPES.ADD_STAFF:
+                        {
+                            modal = new AddStaffModal(data.modal_org_id, data.modal_role);
+                            break;
+                        }
+                    default:
+                        {
+                            modal = new StdModal(title, data.modal_content, data.modal_style);
+                            break;
+                        }
+                }
+                $this.data('modal', modal);
+            }
+            modal.show();
+        });
+    }).addClass(__C.CLASSES.HOOKS.HANDLED + __C.CLASSES.HOOKS.CALL_MODAL);
 }
+
 /**
  *
  * @param {jQuery} [$parent]
  * @return {jQuery}
  */
 function bindPageLinks($parent) {
-	$parent = $parent ? $parent : $('body');
-	var $links = $parent.is('.Link') ? $parent : $parent.find('.Link');
+    $parent = $parent ? $parent : $('body');
+    var $links = $parent.is('.Link') ? $parent : $parent.find('.Link');
 
-	return $links.not('.-Handled_Link').on('click.pageRender', pageLinkClickHandler).addClass('-Handled_Link');
+    return $links.not('.-Handled_Link').on('click.pageRender', pageLinkClickHandler).addClass('-Handled_Link');
 }
 
 /**
@@ -2885,48 +2910,50 @@ function bindPageLinks($parent) {
  * @return {jQuery}
  */
 function handleErrorField($unit) {
-	var $input;
+    var $input;
 
-	if (!($unit instanceof jQuery)) {
-		return handleErrorField($($unit));
-	}
-	if (!$unit.is('.form_unit')) {
-		if ($unit.closest('.form_unit').length) return handleErrorField($unit.closest('.form_unit'));
-		return $unit;
-	}
+    if (!($unit instanceof jQuery)) {
+        return handleErrorField($($unit));
+    }
+    if (!$unit.is('.form_unit')) {
+        if ($unit.closest('.form_unit').length) return handleErrorField($unit.closest('.form_unit'));
+        return $unit;
+    }
 
-	if (!$unit.closest('.form_unit').hasClass('-status_error')) {
-		$input = $unit.find('input, select, textarea');
-		$unit.addClass('-status_error').off('input.ClearError change.ClearError').one('input.ClearError change.ClearError', function () {
-			$unit.off('input.ClearError change.ClearError').removeClass('-status_error');
-			$input.off('blur.ClearError');
-		});
-		$input.off('blur.ClearError').one('blur.ClearError', function () {
-			if ($(this).val().trim() !== '') {
-				$unit.trigger('input.ClearError');
-			}
-		});
-	}
-	return $unit;
+    if (!$unit.closest('.form_unit').hasClass('-status_error')) {
+        $input = $unit.find('input, select, textarea');
+        $unit.addClass('-status_error').off('input.ClearError change.ClearError').one('input.ClearError change.ClearError', function () {
+            $unit.off('input.ClearError change.ClearError').removeClass('-status_error');
+            $input.off('blur.ClearError');
+        });
+        $input.off('blur.ClearError').one('blur.ClearError', function () {
+            if ($(this).val().trim() !== '') {
+                $unit.trigger('input.ClearError');
+            }
+        });
+    }
+    return $unit;
 }
+
 /**
  * Getting base64-encoded string of the image from url
  * @param {string} url
  * @param {function({string})} callback
  */
 function toDataUrl(url, callback) {
-	var xhr = new XMLHttpRequest();
-	xhr.responseType = 'blob';
-	xhr.onload = function () {
-		var reader = new FileReader();
-		reader.onloadend = function () {
-			callback(reader.result);
-		};
-		reader.readAsDataURL(xhr.response);
-	};
-	xhr.open('GET', url);
-	xhr.send();
+    var xhr = new XMLHttpRequest();
+    xhr.responseType = 'blob';
+    xhr.onload = function () {
+        var reader = new FileReader();
+        reader.onloadend = function () {
+            callback(reader.result);
+        };
+        reader.readAsDataURL(xhr.response);
+    };
+    xhr.open('GET', url);
+    xhr.send();
 }
+
 /**
  *
  * @param {object} response
@@ -2935,22 +2962,23 @@ function toDataUrl(url, callback) {
  * @param {boolean} [response.status]
  */
 function showNotifier(response) {
-	$.notify({
-		'message': response.text,
-		'pos': response.pos ? response.pos : 'top-right',
-		'status': response.status ? 'success' : 'danger'
-	});
+    $.notify({
+        'message': response.text,
+        'pos': response.pos ? response.pos : 'top-right',
+        'status': response.status ? 'success' : 'danger'
+    });
 }
+
 /**
  * Checks if device is mobile
  * @return {boolean}
  */
 function isNotDesktop() {
-	var check = false;
-	(function (a) {
-		if (/(android|bb\d+|meego).+mobile|avantgo|bada\/|blackberry|blazer|compal|elaine|fennec|hiptop|iemobile|ip(hone|od)|iris|kindle|lge |maemo|midp|mmp|mobile.+firefox|netfront|opera m(ob|in)i|palm( os)?|phone|p(ixi|re)\/|plucker|pocket|psp|series(4|6)0|symbian|treo|up\.(browser|link)|vodafone|wap|windows ce|xda|xiino|android|ipad|playbook|silk/i.test(a) || /1207|6310|6590|3gso|4thp|50[1-6]i|770s|802s|a wa|abac|ac(er|oo|s\-)|ai(ko|rn)|al(av|ca|co)|amoi|an(ex|ny|yw)|aptu|ar(ch|go)|as(te|us)|attw|au(di|\-m|r |s )|avan|be(ck|ll|nq)|bi(lb|rd)|bl(ac|az)|br(e|v)w|bumb|bw\-(n|u)|c55\/|capi|ccwa|cdm\-|cell|chtm|cldc|cmd\-|co(mp|nd)|craw|da(it|ll|ng)|dbte|dc\-s|devi|dica|dmob|do(c|p)o|ds(12|\-d)|el(49|ai)|em(l2|ul)|er(ic|k0)|esl8|ez([4-7]0|os|wa|ze)|fetc|fly(\-|_)|g1 u|g560|gene|gf\-5|g\-mo|go(\.w|od)|gr(ad|un)|haie|hcit|hd\-(m|p|t)|hei\-|hi(pt|ta)|hp( i|ip)|hs\-c|ht(c(\-| |_|a|g|p|s|t)|tp)|hu(aw|tc)|i\-(20|go|ma)|i230|iac( |\-|\/)|ibro|idea|ig01|ikom|im1k|inno|ipaq|iris|ja(t|v)a|jbro|jemu|jigs|kddi|keji|kgt( |\/)|klon|kpt |kwc\-|kyo(c|k)|le(no|xi)|lg( g|\/(k|l|u)|50|54|\-[a-w])|libw|lynx|m1\-w|m3ga|m50\/|ma(te|ui|xo)|mc(01|21|ca)|m\-cr|me(rc|ri)|mi(o8|oa|ts)|mmef|mo(01|02|bi|de|do|t(\-| |o|v)|zz)|mt(50|p1|v )|mwbp|mywa|n10[0-2]|n20[2-3]|n30(0|2)|n50(0|2|5)|n7(0(0|1)|10)|ne((c|m)\-|on|tf|wf|wg|wt)|nok(6|i)|nzph|o2im|op(ti|wv)|oran|owg1|p800|pan(a|d|t)|pdxg|pg(13|\-([1-8]|c))|phil|pire|pl(ay|uc)|pn\-2|po(ck|rt|se)|prox|psio|pt\-g|qa\-a|qc(07|12|21|32|60|\-[2-7]|i\-)|qtek|r380|r600|raks|rim9|ro(ve|zo)|s55\/|sa(ge|ma|mm|ms|ny|va)|sc(01|h\-|oo|p\-)|sdk\/|se(c(\-|0|1)|47|mc|nd|ri)|sgh\-|shar|sie(\-|m)|sk\-0|sl(45|id)|sm(al|ar|b3|it|t5)|so(ft|ny)|sp(01|h\-|v\-|v )|sy(01|mb)|t2(18|50)|t6(00|10|18)|ta(gt|lk)|tcl\-|tdg\-|tel(i|m)|tim\-|t\-mo|to(pl|sh)|ts(70|m\-|m3|m5)|tx\-9|up(\.b|g1|si)|utst|v400|v750|veri|vi(rg|te)|vk(40|5[0-3]|\-v)|vm40|voda|vulc|vx(52|53|60|61|70|80|81|83|85|98)|w3c(\-| )|webc|whit|wi(g |nc|nw)|wmlb|wonu|x700|yas\-|your|zeto|zte\-/i.test(a.substr(0, 4))) check = true;
-	})(navigator.userAgent || navigator.vendor || window.opera);
-	return check;
+    var check = false;
+    (function (a) {
+        if (/(android|bb\d+|meego).+mobile|avantgo|bada\/|blackberry|blazer|compal|elaine|fennec|hiptop|iemobile|ip(hone|od)|iris|kindle|lge |maemo|midp|mmp|mobile.+firefox|netfront|opera m(ob|in)i|palm( os)?|phone|p(ixi|re)\/|plucker|pocket|psp|series(4|6)0|symbian|treo|up\.(browser|link)|vodafone|wap|windows ce|xda|xiino|android|ipad|playbook|silk/i.test(a) || /1207|6310|6590|3gso|4thp|50[1-6]i|770s|802s|a wa|abac|ac(er|oo|s\-)|ai(ko|rn)|al(av|ca|co)|amoi|an(ex|ny|yw)|aptu|ar(ch|go)|as(te|us)|attw|au(di|\-m|r |s )|avan|be(ck|ll|nq)|bi(lb|rd)|bl(ac|az)|br(e|v)w|bumb|bw\-(n|u)|c55\/|capi|ccwa|cdm\-|cell|chtm|cldc|cmd\-|co(mp|nd)|craw|da(it|ll|ng)|dbte|dc\-s|devi|dica|dmob|do(c|p)o|ds(12|\-d)|el(49|ai)|em(l2|ul)|er(ic|k0)|esl8|ez([4-7]0|os|wa|ze)|fetc|fly(\-|_)|g1 u|g560|gene|gf\-5|g\-mo|go(\.w|od)|gr(ad|un)|haie|hcit|hd\-(m|p|t)|hei\-|hi(pt|ta)|hp( i|ip)|hs\-c|ht(c(\-| |_|a|g|p|s|t)|tp)|hu(aw|tc)|i\-(20|go|ma)|i230|iac( |\-|\/)|ibro|idea|ig01|ikom|im1k|inno|ipaq|iris|ja(t|v)a|jbro|jemu|jigs|kddi|keji|kgt( |\/)|klon|kpt |kwc\-|kyo(c|k)|le(no|xi)|lg( g|\/(k|l|u)|50|54|\-[a-w])|libw|lynx|m1\-w|m3ga|m50\/|ma(te|ui|xo)|mc(01|21|ca)|m\-cr|me(rc|ri)|mi(o8|oa|ts)|mmef|mo(01|02|bi|de|do|t(\-| |o|v)|zz)|mt(50|p1|v )|mwbp|mywa|n10[0-2]|n20[2-3]|n30(0|2)|n50(0|2|5)|n7(0(0|1)|10)|ne((c|m)\-|on|tf|wf|wg|wt)|nok(6|i)|nzph|o2im|op(ti|wv)|oran|owg1|p800|pan(a|d|t)|pdxg|pg(13|\-([1-8]|c))|phil|pire|pl(ay|uc)|pn\-2|po(ck|rt|se)|prox|psio|pt\-g|qa\-a|qc(07|12|21|32|60|\-[2-7]|i\-)|qtek|r380|r600|raks|rim9|ro(ve|zo)|s55\/|sa(ge|ma|mm|ms|ny|va)|sc(01|h\-|oo|p\-)|sdk\/|se(c(\-|0|1)|47|mc|nd|ri)|sgh\-|shar|sie(\-|m)|sk\-0|sl(45|id)|sm(al|ar|b3|it|t5)|so(ft|ny)|sp(01|h\-|v\-|v )|sy(01|mb)|t2(18|50)|t6(00|10|18)|ta(gt|lk)|tcl\-|tdg\-|tel(i|m)|tim\-|t\-mo|to(pl|sh)|ts(70|m\-|m3|m5)|tx\-9|up(\.b|g1|si)|utst|v400|v750|veri|vi(rg|te)|vk(40|5[0-3]|\-v)|vm40|voda|vulc|vx(52|53|60|61|70|80|81|83|85|98)|w3c(\-| )|webc|whit|wi(g |nc|nw)|wmlb|wonu|x700|yas\-|your|zeto|zte\-/i.test(a.substr(0, 4))) check = true;
+    })(navigator.userAgent || navigator.vendor || window.opera);
+    return check;
 }
 
 /**
@@ -2962,29 +2990,29 @@ function isNotDesktop() {
  * @return {?number} New scrollTop value
  */
 function scrollTo($element, duration, complete) {
-	var scroll_top;
+    var scroll_top;
 
-	if ($element instanceof jQuery) {
-		if (!$element.length) {
+    if ($element instanceof jQuery) {
+        if (!$element.length) {
 
-			return null;
-		}
-		scroll_top = $element.offset().top - 150;
-	} else if ($element instanceof Element) {
-		scroll_top = $($element).offset().top - 150;
-	} else {
-		scroll_top = $element - 150;
-	}
+            return null;
+        }
+        scroll_top = $element.offset().top - 150;
+    } else if ($element instanceof Element) {
+        scroll_top = $($element).offset().top - 150;
+    } else {
+        scroll_top = $element - 150;
+    }
 
-	$(document.scrollingElement).stop().animate({
-		scrollTop: Math.ceil(scroll_top)
-	}, {
-		duration: duration ? duration : 400,
-		easing: 'swing',
-		complete: isFunction(complete) ? complete : function () {}
-	});
+    $(document.scrollingElement).stop().animate({
+        scrollTop: Math.ceil(scroll_top)
+    }, {
+        duration: duration ? duration : 400,
+        easing: 'swing',
+        complete: isFunction(complete) ? complete : function () {}
+    });
 
-	return scroll_top;
+    return scroll_top;
 }
 
 /**
@@ -2993,8 +3021,8 @@ function scrollTo($element, duration, complete) {
  * @return {boolean}
  */
 function isScrollRemain(left) {
-	left = left ? left : 200;
-	return $(window).height() + $(window).scrollTop() + +left >= $(document).height();
+    left = left ? left : 200;
+    return $(window).height() + $(window).scrollTop() + +left >= $(document).height();
 }
 
 /**
@@ -3004,9 +3032,9 @@ function isScrollRemain(left) {
  * @return {*}
  */
 function setDefaultValue(variable, default_value) {
-	if (typeof variable === 'undefined' || (typeof variable === 'undefined' ? 'undefined' : _typeof(variable)) === 'object' && $.isEmptyObject(variable)) return default_value;
+    if (typeof variable === 'undefined' || (typeof variable === 'undefined' ? 'undefined' : _typeof(variable)) === 'object' && $.isEmptyObject(variable)) return default_value;
 
-	return variable;
+    return variable;
 }
 
 /**
@@ -3017,94 +3045,98 @@ function setDefaultValue(variable, default_value) {
  */
 function objectToQueryString(obj) {
 
-	return Object.keys(obj).map(function (key) {
+    return Object.keys(obj).map(function (key) {
 
-		return key + '=' + encodeURIComponent(obj[key]);
-	}).join('&');
+        return key + '=' + encodeURIComponent(obj[key]);
+    }).join('&');
 }
 
 function searchToObject() {
-	var pairs = window.location.search.substring(1).split("&"),
-	    obj = {},
-	    pair,
-	    i;
+    var pairs = window.location.search.substring(1).split("&"),
+        obj = {},
+        pair,
+        i;
 
-	for (i in pairs) {
-		if (pairs.hasOwnProperty(i)) {
-			if (pairs[i] === "") continue;
+    for (i in pairs) {
+        if (pairs.hasOwnProperty(i)) {
+            if (pairs[i] === "") continue;
 
-			pair = pairs[i].split("=");
-			obj[decodeURIComponent(pair[0])] = decodeURIComponent(pair[1]);
-		}
-	}
+            pair = pairs[i].split("=");
+            obj[decodeURIComponent(pair[0])] = decodeURIComponent(pair[1]);
+        }
+    }
 
-	return obj;
+    return obj;
 }
 
 function hashToObject() {
-	var pairs = window.location.hash.substring(1).split("&"),
-	    obj = {},
-	    pair,
-	    i;
-	for (i in pairs) {
-		if (pairs.hasOwnProperty(i)) {
-			if (pairs[i] === '') continue;
+    var pairs = window.location.hash.substring(1).split("&"),
+        obj = {},
+        pair,
+        i;
+    for (i in pairs) {
+        if (pairs.hasOwnProperty(i)) {
+            if (pairs[i] === '') continue;
 
-			pair = pairs[i].split("=");
-			obj[decodeURIComponent(pair[0])] = decodeURIComponent(pair[1]);
-		}
-	}
-	return obj;
+            pair = pairs[i].split("=");
+            obj[decodeURIComponent(pair[0])] = decodeURIComponent(pair[1]);
+        }
+    }
+    return obj;
 }
 
 function pageLinkClickHandler(e) {
-	var $this = $(e.currentTarget),
-	    which = e.which || e.nativeEvent.which;
+    var $this = $(e.currentTarget),
+        which = e.which || e.nativeEvent.which;
 
-	if ($this.hasClass(__C.CLASSES.DISABLED)) {
-		e.preventDefault();
-	}
+    if ($this.hasClass(__C.CLASSES.DISABLED)) {
+        e.preventDefault();
+    }
 
-	if (which === 1) {
-		e.preventDefault();
-		__APP.changeState($this.attr('href'));
-	}
+    if (which === 1) {
+        e.preventDefault();
+        __APP.changeState($this.attr('href'));
+    }
 }
 
 function rippleEffectHandler(e) {
-	var $this = $(e.currentTarget),
-	    $ripple = $(),
-	    timeout,
-	    size,
-	    x,
-	    y;
+    var $this = $(e.currentTarget),
+        $ripple = $(),
+        timeout,
+        size,
+        x,
+        y;
 
-	if ($this.children('.Ripple').length === 0) $this.prepend('<span class="ripple Ripple"></span>');
+    if ($this.children('.Ripple').length === 0) $this.prepend('<span class="ripple Ripple"></span>');
 
-	$ripple = $this.children('.Ripple');
-	$ripple.removeClass('animate');
+    $ripple = $this.children('.Ripple');
+    $ripple.removeClass('animate');
 
-	if (!$ripple.height() && !$ripple.width()) {
-		size = Math.max($this.outerWidth(), $this.outerHeight());
-		$ripple.css({ height: size, width: size });
-	}
+    if (!$ripple.height() && !$ripple.width()) {
+        size = Math.max($this.outerWidth(), $this.outerHeight());
+        $ripple.css({ height: size, width: size });
+    }
 
-	x = e.pageX - $this.offset().left - $ripple.width() / 2;
-	y = e.pageY - $this.offset().top - $ripple.height() / 2;
+    x = e.pageX - $this.offset().left - $ripple.width() / 2;
+    y = e.pageY - $this.offset().top - $ripple.height() / 2;
 
-	$ripple.css({ top: y + 'px', left: x + 'px' }).addClass('animate');
+    $ripple.css({ top: y + 'px', left: x + 'px' }).addClass('animate');
 
-	timeout = $ripple.data('timeout');
-	if (!empty(timeout)) {
-		clearTimeout(timeout);
-	}
+    timeout = $ripple.data('timeout');
+    if (!empty(timeout)) {
+        clearTimeout(timeout);
+    }
 
-	timeout = setTimeout(function () {
-		$ripple.removeClass('animate');
-	}, 650);
+    timeout = setTimeout(function () {
+        $ripple.removeClass('animate');
+    }, 650);
 
-	$ripple.data('timeout', timeout);
+    $ripple.data('timeout', timeout);
 }
+var _values, _values2, _values3, _values4, _values5;
+
+function _defineProperty(obj, key, value) { if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
+
 /**
  *
  * @const __LOCALES
@@ -3246,7 +3278,7 @@ var __S = {
 
 var __i18n = {
 	en: {
-		"values": (_values2 = {}, _defineProperty(_values2, __S.ACTIVITY, [[0, 1, "activity"], [1, null, "activities"]]), _defineProperty(_values2, __S.FAVORED_EVENT, [[0, 1, "favored event"], [1, null, "favored events"]]), _defineProperty(_values2, __S.NO_ELEMENTS, "No elements"), _defineProperty(_values2, __S.NO_EVENTS, "No events"), _defineProperty(_values2, __S.NO_ACTIVITIES, "No activity"), _defineProperty(_values2, __S.NO_FRIENDS, "No friends"), _defineProperty(_values2, __S.NO_SUBSCRIPTIONS, "No subscriptions"), _defineProperty(_values2, __S.LOGOUT, "Logout"), _defineProperty(_values2, __S.SHOW_ALL, "Show all"), _defineProperty(_values2, __S.USER_SUBSCRIBED_TO_ORG, [[0, 1, "subscribed to an organization"], [1, null, "subscribed to organizations"]]), _defineProperty(_values2, __S.USER_SUBSCRIBED_TO_USER, [[0, 1, "subscribed to user"], [1, null, "subscribed to users"]]), _defineProperty(_values2, __S.USER_UNSUBSCRIBED_FROM_ORG, [[0, null, "unsubscribed from an organization"]]), _defineProperty(_values2, __S.USER_FAVORED_EVENT, [[0, null, "added to favorites an event"]]), _defineProperty(_values2, __S.USER_UNFAVORED_EVENT, [[0, null, "removed from favorites an event"]]), _defineProperty(_values2, __S.USER_SHARED_EVENT, [[0, null, "shared an event"]]), _values2),
+		"values": (_values = {}, _defineProperty(_values, __S.ACTIVITY, [[0, 1, "activity"], [1, null, "activities"]]), _defineProperty(_values, __S.FAVORED_EVENT, [[0, 1, "favored event"], [1, null, "favored events"]]), _defineProperty(_values, __S.NO_ELEMENTS, "No elements"), _defineProperty(_values, __S.NO_EVENTS, "No events"), _defineProperty(_values, __S.NO_ACTIVITIES, "No activity"), _defineProperty(_values, __S.NO_FRIENDS, "No friends"), _defineProperty(_values, __S.NO_SUBSCRIPTIONS, "No subscriptions"), _defineProperty(_values, __S.LOGOUT, "Logout"), _defineProperty(_values, __S.SHOW_ALL, "Show all"), _defineProperty(_values, __S.USER_SUBSCRIBED_TO_ORG, [[0, 1, "subscribed to an organization"], [1, null, "subscribed to organizations"]]), _defineProperty(_values, __S.USER_SUBSCRIBED_TO_USER, [[0, 1, "subscribed to user"], [1, null, "subscribed to users"]]), _defineProperty(_values, __S.USER_UNSUBSCRIBED_FROM_ORG, [[0, null, "unsubscribed from an organization"]]), _defineProperty(_values, __S.USER_FAVORED_EVENT, [[0, null, "added to favorites an event"]]), _defineProperty(_values, __S.USER_UNFAVORED_EVENT, [[0, null, "removed from favorites an event"]]), _defineProperty(_values, __S.USER_SHARED_EVENT, [[0, null, "shared an event"]]), _values),
 		"contexts": [{
 			"matches": {
 				"gender": "male"
@@ -3261,22 +3293,22 @@ var __i18n = {
 	},
 
 	ru: {
-		"values": (_values3 = {}, _defineProperty(_values3, __S.ACTIVITY, [[0, 1, "активность"], [1, null, "активности"]]), _defineProperty(_values3, __S.FAVORED_EVENT, [[0, 1, "избранное событие"], [1, null, "избранные события"]]), _defineProperty(_values3, __S.NO_ELEMENTS, "Нет элементов"), _defineProperty(_values3, __S.NO_EVENTS, "Событий нет"), _defineProperty(_values3, __S.NO_ACTIVITIES, "Активности нет"), _defineProperty(_values3, __S.NO_FRIENDS, "Нет друзей"), _defineProperty(_values3, __S.NO_SUBSCRIPTIONS, "Нет подписок"), _defineProperty(_values3, __S.LOGOUT, "Выйти"), _defineProperty(_values3, __S.SHOW_ALL, "Показать все"), _values3),
+		"values": (_values2 = {}, _defineProperty(_values2, __S.ACTIVITY, [[0, 1, "активность"], [1, null, "активности"]]), _defineProperty(_values2, __S.FAVORED_EVENT, [[0, 1, "избранное событие"], [1, null, "избранные события"]]), _defineProperty(_values2, __S.NO_ELEMENTS, "Нет элементов"), _defineProperty(_values2, __S.NO_EVENTS, "Событий нет"), _defineProperty(_values2, __S.NO_ACTIVITIES, "Активности нет"), _defineProperty(_values2, __S.NO_FRIENDS, "Нет друзей"), _defineProperty(_values2, __S.NO_SUBSCRIPTIONS, "Нет подписок"), _defineProperty(_values2, __S.LOGOUT, "Выйти"), _defineProperty(_values2, __S.SHOW_ALL, "Показать все"), _values2),
 		"contexts": [{
 			"matches": {
 				"gender": "male"
 			},
-			"values": (_values4 = {}, _defineProperty(_values4, __S.USER_SUBSCRIBED_TO_ORG, [[0, 1, "подписался на организацию"], [1, null, "подписался на организации"]]), _defineProperty(_values4, __S.USER_SUBSCRIBED_TO_USER, [[0, 1, "подписался на пользователя"], [1, null, "подписался на пользователей"]]), _defineProperty(_values4, __S.USER_UNSUBSCRIBED_FROM_ORG, [[0, null, "отписался от организации"]]), _defineProperty(_values4, __S.USER_FAVORED_EVENT, [[0, null, "добавил в избранное событие"]]), _defineProperty(_values4, __S.USER_UNFAVORED_EVENT, [[0, null, "удалил из избранного событие"]]), _defineProperty(_values4, __S.USER_SHARED_EVENT, [[0, null, "поделился событием"]]), _values4)
+			"values": (_values3 = {}, _defineProperty(_values3, __S.USER_SUBSCRIBED_TO_ORG, [[0, 1, "подписался на организацию"], [1, null, "подписался на организации"]]), _defineProperty(_values3, __S.USER_SUBSCRIBED_TO_USER, [[0, 1, "подписался на пользователя"], [1, null, "подписался на пользователей"]]), _defineProperty(_values3, __S.USER_UNSUBSCRIBED_FROM_ORG, [[0, null, "отписался от организации"]]), _defineProperty(_values3, __S.USER_FAVORED_EVENT, [[0, null, "добавил в избранное событие"]]), _defineProperty(_values3, __S.USER_UNFAVORED_EVENT, [[0, null, "удалил из избранного событие"]]), _defineProperty(_values3, __S.USER_SHARED_EVENT, [[0, null, "поделился событием"]]), _values3)
 		}, {
 			"matches": {
 				"gender": "female"
 			},
-			"values": (_values5 = {}, _defineProperty(_values5, __S.USER_SUBSCRIBED_TO_ORG, [[0, 1, "подписалась на организацию"], [1, null, "подписалась на организации"]]), _defineProperty(_values5, __S.USER_SUBSCRIBED_TO_USER, [[0, 1, "подписалась на пользователя"], [1, null, "подписалась на пользователей"]]), _defineProperty(_values5, __S.USER_UNSUBSCRIBED_FROM_ORG, [[0, null, "отписалась от организации"]]), _defineProperty(_values5, __S.USER_FAVORED_EVENT, [[0, null, "добавила в избранное событие"]]), _defineProperty(_values5, __S.USER_UNFAVORED_EVENT, [[0, null, "удалила из избранного событие"]]), _defineProperty(_values5, __S.USER_SHARED_EVENT, [[0, null, "поделилась событием"]]), _values5)
+			"values": (_values4 = {}, _defineProperty(_values4, __S.USER_SUBSCRIBED_TO_ORG, [[0, 1, "подписалась на организацию"], [1, null, "подписалась на организации"]]), _defineProperty(_values4, __S.USER_SUBSCRIBED_TO_USER, [[0, 1, "подписалась на пользователя"], [1, null, "подписалась на пользователей"]]), _defineProperty(_values4, __S.USER_UNSUBSCRIBED_FROM_ORG, [[0, null, "отписалась от организации"]]), _defineProperty(_values4, __S.USER_FAVORED_EVENT, [[0, null, "добавила в избранное событие"]]), _defineProperty(_values4, __S.USER_UNFAVORED_EVENT, [[0, null, "удалила из избранного событие"]]), _defineProperty(_values4, __S.USER_SHARED_EVENT, [[0, null, "поделилась событием"]]), _values4)
 		}, {
 			"matches": {
 				"gender": "neutral"
 			},
-			"values": (_values6 = {}, _defineProperty(_values6, __S.USER_SUBSCRIBED_TO_ORG, [[0, 1, "подписался(-ась) на организацию"], [1, null, "подписался(-ась) на организации"]]), _defineProperty(_values6, __S.USER_SUBSCRIBED_TO_USER, [[0, 1, "подписался(-ась) на пользователя"], [1, null, "подписался(-ась) на пользователей"]]), _defineProperty(_values6, __S.USER_UNSUBSCRIBED_FROM_ORG, [[0, null, "отписался(-ась) от организации"]]), _defineProperty(_values6, __S.USER_FAVORED_EVENT, [[0, null, "добавил(а) в избранное событие"]]), _defineProperty(_values6, __S.USER_UNFAVORED_EVENT, [[0, null, "удалил(а) из избранного событие"]]), _defineProperty(_values6, __S.USER_SHARED_EVENT, [[0, null, "поделился(-ась) событием"]]), _values6)
+			"values": (_values5 = {}, _defineProperty(_values5, __S.USER_SUBSCRIBED_TO_ORG, [[0, 1, "подписался(-ась) на организацию"], [1, null, "подписался(-ась) на организации"]]), _defineProperty(_values5, __S.USER_SUBSCRIBED_TO_USER, [[0, 1, "подписался(-ась) на пользователя"], [1, null, "подписался(-ась) на пользователей"]]), _defineProperty(_values5, __S.USER_UNSUBSCRIBED_FROM_ORG, [[0, null, "отписался(-ась) от организации"]]), _defineProperty(_values5, __S.USER_FAVORED_EVENT, [[0, null, "добавил(а) в избранное событие"]]), _defineProperty(_values5, __S.USER_UNFAVORED_EVENT, [[0, null, "удалил(а) из избранного событие"]]), _defineProperty(_values5, __S.USER_SHARED_EVENT, [[0, null, "поделился(-ась) событием"]]), _values5)
 		}]
 	}
 };
@@ -3493,6 +3525,10 @@ WidgetPostMessageConnection = extending(PostMessageConnection, function () {
 
 	return WidgetPostMessageConnection;
 }());
+var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) { return typeof obj; } : function (obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; };
+
+function _toConsumableArray(arr) { if (Array.isArray(arr)) { for (var i = 0, arr2 = Array(arr.length); i < arr.length; i++) { arr2[i] = arr[i]; } return arr2; } else { return Array.from(arr); } }
+
 /**
  * @singleton
  * @class AsynchronousConnection
@@ -3637,6 +3673,8 @@ HelpCenterConnection = extending(AsynchronousConnection, function () {
 
 	return HelpCenterConnection;
 }());
+var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) { return typeof obj; } : function (obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; };
+
 /**
  * @requires Class.AsynchronousConnection.js
  */
@@ -3692,6 +3730,8 @@ Payment = extending(AsynchronousConnection, function () {
 
 	return Payment;
 }());
+var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) { return typeof obj; } : function (obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; };
+
 /**
  * @requires Class.AsynchronousConnection.js
  */
@@ -4015,6 +4055,8 @@ ServerConnection = extending(AsynchronousConnection, function () {
 
 	return ServerConnection;
 }());
+var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) { return typeof obj; } : function (obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; };
+
 /**
  * @requires Class.AsynchronousConnection.js
  */
@@ -4134,7 +4176,6 @@ socket.on('image.getFromURLDone', function (response) {
 		ImgLoader.handleImgUpload(ImgLoader.current_load_context, response.data, response.filename);
 	}
 });
-
 /**
  *
  * @class Data
@@ -4182,6 +4223,8 @@ Data = function () {
 
 	return Data;
 }();
+var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) { return typeof obj; } : function (obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; };
+
 /**
  *
  * @class DataSet
@@ -4327,10 +4370,20 @@ DataSet = extending(Array, function () {
    *
    * @return {PlainArray}
    */
-		toPlainArray: function toPlainArray() {
+		toPlainArray: function (_toPlainArray) {
+			function toPlainArray() {
+				return _toPlainArray.apply(this, arguments);
+			}
 
-			return _toPlainArray(this);
-		},
+			toPlainArray.toString = function () {
+				return _toPlainArray.toString();
+			};
+
+			return toPlainArray;
+		}(function () {
+
+			return toPlainArray(this);
+		}),
 		/**
    *
    * @param {(string|number)} id
@@ -4701,7 +4754,6 @@ OneEntity = extending(Data, function () {
 
 	return OneEntity;
 }());
-
 /**
  * @requires Class.DataSet.js
  * @requires Class.OneEntity.js
@@ -4746,19 +4798,19 @@ EntitiesCollection = extending(DataSet, function () {
  * @interface
  */
 EntityInterface = function () {
-	/**
-  *
-  * @interface
-  */
-	function EntityInterface() {}
-	/**
-  *
-  * @param {(Array|object)} data
-  * @returns {EntityInterface}
-  */
-	EntityInterface.prototype.setData = function (data) {};
+  /**
+   *
+   * @interface
+   */
+  function EntityInterface() {}
+  /**
+   *
+   * @param {(Array|object)} data
+   * @returns {EntityInterface}
+   */
+  EntityInterface.prototype.setData = function (data) {};
 
-	return EntityInterface;
+  return EntityInterface;
 }();
 /**
  * @requires ../entities/Class.Data.js
@@ -5801,79 +5853,6 @@ InterestModelsCollection = extending(EntitiesCollection, function () {
 	return InterestModelsCollection;
 }());
 /**
- * @requires ../../entities/Class.OneEntity.js
- */
-/**
- *
- * @class PromocodeModel
- * @extends OneEntity
- */
-PromocodeModel = extending(OneEntity, function () {
-	/**
-  *
-  * @constructor
-  * @constructs PromocodeModel
-  *
-  * @property {?string} uuid
-  * @property {?number} event_id
-  * @property {?string} code
-  * @property {?boolean} is_fixed
-  * @property {?boolean} is_percentage
-  * @property {?number} effort
-  * @property {?number} total_effort
-  * @property {?number} use_limit
-  * @property {?number} use_count
-  * @property {?timestamp} start_date
-  * @property {?timestamp} end_date
-  * @property {?boolean} enabled
-  *
-  * @property {?timestamp} created_at
-  * @property {?timestamp} updated_at
-  */
-	function PromocodeModel() {
-		this.uuid = null;
-		this.event_id = null;
-		this.code = null;
-		this.is_fixed = null;
-		this.is_percentage = null;
-		this.effort = null;
-		this.total_effort = null;
-		this.use_limit = null;
-		this.use_count = null;
-		this.start_date = null;
-		this.end_date = null;
-		this.enabled = null;
-
-		this.created_at = null;
-		this.updated_at = null;
-	}
-	PromocodeModel.prototype.ID_PROP_NAME = 'uuid';
-
-	return PromocodeModel;
-}());
-/**
- * @requires ../../entities/Class.EntitiesCollection.js
- * @requires Class.PromocodeModel.js
- */
-/**
- *
- * @class PromocodeModelsCollection
- * @extends EntitiesCollection
- */
-PromocodeModelsCollection = extending(EntitiesCollection, function () {
-	/**
-  *
-  * @constructor
-  * @constructs PromocodeModelsCollection
-  */
-	function PromocodeModelsCollection() {
-		EntitiesCollection.call(this);
-	}
-	PromocodeModelsCollection.prototype.collection_of = PromocodeModel;
-
-	return PromocodeModelsCollection;
-}());
-/**
  * @requires ../Class.AbstractDataModel.js
  */
 /**
@@ -5957,6 +5936,79 @@ PricingRuleModelsCollection = extending(AbstractDataModelsCollection, function (
 	PricingRuleModelsCollection.prototype.collection_of = PricingRuleModel;
 
 	return PricingRuleModelsCollection;
+}());
+/**
+ * @requires ../../entities/Class.OneEntity.js
+ */
+/**
+ *
+ * @class PromocodeModel
+ * @extends OneEntity
+ */
+PromocodeModel = extending(OneEntity, function () {
+	/**
+  *
+  * @constructor
+  * @constructs PromocodeModel
+  *
+  * @property {?string} uuid
+  * @property {?number} event_id
+  * @property {?string} code
+  * @property {?boolean} is_fixed
+  * @property {?boolean} is_percentage
+  * @property {?number} effort
+  * @property {?number} total_effort
+  * @property {?number} use_limit
+  * @property {?number} use_count
+  * @property {?timestamp} start_date
+  * @property {?timestamp} end_date
+  * @property {?boolean} enabled
+  *
+  * @property {?timestamp} created_at
+  * @property {?timestamp} updated_at
+  */
+	function PromocodeModel() {
+		this.uuid = null;
+		this.event_id = null;
+		this.code = null;
+		this.is_fixed = null;
+		this.is_percentage = null;
+		this.effort = null;
+		this.total_effort = null;
+		this.use_limit = null;
+		this.use_count = null;
+		this.start_date = null;
+		this.end_date = null;
+		this.enabled = null;
+
+		this.created_at = null;
+		this.updated_at = null;
+	}
+	PromocodeModel.prototype.ID_PROP_NAME = 'uuid';
+
+	return PromocodeModel;
+}());
+/**
+ * @requires ../../entities/Class.EntitiesCollection.js
+ * @requires Class.PromocodeModel.js
+ */
+/**
+ *
+ * @class PromocodeModelsCollection
+ * @extends EntitiesCollection
+ */
+PromocodeModelsCollection = extending(EntitiesCollection, function () {
+	/**
+  *
+  * @constructor
+  * @constructs PromocodeModelsCollection
+  */
+	function PromocodeModelsCollection() {
+		EntitiesCollection.call(this);
+	}
+	PromocodeModelsCollection.prototype.collection_of = PromocodeModel;
+
+	return PromocodeModelsCollection;
 }());
 /**
  * @requires ../../entities/Class.OneEntity.js
@@ -6173,6 +6225,147 @@ RegistrationSelectFieldValue = function () {
  * @requires ../Class.OneEntity.js
  */
 /**
+ *
+ * @class OneCategory
+ * @extends OneEntity
+ */
+OneCategory = extending(OneEntity, function () {
+	/**
+  *
+  * @param {(string|number)} [category_id]
+  * @param {boolean} [is_loading_continuous]
+  * @constructor
+  * @constructs OneCategory
+  *
+  * @property {(number|string)} id
+  * @property {string} ?name
+  * @property {number} ?order_position
+  * @property {OrganizationsCollection} organizations
+  */
+	function OneCategory(category_id, is_loading_continuous) {
+		this.id = setDefaultValue(category_id, 0);
+		this.name = null;
+		this.order_position = null;
+		this.organizations = new OrganizationsCollection();
+
+		this.loading = false;
+		if (category_id && is_loading_continuous) {
+			this.loading = true;
+			this.fetchCategory([], function () {
+				this.loading = false;
+				$(window).trigger('fetch.OneCategory');
+			});
+		}
+	}
+	/**
+  *
+  * @param {(string|number)} category_id
+  * @param {AJAXData} data
+  * @param {AJAXCallback} [success]
+  * @return {Promise}
+  */
+	OneCategory.fetchCategory = function (category_id, data, success) {
+		return __APP.SERVER.getData('/api/v1/organizations/types', $.extend({}, data, { id: category_id }), success);
+	};
+	/**
+  *
+  * @param {(Array|string)} fields
+  * @param {AJAXCallback} [success]
+  * @return {Promise}
+  */
+	OneCategory.prototype.fetchCategory = function (fields, success) {
+		var self = this;
+		return this.constructor.fetchCategory(self.id, { fields: fields }, function (data) {
+			self.setData(data);
+			if (success && typeof success == 'function') {
+				success.call(self, data[0]);
+			}
+		});
+	};
+
+	return OneCategory;
+}());
+/**
+ * @requires ../Class.EntitiesCollection.js
+ * @requires Class.OneCategory.js
+ */
+/**
+ *
+ * @class CategoriesCollection
+ * @extends EntitiesCollection
+ */
+CategoriesCollection = extending(EntitiesCollection, function () {
+	/**
+  *
+  * @constructor
+  * @constructs CategoriesCollection
+  */
+	function CategoriesCollection() {
+		EntitiesCollection.call(this);
+	}
+
+	CategoriesCollection.prototype.collection_of = OneCategory;
+	/**
+  *
+  * @param {AJAXData} data
+  * @param {AJAXCallback} [success]
+  */
+	CategoriesCollection.fetchCategories = function (data, success) {
+		return __APP.SERVER.getData('/api/v1/organizations/types', data, success);
+	};
+	/**
+  *
+  * @param {AJAXData} data
+  * @param {(number|string)} [length]
+  * @param {AJAXCallback} [success]
+  */
+	CategoriesCollection.prototype.fetchCategories = function (data, length, success) {
+		var self = this,
+		    ajax_data = $.extend({}, data, {
+			offset: this.length,
+			length: length
+		});
+		return this.constructor.fetchCategories(ajax_data, function (data) {
+			self.setData(data);
+			if (success && typeof success == 'function') {
+				success.call(self, data);
+			}
+		});
+	};
+	/**
+  *
+  * @param {AJAXData} categories_ajax_data
+  * @param {AJAXData} orgs_ajax_data
+  * @param {(number|string)} [length]
+  * @param {AJAXCallback} [success]
+  */
+	CategoriesCollection.prototype.fetchCategoriesWithOrganizations = function (categories_ajax_data, orgs_ajax_data, length, success) {
+		var self = this,
+		    ajax_data = $.extend({}, categories_ajax_data, {
+			offset: this.length,
+			length: length
+		}),
+		    org_field = 'organizations' + JSON.stringify(__APP.SERVER.validateData(orgs_ajax_data));
+		if (!ajax_data.fields) {
+			ajax_data.fields = [];
+		} else if (!Array.isArray(ajax_data.fields)) {
+			ajax_data.fields = ajax_data.fields.split(',');
+		}
+		ajax_data.fields.push(org_field);
+		return this.constructor.fetchCategories(ajax_data, function (data) {
+			self.setData(data);
+			if (success && typeof success == 'function') {
+				success.call(self, data);
+			}
+		});
+	};
+
+	return CategoriesCollection;
+}());
+/**
+ * @requires ../Class.OneEntity.js
+ */
+/**
  * @abstract
  * @class OneAbstractActivity
  * @extends OneEntity
@@ -6355,7 +6548,7 @@ UsersActivitiesCollection = extending(EntitiesCollection, function () {
   * @returns {Promise}
   */
 	UsersActivitiesCollection.prototype.fetch = function (fields, length, order_by, success) {
-		var _this2 = this;
+		var _this = this;
 
 		var ajax_data = {
 			fields: fields,
@@ -6367,9 +6560,9 @@ UsersActivitiesCollection = extending(EntitiesCollection, function () {
 			ajax_data.order_by = order_by;
 		}
 		return this.constructor.fetch(this.user_id, ajax_data).then(function (data) {
-			_this2.setData(data);
+			_this.setData(data);
 
-			return new _this2.constructor().setData(data);
+			return new _this.constructor().setData(data);
 		});
 	};
 
@@ -6483,147 +6676,6 @@ CitiesCollection = extending(EntitiesCollection, function () {
 	};
 
 	return CitiesCollection;
-}());
-/**
- * @requires ../Class.OneEntity.js
- */
-/**
- *
- * @class OneCategory
- * @extends OneEntity
- */
-OneCategory = extending(OneEntity, function () {
-	/**
-  *
-  * @param {(string|number)} [category_id]
-  * @param {boolean} [is_loading_continuous]
-  * @constructor
-  * @constructs OneCategory
-  *
-  * @property {(number|string)} id
-  * @property {string} ?name
-  * @property {number} ?order_position
-  * @property {OrganizationsCollection} organizations
-  */
-	function OneCategory(category_id, is_loading_continuous) {
-		this.id = setDefaultValue(category_id, 0);
-		this.name = null;
-		this.order_position = null;
-		this.organizations = new OrganizationsCollection();
-
-		this.loading = false;
-		if (category_id && is_loading_continuous) {
-			this.loading = true;
-			this.fetchCategory([], function () {
-				this.loading = false;
-				$(window).trigger('fetch.OneCategory');
-			});
-		}
-	}
-	/**
-  *
-  * @param {(string|number)} category_id
-  * @param {AJAXData} data
-  * @param {AJAXCallback} [success]
-  * @return {Promise}
-  */
-	OneCategory.fetchCategory = function (category_id, data, success) {
-		return __APP.SERVER.getData('/api/v1/organizations/types', $.extend({}, data, { id: category_id }), success);
-	};
-	/**
-  *
-  * @param {(Array|string)} fields
-  * @param {AJAXCallback} [success]
-  * @return {Promise}
-  */
-	OneCategory.prototype.fetchCategory = function (fields, success) {
-		var self = this;
-		return this.constructor.fetchCategory(self.id, { fields: fields }, function (data) {
-			self.setData(data);
-			if (success && typeof success == 'function') {
-				success.call(self, data[0]);
-			}
-		});
-	};
-
-	return OneCategory;
-}());
-/**
- * @requires ../Class.EntitiesCollection.js
- * @requires Class.OneCategory.js
- */
-/**
- *
- * @class CategoriesCollection
- * @extends EntitiesCollection
- */
-CategoriesCollection = extending(EntitiesCollection, function () {
-	/**
-  *
-  * @constructor
-  * @constructs CategoriesCollection
-  */
-	function CategoriesCollection() {
-		EntitiesCollection.call(this);
-	}
-
-	CategoriesCollection.prototype.collection_of = OneCategory;
-	/**
-  *
-  * @param {AJAXData} data
-  * @param {AJAXCallback} [success]
-  */
-	CategoriesCollection.fetchCategories = function (data, success) {
-		return __APP.SERVER.getData('/api/v1/organizations/types', data, success);
-	};
-	/**
-  *
-  * @param {AJAXData} data
-  * @param {(number|string)} [length]
-  * @param {AJAXCallback} [success]
-  */
-	CategoriesCollection.prototype.fetchCategories = function (data, length, success) {
-		var self = this,
-		    ajax_data = $.extend({}, data, {
-			offset: this.length,
-			length: length
-		});
-		return this.constructor.fetchCategories(ajax_data, function (data) {
-			self.setData(data);
-			if (success && typeof success == 'function') {
-				success.call(self, data);
-			}
-		});
-	};
-	/**
-  *
-  * @param {AJAXData} categories_ajax_data
-  * @param {AJAXData} orgs_ajax_data
-  * @param {(number|string)} [length]
-  * @param {AJAXCallback} [success]
-  */
-	CategoriesCollection.prototype.fetchCategoriesWithOrganizations = function (categories_ajax_data, orgs_ajax_data, length, success) {
-		var self = this,
-		    ajax_data = $.extend({}, categories_ajax_data, {
-			offset: this.length,
-			length: length
-		}),
-		    org_field = 'organizations' + JSON.stringify(__APP.SERVER.validateData(orgs_ajax_data));
-		if (!ajax_data.fields) {
-			ajax_data.fields = [];
-		} else if (!Array.isArray(ajax_data.fields)) {
-			ajax_data.fields = ajax_data.fields.split(',');
-		}
-		ajax_data.fields.push(org_field);
-		return this.constructor.fetchCategories(ajax_data, function (data) {
-			self.setData(data);
-			if (success && typeof success == 'function') {
-				success.call(self, data);
-			}
-		});
-	};
-
-	return CategoriesCollection;
 }());
 /**
  * @requires ../../data_models/date/Class.DateModel.js
@@ -7123,6 +7175,8 @@ TagsCollection = extending(EntitiesCollection, function () {
 
 	return TagsCollection;
 }());
+var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) { return typeof obj; } : function (obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; };
+
 /**
  * @requires ../Class.OneEntity.js
  * @requires ../../data_models/registration_field/Class.RegistrationFieldModelsCollection.js
@@ -9205,7 +9259,6 @@ UsersCollection = extending(EntitiesCollection, function () {
 
 	return UsersCollection;
 }());
-
 /**
  * @requires ../Class.OneEntity.js
  */
@@ -10625,6 +10678,8 @@ FutureEventsCollection = extending(EventsCollection, function () {
 
 	return FutureEventsCollection;
 }());
+var _slicedToArray = function () { function sliceIterator(arr, i) { var _arr = []; var _n = true; var _d = false; var _e = undefined; try { for (var _i = arr[Symbol.iterator](), _s; !(_n = (_s = _i.next()).done); _n = true) { _arr.push(_s.value); if (i && _arr.length === i) break; } } catch (err) { _d = true; _e = err; } finally { try { if (!_n && _i["return"]) _i["return"](); } finally { if (_d) throw _e; } } return _arr; } return function (arr, i) { if (Array.isArray(arr)) { return arr; } else if (Symbol.iterator in Object(arr)) { return sliceIterator(arr, i); } else { throw new TypeError("Invalid attempt to destructure non-iterable instance"); } }; }();
+
 /**
  * @requires Class.OneEvent.js
  */
@@ -10689,10 +10744,10 @@ OneEventWithFinances = extending(OneEvent, function () {
 
 		if (finance_fields.length) {
 
-			return __APP.SERVER.multipleAjax(__APP.SERVER.getData('/api/v1/events/{event_id}'.format({ event_id: event_id }), { fields: fields }), __APP.SERVER.getData(EventStatisticsCollection.ENDPOINT.FINANCE.format({ event_id: event_id }), { fields: finance_fields })).then(function (_ref2) {
-				var _ref3 = _slicedToArray(_ref2, 2),
-				    event_data = _ref3[0],
-				    finances_data = _ref3[1];
+			return __APP.SERVER.multipleAjax(__APP.SERVER.getData('/api/v1/events/{event_id}'.format({ event_id: event_id }), { fields: fields }), __APP.SERVER.getData(EventStatisticsCollection.ENDPOINT.FINANCE.format({ event_id: event_id }), { fields: finance_fields })).then(function (_ref) {
+				var _ref2 = _slicedToArray(_ref, 2),
+				    event_data = _ref2[0],
+				    finances_data = _ref2[1];
 
 				if (isFunction(success)) {
 					success(Object.assign({}, event_data instanceof Array ? event_data[0] : event_data, finances_data));
@@ -10791,70 +10846,77 @@ TimelineEventsCollection = extending(EventsCollection, function () {
 
 	return TimelineEventsCollection;
 }());
+var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
+
+function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
+
 /**
  * @requires ../Class.OneEntity.js
  */
-
 var OneNetworkingProfile = function (_OneEntity) {
 	_inherits(OneNetworkingProfile, _OneEntity);
 
 	function OneNetworkingProfile(user_id) {
 		_classCallCheck(this, OneNetworkingProfile);
 
-		var _this3 = _possibleConstructorReturn(this, (OneNetworkingProfile.__proto__ || Object.getPrototypeOf(OneNetworkingProfile)).call(this));
+		var _this = _possibleConstructorReturn(this, (OneNetworkingProfile.__proto__ || Object.getPrototypeOf(OneNetworkingProfile)).call(this));
 
-		_this3.user_id = setDefaultValue(user_id, null);
-		_this3.first_name = null;
-		_this3.last_name = null;
-		_this3.avatar_url = null;
-		_this3.info = null;
-		_this3.looking_for = null;
-		_this3.vk_url = null;
-		_this3.facebook_url = null;
-		_this3.twitter_url = null;
-		_this3.linkedin_url = null;
-		_this3.telegram_url = null;
-		_this3.instagram_url = null;
-		_this3.github_url = null;
-		_this3.email = null;
-		_this3.signed_up = null;
-		_this3.company_name = null;
-		_this3.request_uuid = null;
-		_this3.request = new OneNetworkingRequest(_this3.request_uuid);
-		_this3.outgoing_request_uuid = null;
-		_this3.outgoing_request = new OneNetworkingRequest(_this3.outgoing_request_uuid);
-		_this3.user = new OneUser(_this3.user_id);
+		_this.user_id = setDefaultValue(user_id, null);
+		_this.first_name = null;
+		_this.last_name = null;
+		_this.avatar_url = null;
+		_this.info = null;
+		_this.looking_for = null;
+		_this.vk_url = null;
+		_this.facebook_url = null;
+		_this.twitter_url = null;
+		_this.linkedin_url = null;
+		_this.telegram_url = null;
+		_this.instagram_url = null;
+		_this.github_url = null;
+		_this.email = null;
+		_this.signed_up = null;
+		_this.company_name = null;
+		_this.request_uuid = null;
+		_this.request = new OneNetworkingRequest(_this.request_uuid);
+		_this.outgoing_request_uuid = null;
+		_this.outgoing_request = new OneNetworkingRequest(_this.outgoing_request_uuid);
+		_this.user = new OneUser(_this.user_id);
 
-		Object.defineProperties(_this3.user, {
+		Object.defineProperties(_this.user, {
 			first_name: {
 				get: function get() {
 
-					return _this3.first_name;
+					return _this.first_name;
 				}
 			},
 			last_name: {
 				get: function get() {
 
-					return _this3.last_name;
+					return _this.last_name;
 				}
 			},
 			avatar_url: {
 				get: function get() {
 
-					return _this3.avatar_url;
+					return _this.avatar_url;
 				}
 			}
 		});
-		return _this3;
+		return _this;
 	}
 
 	_createClass(OneNetworkingProfile, [{
 		key: 'fetch',
 		value: function fetch(fields) {
-			var _this4 = this;
+			var _this2 = this;
 
 			return OneNetworkingProfile.fetchProfile(this.user_id, fields).then(function (data) {
-				_this4.setData(data);
+				_this2.setData(data);
 
 				return data;
 			});
@@ -10874,11 +10936,18 @@ OneNetworkingProfile.prototype.ID_PROP_NAME = 'user_id';
 OneNetworkingProfile.profilePath = function (user_id) {
 	return '/events/networking/profiles/' + user_id;
 };
+var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
+
+function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
+
 /**
  * @requires ../Class.EntitiesCollection.js
  * @requires OneNetworkingProfile.js
  */
-
 var NetworkingProfilesCollection = function (_EntitiesCollection) {
 	_inherits(NetworkingProfilesCollection, _EntitiesCollection);
 
@@ -10889,7 +10958,7 @@ var NetworkingProfilesCollection = function (_EntitiesCollection) {
 	}
 
 	_createClass(NetworkingProfilesCollection, [{
-		key: 'fetch',
+		key: "fetch",
 		value: function fetch(fields, length, order_by) {
 
 			return Promise.resolve();
@@ -10900,37 +10969,44 @@ var NetworkingProfilesCollection = function (_EntitiesCollection) {
 }(EntitiesCollection);
 
 NetworkingProfilesCollection.prototype.collection_of = OneNetworkingProfile;
+var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
+
+function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
+
 /**
  * @requires OneNetworkingProfile.js
  */
-
 var OneEventNetworkingProfile = function (_OneNetworkingProfile) {
 	_inherits(OneEventNetworkingProfile, _OneNetworkingProfile);
 
 	function OneEventNetworkingProfile(user_id, event_id) {
 		_classCallCheck(this, OneEventNetworkingProfile);
 
-		var _this6 = _possibleConstructorReturn(this, (OneEventNetworkingProfile.__proto__ || Object.getPrototypeOf(OneEventNetworkingProfile)).call(this, user_id));
+		var _this = _possibleConstructorReturn(this, (OneEventNetworkingProfile.__proto__ || Object.getPrototypeOf(OneEventNetworkingProfile)).call(this, user_id));
 
-		_this6.event_id = setDefaultValue(event_id, null);
-		_this6.request = new OneEventNetworkingRequest(event_id, _this6.request_uuid);
-		_this6.outgoing_request = new OneEventNetworkingRequest(event_id, _this6.outgoing_request_uuid);
-		return _this6;
+		_this.event_id = setDefaultValue(event_id, null);
+		_this.request = new OneEventNetworkingRequest(event_id, _this.request_uuid);
+		_this.outgoing_request = new OneEventNetworkingRequest(event_id, _this.outgoing_request_uuid);
+		return _this;
 	}
 
 	_createClass(OneEventNetworkingProfile, [{
-		key: 'fetch',
+		key: "fetch",
 		value: function fetch(fields) {
-			var _this7 = this;
+			var _this2 = this;
 
 			return OneEventNetworkingProfile.fetchProfile(this.event_id, this.user_id, fields).then(function (data) {
-				_this7.setData(data);
+				_this2.setData(data);
 
 				return data;
 			});
 		}
 	}], [{
-		key: 'fetchProfile',
+		key: "fetchProfile",
 		value: function fetchProfile(event_id, user_id, fields) {
 
 			return __APP.SERVER.getData(OneEventNetworkingProfile.profilePath(event_id, user_id), { fields: fields });
@@ -10941,28 +11017,35 @@ var OneEventNetworkingProfile = function (_OneNetworkingProfile) {
 }(OneNetworkingProfile);
 
 OneEventNetworkingProfile.profilePath = function (event_id, user_id) {
-	return '/events/' + event_id + '/networking/profiles/' + user_id;
+	return "/events/" + event_id + "/networking/profiles/" + user_id;
 };
+var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
+
+function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
+
 /**
  * @requires NetworkingProfilesCollection.js
  * @requires OneEventNetworkingProfile.js
  */
-
 var EventNetworkingProfilesCollection = function (_NetworkingProfilesCo) {
 	_inherits(EventNetworkingProfilesCollection, _NetworkingProfilesCo);
 
 	function EventNetworkingProfilesCollection(event_id) {
 		_classCallCheck(this, EventNetworkingProfilesCollection);
 
-		var _this8 = _possibleConstructorReturn(this, (EventNetworkingProfilesCollection.__proto__ || Object.getPrototypeOf(EventNetworkingProfilesCollection)).call(this));
+		var _this = _possibleConstructorReturn(this, (EventNetworkingProfilesCollection.__proto__ || Object.getPrototypeOf(EventNetworkingProfilesCollection)).call(this));
 
-		Object.defineProperty(_this8, 'event_id', {
+		Object.defineProperty(_this, 'event_id', {
 			get: function get() {
 
 				return event_id;
 			}
 		});
-		return _this8;
+		return _this;
 	}
 
 	/**
@@ -10977,7 +11060,7 @@ var EventNetworkingProfilesCollection = function (_NetworkingProfilesCo) {
 	_createClass(EventNetworkingProfilesCollection, [{
 		key: 'fetch',
 		value: function fetch(fields, length, order_by) {
-			var _this9 = this;
+			var _this2 = this;
 
 			return EventNetworkingProfilesCollection.fetchProfiles(this.event_id, {
 				fields: fields,
@@ -10985,9 +11068,9 @@ var EventNetworkingProfilesCollection = function (_NetworkingProfilesCo) {
 				order_by: order_by,
 				offset: this.length
 			}).then(function (profiles) {
-				_this9.setData(profiles);
+				_this2.setData(profiles);
 
-				return _this9.__last_pushed;
+				return _this2.__last_pushed;
 			});
 		}
 	}], [{
@@ -11005,10 +11088,17 @@ EventNetworkingProfilesCollection.prototype.collection_of = OneEventNetworkingPr
 EventNetworkingProfilesCollection.profilesPath = function (event_id) {
 	return '/events/' + event_id + '/networking/profiles/';
 };
+var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
+
+function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
+
 /**
  * @requires EventNetworkingProfilesCollection.js
  */
-
 var EventNetworkingAcceptedRequestProfilesCollection = function (_EventNetworkingProfi) {
 	_inherits(EventNetworkingAcceptedRequestProfilesCollection, _EventNetworkingProfi);
 
@@ -11019,9 +11109,9 @@ var EventNetworkingAcceptedRequestProfilesCollection = function (_EventNetworkin
 	}
 
 	_createClass(EventNetworkingAcceptedRequestProfilesCollection, [{
-		key: 'fetch',
+		key: "fetch",
 		value: function fetch(fields, length, order_by) {
-			var _this11 = this;
+			var _this2 = this;
 
 			return EventNetworkingProfilesCollection.fetchProfiles(this.event_id, {
 				request_accepted: true,
@@ -11030,22 +11120,28 @@ var EventNetworkingAcceptedRequestProfilesCollection = function (_EventNetworkin
 				order_by: order_by,
 				offset: this.length
 			}).then(function (profiles) {
-				_this11.setData(profiles);
+				_this2.setData(profiles);
 
-				return _this11.__last_pushed;
+				return _this2.__last_pushed;
 			});
 		}
 	}]);
 
 	return EventNetworkingAcceptedRequestProfilesCollection;
 }(EventNetworkingProfilesCollection);
+var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
+
+function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
+
 /**
  * @requires NetworkingProfilesCollection.js
  */
-
-
-var NetworkingContactsProfilesCollection = function (_NetworkingProfilesCo2) {
-	_inherits(NetworkingContactsProfilesCollection, _NetworkingProfilesCo2);
+var NetworkingContactsProfilesCollection = function (_NetworkingProfilesCo) {
+	_inherits(NetworkingContactsProfilesCollection, _NetworkingProfilesCo);
 
 	function NetworkingContactsProfilesCollection() {
 		_classCallCheck(this, NetworkingContactsProfilesCollection);
@@ -11056,7 +11152,7 @@ var NetworkingContactsProfilesCollection = function (_NetworkingProfilesCo2) {
 	_createClass(NetworkingContactsProfilesCollection, [{
 		key: 'fetch',
 		value: function fetch(fields, length, order_by) {
-			var _this13 = this;
+			var _this2 = this;
 
 			return NetworkingContactsProfilesCollection.fetchProfiles({
 				fields: fields,
@@ -11064,9 +11160,9 @@ var NetworkingContactsProfilesCollection = function (_NetworkingProfilesCo2) {
 				order_by: order_by,
 				offset: this.length
 			}).then(function (profiles) {
-				_this13.setData(profiles);
+				_this2.setData(profiles);
 
-				return _this13.__last_pushed;
+				return _this2.__last_pushed;
 			});
 		}
 	}], [{
@@ -11091,25 +11187,32 @@ NetworkingContactsProfilesCollection.prototype.collection_of = OneNetworkingProf
 NetworkingContactsProfilesCollection.profilesPath = function () {
 	return '/users/me/contacts/';
 };
+var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
+
+function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
+
 /**
  * @requires NetworkingContactsProfilesCollection.js
  */
-
 var EventNetworkingContactsProfilesCollection = function (_NetworkingContactsPr) {
 	_inherits(EventNetworkingContactsProfilesCollection, _NetworkingContactsPr);
 
 	function EventNetworkingContactsProfilesCollection(event_id) {
 		_classCallCheck(this, EventNetworkingContactsProfilesCollection);
 
-		var _this14 = _possibleConstructorReturn(this, (EventNetworkingContactsProfilesCollection.__proto__ || Object.getPrototypeOf(EventNetworkingContactsProfilesCollection)).call(this));
+		var _this = _possibleConstructorReturn(this, (EventNetworkingContactsProfilesCollection.__proto__ || Object.getPrototypeOf(EventNetworkingContactsProfilesCollection)).call(this));
 
-		Object.defineProperty(_this14, 'event_id', {
+		Object.defineProperty(_this, 'event_id', {
 			get: function get() {
 
 				return event_id;
 			}
 		});
-		return _this14;
+		return _this;
 	}
 
 	/**
@@ -11123,7 +11226,7 @@ var EventNetworkingContactsProfilesCollection = function (_NetworkingContactsPr)
 	_createClass(EventNetworkingContactsProfilesCollection, [{
 		key: 'fetch',
 		value: function fetch(fields, length, order_by) {
-			var _this15 = this;
+			var _this2 = this;
 
 			return EventNetworkingContactsProfilesCollection.fetchProfiles(this.event_id, {
 				fields: fields,
@@ -11131,9 +11234,9 @@ var EventNetworkingContactsProfilesCollection = function (_NetworkingContactsPr)
 				order_by: order_by,
 				offset: this.length
 			}).then(function (profiles) {
-				_this15.setData(profiles);
+				_this2.setData(profiles);
 
-				return _this15.__last_pushed;
+				return _this2.__last_pushed;
 			});
 		}
 	}], [{
@@ -11151,12 +11254,19 @@ EventNetworkingContactsProfilesCollection.prototype.collection_of = OneEventNetw
 EventNetworkingContactsProfilesCollection.profilesPath = function (event_id) {
 	return '/events/' + event_id + '/networking/contacts';
 };
+var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
+
+function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
+
 /**
  * @requires EventNetworkingProfilesCollection.js
  */
-
-var EventNetworkingPendingRequestProfilesCollection = function (_EventNetworkingProfi2) {
-	_inherits(EventNetworkingPendingRequestProfilesCollection, _EventNetworkingProfi2);
+var EventNetworkingPendingRequestProfilesCollection = function (_EventNetworkingProfi) {
+	_inherits(EventNetworkingPendingRequestProfilesCollection, _EventNetworkingProfi);
 
 	function EventNetworkingPendingRequestProfilesCollection() {
 		_classCallCheck(this, EventNetworkingPendingRequestProfilesCollection);
@@ -11165,9 +11275,9 @@ var EventNetworkingPendingRequestProfilesCollection = function (_EventNetworking
 	}
 
 	_createClass(EventNetworkingPendingRequestProfilesCollection, [{
-		key: 'fetch',
+		key: "fetch",
 		value: function fetch(fields, length, order_by) {
-			var _this17 = this;
+			var _this2 = this;
 
 			return EventNetworkingProfilesCollection.fetchProfiles(this.event_id, {
 				request_pending: true,
@@ -11176,22 +11286,28 @@ var EventNetworkingPendingRequestProfilesCollection = function (_EventNetworking
 				order_by: order_by,
 				offset: this.length
 			}).then(function (profiles) {
-				_this17.setData(profiles);
+				_this2.setData(profiles);
 
-				return _this17.__last_pushed;
+				return _this2.__last_pushed;
 			});
 		}
 	}]);
 
 	return EventNetworkingPendingRequestProfilesCollection;
 }(EventNetworkingProfilesCollection);
+var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
+
+function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
+
 /**
  * @requires EventNetworkingProfilesCollection.js
  */
-
-
-var EventNetworkingRejectedRequestProfilesCollection = function (_EventNetworkingProfi3) {
-	_inherits(EventNetworkingRejectedRequestProfilesCollection, _EventNetworkingProfi3);
+var EventNetworkingRejectedRequestProfilesCollection = function (_EventNetworkingProfi) {
+	_inherits(EventNetworkingRejectedRequestProfilesCollection, _EventNetworkingProfi);
 
 	function EventNetworkingRejectedRequestProfilesCollection() {
 		_classCallCheck(this, EventNetworkingRejectedRequestProfilesCollection);
@@ -11200,9 +11316,9 @@ var EventNetworkingRejectedRequestProfilesCollection = function (_EventNetworkin
 	}
 
 	_createClass(EventNetworkingRejectedRequestProfilesCollection, [{
-		key: 'fetch',
+		key: "fetch",
 		value: function fetch(fields, length, order_by) {
-			var _this19 = this;
+			var _this2 = this;
 
 			return EventNetworkingProfilesCollection.fetchProfiles(this.event_id, {
 				request_rejected: true,
@@ -11211,20 +11327,26 @@ var EventNetworkingRejectedRequestProfilesCollection = function (_EventNetworkin
 				order_by: order_by,
 				offset: this.length
 			}).then(function (profiles) {
-				_this19.setData(profiles);
+				_this2.setData(profiles);
 
-				return _this19.__last_pushed;
+				return _this2.__last_pushed;
 			});
 		}
 	}]);
 
 	return EventNetworkingRejectedRequestProfilesCollection;
 }(EventNetworkingProfilesCollection);
+var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
+
+function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
+
 /**
  * @requires OneEventNetworkingProfile.js
  */
-
-
 var MyEventNetworkingProfile = function (_OneEventNetworkingPr) {
 	_inherits(MyEventNetworkingProfile, _OneEventNetworkingPr);
 
@@ -11245,14 +11367,14 @@ var MyEventNetworkingProfile = function (_OneEventNetworkingPr) {
    * @return {*}
    */
 		value: function checkAccess(fields, event_id) {
-			var _this21 = this;
+			var _this2 = this;
 
 			if (isVoid(this.event_id)) {
 				this.event_id = event_id;
 			}
 
 			return OneEventNetworkingProfile.fetchProfile(this.event_id, 'me', fields).then(function (data) {
-				_this21.setData(data);
+				_this2.setData(data);
 
 				return data;
 			}, function (reason) {
@@ -11272,14 +11394,14 @@ var MyEventNetworkingProfile = function (_OneEventNetworkingPr) {
 	}, {
 		key: 'redeemAccess',
 		value: function redeemAccess(code, fields, event_id) {
-			var _this22 = this;
+			var _this3 = this;
 
 			if (isVoid(this.event_id)) {
 				this.event_id = event_id;
 			}
 
 			return MyEventNetworkingProfile.redeemEventAccess(this.event_id, 'me', code, fields).then(function (data) {
-				_this22.setData(data);
+				_this3.setData(data);
 
 				return data;
 			});
@@ -11333,13 +11455,19 @@ var MyEventNetworkingProfile = function (_OneEventNetworkingPr) {
 
 	return MyEventNetworkingProfile;
 }(OneEventNetworkingProfile);
+var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
+
+function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
+
 /**
  * @requires OneNetworkingProfile.js
  */
-
-
-var MyNetworkingProfile = function (_OneNetworkingProfile2) {
-	_inherits(MyNetworkingProfile, _OneNetworkingProfile2);
+var MyNetworkingProfile = function (_OneNetworkingProfile) {
+	_inherits(MyNetworkingProfile, _OneNetworkingProfile);
 
 	function MyNetworkingProfile() {
 		_classCallCheck(this, MyNetworkingProfile);
@@ -11380,6 +11508,12 @@ var MyNetworkingProfile = function (_OneNetworkingProfile2) {
 
 	return MyNetworkingProfile;
 }(OneNetworkingProfile);
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
+
+function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
+
 /**
  * @requires ../Class.OneEntity.js
  */
@@ -11397,45 +11531,51 @@ var MyNetworkingProfile = function (_OneNetworkingProfile2) {
  * @property {?timestamp} created_at
  * @property {?timestamp} updated_at
  */
+var OneNetworkingRequest = function (_OneEntity) {
+  _inherits(OneNetworkingRequest, _OneEntity);
 
+  function OneNetworkingRequest(uuid) {
+    _classCallCheck(this, OneNetworkingRequest);
 
-var OneNetworkingRequest = function (_OneEntity2) {
-	_inherits(OneNetworkingRequest, _OneEntity2);
+    var _this = _possibleConstructorReturn(this, (OneNetworkingRequest.__proto__ || Object.getPrototypeOf(OneNetworkingRequest)).call(this));
 
-	function OneNetworkingRequest(uuid) {
-		_classCallCheck(this, OneNetworkingRequest);
+    _this.uuid = setDefaultValue(uuid, null);
+    _this.sender_user_id = null;
+    _this.recipient_user_id = null;
+    _this.message = null;
+    _this.status = null;
+    _this.accept_status = null;
+    _this.accepted_at = null;
+    _this.created_at = null;
+    _this.updated_at = null;
+    return _this;
+  }
 
-		var _this24 = _possibleConstructorReturn(this, (OneNetworkingRequest.__proto__ || Object.getPrototypeOf(OneNetworkingRequest)).call(this));
-
-		_this24.uuid = setDefaultValue(uuid, null);
-		_this24.sender_user_id = null;
-		_this24.recipient_user_id = null;
-		_this24.message = null;
-		_this24.status = null;
-		_this24.accept_status = null;
-		_this24.accepted_at = null;
-		_this24.created_at = null;
-		_this24.updated_at = null;
-		return _this24;
-	}
-
-	return OneNetworkingRequest;
+  return OneNetworkingRequest;
 }(OneEntity);
+var _extends = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; };
+
+var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
+
+function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
+
 /**
  * @requires OneNetworkingRequest.js
  */
-
-
 var OneEventNetworkingRequest = function (_OneNetworkingRequest) {
 	_inherits(OneEventNetworkingRequest, _OneNetworkingRequest);
 
 	function OneEventNetworkingRequest(event_id, uuid) {
 		_classCallCheck(this, OneEventNetworkingRequest);
 
-		var _this25 = _possibleConstructorReturn(this, (OneEventNetworkingRequest.__proto__ || Object.getPrototypeOf(OneEventNetworkingRequest)).call(this, uuid));
+		var _this = _possibleConstructorReturn(this, (OneEventNetworkingRequest.__proto__ || Object.getPrototypeOf(OneEventNetworkingRequest)).call(this, uuid));
 
-		_this25.event_id = setDefaultValue(event_id, null);
-		return _this25;
+		_this.event_id = setDefaultValue(event_id, null);
+		return _this;
 	}
 
 	/**
@@ -11449,7 +11589,7 @@ var OneEventNetworkingRequest = function (_OneNetworkingRequest) {
 
 
 	_createClass(OneEventNetworkingRequest, [{
-		key: 'create',
+		key: "create",
 
 
 		/**
@@ -11462,64 +11602,64 @@ var OneEventNetworkingRequest = function (_OneNetworkingRequest) {
    * @return {Promise}
    */
 		value: function create(data) {
-			var _this26 = this;
+			var _this2 = this;
 
 			if (!isVoid(data)) {
 				this.setData(_extends({}, data, { recipient_user_id: data.user_id || data.recipient_user_id }));
 			}
 
 			return OneEventNetworkingRequest.createRequest(this.event_id, this.recipient_user_id, this.message).then(function (uuid) {
-				_this26.uuid = uuid instanceof Array ? uuid[0].uuid : uuid;
+				_this2.uuid = uuid instanceof Array ? uuid[0].uuid : uuid;
 
-				return _this26;
+				return _this2;
 			});
 		}
 	}, {
-		key: 'revokeRequest',
+		key: "revokeRequest",
 		value: function revokeRequest() {
-			var _this27 = this;
+			var _this3 = this;
 
 			return OneEventNetworkingRequest.updateRequest(this.event_id, this.uuid, { status: false }).then(function (data) {
-				_this27.status = false;
+				_this3.status = false;
 
 				return data;
 			});
 		}
 	}, {
-		key: 'cancelRequest',
+		key: "cancelRequest",
 		value: function cancelRequest() {
-			var _this28 = this;
+			var _this4 = this;
 
 			return OneEventNetworkingRequest.updateRequest(this.event_id, this.uuid, { accept_status: false }).then(function (data) {
-				_this28.accept_status = false;
+				_this4.accept_status = false;
 
 				return data;
 			});
 		}
 	}, {
-		key: 'acceptRequest',
+		key: "acceptRequest",
 		value: function acceptRequest() {
-			var _this29 = this;
+			var _this5 = this;
 
 			return OneEventNetworkingRequest.updateRequest(this.event_id, this.uuid, { accept_status: true }).then(function (data) {
-				_this29.accept_status = true;
+				_this5.accept_status = true;
 
 				return data;
 			});
 		}
 	}, {
-		key: 'fetch',
+		key: "fetch",
 		value: function fetch(fields) {
-			var _this30 = this;
+			var _this6 = this;
 
 			return OneEventNetworkingRequest.fetchRequest(this.event_id, this.uuid, { fields: fields }).then(function (data) {
-				_this30.setData(data);
+				_this6.setData(data);
 
 				return data;
 			});
 		}
 	}], [{
-		key: 'createRequest',
+		key: "createRequest",
 		value: function createRequest(event_id, user_id, message) {
 
 			return __APP.SERVER.addData(OneEventNetworkingRequest.requestsPath(event_id), {
@@ -11539,13 +11679,13 @@ var OneEventNetworkingRequest = function (_OneNetworkingRequest) {
    */
 
 	}, {
-		key: 'updateRequest',
+		key: "updateRequest",
 		value: function updateRequest(event_id, uuid, new_data) {
 
 			return __APP.SERVER.updateData(OneEventNetworkingRequest.requestPath(event_id, uuid), new_data);
 		}
 	}, {
-		key: 'revokeRequest',
+		key: "revokeRequest",
 		value: function revokeRequest(event_id, uuid) {
 
 			return __APP.SERVER.updateData(OneEventNetworkingRequest.requestPath(event_id, uuid), { status: false });
@@ -11561,7 +11701,7 @@ var OneEventNetworkingRequest = function (_OneNetworkingRequest) {
    */
 
 	}, {
-		key: 'fetchRequest',
+		key: "fetchRequest",
 		value: function fetchRequest(event_id, uuid, request_data) {
 
 			return __APP.SERVER.getData(OneEventNetworkingRequest.requestPath(event_id, uuid), request_data);
@@ -11572,10 +11712,10 @@ var OneEventNetworkingRequest = function (_OneNetworkingRequest) {
 }(OneNetworkingRequest);
 
 OneEventNetworkingRequest.requestPath = function (event_id, uuid) {
-	return '/api/v1/events/' + event_id + '/networking/requests/' + uuid;
+	return "/api/v1/events/" + event_id + "/networking/requests/" + uuid;
 };
 OneEventNetworkingRequest.requestsPath = function (event_id) {
-	return '/api/v1/events/' + event_id + '/networking/requests/';
+	return "/api/v1/events/" + event_id + "/networking/requests/";
 };
 /**
  * @requires Class.AbstractEventOrdersCollection.js
@@ -12327,6 +12467,8 @@ ConversionStatisticsCollection = extending(AbstractStatisticsCollection, functio
 
 	return ConversionStatisticsCollection;
 }());
+var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) { return typeof obj; } : function (obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; };
+
 /**
  * @typedef {object} StatisticsUnit
  * @property {number} time_value
@@ -13093,6 +13235,152 @@ MyTicketsCollection = extending(ExtendedTicketsCollection, function () {
 	return MyTicketsCollection;
 }());
 /**
+ * @requires ../Class.OneEntity.js
+ */
+/**
+ *
+ * @class OneUTMStat
+ * @extends OneEntity
+ */
+OneUTMStat = extending(OneEntity, function () {
+	/**
+  *
+  * @constructor
+  * @constructs OneUTMStat
+  *
+  * @property {?string} uuid
+  * @property {?string} utm_source
+  * @property {?string} utm_medium
+  * @property {?string} utm_campaign
+  * @property {?string} utm_content
+  * @property {?string} utm_term
+  * @property {?number} open_count
+  * @property {?number} conversion
+  * @property {?number} orders_sum
+  */
+	function OneUTMStat() {
+		var self = this;
+
+		OneEntity.call(this);
+
+		this.utm_source = null;
+		this.utm_medium = null;
+		this.utm_campaign = null;
+		this.utm_content = null;
+		this.utm_term = null;
+		this.open_count = null;
+		this.tickets_count = null;
+		this.orders_count = null;
+		this.orders_sum = null;
+
+		Object.defineProperty(this, 'uuid', {
+			get: function get() {
+
+				return CryptoJS.MD5([self.utm_source, self.utm_medium, self.utm_campaign, self.utm_content, self.utm_term].clean().join('-')).toString();
+			}
+		});
+	}
+
+	OneUTMStat.prototype.ID_PROP_NAME = 'uuid';
+
+	return OneUTMStat;
+}());
+/**
+ * @requires ../Class.EntitiesCollection.js
+ * @requires Class.OneUTMStat.js
+ */
+/**
+ *
+ * @class UTMStatsCollection
+ * @extends EntitiesCollection
+ */
+UTMStatsCollection = extending(EntitiesCollection, function () {
+	/**
+  *
+  * @constructor
+  * @constructs UTMStatsCollection
+  */
+	function UTMStatsCollection() {
+		EntitiesCollection.call(this);
+	}
+
+	UTMStatsCollection.prototype.collection_of = OneUTMStat;
+
+	UTMStatsCollection.ENDPOINT = Object.freeze({
+		UTM: '/statistics/events/{event_id}/utm'
+	});
+
+	/**
+  *
+  * @param {number} event_id
+  * @param {AJAXData} [ajax_data]
+  *
+  * @return {Promise}
+  */
+	UTMStatsCollection.fetchEventUTMStats = function (event_id, ajax_data) {
+
+		return __APP.SERVER.getData(UTMStatsCollection.ENDPOINT.UTM.format({ event_id: event_id }), ajax_data);
+	};
+
+	return UTMStatsCollection;
+}());
+/**
+ * @requires Class.UTMStatsCollection.js
+ */
+/**
+ *
+ * @class EventUTMStatsCollection
+ * @extends UTMStatsCollection
+ */
+EventUTMStatsCollection = extending(UTMStatsCollection, function () {
+	/**
+  *
+  * @param {number} event_id
+  *
+  * @constructor
+  * @constructs EventUTMStatsCollection
+  *
+  * @property {number} event_id
+  */
+	function EventUTMStatsCollection(event_id) {
+		UTMStatsCollection.call(this);
+
+		Object.defineProperty(this, 'event_id', {
+			value: event_id
+		});
+	}
+	/**
+  *
+  * @param {(Fields|string)} [fields]
+  * @param {number} [length]
+  * @param {(string|Array)} [order_by]
+  *
+  * @return {Promise}
+  */
+	EventUTMStatsCollection.prototype.fetch = function (fields, length, order_by) {
+		var self = this;
+
+		return UTMStatsCollection.fetchEventUTMStats(this.event_id, {
+			fields: fields || undefined,
+			offset: this.length,
+			length: length || undefined,
+			order_by: order_by || undefined
+		}).then(function (data) {
+			self.setData(data);
+
+			return self.__last_pushed;
+		});
+	};
+
+	return EventUTMStatsCollection;
+}());
+var _extends = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; };
+
+var _slicedToArray = function () { function sliceIterator(arr, i) { var _arr = []; var _n = true; var _d = false; var _e = undefined; try { for (var _i = arr[Symbol.iterator](), _s; !(_n = (_s = _i.next()).done); _n = true) { _arr.push(_s.value); if (i && _arr.length === i) break; } } catch (err) { _d = true; _e = err; } finally { try { if (!_n && _i["return"]) _i["return"](); } finally { if (_d) throw _e; } } return _arr; } return function (arr, i) { if (Array.isArray(arr)) { return arr; } else if (Symbol.iterator in Object(arr)) { return sliceIterator(arr, i); } else { throw new TypeError("Invalid attempt to destructure non-iterable instance"); } }; }();
+
+var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) { return typeof obj; } : function (obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; };
+
+/**
  * @requires Class.OneUser.js
  */
 /**
@@ -13205,10 +13493,10 @@ CurrentUser = extending(OneUser, function () {
 
 		if (fields.hasOwnProperty('friends')) {
 
-			return Promise.all([promise, this.fetchFriends(fields.friends)]).then(function (_ref4) {
-				var _ref5 = _slicedToArray(_ref4, 2),
-				    user_data = _ref5[0],
-				    friends_data = _ref5[1];
+			return Promise.all([promise, this.fetchFriends(fields.friends)]).then(function (_ref) {
+				var _ref2 = _slicedToArray(_ref, 2),
+				    user_data = _ref2[0],
+				    friends_data = _ref2[1];
 
 				user_data = user_data instanceof Array ? user_data[0] : user_data;
 				user_data.friends = friends_data;
@@ -13226,15 +13514,15 @@ CurrentUser = extending(OneUser, function () {
   * @returns {Promise}
   */
 	CurrentUser.prototype.fetchFriends = function (ajax_data, success) {
-		var _this31 = this;
+		var _this = this;
 
 		return CurrentUser.fetchFriends(_extends({}, ajax_data, { offset: this.friends.length })).then(function (data) {
-			_this31.friends.setData(data);
+			_this.friends.setData(data);
 			if (isFunction(success)) {
-				success.call(_this31, _this31.friends.__last_pushed);
+				success.call(_this, _this.friends.__last_pushed);
 			}
 
-			return _this31.friends.__last_pushed;
+			return _this.friends.__last_pushed;
 		});
 	};
 	/**
@@ -13434,145 +13722,8 @@ OrganizationSubscribersCollection = extending(UsersCollection, function () {
 
 	return OrganizationSubscribersCollection;
 }());
-/**
- * @requires ../Class.OneEntity.js
- */
-/**
- *
- * @class OneUTMStat
- * @extends OneEntity
- */
-OneUTMStat = extending(OneEntity, function () {
-	/**
-  *
-  * @constructor
-  * @constructs OneUTMStat
-  *
-  * @property {?string} uuid
-  * @property {?string} utm_source
-  * @property {?string} utm_medium
-  * @property {?string} utm_campaign
-  * @property {?string} utm_content
-  * @property {?string} utm_term
-  * @property {?number} open_count
-  * @property {?number} conversion
-  * @property {?number} orders_sum
-  */
-	function OneUTMStat() {
-		var self = this;
+var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) { return typeof obj; } : function (obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; };
 
-		OneEntity.call(this);
-
-		this.utm_source = null;
-		this.utm_medium = null;
-		this.utm_campaign = null;
-		this.utm_content = null;
-		this.utm_term = null;
-		this.open_count = null;
-		this.conversion = null;
-		this.orders_sum = null;
-
-		Object.defineProperty(this, 'uuid', {
-			get: function get() {
-
-				return CryptoJS.MD5([self.utm_source, self.utm_medium, self.utm_campaign, self.utm_content, self.utm_term].clean().join('-')).toString();
-			}
-		});
-	}
-
-	OneUTMStat.prototype.ID_PROP_NAME = 'uuid';
-
-	return OneUTMStat;
-}());
-/**
- * @requires ../Class.EntitiesCollection.js
- * @requires Class.OneUTMStat.js
- */
-/**
- *
- * @class UTMStatsCollection
- * @extends EntitiesCollection
- */
-UTMStatsCollection = extending(EntitiesCollection, function () {
-	/**
-  *
-  * @constructor
-  * @constructs UTMStatsCollection
-  */
-	function UTMStatsCollection() {
-		EntitiesCollection.call(this);
-	}
-
-	UTMStatsCollection.prototype.collection_of = OneUTMStat;
-
-	UTMStatsCollection.ENDPOINT = Object.freeze({
-		UTM: '/statistics/events/{event_id}/utm'
-	});
-
-	/**
-  *
-  * @param {number} event_id
-  * @param {AJAXData} [ajax_data]
-  *
-  * @return {Promise}
-  */
-	UTMStatsCollection.fetchEventUTMStats = function (event_id, ajax_data) {
-
-		return __APP.SERVER.getData(UTMStatsCollection.ENDPOINT.UTM.format({ event_id: event_id }), ajax_data);
-	};
-
-	return UTMStatsCollection;
-}());
-/**
- * @requires Class.UTMStatsCollection.js
- */
-/**
- *
- * @class EventUTMStatsCollection
- * @extends UTMStatsCollection
- */
-EventUTMStatsCollection = extending(UTMStatsCollection, function () {
-	/**
-  *
-  * @param {number} event_id
-  *
-  * @constructor
-  * @constructs EventUTMStatsCollection
-  *
-  * @property {number} event_id
-  */
-	function EventUTMStatsCollection(event_id) {
-		UTMStatsCollection.call(this);
-
-		Object.defineProperty(this, 'event_id', {
-			value: event_id
-		});
-	}
-	/**
-  *
-  * @param {(Fields|string)} [fields]
-  * @param {number} [length]
-  * @param {(string|Array)} [order_by]
-  *
-  * @return {Promise}
-  */
-	EventUTMStatsCollection.prototype.fetch = function (fields, length, order_by) {
-		var self = this;
-
-		return UTMStatsCollection.fetchEventUTMStats(this.event_id, {
-			fields: fields || undefined,
-			offset: this.length,
-			length: length || undefined,
-			order_by: order_by || undefined
-		}).then(function (data) {
-			self.setData(data);
-
-			return self.__last_pushed;
-		});
-	};
-
-	return EventUTMStatsCollection;
-}());
 /**
  * @singleton
  * @class Builder
@@ -15188,6 +15339,1413 @@ Builder = function () {
 
 	return Builder;
 }();
+var _extends = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; };
+
+function _toConsumableArray(arr) { if (Array.isArray(arr)) { for (var i = 0, arr2 = Array(arr.length); i < arr.length; i++) { arr2[i] = arr[i]; } return arr2; } else { return Array.from(arr); } }
+
+function _objectWithoutProperties(obj, keys) { var target = {}; for (var i in obj) { if (keys.indexOf(i) >= 0) continue; if (!Object.prototype.hasOwnProperty.call(obj, i)) continue; target[i] = obj[i]; } return target; }
+
+function AvatarBlocks(_ref) {
+	var entity_type = _ref.entity,
+	    _ref$entities = _ref.entities,
+	    entities = _ref$entities === undefined ? new UsersCollection() : _ref$entities,
+	    _ref$isLink = _ref.isLink,
+	    isLink = _ref$isLink === undefined ? false : _ref$isLink,
+	    className = _ref.className,
+	    _ref$avatarClasses = _ref.avatarClasses,
+	    avatarClasses = _ref$avatarClasses === undefined ? [] : _ref$avatarClasses,
+	    rest_props = _objectWithoutProperties(_ref, ['entity', 'entities', 'isLink', 'className', 'avatarClasses']);
+
+	var block_classes = new HtmlClassesArray(className);
+
+	return (entities instanceof Array ? entities : [entities]).map(function (entity) {
+		return React.createElement(AvatarBlock, _extends({
+			key: entity.id,
+			entity: entity,
+			entityType: entity_type,
+			isLink: isLink,
+			className: block_classes,
+			avatarClasses: avatarClasses
+		}, rest_props));
+	});
+}
+
+AvatarBlocks.propTypes = {
+	entities: PropTypes.oneOfType([PropTypes.instanceOf(UsersCollection), PropTypes.instanceOf(OrganizationsCollection), PropTypes.arrayOf(PropTypes.instanceOf(OneUser)), PropTypes.arrayOf(PropTypes.instanceOf(OneOrganization)), PropTypes.instanceOf(OneUser), PropTypes.instanceOf(OneOrganization)]).isRequired,
+	entity: PropTypes.oneOf([__C.ENTITIES.USER, __C.ENTITIES.ORGANIZATION]),
+	avatarClasses: PropTypes.oneOfType([PropTypes.string, PropTypes.arrayOf(PropTypes.string), PropTypes.instanceOf(HtmlClassesArray)]),
+	className: PropTypes.oneOfType([PropTypes.string, PropTypes.instanceOf(HtmlClassesArray)]),
+	isLink: PropTypes.bool
+};
+
+function AvatarBlock(_ref2) {
+	var entity = _ref2.entity,
+	    entityType = _ref2.entityType,
+	    avatarClasses = _ref2.avatarClasses,
+	    className = _ref2.className,
+	    isLink = _ref2.isLink,
+	    rest_props = _objectWithoutProperties(_ref2, ['entity', 'entityType', 'avatarClasses', 'className', 'isLink']);
+
+	var name = void 0,
+	    href = void 0;
+
+	if (entityType && entityType === __C.ENTITIES.USER || entity instanceof OneUser || entity.first_name) {
+		name = entity.full_name || [entity.first_name, entity.last_name].join(' ');
+		href = '/user/' + entity.id;
+	} else {
+		name = entity.short_name || entity.name;
+		href = '/organization/' + entity.id;
+	}
+	var avatar = React.createElement(Avatar, { entity: entity, className: new HtmlClassesArray(avatarClasses) }),
+	    avatar_name = React.createElement(
+		'span',
+		{ className: 'avatar_name' },
+		name
+	),
+	    avatar_block_classes = new HtmlClassesArray(['avatar_block', 'User' + entity.id, 'link'].concat(_toConsumableArray(new HtmlClassesArray(className))));
+
+	if (isLink) {
+
+		return React.createElement(
+			PageLink,
+			_extends({ className: avatar_block_classes, href: href }, rest_props),
+			avatar,
+			avatar_name
+		);
+	}
+
+	return React.createElement(
+		'div',
+		_extends({ className: avatar_block_classes }, rest_props),
+		avatar,
+		avatar_name
+	);
+}
+
+AvatarBlock.propTypes = {
+	entity: PropTypes.oneOfType([PropTypes.instanceOf(OneUser), PropTypes.instanceOf(OneOrganization)]).isRequired,
+	entityType: PropTypes.oneOf([__C.ENTITIES.USER, __C.ENTITIES.ORGANIZATION]),
+	avatarClasses: PropTypes.oneOfType([PropTypes.string, PropTypes.arrayOf(PropTypes.string), PropTypes.instanceOf(HtmlClassesArray)]),
+	className: PropTypes.oneOfType([PropTypes.string, PropTypes.instanceOf(HtmlClassesArray)]),
+	isLink: PropTypes.bool
+};
+var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+
+function _defineProperty(obj, key, value) { if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
+
+function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
+
+var AvatarCollectionContextProvider = function (_React$Component) {
+	_inherits(AvatarCollectionContextProvider, _React$Component);
+
+	function AvatarCollectionContextProvider(props) {
+		_classCallCheck(this, AvatarCollectionContextProvider);
+
+		var _this = _possibleConstructorReturn(this, (AvatarCollectionContextProvider.__proto__ || Object.getPrototypeOf(AvatarCollectionContextProvider)).call(this, props));
+
+		_this.state = {
+			is_subscribed: props.isSubscribed
+		};
+		return _this;
+	}
+
+	_createClass(AvatarCollectionContextProvider, [{
+		key: 'getChildContext',
+		value: function getChildContext() {
+			var _this2 = this;
+
+			return _defineProperty({}, AvatarCollectionContextProvider.CONTEXT_NAME, {
+				isSubscribed: this.state.is_subscribed,
+				subscribe: function subscribe() {
+					_this2.setState({
+						is_subscribed: true
+					});
+				},
+				unsubscribe: function unsubscribe() {
+					_this2.setState({
+						is_subscribed: false
+					});
+				}
+			});
+		}
+	}, {
+		key: 'render',
+		value: function render() {
+
+			return React.Children.map(this.props.children, function (child) {
+				return child;
+			});
+		}
+	}]);
+
+	return AvatarCollectionContextProvider;
+}(React.Component);
+
+AvatarCollectionContextProvider.CONTEXT_NAME = '__avatar_collection__';
+
+AvatarCollectionContextProvider.propTypes = {
+	isSubscribed: PropTypes.bool
+};
+
+AvatarCollectionContextProvider.childContextTypes = _defineProperty({}, AvatarCollectionContextProvider.CONTEXT_NAME, PropTypes.shape({
+	isSubscribed: PropTypes.bool,
+	subscribe: PropTypes.func,
+	unsubscribe: PropTypes.func
+}));
+var _extends = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; };
+
+var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+
+function _objectWithoutProperties(obj, keys) { var target = {}; for (var i in obj) { if (keys.indexOf(i) >= 0) continue; if (!Object.prototype.hasOwnProperty.call(obj, i)) continue; target[i] = obj[i]; } return target; }
+
+function _toConsumableArray(arr) { if (Array.isArray(arr)) { for (var i = 0, arr2 = Array(arr.length); i < arr.length; i++) { arr2[i] = arr[i]; } return arr2; } else { return Array.from(arr); } }
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
+
+function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
+
+/**
+ * @requires AvatarCollectionContextProvider.js
+ */
+var AvatarCollection = function (_React$Component) {
+	_inherits(AvatarCollection, _React$Component);
+
+	function AvatarCollection(props, context) {
+		_classCallCheck(this, AvatarCollection);
+
+		var left = props.maxCount;
+
+		var _this = _possibleConstructorReturn(this, (AvatarCollection.__proto__ || Object.getPrototypeOf(AvatarCollection)).call(this, props, context));
+
+		_this.avatars = [__APP.USER].concat(_toConsumableArray(props.users.filter(function (user) {
+			return __APP.USER.id !== parseInt(user.id) && left-- > 0;
+		})));
+		return _this;
+	}
+
+	_createClass(AvatarCollection, [{
+		key: 'getWidth',
+		value: function getWidth() {
+			var avatar_width = 30,
+			    amount = this.avatars.length,
+			    kink = 6;
+
+			if (this.context[AvatarCollectionContextProvider.CONTEXT_NAME].isSubscribed && amount < this.props.maxCount) {
+
+				return amount === 1 ? avatar_width * amount : avatar_width * amount - kink * (amount - 1);
+			}
+
+			return amount === 1 ? 0 : avatar_width * (amount - 1) - kink * (amount - 2);
+		}
+	}, {
+		key: 'render',
+		value: function render() {
+			var _props = this.props,
+			    users = _props.users,
+			    overallAvatarsCount = _props.overallAvatarsCount,
+			    className = _props.className,
+			    counterClasses = _props.counterClasses,
+			    maxCount = _props.maxCount,
+			    rest_props = _objectWithoutProperties(_props, ['users', 'overallAvatarsCount', 'className', 'counterClasses', 'maxCount']),
+			    classes = new HtmlClassesArray('avatars_collection', '-max_' + maxCount, '-trimmed'),
+			    more_avatars_count = (overallAvatarsCount || users.length) - maxCount,
+			    is_counter_hidden = more_avatars_count <= 0;
+
+			if (this.context[AvatarCollectionContextProvider.CONTEXT_NAME].isSubscribed) {
+				classes.push(__C.CLASSES.HOOKS.ADD_AVATAR.STATES.SHIFTED);
+			}
+
+			classes.push(className);
+
+			return React.createElement(
+				React.Fragment,
+				null,
+				React.createElement(
+					'div',
+					_extends({ className: classes, style: { width: this.getWidth() } }, rest_props),
+					React.createElement(Avatars, { entities: this.avatars })
+				),
+				React.createElement(
+					'span',
+					{ className: 'counter ' + new HtmlClassesArray(counterClasses) + ' ' + (is_counter_hidden ? '-cast' : '') },
+					'+',
+					more_avatars_count
+				)
+			);
+		}
+	}]);
+
+	return AvatarCollection;
+}(React.Component);
+
+AvatarCollection.propTypes = {
+	users: PropTypes.oneOfType([PropTypes.instanceOf(UsersCollection), PropTypes.arrayOf(PropTypes.instanceOf(OneUser))]).isRequired,
+	maxCount: PropTypes.number.isRequired,
+	overallAvatarsCount: PropTypes.number,
+	className: PropTypes.oneOfType([PropTypes.string, PropTypes.instanceOf(HtmlClassesArray)]),
+	counterClasses: PropTypes.oneOfType([PropTypes.string, PropTypes.arrayOf(PropTypes.string), PropTypes.instanceOf(HtmlClassesArray)])
+};
+
+AvatarCollection.contextTypes = AvatarCollectionContextProvider.childContextTypes;
+var _extends = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; };
+
+function _objectWithoutProperties(obj, keys) { var target = {}; for (var i in obj) { if (keys.indexOf(i) >= 0) continue; if (!Object.prototype.hasOwnProperty.call(obj, i)) continue; target[i] = obj[i]; } return target; }
+
+function Avatars(_ref) {
+	var entities = _ref.entities,
+	    className = _ref.className,
+	    rest_props = _objectWithoutProperties(_ref, ['entities', 'className']);
+
+	var classes = new HtmlClassesArray(className);
+
+	return (entities instanceof Array ? entities : [entities]).map(function (entity) {
+		return React.createElement(Avatar, _extends({ key: entity.id, entity: entity, className: classes }, rest_props));
+	});
+}
+
+Avatars.propTypes = {
+	entities: PropTypes.oneOfType([PropTypes.instanceOf(UsersCollection), PropTypes.instanceOf(OrganizationsCollection), PropTypes.instanceOf(OneUser), PropTypes.instanceOf(OneOrganization), PropTypes.arrayOf(PropTypes.instanceOf(OneUser)), PropTypes.arrayOf(PropTypes.instanceOf(OneOrganization))]).isRequired,
+	className: PropTypes.oneOfType([PropTypes.string, PropTypes.instanceOf(HtmlClassesArray)])
+};
+
+function Avatar(_ref2) {
+	var entity = _ref2.entity,
+	    className = _ref2.className,
+	    badgeClass = _ref2.badgeClass,
+	    rest_props = _objectWithoutProperties(_ref2, ['entity', 'className', 'badgeClass']);
+
+	var classes = new HtmlClassesArray(className);
+
+	var avatar_url = void 0,
+	    name = void 0;
+
+	if (entity instanceof OneUser || entity.avatar_url) {
+		avatar_url = entity.avatar_url;
+		name = entity.full_name || [entity.first_name, entity.last_name].join(' ');
+	} else {
+		avatar_url = entity.img_small_url || entity.img_url;
+		name = entity.short_name || entity.name;
+	}
+
+	return React.createElement(
+		'div',
+		_extends({ className: 'avatar ' + classes, title: name }, rest_props),
+		React.createElement('img', { src: avatar_url || '/app/img/brand_logo.png', onError: function onError(e) {
+				return e.target.src = '/app/img/brand_logo.png';
+			} }),
+		badgeClass && React.createElement(
+			'span',
+			{ className: 'avatar_badge' },
+			React.createElement('i', { className: 'fa fa-' + badgeClass })
+		)
+	);
+}
+
+Avatar.propTypes = {
+	entity: PropTypes.oneOfType([PropTypes.instanceOf(OneUser), PropTypes.instanceOf(OneOrganization)]).isRequired,
+	className: PropTypes.oneOfType([PropTypes.string, PropTypes.instanceOf(HtmlClassesArray)]),
+	badgeClass: PropTypes.oneOf(['plus', 'minus', 'star'])
+};
+var _extends = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; };
+
+function _objectWithoutProperties(obj, keys) { var target = {}; for (var i in obj) { if (keys.indexOf(i) >= 0) continue; if (!Object.prototype.hasOwnProperty.call(obj, i)) continue; target[i] = obj[i]; } return target; }
+
+function Button(_ref) {
+	var children = _ref.children,
+	    className = _ref.className,
+	    rest_props = _objectWithoutProperties(_ref, ["children", "className"]);
+
+	return React.createElement(
+		"button",
+		_extends({
+			className: __C.CLASSES.COMPONENT.BUTTON + " " + new HtmlClassesArray(className),
+			type: "button"
+		}, rest_props),
+		React.createElement(
+			"span",
+			{ className: "Text" },
+			children
+		)
+	);
+}
+
+function RippleButton(_ref2) {
+	var children = _ref2.children,
+	    className = _ref2.className,
+	    _onClick = _ref2.onClick,
+	    rest_props = _objectWithoutProperties(_ref2, ["children", "className", "onClick"]);
+
+	return React.createElement(
+		"button",
+		_extends({
+			className: __C.CLASSES.COMPONENT.BUTTON + " " + new HtmlClassesArray(className),
+			type: "button",
+			onClick: function onClick(e) {
+				rippleEffectHandler(e);
+				if (isFunction(_onClick)) {
+					_onClick(e);
+				}
+			}
+		}, rest_props),
+		React.createElement(
+			"span",
+			{ className: "Text" },
+			children
+		)
+	);
+}
+
+function Action(_ref3) {
+	var children = _ref3.children,
+	    className = _ref3.className,
+	    rest_props = _objectWithoutProperties(_ref3, ["children", "className"]);
+
+	return React.createElement(
+		"button",
+		_extends({
+			className: __C.CLASSES.COMPONENT.ACTION + " " + new HtmlClassesArray(className),
+			type: "button"
+		}, rest_props),
+		React.createElement(
+			"span",
+			{ className: "Text" },
+			children
+		)
+	);
+}
+var _extends = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; };
+
+var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+
+function _defineProperty(obj, key, value) { if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
+
+function _objectWithoutProperties(obj, keys) { var target = {}; for (var i in obj) { if (keys.indexOf(i) >= 0) continue; if (!Object.prototype.hasOwnProperty.call(obj, i)) continue; target[i] = obj[i]; } return target; }
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
+
+function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
+
+/**
+ *
+ * @param {React.Component} Component
+ * @param {object} configs
+ * @param {string} configs.entity_name
+ * @param {string} configs.entities_name
+ * @param {EntitiesCollection} [configs.CollectionClass]
+ * @param {function(): XML} [configs.noEntities]
+ * @param {function(): {}} [configs.dynamicProps]
+ * @param {function(): {}} [configs.renderEntities]
+ * @return {React.Component}
+ */
+function componentsContainer(Component, _ref) {
+	var entity_name = _ref.entity_name,
+	    entities_name = _ref.entities_name,
+	    _ref$CollectionClass = _ref.CollectionClass,
+	    CollectionClass = _ref$CollectionClass === undefined ? null : _ref$CollectionClass,
+	    _ref$noEntities = _ref.noEntities,
+	    noEntities = _ref$noEntities === undefined ? function () {
+		return React.createElement(
+			Cap,
+			null,
+			i18n(__S.NO_ELEMENTS)
+		);
+	} : _ref$noEntities,
+	    _ref$dynamicProps = _ref.dynamicProps,
+	    dynamicProps = _ref$dynamicProps === undefined ? function (entity) {
+		return {};
+	} : _ref$dynamicProps,
+	    _ref$renderEntities = _ref.renderEntities,
+	    renderEntities = _ref$renderEntities === undefined ? null : _ref$renderEntities;
+
+	var ComponentsContainer = function (_React$Component) {
+		_inherits(ComponentsContainer, _React$Component);
+
+		function ComponentsContainer(props) {
+			_classCallCheck(this, ComponentsContainer);
+
+			var _this = _possibleConstructorReturn(this, (ComponentsContainer.__proto__ || Object.getPrototypeOf(ComponentsContainer)).call(this, props));
+
+			_this.state = {
+				length: _this.props[entities_name].length,
+				is_loading: false
+			};
+			return _this;
+		}
+
+		_createClass(ComponentsContainer, [{
+			key: 'fetch',
+			value: function fetch() {
+				var _this2 = this;
+
+				if (!isVoid(CollectionClass) && this.props[entities_name] instanceof CollectionClass) {
+					var _props$entities_name;
+
+					this.setLoadingState();
+					return (_props$entities_name = this.props[entities_name]).fetch.apply(_props$entities_name, arguments).then(function (entities) {
+						_this2.unsetLoadingState().update();
+
+						return entities;
+					}).catch(function () {
+						_this2.unsetLoadingState();
+					});
+				}
+
+				return Promise.resolve();
+			}
+		}, {
+			key: 'update',
+			value: function update() {
+				if (this.props[entities_name].length !== this.state.length) {
+					this.setState({
+						length: this.props[entities_name].length
+					});
+				}
+
+				return this;
+			}
+		}, {
+			key: 'setLoadingState',
+			value: function setLoadingState() {
+				this.setState({
+					is_loading: true
+				});
+
+				return this;
+			}
+		}, {
+			key: 'unsetLoadingState',
+			value: function unsetLoadingState() {
+				this.setState({
+					is_loading: false
+				});
+
+				return this;
+			}
+		}, {
+			key: 'render',
+			value: function render() {
+				var _props = this.props,
+				    entities = _props[entities_name],
+				    rest_props = _objectWithoutProperties(_props, [entities_name]);
+
+				if (!entities.length && !this.state.is_loading) {
+
+					return noEntities();
+				}
+
+				return React.createElement(
+					React.Fragment,
+					null,
+					isFunction(renderEntities) ? renderEntities.call(this, entities) : entities.map(function (entity) {
+						return React.createElement(Component, _extends({ key: entity[entity.ID_PROP_NAME] }, _extends(_defineProperty({}, entity_name, entity), rest_props, dynamicProps(entity))));
+					}),
+					this.state.is_loading && React.createElement(LoaderBlock, null)
+				);
+			}
+		}]);
+
+		return ComponentsContainer;
+	}(React.Component);
+
+	ComponentsContainer.displayName = 'collectionOf(' + (Component.displayName || Component.name || 'Component') + ')';
+
+	return ComponentsContainer;
+}
+var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
+
+function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
+
+var Dropdown = function (_React$Component) {
+	_inherits(Dropdown, _React$Component);
+
+	function Dropdown(props) {
+		_classCallCheck(this, Dropdown);
+
+		var _this = _possibleConstructorReturn(this, (Dropdown.__proto__ || Object.getPrototypeOf(Dropdown)).call(this, props));
+
+		_this.state = {
+			click_pos: {
+				X: 0,
+				Y: 0
+			},
+			opened: false
+		};
+
+		_this.open = _this.open.bind(_this);
+		_this.close = _this.close.bind(_this);
+		_this.handleClickOutside = _this.handleClickOutside.bind(_this);
+		return _this;
+	}
+
+	_createClass(Dropdown, [{
+		key: 'componentDidMount',
+		value: function componentDidMount() {
+			if (this.state.opened) {
+				this.bindClickOutside();
+			}
+		}
+	}, {
+		key: 'componentWillUnmount',
+		value: function componentWillUnmount() {
+			this.unbindClickOutside();
+		}
+	}, {
+		key: 'open',
+		value: function open(e) {
+			var _this2 = this;
+
+			this.setState({
+				opened: true,
+				click_pos: {
+					X: e.pageX,
+					Y: e.pageY
+				}
+			}, function () {
+				_this2.bindClickOutside();
+			});
+		}
+	}, {
+		key: 'close',
+		value: function close(e) {
+			var _this3 = this;
+
+			this.setState({
+				opened: false
+			}, function () {
+				_this3.unbindClickOutside();
+				_this3.setState({
+					click_pos: {
+						X: 0,
+						Y: 0
+					}
+				});
+			});
+		}
+	}, {
+		key: 'bindClickOutside',
+		value: function bindClickOutside() {
+			if (this.props.isDismissOnOuterClick) {
+				document.addEventListener('mousedown', this.handleClickOutside);
+			}
+		}
+	}, {
+		key: 'unbindClickOutside',
+		value: function unbindClickOutside() {
+			if (this.props.isDismissOnOuterClick) {
+				document.removeEventListener('mousedown', this.handleClickOutside);
+			}
+		}
+	}, {
+		key: 'handleClickOutside',
+		value: function handleClickOutside(event) {
+			if (this.dropdown && !this.dropdown.contains(event.target)) {
+				this.close();
+			}
+		}
+	}, {
+		key: 'getPos',
+		value: function getPos() {
+			var viewport_width = window.outerWidth,
+			    _state$click_pos = this.state.click_pos,
+			    click_X = _state$click_pos.X,
+			    click_Y = _state$click_pos.Y;
+
+
+			var left = void 0,
+			    dropdown_width = void 0;
+
+			if (!this.dropdown) {
+
+				return {};
+			}
+
+			dropdown_width = this.dropdown.offsetWidth;
+			if (viewport_width < click_X + dropdown_width / 2) {
+				left = viewport_width - dropdown_width;
+			} else {
+				left = click_X - dropdown_width / 2;
+			}
+
+			return {
+				left: left,
+				top: click_Y + 25
+			};
+		}
+	}, {
+		key: 'render',
+		value: function render() {
+			var _this4 = this;
+
+			var _props = this.props,
+			    renderControl = _props.renderControl,
+			    renderDropdown = _props.renderDropdown,
+			    children = _props.children,
+			    opened = this.state.opened;
+
+
+			return React.createElement(
+				React.Fragment,
+				null,
+				renderControl(opened, this.open, this.close),
+				children,
+				ReactDOM.createPortal(React.createElement(
+					'div',
+					{
+						className: 'dropdown_box ' + (opened ? '-show' : ''),
+						ref: function ref(node) {
+							return _this4.dropdown = node;
+						},
+						style: this.getPos()
+					},
+					renderDropdown(this.close)
+				), document.body)
+			);
+		}
+	}]);
+
+	return Dropdown;
+}(React.Component);
+
+Dropdown.propTypes = {
+	renderControl: PropTypes.func.isRequired,
+	renderDropdown: PropTypes.func.isRequired,
+	isDismissOnOuterClick: PropTypes.bool
+};
+function _toConsumableArray(arr) { if (Array.isArray(arr)) { for (var i = 0, arr2 = Array(arr.length); i < arr.length; i++) { arr2[i] = arr[i]; } return arr2; } else { return Array.from(arr); } }
+
+/**
+ * @requires componentsContainer.js
+ */
+function EventBlock(_ref) {
+	var _this = this;
+
+	var event = _ref.event,
+	    date = _ref.date,
+	    _ref$hasDivider = _ref.hasDivider,
+	    hasDivider = _ref$hasDivider === undefined ? false : _ref$hasDivider,
+	    _ref$coverWidth = _ref.coverWidth,
+	    coverWidth = _ref$coverWidth === undefined ? 550 : _ref$coverWidth;
+
+	var event_id = event.id,
+	    avatars_collection_classes = new HtmlClassesArray(__C.CLASSES.UNIVERSAL_STATES.ROUNDED, __C.CLASSES.UNIVERSAL_STATES.BORDERED, __C.CLASSES.SIZES.SMALL),
+	    event_date = date.format(__C.DATE_FORMAT),
+	    time = event.dates.reduce(function (times, date) {
+		if (moment.unix(date.event_date).format(__C.DATE_FORMAT) === event_date) {
+
+			return [].concat(_toConsumableArray(times), [displayTimeRange(date.start_time, date.end_time)]);
+		}
+
+		return times;
+	}, []).join('; ');
+
+	return React.createElement(
+		React.Fragment,
+		null,
+		hasDivider && React.createElement("hr", { title: date.calendar().capitalize() }),
+		React.createElement(
+			"div",
+			{ className: "event_block", "data-event-id": event_id, "data-event_date": event_date },
+			React.createElement(
+				PageLink,
+				{ href: "/event/" + event_id, className: "event_block_img img_holder link" },
+				React.createElement("img", { src: event.image_horizontal_url + "?width=" + coverWidth, title: event.title, width: coverWidth })
+			),
+			React.createElement(
+				"div",
+				{ className: "event_block_info" },
+				React.createElement(
+					"header",
+					{ className: "event_block_title" },
+					React.createElement(
+						PageLink,
+						{ href: "/event/" + event_id, className: "link" },
+						event.title
+					)
+				),
+				React.createElement(
+					"div",
+					{ className: "event_block_service" },
+					React.createElement(
+						"p",
+						null,
+						React.createElement(
+							"small",
+							null,
+							time
+						)
+					),
+					React.createElement(
+						"div",
+						{ className: "event_block_action_buttons" },
+						React.createElement(
+							AvatarCollectionContextProvider,
+							{ isSubscribed: event.is_favorite },
+							React.createElement(
+								"div",
+								{ className: "event_block_add_avatar_wrapper" },
+								React.createElement(AvatarCollection, {
+									users: event.favored,
+									maxCount: 3,
+									className: avatars_collection_classes,
+									counterClasses: [__C.CLASSES.SIZES.X30, __C.CLASSES.UNIVERSAL_STATES.BORDERED, __C.CLASSES.COLORS.MARGINAL, __C.CLASSES.HOOKS.ADD_AVATAR.STATES.CASTABLE],
+									overallAvatarsCount: event.favored_users_count,
+									onClick: function onClick() {
+										if (!_this.favored_modal) {
+											_this.favored_modal = new FavoredModal(event.id);
+										}
+										_this.favored_modal.show();
+									}
+								})
+							),
+							React.createElement(
+								"div",
+								{ className: "event_block_action_buttons_wrapper" },
+								React.createElement(ReactAddToFavoriteButton, {
+									event: event,
+									className: new HtmlClassesArray(['event_block_main_action_button', __C.CLASSES.SIZES.LOW, __C.CLASSES.UNIVERSAL_STATES.ROUNDED])
+								})
+							)
+						)
+					)
+				)
+			)
+		)
+	);
+}
+
+EventBlock.propTypes = {
+	event: PropTypes.instanceOf(OneEvent).isRequired,
+	date: PropTypes.moment.isRequired,
+	hasDivider: PropTypes.bool,
+	coverWidth: PropTypes.number
+};
+
+var EventBlocks = componentsContainer(EventBlock, {
+	entity_name: 'event',
+	entities_name: 'events',
+	CollectionClass: EventsCollection,
+	noEntities: function noEntities() {
+		return React.createElement(
+			Cap,
+			null,
+			i18n(__S.NO_EVENTS)
+		);
+	},
+	renderEntities: function renderEntities(events) {
+		var _props = this.props,
+		    coverWidth = _props.coverWidth,
+		    _props$sortDateType = _props.sortDateType,
+		    sortDateType = _props$sortDateType === undefined ? 'nearest_event_date' : _props$sortDateType;
+
+
+		var last_date = void 0;
+
+		return events.map(function (event) {
+			var m_event_date = moment.unix(event[sortDateType] || event.first_event_date),
+			    event_date = m_event_date.format(__C.DATE_FORMAT),
+			    is_different_day = last_date !== event_date;
+
+			last_date = event_date;
+
+			return React.createElement(EventBlock, {
+				key: event.id,
+				event: event,
+				date: m_event_date,
+				coverWidth: coverWidth,
+				hasDivider: is_different_day
+			});
+		});
+	}
+});
+
+EventBlocks.propTypes = {
+	events: PropTypes.oneOfType([PropTypes.arrayOf(PropTypes.instanceOf(OneEvent)), PropTypes.instanceOf(EventsCollection)]).isRequired,
+	sortDateType: PropTypes.string,
+	coverWidth: PropTypes.number
+};
+var _extends = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; };
+
+function _objectWithoutProperties(obj, keys) { var target = {}; for (var i in obj) { if (keys.indexOf(i) >= 0) continue; if (!Object.prototype.hasOwnProperty.call(obj, i)) continue; target[i] = obj[i]; } return target; }
+
+PageLink.propTypes = {
+	href: PropTypes.string.isRequired,
+	children: PropTypes.oneOfType([PropTypes.string, PropTypes.node, PropTypes.element])
+};
+
+function PageLink(_ref) {
+	var href = _ref.href,
+	    children = _ref.children,
+	    rest_props = _objectWithoutProperties(_ref, ["href", "children"]);
+
+	return React.createElement(
+		ReactRouterDOM.Link,
+		_extends({ to: href }, rest_props),
+		children
+	);
+}
+var _extends = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; };
+
+function _objectWithoutProperties(obj, keys) { var target = {}; for (var i in obj) { if (keys.indexOf(i) >= 0) continue; if (!Object.prototype.hasOwnProperty.call(obj, i)) continue; target[i] = obj[i]; } return target; }
+
+/**
+ *
+ * @param {buildProps} props
+ * @param {Object<OneUser.ACCOUNTS, string>} props.links
+ * @constructor
+ */
+function SocialLinks(_ref) {
+	var _ref$links = _ref.links,
+	    links = _ref$links === undefined ? {} : _ref$links,
+	    className = _ref.className,
+	    rest_props = _objectWithoutProperties(_ref, ['links', 'className']);
+
+	var ICON_SLUGS = {
+		VK: 'vk',
+		GOOGLE: 'google-plus',
+		FACEBOOK: 'facebook-official'
+	};
+
+	return React.createElement(
+		'div',
+		{ className: 'social_link_wrapper' },
+		Object.keys(OneUser.ACCOUNTS).map(function (account_type) {
+			var parent_classes = 'social_link -color_' + OneUser.ACCOUNTS[account_type] + ' -valign_center ' + new HtmlClassesArray(className),
+			    icon_classes = 'fa_icon fa-' + ICON_SLUGS[account_type];
+
+			if (links.hasOwnProperty(OneUser.ACCOUNTS[account_type])) {
+
+				return React.createElement(
+					'a',
+					_extends({ key: account_type, className: parent_classes, href: links[OneUser.ACCOUNTS[account_type]], target: '_blank' }, rest_props),
+					React.createElement('i', { className: icon_classes })
+				);
+			} else {
+
+				return React.createElement(
+					'span',
+					_extends({ key: account_type, className: parent_classes }, rest_props),
+					React.createElement('i', { className: icon_classes })
+				);
+			}
+		})
+	);
+}
+var _extends = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; };
+
+var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+
+function _objectWithoutProperties(obj, keys) { var target = {}; for (var i in obj) { if (keys.indexOf(i) >= 0) continue; if (!Object.prototype.hasOwnProperty.call(obj, i)) continue; target[i] = obj[i]; } return target; }
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
+
+function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
+
+var Tabs = function (_React$Component) {
+	_inherits(Tabs, _React$Component);
+
+	/**
+  *
+  * @param props
+  * @param props.selectedTab
+  * @param props.className
+  * @param props.headerClasses
+  * @param props.bodyWrapperClasses
+  */
+	function Tabs(props) {
+		_classCallCheck(this, Tabs);
+
+		var _this = _possibleConstructorReturn(this, (Tabs.__proto__ || Object.getPrototypeOf(Tabs)).call(this, props));
+
+		_this.state = {
+			selected_tab: props.selectedTab || null
+		};
+
+		_this.changeTab = _this.changeTab.bind(_this);
+		return _this;
+	}
+
+	_createClass(Tabs, [{
+		key: 'changeTab',
+		value: function changeTab(new_state) {
+			this.setState(function (prev_state) {
+				if (prev_state.selected_tab !== new_state) {
+
+					return {
+						selected_tab: new_state
+					};
+				}
+
+				return null;
+			});
+		}
+	}, {
+		key: 'render',
+		value: function render() {
+			var _this2 = this;
+
+			var _props = this.props,
+			    className = _props.className,
+			    headerClasses = _props.headerClasses,
+			    bodyWrapperClasses = _props.bodyWrapperClasses,
+			    selectedTab = _props.selectedTab,
+			    rest_props = _objectWithoutProperties(_props, ['className', 'headerClasses', 'bodyWrapperClasses', 'selectedTab']),
+			    children = React.Children.toArray(this.props.children);
+
+			return React.createElement(
+				'div',
+				_extends({ className: new HtmlClassesArray(className) + ' Tabs' }, rest_props),
+				React.createElement(
+					'header',
+					{ className: new HtmlClassesArray(headerClasses) + ' tabs_header HeaderTabs' },
+					children.map(function (child) {
+						return React.createElement(
+							'span',
+							{
+								key: child.props.name,
+								className: 'tab Tab ' + (child.props.name === _this2.state.selected_tab ? '-active' : ''),
+								onClick: function onClick() {
+									return _this2.changeTab(child.props.name);
+								}
+							},
+							child.props.title
+						);
+					})
+				),
+				React.createElement(
+					'div',
+					{ className: new HtmlClassesArray(bodyWrapperClasses) + ' tab_bodies_wrap TabsBodyWrapper' },
+					children.map(function (child) {
+						return React.createElement(
+							'div',
+							{ className: 'tab_body TabsBody ' + (child.props.name === _this2.state.selected_tab ? '-active' : ''), key: child.props.name },
+							child.props.children
+						);
+					})
+				)
+			);
+		}
+	}]);
+
+	return Tabs;
+}(React.Component);
+
+Tabs.propTypes = {
+	className: PropTypes.oneOfType([PropTypes.string, PropTypes.instanceOf(HtmlClassesArray)]),
+	headerClasses: PropTypes.oneOfType([PropTypes.string, PropTypes.arrayOf(PropTypes.string), PropTypes.instanceOf(HtmlClassesArray)]),
+	bodyWrapperClasses: PropTypes.oneOfType([PropTypes.string, PropTypes.arrayOf(PropTypes.string), PropTypes.instanceOf(HtmlClassesArray)]),
+	selectedTab: PropTypes.string
+};
+
+var Tab = function (_React$Component2) {
+	_inherits(Tab, _React$Component2);
+
+	function Tab() {
+		_classCallCheck(this, Tab);
+
+		return _possibleConstructorReturn(this, (Tab.__proto__ || Object.getPrototypeOf(Tab)).apply(this, arguments));
+	}
+
+	return Tab;
+}(React.Component);
+
+Tab.propTypes = {
+	title: PropTypes.string.isRequired,
+	name: PropTypes.string.isRequired
+};
+var _UserActivity$AVATAR_, _UserActivity$ACTION_;
+
+function _defineProperty(obj, key, value) { if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
+
+/**
+ * @requires componentsContainer.js
+ */
+function UserActivity(_ref) {
+	var user = _ref.user,
+	    activity = _ref.activity,
+	    avatarClasses = _ref.avatarClasses;
+
+	var classes = new HtmlClassesArray('activity_block'),
+	    avatar_classes = new HtmlClassesArray(avatarClasses),
+	    creator_name = user.full_name || user.first_name + ' ' + user.last_name,
+	    date = moment.unix(activity.created_at).calendar(null, __LOCALE.DATE.CALENDAR_DATE_TIME);
+
+	var img_url = void 0,
+	    entity_url = void 0,
+	    entity_title = void 0;
+
+	classes.push('-type_' + activity.type_code);
+	avatar_classes.push(__C.CLASSES.SIZES.X50, __C.CLASSES.UNIVERSAL_STATES.ROUNDED);
+
+	switch (true) {
+		case activity instanceof OneOrganizationActivity:
+			{
+				classes.push('-entity_organization');
+				img_url = activity.organization.img_small_url || activity.organization.img_url;
+				entity_url = '/organization/' + activity.organization.id;
+				entity_title = activity.organization.short_name;
+				break;
+			}
+		case activity instanceof OneEventActivity:
+			{
+				classes.push('-entity_event');
+				img_url = activity.event.image_horizontal_small_url || activity.event.image_horizontal_url;
+				entity_url = '/event/' + activity.event.id;
+				entity_title = activity.event.title;
+				break;
+			}
+	}
+
+	return React.createElement(
+		'div',
+		{ className: classes },
+		React.createElement(Avatar, { entity: user, className: avatar_classes, badgeClass: UserActivity.AVATAR_BADGE_ICON[activity.type_code] }),
+		React.createElement(
+			'div',
+			{ className: 'activity_block_content' },
+			React.createElement(
+				'p',
+				{ className: 'activity_block_top' },
+				React.createElement(
+					PageLink,
+					{ className: 'activity_block_creator link', href: '/user/' + user.id },
+					creator_name
+				),
+				' ' + i18n(UserActivity.ACTION_TEXT[activity.type_code], 1, {}, {
+					gender: user.gender
+				})
+			),
+			React.createElement(
+				'p',
+				{ className: 'activity_block_middle' },
+				React.createElement(
+					PageLink,
+					{ className: 'link', href: entity_url },
+					entity_title
+				)
+			),
+			React.createElement(
+				'p',
+				{ className: 'activity_block_bottom' },
+				date
+			)
+		),
+		React.createElement(
+			PageLink,
+			{ className: 'activity_block_image img_holder link', href: entity_url },
+			React.createElement('img', { src: img_url, height: '48', onClick: function onClick(e) {
+					return e.target.src = '/app/img/brand_logo.png';
+				} })
+		)
+	);
+}
+
+UserActivity.propTypes = {
+	user: PropTypes.instanceOf(OneUser).isRequired,
+	activity: PropTypes.instanceOf(OneAbstractActivity).isRequired,
+	avatarClasses: PropTypes.oneOfType([PropTypes.string, PropTypes.instanceOf(HtmlClassesArray)])
+};
+
+UserActivity.AVATAR_BADGE_ICON = (_UserActivity$AVATAR_ = {}, _defineProperty(_UserActivity$AVATAR_, OneAbstractActivity.TYPES.SUBSCRIBE, 'plus'), _defineProperty(_UserActivity$AVATAR_, OneAbstractActivity.TYPES.UNSUBSCRIBE, 'minus'), _defineProperty(_UserActivity$AVATAR_, OneAbstractActivity.TYPES.FAVE, 'star'), _defineProperty(_UserActivity$AVATAR_, OneAbstractActivity.TYPES.UNFAVE, 'minus'), _UserActivity$AVATAR_);
+
+UserActivity.ACTION_TEXT = (_UserActivity$ACTION_ = {}, _defineProperty(_UserActivity$ACTION_, OneAbstractActivity.TYPES.SUBSCRIBE, __S.USER_SUBSCRIBED_TO_ORG), _defineProperty(_UserActivity$ACTION_, OneAbstractActivity.TYPES.UNSUBSCRIBE, __S.USER_UNSUBSCRIBED_FROM_ORG), _defineProperty(_UserActivity$ACTION_, OneAbstractActivity.TYPES.FAVE, __S.USER_FAVORED_EVENT), _defineProperty(_UserActivity$ACTION_, OneAbstractActivity.TYPES.UNFAVE, __S.USER_UNFAVORED_EVENT), _defineProperty(_UserActivity$ACTION_, OneAbstractActivity.TYPES.SHARE_VK, __S.USER_SHARED_EVENT), _defineProperty(_UserActivity$ACTION_, OneAbstractActivity.TYPES.SHARE_FB, __S.USER_SHARED_EVENT), _defineProperty(_UserActivity$ACTION_, OneAbstractActivity.TYPES.SHARE_TW, __S.USER_SHARED_EVENT), _UserActivity$ACTION_);
+
+var UserActivities = componentsContainer(UserActivity, {
+	entity_name: 'activity',
+	entities_name: 'activities',
+	CollectionClass: UsersActivitiesCollection,
+	noEntities: function noEntities() {
+		return React.createElement(
+			Cap,
+			null,
+			i18n(__S.NO_ACTIVITIES)
+		);
+	}
+});
+
+UserActivities.propTypes = {
+	user: PropTypes.instanceOf(OneUser).isRequired,
+	activities: PropTypes.oneOfType([PropTypes.instanceOf(UsersActivitiesCollection), PropTypes.arrayOf(PropTypes.instanceOf(OneAbstractActivity))]).isRequired
+};
+var _extends = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; };
+
+function _toConsumableArray(arr) { if (Array.isArray(arr)) { for (var i = 0, arr2 = Array(arr.length); i < arr.length; i++) { arr2[i] = arr[i]; } return arr2; } else { return Array.from(arr); } }
+
+function _objectWithoutProperties(obj, keys) { var target = {}; for (var i in obj) { if (keys.indexOf(i) >= 0) continue; if (!Object.prototype.hasOwnProperty.call(obj, i)) continue; target[i] = obj[i]; } return target; }
+
+/**
+ *
+ * @param {buildProps} props
+ * @param {(UsersCollection|Array<OneUser>|OneUser)} props.users
+ * @param {boolean} [props.isLink = false]
+ * @param {Array<string>} [props.avatarClasses = []]
+ * @param {string} [props.size = '70x70']
+ * @constructor
+ */
+function UserTombstones(_ref) {
+	var _ref$users = _ref.users,
+	    users = _ref$users === undefined ? new UsersCollection() : _ref$users,
+	    _ref$isLink = _ref.isLink,
+	    isLink = _ref$isLink === undefined ? false : _ref$isLink,
+	    _ref$avatarClasses = _ref.avatarClasses,
+	    avatarClasses = _ref$avatarClasses === undefined ? [] : _ref$avatarClasses,
+	    className = _ref.className,
+	    _ref$size = _ref.size,
+	    size = _ref$size === undefined ? '70x70' : _ref$size,
+	    rest_props = _objectWithoutProperties(_ref, ['users', 'isLink', 'avatarClasses', 'className', 'size']);
+
+	var tombstone_classes = new HtmlClassesArray(className),
+	    avatar_component_classes = new HtmlClassesArray([].concat(_toConsumableArray(avatarClasses), ['-rounded', '-size_' + size]));
+
+	return (users instanceof Array ? users : [users]).map(function (user, id) {
+		var name = user.full_name || [user.first_name, user.last_name].join(' ');
+
+		if (isLink) {
+
+			return React.createElement(
+				PageLink,
+				_extends({
+					key: user.id,
+					className: 'user_tombstone link ' + tombstone_classes,
+					href: '/user/' + user.id
+				}, rest_props),
+				React.createElement(Avatars, { entities: users, className: avatar_component_classes }),
+				React.createElement(
+					'p',
+					{ className: 'user_tombstone_title' },
+					name
+				)
+			);
+		}
+		return React.createElement(
+			'div',
+			_extends({
+				key: user.id,
+				className: 'user_tombstone ' + tombstone_classes
+			}, rest_props),
+			React.createElement(Avatars, { entities: users, className: avatar_component_classes }),
+			React.createElement(
+				'p',
+				{ className: 'user_tombstone_title' },
+				name
+			)
+		);
+	});
+}
+var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
+
+function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
+
+/**
+ * @requires ../../entities/networking_profile/OneEventNetworkingProfile.js
+ */
+var CreateNetworkingRequestModal = function (_React$Component) {
+	_inherits(CreateNetworkingRequestModal, _React$Component);
+
+	function CreateNetworkingRequestModal(props) {
+		_classCallCheck(this, CreateNetworkingRequestModal);
+
+		var _this = _possibleConstructorReturn(this, (CreateNetworkingRequestModal.__proto__ || Object.getPrototypeOf(CreateNetworkingRequestModal)).call(this, props));
+
+		_this.state = {
+			with_message: false,
+			fade_in: true
+		};
+		_this.inputs = [];
+		_this.modal = null;
+		_this.modal_wrapper = $('.ModalsWrapper').get(0);
+
+		_this.handleClickOutside = _this.handleClickOutside.bind(_this);
+		return _this;
+	}
+
+	_createClass(CreateNetworkingRequestModal, [{
+		key: 'componentWillMount',
+		value: function componentWillMount() {
+			$('body').addClass('-open_modal');
+		}
+	}, {
+		key: 'componentDidMount',
+		value: function componentDidMount() {
+			this.bindClickOutside();
+			this.setState({
+				fade_in: false
+			});
+		}
+	}, {
+		key: 'componentWillUnmount',
+		value: function componentWillUnmount() {
+			this.unbindClickOutside();
+			$('body').removeClass('-open_modal');
+		}
+	}, {
+		key: 'bindClickOutside',
+		value: function bindClickOutside() {
+			if (!this.props.canHide) {
+				document.addEventListener('mousedown', this.handleClickOutside);
+			}
+		}
+	}, {
+		key: 'unbindClickOutside',
+		value: function unbindClickOutside() {
+			if (!this.props.canHide) {
+				document.removeEventListener('mousedown', this.handleClickOutside);
+			}
+		}
+	}, {
+		key: 'handleClickOutside',
+		value: function handleClickOutside(event) {
+			if (this.modal && !this.modal.contains(event.target)) {
+				this.setState({
+					fade_in: false
+				}, this.props.hideModalHandler);
+			}
+		}
+	}, {
+		key: 'render',
+		value: function render() {
+			var _this2 = this;
+
+			var profile = this.props.profile,
+			    with_message = this.state.with_message;
+
+
+			return ReactDOM.createPortal(React.createElement(
+				'div',
+				{
+					className: 'modal_unit material -floating_material ' + (this.state.fade_in ? '-faded' : ''),
+					ref: function ref(node) {
+						return _this2.modal = node;
+					},
+					style: { width: 370 }
+				},
+				React.createElement(
+					'header',
+					{ className: 'modal_header' },
+					React.createElement(
+						'span',
+						null,
+						'\u041E\u0442\u043F\u0440\u0430\u0432\u043A\u0430 \u0437\u0430\u044F\u0432\u043A\u0438'
+					),
+					React.createElement(
+						RippleButton,
+						{ className: 'modal_destroy_button CloseModal', onClick: function onClick(e) {
+								_this2.props.hideModalHandler();
+							} },
+						'\xD7'
+					)
+				),
+				React.createElement(
+					'div',
+					{ className: 'modal_content' },
+					React.createElement(
+						'header',
+						{ className: 'create_networking_request_modal_head' },
+						React.createElement(
+							'aside',
+							{ className: 'create_networking_request_modal_head_side' },
+							React.createElement(Avatar, { entity: profile.user, className: new HtmlClassesArray(__C.CLASSES.UNIVERSAL_STATES.ROUNDED, __C.CLASSES.SIZES.X55) })
+						),
+						React.createElement(
+							'div',
+							{ className: 'create_networking_request_modal_head_body' },
+							React.createElement(
+								'h5',
+								{ className: 'create_networking_request_modal_title' },
+								profile.user.full_name
+							),
+							React.createElement(
+								'span',
+								{ className: 'create_networking_request_modal_subtitle' },
+								profile.company_name
+							)
+						)
+					),
+					with_message && React.createElement(
+						'div',
+						{ className: 'form_unit' },
+						React.createElement('textarea', {
+							className: 'form_textarea',
+							name: 'message',
+							placeholder: '\u0412\u0432\u0435\u0434\u0438\u0442\u0435 \u0441\u043E\u043E\u0431\u0449\u0435\u043D\u0438\u0435 (\u043D\u0435\u043E\u0431\u044F\u0437\u0430\u0442\u0435\u043B\u044C\u043D\u043E)',
+							ref: 'message'
+						})
+					),
+					React.createElement(
+						'div',
+						{ className: 'form_group -parts_e_2' },
+						React.createElement(
+							'div',
+							{ className: 'form_unit' },
+							with_message || React.createElement(
+								Action,
+								{
+									className: 'fa_icon fa-commenting',
+									onClick: function onClick(e) {
+										_this2.setState({
+											with_message: true
+										});
+									}
+								},
+								'\u041F\u0440\u0438\u043A\u0440\u0435\u043F\u0438\u0442\u044C \u0441\u043E\u043E\u0431\u0449\u0435\u043D\u0438\u0435'
+							)
+						),
+						React.createElement(
+							'div',
+							{ className: 'form_unit' },
+							React.createElement(
+								RippleButton,
+								{
+									className: new HtmlClassesArray(__C.CLASSES.COLORS.ACCENT),
+									onClick: function onClick(e) {
+										profile.request.create({
+											event_id: profile.event_id,
+											user_id: profile.user_id,
+											sender_user_id: __APP.USER.id,
+											message: with_message ? _this2.refs.message.value : null
+										}).then(function (data) {
+											_this2.props.hideModalHandler();
+
+											return data;
+										});
+									}
+								},
+								'\u041E\u0442\u043F\u0440\u0430\u0432\u0438\u0442\u044C \u0437\u0430\u044F\u0432\u043A\u0443'
+							)
+						)
+					)
+				)
+			), this.modal_wrapper);
+		}
+	}]);
+
+	return CreateNetworkingRequestModal;
+}(React.Component);
+
+CreateNetworkingRequestModal.propTypes = {
+	profile: PropTypes.instanceOf(OneEventNetworkingProfile),
+	canHide: PropTypes.bool,
+	hideModalHandler: PropTypes.func
+};
+var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) { return typeof obj; } : function (obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; };
+
 /**
  *
  * @class AppInspectorComponents
@@ -15804,1316 +17362,16 @@ OrderAppInspector = extending(AbstractAppInspector, function () {
 
 	return OrderAppInspector;
 }());
-function AvatarBlocks(_ref6) {
-	var entity_type = _ref6.entity,
-	    _ref6$entities = _ref6.entities,
-	    entities = _ref6$entities === undefined ? new UsersCollection() : _ref6$entities,
-	    _ref6$isLink = _ref6.isLink,
-	    isLink = _ref6$isLink === undefined ? false : _ref6$isLink,
-	    className = _ref6.className,
-	    _ref6$avatarClasses = _ref6.avatarClasses,
-	    avatarClasses = _ref6$avatarClasses === undefined ? [] : _ref6$avatarClasses,
-	    rest_props = _objectWithoutProperties(_ref6, ['entity', 'entities', 'isLink', 'className', 'avatarClasses']);
+var _extends = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; };
 
-	var block_classes = new HtmlClassesArray(className);
+var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 
-	return (entities instanceof Array ? entities : [entities]).map(function (entity) {
-		return React.createElement(AvatarBlock, _extends({
-			key: entity.id,
-			entity: entity,
-			entityType: entity_type,
-			isLink: isLink,
-			className: block_classes,
-			avatarClasses: avatarClasses
-		}, rest_props));
-	});
-}
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
-AvatarBlocks.propTypes = {
-	entities: PropTypes.oneOfType([PropTypes.instanceOf(UsersCollection), PropTypes.instanceOf(OrganizationsCollection), PropTypes.arrayOf(PropTypes.instanceOf(OneUser)), PropTypes.arrayOf(PropTypes.instanceOf(OneOrganization)), PropTypes.instanceOf(OneUser), PropTypes.instanceOf(OneOrganization)]).isRequired,
-	entity: PropTypes.oneOf([__C.ENTITIES.USER, __C.ENTITIES.ORGANIZATION]),
-	avatarClasses: PropTypes.oneOfType([PropTypes.string, PropTypes.arrayOf(PropTypes.string), PropTypes.instanceOf(HtmlClassesArray)]),
-	className: PropTypes.oneOfType([PropTypes.string, PropTypes.instanceOf(HtmlClassesArray)]),
-	isLink: PropTypes.bool
-};
+function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
 
-function AvatarBlock(_ref7) {
-	var entity = _ref7.entity,
-	    entityType = _ref7.entityType,
-	    avatarClasses = _ref7.avatarClasses,
-	    className = _ref7.className,
-	    isLink = _ref7.isLink,
-	    rest_props = _objectWithoutProperties(_ref7, ['entity', 'entityType', 'avatarClasses', 'className', 'isLink']);
+function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
 
-	var name = void 0,
-	    href = void 0;
-
-	if (entityType && entityType === __C.ENTITIES.USER || entity instanceof OneUser || entity.first_name) {
-		name = entity.full_name || [entity.first_name, entity.last_name].join(' ');
-		href = '/user/' + entity.id;
-	} else {
-		name = entity.short_name || entity.name;
-		href = '/organization/' + entity.id;
-	}
-	var avatar = React.createElement(Avatar, { entity: entity, className: new HtmlClassesArray(avatarClasses) }),
-	    avatar_name = React.createElement(
-		'span',
-		{ className: 'avatar_name' },
-		name
-	),
-	    avatar_block_classes = new HtmlClassesArray(['avatar_block', 'User' + entity.id, 'link'].concat(_toConsumableArray(new HtmlClassesArray(className))));
-
-	if (isLink) {
-
-		return React.createElement(
-			PageLink,
-			_extends({ className: avatar_block_classes, href: href }, rest_props),
-			avatar,
-			avatar_name
-		);
-	}
-
-	return React.createElement(
-		'div',
-		_extends({ className: avatar_block_classes }, rest_props),
-		avatar,
-		avatar_name
-	);
-}
-
-AvatarBlock.propTypes = {
-	entity: PropTypes.oneOfType([PropTypes.instanceOf(OneUser), PropTypes.instanceOf(OneOrganization)]).isRequired,
-	entityType: PropTypes.oneOf([__C.ENTITIES.USER, __C.ENTITIES.ORGANIZATION]),
-	avatarClasses: PropTypes.oneOfType([PropTypes.string, PropTypes.arrayOf(PropTypes.string), PropTypes.instanceOf(HtmlClassesArray)]),
-	className: PropTypes.oneOfType([PropTypes.string, PropTypes.instanceOf(HtmlClassesArray)]),
-	isLink: PropTypes.bool
-};
-
-var AvatarCollectionContextProvider = function (_React$Component) {
-	_inherits(AvatarCollectionContextProvider, _React$Component);
-
-	function AvatarCollectionContextProvider(props) {
-		_classCallCheck(this, AvatarCollectionContextProvider);
-
-		var _this32 = _possibleConstructorReturn(this, (AvatarCollectionContextProvider.__proto__ || Object.getPrototypeOf(AvatarCollectionContextProvider)).call(this, props));
-
-		_this32.state = {
-			is_subscribed: props.isSubscribed
-		};
-		return _this32;
-	}
-
-	_createClass(AvatarCollectionContextProvider, [{
-		key: 'getChildContext',
-		value: function getChildContext() {
-			var _this33 = this;
-
-			return _defineProperty({}, AvatarCollectionContextProvider.CONTEXT_NAME, {
-				isSubscribed: this.state.is_subscribed,
-				subscribe: function subscribe() {
-					_this33.setState({
-						is_subscribed: true
-					});
-				},
-				unsubscribe: function unsubscribe() {
-					_this33.setState({
-						is_subscribed: false
-					});
-				}
-			});
-		}
-	}, {
-		key: 'render',
-		value: function render() {
-
-			return React.Children.map(this.props.children, function (child) {
-				return child;
-			});
-		}
-	}]);
-
-	return AvatarCollectionContextProvider;
-}(React.Component);
-
-AvatarCollectionContextProvider.CONTEXT_NAME = '__avatar_collection__';
-
-AvatarCollectionContextProvider.propTypes = {
-	isSubscribed: PropTypes.bool
-};
-
-AvatarCollectionContextProvider.childContextTypes = _defineProperty({}, AvatarCollectionContextProvider.CONTEXT_NAME, PropTypes.shape({
-	isSubscribed: PropTypes.bool,
-	subscribe: PropTypes.func,
-	unsubscribe: PropTypes.func
-}));
-/**
- * @requires AvatarCollectionContextProvider.js
- */
-
-var AvatarCollection = function (_React$Component2) {
-	_inherits(AvatarCollection, _React$Component2);
-
-	function AvatarCollection(props, context) {
-		_classCallCheck(this, AvatarCollection);
-
-		var left = props.maxCount;
-
-		var _this34 = _possibleConstructorReturn(this, (AvatarCollection.__proto__ || Object.getPrototypeOf(AvatarCollection)).call(this, props, context));
-
-		_this34.avatars = [__APP.USER].concat(_toConsumableArray(props.users.filter(function (user) {
-			return __APP.USER.id !== parseInt(user.id) && left-- > 0;
-		})));
-		return _this34;
-	}
-
-	_createClass(AvatarCollection, [{
-		key: 'getWidth',
-		value: function getWidth() {
-			var avatar_width = 30,
-			    amount = this.avatars.length,
-			    kink = 6;
-
-			if (this.context[AvatarCollectionContextProvider.CONTEXT_NAME].isSubscribed && amount < this.props.maxCount) {
-
-				return amount === 1 ? avatar_width * amount : avatar_width * amount - kink * (amount - 1);
-			}
-
-			return amount === 1 ? 0 : avatar_width * (amount - 1) - kink * (amount - 2);
-		}
-	}, {
-		key: 'render',
-		value: function render() {
-			var _props2 = this.props,
-			    users = _props2.users,
-			    overallAvatarsCount = _props2.overallAvatarsCount,
-			    className = _props2.className,
-			    counterClasses = _props2.counterClasses,
-			    maxCount = _props2.maxCount,
-			    rest_props = _objectWithoutProperties(_props2, ['users', 'overallAvatarsCount', 'className', 'counterClasses', 'maxCount']),
-			    classes = new HtmlClassesArray('avatars_collection', '-max_' + maxCount, '-trimmed'),
-			    more_avatars_count = (overallAvatarsCount || users.length) - maxCount,
-			    is_counter_hidden = more_avatars_count <= 0;
-
-			if (this.context[AvatarCollectionContextProvider.CONTEXT_NAME].isSubscribed) {
-				classes.push(__C.CLASSES.HOOKS.ADD_AVATAR.STATES.SHIFTED);
-			}
-
-			classes.push(className);
-
-			return React.createElement(
-				React.Fragment,
-				null,
-				React.createElement(
-					'div',
-					_extends({ className: classes, style: { width: this.getWidth() } }, rest_props),
-					React.createElement(Avatars, { entities: this.avatars })
-				),
-				React.createElement(
-					'span',
-					{ className: 'counter ' + new HtmlClassesArray(counterClasses) + ' ' + (is_counter_hidden ? '-cast' : '') },
-					'+',
-					more_avatars_count
-				)
-			);
-		}
-	}]);
-
-	return AvatarCollection;
-}(React.Component);
-
-AvatarCollection.propTypes = {
-	users: PropTypes.oneOfType([PropTypes.instanceOf(UsersCollection), PropTypes.arrayOf(PropTypes.instanceOf(OneUser))]).isRequired,
-	maxCount: PropTypes.number.isRequired,
-	overallAvatarsCount: PropTypes.number,
-	className: PropTypes.oneOfType([PropTypes.string, PropTypes.instanceOf(HtmlClassesArray)]),
-	counterClasses: PropTypes.oneOfType([PropTypes.string, PropTypes.arrayOf(PropTypes.string), PropTypes.instanceOf(HtmlClassesArray)])
-};
-
-AvatarCollection.contextTypes = AvatarCollectionContextProvider.childContextTypes;
-function Avatars(_ref9) {
-	var entities = _ref9.entities,
-	    className = _ref9.className,
-	    rest_props = _objectWithoutProperties(_ref9, ['entities', 'className']);
-
-	var classes = new HtmlClassesArray(className);
-
-	return (entities instanceof Array ? entities : [entities]).map(function (entity) {
-		return React.createElement(Avatar, _extends({ key: entity.id, entity: entity, className: classes }, rest_props));
-	});
-}
-
-Avatars.propTypes = {
-	entities: PropTypes.oneOfType([PropTypes.instanceOf(UsersCollection), PropTypes.instanceOf(OrganizationsCollection), PropTypes.instanceOf(OneUser), PropTypes.instanceOf(OneOrganization), PropTypes.arrayOf(PropTypes.instanceOf(OneUser)), PropTypes.arrayOf(PropTypes.instanceOf(OneOrganization))]).isRequired,
-	className: PropTypes.oneOfType([PropTypes.string, PropTypes.instanceOf(HtmlClassesArray)])
-};
-
-function Avatar(_ref10) {
-	var entity = _ref10.entity,
-	    className = _ref10.className,
-	    badgeClass = _ref10.badgeClass,
-	    rest_props = _objectWithoutProperties(_ref10, ['entity', 'className', 'badgeClass']);
-
-	var classes = new HtmlClassesArray(className);
-
-	var avatar_url = void 0,
-	    name = void 0;
-
-	if (entity instanceof OneUser || entity.avatar_url) {
-		avatar_url = entity.avatar_url;
-		name = entity.full_name || [entity.first_name, entity.last_name].join(' ');
-	} else {
-		avatar_url = entity.img_small_url || entity.img_url;
-		name = entity.short_name || entity.name;
-	}
-
-	return React.createElement(
-		'div',
-		_extends({ className: 'avatar ' + classes, title: name }, rest_props),
-		React.createElement('img', { src: avatar_url || '/app/img/brand_logo.png', onError: function onError(e) {
-				return e.target.src = '/app/img/brand_logo.png';
-			} }),
-		badgeClass && React.createElement(
-			'span',
-			{ className: 'avatar_badge' },
-			React.createElement('i', { className: 'fa fa-' + badgeClass })
-		)
-	);
-}
-
-Avatar.propTypes = {
-	entity: PropTypes.oneOfType([PropTypes.instanceOf(OneUser), PropTypes.instanceOf(OneOrganization)]).isRequired,
-	className: PropTypes.oneOfType([PropTypes.string, PropTypes.instanceOf(HtmlClassesArray)]),
-	badgeClass: PropTypes.oneOf(['plus', 'minus', 'star'])
-};
-function Button(_ref11) {
-	var children = _ref11.children,
-	    className = _ref11.className,
-	    rest_props = _objectWithoutProperties(_ref11, ['children', 'className']);
-
-	return React.createElement(
-		'button',
-		_extends({
-			className: __C.CLASSES.COMPONENT.BUTTON + ' ' + new HtmlClassesArray(className),
-			type: 'button'
-		}, rest_props),
-		React.createElement(
-			'span',
-			{ className: 'Text' },
-			children
-		)
-	);
-}
-
-function RippleButton(_ref12) {
-	var children = _ref12.children,
-	    className = _ref12.className,
-	    _onClick = _ref12.onClick,
-	    rest_props = _objectWithoutProperties(_ref12, ['children', 'className', 'onClick']);
-
-	return React.createElement(
-		'button',
-		_extends({
-			className: __C.CLASSES.COMPONENT.BUTTON + ' ' + new HtmlClassesArray(className),
-			type: 'button',
-			onClick: function onClick(e) {
-				rippleEffectHandler(e);
-				if (isFunction(_onClick)) {
-					_onClick(e);
-				}
-			}
-		}, rest_props),
-		React.createElement(
-			'span',
-			{ className: 'Text' },
-			children
-		)
-	);
-}
-
-function Action(_ref13) {
-	var children = _ref13.children,
-	    className = _ref13.className,
-	    rest_props = _objectWithoutProperties(_ref13, ['children', 'className']);
-
-	return React.createElement(
-		'button',
-		_extends({
-			className: __C.CLASSES.COMPONENT.ACTION + ' ' + new HtmlClassesArray(className),
-			type: 'button'
-		}, rest_props),
-		React.createElement(
-			'span',
-			{ className: 'Text' },
-			children
-		)
-	);
-}
-/**
- *
- * @param {React.Component} Component
- * @param {object} configs
- * @param {string} configs.entity_name
- * @param {string} configs.entities_name
- * @param {EntitiesCollection} [configs.CollectionClass]
- * @param {function(): XML} [configs.noEntities]
- * @param {function(): {}} [configs.dynamicProps]
- * @param {function(): {}} [configs.renderEntities]
- * @return {React.Component}
- */
-function componentsContainer(Component, _ref14) {
-	var entity_name = _ref14.entity_name,
-	    entities_name = _ref14.entities_name,
-	    _ref14$CollectionClas = _ref14.CollectionClass,
-	    CollectionClass = _ref14$CollectionClas === undefined ? null : _ref14$CollectionClas,
-	    _ref14$noEntities = _ref14.noEntities,
-	    noEntities = _ref14$noEntities === undefined ? function () {
-		return React.createElement(
-			Cap,
-			null,
-			i18n(__S.NO_ELEMENTS)
-		);
-	} : _ref14$noEntities,
-	    _ref14$dynamicProps = _ref14.dynamicProps,
-	    dynamicProps = _ref14$dynamicProps === undefined ? function (entity) {
-		return {};
-	} : _ref14$dynamicProps,
-	    _ref14$renderEntities = _ref14.renderEntities,
-	    renderEntities = _ref14$renderEntities === undefined ? null : _ref14$renderEntities;
-
-	var ComponentsContainer = function (_React$Component3) {
-		_inherits(ComponentsContainer, _React$Component3);
-
-		function ComponentsContainer(props) {
-			_classCallCheck(this, ComponentsContainer);
-
-			var _this35 = _possibleConstructorReturn(this, (ComponentsContainer.__proto__ || Object.getPrototypeOf(ComponentsContainer)).call(this, props));
-
-			_this35.state = {
-				length: _this35.props[entities_name].length,
-				is_loading: false
-			};
-			return _this35;
-		}
-
-		_createClass(ComponentsContainer, [{
-			key: 'fetch',
-			value: function fetch() {
-				var _this36 = this;
-
-				if (!isVoid(CollectionClass) && this.props[entities_name] instanceof CollectionClass) {
-					var _props$entities_name;
-
-					this.setLoadingState();
-					return (_props$entities_name = this.props[entities_name]).fetch.apply(_props$entities_name, arguments).then(function (entities) {
-						_this36.unsetLoadingState().update();
-
-						return entities;
-					}).catch(function () {
-						_this36.unsetLoadingState();
-					});
-				}
-
-				return Promise.resolve();
-			}
-		}, {
-			key: 'update',
-			value: function update() {
-				if (this.props[entities_name].length !== this.state.length) {
-					this.setState({
-						length: this.props[entities_name].length
-					});
-				}
-
-				return this;
-			}
-		}, {
-			key: 'setLoadingState',
-			value: function setLoadingState() {
-				this.setState({
-					is_loading: true
-				});
-
-				return this;
-			}
-		}, {
-			key: 'unsetLoadingState',
-			value: function unsetLoadingState() {
-				this.setState({
-					is_loading: false
-				});
-
-				return this;
-			}
-		}, {
-			key: 'render',
-			value: function render() {
-				var _props3 = this.props,
-				    entities = _props3[entities_name],
-				    rest_props = _objectWithoutProperties(_props3, [entities_name]);
-
-				if (!entities.length && !this.state.is_loading) {
-
-					return noEntities();
-				}
-
-				return React.createElement(
-					React.Fragment,
-					null,
-					isFunction(renderEntities) ? renderEntities.call(this, entities) : entities.map(function (entity) {
-						return React.createElement(Component, _extends({ key: entity[entity.ID_PROP_NAME] }, _extends(_defineProperty({}, entity_name, entity), rest_props, dynamicProps(entity))));
-					}),
-					this.state.is_loading && React.createElement(LoaderBlock, null)
-				);
-			}
-		}]);
-
-		return ComponentsContainer;
-	}(React.Component);
-
-	ComponentsContainer.displayName = 'collectionOf(' + (Component.displayName || Component.name || 'Component') + ')';
-
-	return ComponentsContainer;
-}
-
-var Dropdown = function (_React$Component4) {
-	_inherits(Dropdown, _React$Component4);
-
-	function Dropdown(props) {
-		_classCallCheck(this, Dropdown);
-
-		var _this37 = _possibleConstructorReturn(this, (Dropdown.__proto__ || Object.getPrototypeOf(Dropdown)).call(this, props));
-
-		_this37.state = {
-			click_pos: {
-				X: 0,
-				Y: 0
-			},
-			opened: false
-		};
-
-		_this37.open = _this37.open.bind(_this37);
-		_this37.close = _this37.close.bind(_this37);
-		_this37.handleClickOutside = _this37.handleClickOutside.bind(_this37);
-		return _this37;
-	}
-
-	_createClass(Dropdown, [{
-		key: 'componentDidMount',
-		value: function componentDidMount() {
-			if (this.state.opened) {
-				this.bindClickOutside();
-			}
-		}
-	}, {
-		key: 'componentWillUnmount',
-		value: function componentWillUnmount() {
-			this.unbindClickOutside();
-		}
-	}, {
-		key: 'open',
-		value: function open(e) {
-			var _this38 = this;
-
-			this.setState({
-				opened: true,
-				click_pos: {
-					X: e.pageX,
-					Y: e.pageY
-				}
-			}, function () {
-				_this38.bindClickOutside();
-			});
-		}
-	}, {
-		key: 'close',
-		value: function close(e) {
-			var _this39 = this;
-
-			this.setState({
-				opened: false
-			}, function () {
-				_this39.unbindClickOutside();
-				_this39.setState({
-					click_pos: {
-						X: 0,
-						Y: 0
-					}
-				});
-			});
-		}
-	}, {
-		key: 'bindClickOutside',
-		value: function bindClickOutside() {
-			if (this.props.isDismissOnOuterClick) {
-				document.addEventListener('mousedown', this.handleClickOutside);
-			}
-		}
-	}, {
-		key: 'unbindClickOutside',
-		value: function unbindClickOutside() {
-			if (this.props.isDismissOnOuterClick) {
-				document.removeEventListener('mousedown', this.handleClickOutside);
-			}
-		}
-	}, {
-		key: 'handleClickOutside',
-		value: function handleClickOutside(event) {
-			if (this.dropdown && !this.dropdown.contains(event.target)) {
-				this.close();
-			}
-		}
-	}, {
-		key: 'getPos',
-		value: function getPos() {
-			var viewport_width = window.outerWidth,
-			    _state$click_pos = this.state.click_pos,
-			    click_X = _state$click_pos.X,
-			    click_Y = _state$click_pos.Y;
-
-
-			var left = void 0,
-			    dropdown_width = void 0;
-
-			if (!this.dropdown) {
-
-				return {};
-			}
-
-			dropdown_width = this.dropdown.offsetWidth;
-			if (viewport_width < click_X + dropdown_width / 2) {
-				left = viewport_width - dropdown_width;
-			} else {
-				left = click_X - dropdown_width / 2;
-			}
-
-			return {
-				left: left,
-				top: click_Y + 25
-			};
-		}
-	}, {
-		key: 'render',
-		value: function render() {
-			var _this40 = this;
-
-			var _props4 = this.props,
-			    renderControl = _props4.renderControl,
-			    renderDropdown = _props4.renderDropdown,
-			    children = _props4.children,
-			    opened = this.state.opened;
-
-
-			return React.createElement(
-				React.Fragment,
-				null,
-				renderControl(opened, this.open, this.close),
-				children,
-				ReactDOM.createPortal(React.createElement(
-					'div',
-					{
-						className: 'dropdown_box ' + (opened ? '-show' : ''),
-						ref: function ref(node) {
-							return _this40.dropdown = node;
-						},
-						style: this.getPos()
-					},
-					renderDropdown(this.close)
-				), document.body)
-			);
-		}
-	}]);
-
-	return Dropdown;
-}(React.Component);
-
-Dropdown.propTypes = {
-	renderControl: PropTypes.func.isRequired,
-	renderDropdown: PropTypes.func.isRequired,
-	isDismissOnOuterClick: PropTypes.bool
-};
-/**
- * @requires componentsContainer.js
- */
-function EventBlock(_ref15) {
-	var _this41 = this;
-
-	var event = _ref15.event,
-	    date = _ref15.date,
-	    _ref15$hasDivider = _ref15.hasDivider,
-	    hasDivider = _ref15$hasDivider === undefined ? false : _ref15$hasDivider,
-	    _ref15$coverWidth = _ref15.coverWidth,
-	    coverWidth = _ref15$coverWidth === undefined ? 550 : _ref15$coverWidth;
-
-	var event_id = event.id,
-	    avatars_collection_classes = new HtmlClassesArray(__C.CLASSES.UNIVERSAL_STATES.ROUNDED, __C.CLASSES.UNIVERSAL_STATES.BORDERED, __C.CLASSES.SIZES.SMALL),
-	    event_date = date.format(__C.DATE_FORMAT),
-	    time = event.dates.reduce(function (times, date) {
-		if (moment.unix(date.event_date).format(__C.DATE_FORMAT) === event_date) {
-
-			return [].concat(_toConsumableArray(times), [displayTimeRange(date.start_time, date.end_time)]);
-		}
-
-		return times;
-	}, []).join('; ');
-
-	return React.createElement(
-		React.Fragment,
-		null,
-		hasDivider && React.createElement('hr', { title: date.calendar().capitalize() }),
-		React.createElement(
-			'div',
-			{ className: 'event_block', 'data-event-id': event_id, 'data-event_date': event_date },
-			React.createElement(
-				PageLink,
-				{ href: '/event/' + event_id, className: 'event_block_img img_holder link' },
-				React.createElement('img', { src: event.image_horizontal_url + '?width=' + coverWidth, title: event.title, width: coverWidth })
-			),
-			React.createElement(
-				'div',
-				{ className: 'event_block_info' },
-				React.createElement(
-					'header',
-					{ className: 'event_block_title' },
-					React.createElement(
-						PageLink,
-						{ href: '/event/' + event_id, className: 'link' },
-						event.title
-					)
-				),
-				React.createElement(
-					'div',
-					{ className: 'event_block_service' },
-					React.createElement(
-						'p',
-						null,
-						React.createElement(
-							'small',
-							null,
-							time
-						)
-					),
-					React.createElement(
-						'div',
-						{ className: 'event_block_action_buttons' },
-						React.createElement(
-							AvatarCollectionContextProvider,
-							{ isSubscribed: event.is_favorite },
-							React.createElement(
-								'div',
-								{ className: 'event_block_add_avatar_wrapper' },
-								React.createElement(AvatarCollection, {
-									users: event.favored,
-									maxCount: 3,
-									className: avatars_collection_classes,
-									counterClasses: [__C.CLASSES.SIZES.X30, __C.CLASSES.UNIVERSAL_STATES.BORDERED, __C.CLASSES.COLORS.MARGINAL, __C.CLASSES.HOOKS.ADD_AVATAR.STATES.CASTABLE],
-									overallAvatarsCount: event.favored_users_count,
-									onClick: function onClick() {
-										if (!_this41.favored_modal) {
-											_this41.favored_modal = new FavoredModal(event.id);
-										}
-										_this41.favored_modal.show();
-									}
-								})
-							),
-							React.createElement(
-								'div',
-								{ className: 'event_block_action_buttons_wrapper' },
-								React.createElement(ReactAddToFavoriteButton, {
-									event: event,
-									className: new HtmlClassesArray(['event_block_main_action_button', __C.CLASSES.SIZES.LOW, __C.CLASSES.UNIVERSAL_STATES.ROUNDED])
-								})
-							)
-						)
-					)
-				)
-			)
-		)
-	);
-}
-
-EventBlock.propTypes = {
-	event: PropTypes.instanceOf(OneEvent).isRequired,
-	date: PropTypes.moment.isRequired,
-	hasDivider: PropTypes.bool,
-	coverWidth: PropTypes.number
-};
-
-var EventBlocks = componentsContainer(EventBlock, {
-	entity_name: 'event',
-	entities_name: 'events',
-	CollectionClass: EventsCollection,
-	noEntities: function noEntities() {
-		return React.createElement(
-			Cap,
-			null,
-			i18n(__S.NO_EVENTS)
-		);
-	},
-	renderEntities: function renderEntities(events) {
-		var _props5 = this.props,
-		    coverWidth = _props5.coverWidth,
-		    _props5$sortDateType = _props5.sortDateType,
-		    sortDateType = _props5$sortDateType === undefined ? 'nearest_event_date' : _props5$sortDateType;
-
-
-		var last_date = void 0;
-
-		return events.map(function (event) {
-			var m_event_date = moment.unix(event[sortDateType] || event.first_event_date),
-			    event_date = m_event_date.format(__C.DATE_FORMAT),
-			    is_different_day = last_date !== event_date;
-
-			last_date = event_date;
-
-			return React.createElement(EventBlock, {
-				key: event.id,
-				event: event,
-				date: m_event_date,
-				coverWidth: coverWidth,
-				hasDivider: is_different_day
-			});
-		});
-	}
-});
-
-EventBlocks.propTypes = {
-	events: PropTypes.oneOfType([PropTypes.arrayOf(PropTypes.instanceOf(OneEvent)), PropTypes.instanceOf(EventsCollection)]).isRequired,
-	sortDateType: PropTypes.string,
-	coverWidth: PropTypes.number
-};
-PageLink.propTypes = {
-	href: PropTypes.string.isRequired,
-	children: PropTypes.oneOfType([PropTypes.string, PropTypes.node, PropTypes.element])
-};
-
-function PageLink(_ref16) {
-	var href = _ref16.href,
-	    children = _ref16.children,
-	    rest_props = _objectWithoutProperties(_ref16, ['href', 'children']);
-
-	return React.createElement(
-		ReactRouterDOM.Link,
-		_extends({ to: href }, rest_props),
-		children
-	);
-}
-/**
- *
- * @param {buildProps} props
- * @param {Object<OneUser.ACCOUNTS, string>} props.links
- * @constructor
- */
-function SocialLinks(_ref17) {
-	var _ref17$links = _ref17.links,
-	    links = _ref17$links === undefined ? {} : _ref17$links,
-	    className = _ref17.className,
-	    rest_props = _objectWithoutProperties(_ref17, ['links', 'className']);
-
-	var ICON_SLUGS = {
-		VK: 'vk',
-		GOOGLE: 'google-plus',
-		FACEBOOK: 'facebook-official'
-	};
-
-	return React.createElement(
-		'div',
-		{ className: 'social_link_wrapper' },
-		Object.keys(OneUser.ACCOUNTS).map(function (account_type) {
-			var parent_classes = 'social_link -color_' + OneUser.ACCOUNTS[account_type] + ' -valign_center ' + new HtmlClassesArray(className),
-			    icon_classes = 'fa_icon fa-' + ICON_SLUGS[account_type];
-
-			if (links.hasOwnProperty(OneUser.ACCOUNTS[account_type])) {
-
-				return React.createElement(
-					'a',
-					_extends({ key: account_type, className: parent_classes, href: links[OneUser.ACCOUNTS[account_type]], target: '_blank' }, rest_props),
-					React.createElement('i', { className: icon_classes })
-				);
-			} else {
-
-				return React.createElement(
-					'span',
-					_extends({ key: account_type, className: parent_classes }, rest_props),
-					React.createElement('i', { className: icon_classes })
-				);
-			}
-		})
-	);
-}
-
-var Tabs = function (_React$Component5) {
-	_inherits(Tabs, _React$Component5);
-
-	/**
-  *
-  * @param props
-  * @param props.selectedTab
-  * @param props.className
-  * @param props.headerClasses
-  * @param props.bodyWrapperClasses
-  */
-	function Tabs(props) {
-		_classCallCheck(this, Tabs);
-
-		var _this42 = _possibleConstructorReturn(this, (Tabs.__proto__ || Object.getPrototypeOf(Tabs)).call(this, props));
-
-		_this42.state = {
-			selected_tab: props.selectedTab || null
-		};
-
-		_this42.changeTab = _this42.changeTab.bind(_this42);
-		return _this42;
-	}
-
-	_createClass(Tabs, [{
-		key: 'changeTab',
-		value: function changeTab(new_state) {
-			this.setState(function (prev_state) {
-				if (prev_state.selected_tab !== new_state) {
-
-					return {
-						selected_tab: new_state
-					};
-				}
-
-				return null;
-			});
-		}
-	}, {
-		key: 'render',
-		value: function render() {
-			var _this43 = this;
-
-			var _props6 = this.props,
-			    className = _props6.className,
-			    headerClasses = _props6.headerClasses,
-			    bodyWrapperClasses = _props6.bodyWrapperClasses,
-			    selectedTab = _props6.selectedTab,
-			    rest_props = _objectWithoutProperties(_props6, ['className', 'headerClasses', 'bodyWrapperClasses', 'selectedTab']),
-			    children = React.Children.toArray(this.props.children);
-
-			return React.createElement(
-				'div',
-				_extends({ className: new HtmlClassesArray(className) + ' Tabs' }, rest_props),
-				React.createElement(
-					'header',
-					{ className: new HtmlClassesArray(headerClasses) + ' tabs_header HeaderTabs' },
-					children.map(function (child) {
-						return React.createElement(
-							'span',
-							{
-								key: child.props.name,
-								className: 'tab Tab ' + (child.props.name === _this43.state.selected_tab ? '-active' : ''),
-								onClick: function onClick() {
-									return _this43.changeTab(child.props.name);
-								}
-							},
-							child.props.title
-						);
-					})
-				),
-				React.createElement(
-					'div',
-					{ className: new HtmlClassesArray(bodyWrapperClasses) + ' tab_bodies_wrap TabsBodyWrapper' },
-					children.map(function (child) {
-						return React.createElement(
-							'div',
-							{ className: 'tab_body TabsBody ' + (child.props.name === _this43.state.selected_tab ? '-active' : ''), key: child.props.name },
-							child.props.children
-						);
-					})
-				)
-			);
-		}
-	}]);
-
-	return Tabs;
-}(React.Component);
-
-Tabs.propTypes = {
-	className: PropTypes.oneOfType([PropTypes.string, PropTypes.instanceOf(HtmlClassesArray)]),
-	headerClasses: PropTypes.oneOfType([PropTypes.string, PropTypes.arrayOf(PropTypes.string), PropTypes.instanceOf(HtmlClassesArray)]),
-	bodyWrapperClasses: PropTypes.oneOfType([PropTypes.string, PropTypes.arrayOf(PropTypes.string), PropTypes.instanceOf(HtmlClassesArray)]),
-	selectedTab: PropTypes.string
-};
-
-var Tab = function (_React$Component6) {
-	_inherits(Tab, _React$Component6);
-
-	function Tab() {
-		_classCallCheck(this, Tab);
-
-		return _possibleConstructorReturn(this, (Tab.__proto__ || Object.getPrototypeOf(Tab)).apply(this, arguments));
-	}
-
-	return Tab;
-}(React.Component);
-
-Tab.propTypes = {
-	title: PropTypes.string.isRequired,
-	name: PropTypes.string.isRequired
-};
-/**
- * @requires componentsContainer.js
- */
-function UserActivity(_ref18) {
-	var user = _ref18.user,
-	    activity = _ref18.activity,
-	    avatarClasses = _ref18.avatarClasses;
-
-	var classes = new HtmlClassesArray('activity_block'),
-	    avatar_classes = new HtmlClassesArray(avatarClasses),
-	    creator_name = user.full_name || user.first_name + ' ' + user.last_name,
-	    date = moment.unix(activity.created_at).calendar(null, __LOCALE.DATE.CALENDAR_DATE_TIME);
-
-	var img_url = void 0,
-	    entity_url = void 0,
-	    entity_title = void 0;
-
-	classes.push('-type_' + activity.type_code);
-	avatar_classes.push(__C.CLASSES.SIZES.X50, __C.CLASSES.UNIVERSAL_STATES.ROUNDED);
-
-	switch (true) {
-		case activity instanceof OneOrganizationActivity:
-			{
-				classes.push('-entity_organization');
-				img_url = activity.organization.img_small_url || activity.organization.img_url;
-				entity_url = '/organization/' + activity.organization.id;
-				entity_title = activity.organization.short_name;
-				break;
-			}
-		case activity instanceof OneEventActivity:
-			{
-				classes.push('-entity_event');
-				img_url = activity.event.image_horizontal_small_url || activity.event.image_horizontal_url;
-				entity_url = '/event/' + activity.event.id;
-				entity_title = activity.event.title;
-				break;
-			}
-	}
-
-	return React.createElement(
-		'div',
-		{ className: classes },
-		React.createElement(Avatar, { entity: user, className: avatar_classes, badgeClass: UserActivity.AVATAR_BADGE_ICON[activity.type_code] }),
-		React.createElement(
-			'div',
-			{ className: 'activity_block_content' },
-			React.createElement(
-				'p',
-				{ className: 'activity_block_top' },
-				React.createElement(
-					PageLink,
-					{ className: 'activity_block_creator link', href: '/user/' + user.id },
-					creator_name
-				),
-				' ' + i18n(UserActivity.ACTION_TEXT[activity.type_code], 1, {}, {
-					gender: user.gender
-				})
-			),
-			React.createElement(
-				'p',
-				{ className: 'activity_block_middle' },
-				React.createElement(
-					PageLink,
-					{ className: 'link', href: entity_url },
-					entity_title
-				)
-			),
-			React.createElement(
-				'p',
-				{ className: 'activity_block_bottom' },
-				date
-			)
-		),
-		React.createElement(
-			PageLink,
-			{ className: 'activity_block_image img_holder link', href: entity_url },
-			React.createElement('img', { src: img_url, height: '48', onClick: function onClick(e) {
-					return e.target.src = '/app/img/brand_logo.png';
-				} })
-		)
-	);
-}
-
-UserActivity.propTypes = {
-	user: PropTypes.instanceOf(OneUser).isRequired,
-	activity: PropTypes.instanceOf(OneAbstractActivity).isRequired,
-	avatarClasses: PropTypes.oneOfType([PropTypes.string, PropTypes.instanceOf(HtmlClassesArray)])
-};
-
-UserActivity.AVATAR_BADGE_ICON = (_UserActivity$AVATAR_ = {}, _defineProperty(_UserActivity$AVATAR_, OneAbstractActivity.TYPES.SUBSCRIBE, 'plus'), _defineProperty(_UserActivity$AVATAR_, OneAbstractActivity.TYPES.UNSUBSCRIBE, 'minus'), _defineProperty(_UserActivity$AVATAR_, OneAbstractActivity.TYPES.FAVE, 'star'), _defineProperty(_UserActivity$AVATAR_, OneAbstractActivity.TYPES.UNFAVE, 'minus'), _UserActivity$AVATAR_);
-
-UserActivity.ACTION_TEXT = (_UserActivity$ACTION_ = {}, _defineProperty(_UserActivity$ACTION_, OneAbstractActivity.TYPES.SUBSCRIBE, __S.USER_SUBSCRIBED_TO_ORG), _defineProperty(_UserActivity$ACTION_, OneAbstractActivity.TYPES.UNSUBSCRIBE, __S.USER_UNSUBSCRIBED_FROM_ORG), _defineProperty(_UserActivity$ACTION_, OneAbstractActivity.TYPES.FAVE, __S.USER_FAVORED_EVENT), _defineProperty(_UserActivity$ACTION_, OneAbstractActivity.TYPES.UNFAVE, __S.USER_UNFAVORED_EVENT), _defineProperty(_UserActivity$ACTION_, OneAbstractActivity.TYPES.SHARE_VK, __S.USER_SHARED_EVENT), _defineProperty(_UserActivity$ACTION_, OneAbstractActivity.TYPES.SHARE_FB, __S.USER_SHARED_EVENT), _defineProperty(_UserActivity$ACTION_, OneAbstractActivity.TYPES.SHARE_TW, __S.USER_SHARED_EVENT), _UserActivity$ACTION_);
-
-var UserActivities = componentsContainer(UserActivity, {
-	entity_name: 'activity',
-	entities_name: 'activities',
-	CollectionClass: UsersActivitiesCollection,
-	noEntities: function noEntities() {
-		return React.createElement(
-			Cap,
-			null,
-			i18n(__S.NO_ACTIVITIES)
-		);
-	}
-});
-
-UserActivities.propTypes = {
-	user: PropTypes.instanceOf(OneUser).isRequired,
-	activities: PropTypes.oneOfType([PropTypes.instanceOf(UsersActivitiesCollection), PropTypes.arrayOf(PropTypes.instanceOf(OneAbstractActivity))]).isRequired
-};
-/**
- *
- * @param {buildProps} props
- * @param {(UsersCollection|Array<OneUser>|OneUser)} props.users
- * @param {boolean} [props.isLink = false]
- * @param {Array<string>} [props.avatarClasses = []]
- * @param {string} [props.size = '70x70']
- * @constructor
- */
-function UserTombstones(_ref19) {
-	var _ref19$users = _ref19.users,
-	    users = _ref19$users === undefined ? new UsersCollection() : _ref19$users,
-	    _ref19$isLink = _ref19.isLink,
-	    isLink = _ref19$isLink === undefined ? false : _ref19$isLink,
-	    _ref19$avatarClasses = _ref19.avatarClasses,
-	    avatarClasses = _ref19$avatarClasses === undefined ? [] : _ref19$avatarClasses,
-	    className = _ref19.className,
-	    _ref19$size = _ref19.size,
-	    size = _ref19$size === undefined ? '70x70' : _ref19$size,
-	    rest_props = _objectWithoutProperties(_ref19, ['users', 'isLink', 'avatarClasses', 'className', 'size']);
-
-	var tombstone_classes = new HtmlClassesArray(className),
-	    avatar_component_classes = new HtmlClassesArray([].concat(_toConsumableArray(avatarClasses), ['-rounded', '-size_' + size]));
-
-	return (users instanceof Array ? users : [users]).map(function (user, id) {
-		var name = user.full_name || [user.first_name, user.last_name].join(' ');
-
-		if (isLink) {
-
-			return React.createElement(
-				PageLink,
-				_extends({
-					key: user.id,
-					className: 'user_tombstone link ' + tombstone_classes,
-					href: '/user/' + user.id
-				}, rest_props),
-				React.createElement(Avatars, { entities: users, className: avatar_component_classes }),
-				React.createElement(
-					'p',
-					{ className: 'user_tombstone_title' },
-					name
-				)
-			);
-		}
-		return React.createElement(
-			'div',
-			_extends({
-				key: user.id,
-				className: 'user_tombstone ' + tombstone_classes
-			}, rest_props),
-			React.createElement(Avatars, { entities: users, className: avatar_component_classes }),
-			React.createElement(
-				'p',
-				{ className: 'user_tombstone_title' },
-				name
-			)
-		);
-	});
-}
-/**
- * @requires ../../entities/networking_profile/OneEventNetworkingProfile.js
- */
-
-var CreateNetworkingRequestModal = function (_React$Component7) {
-	_inherits(CreateNetworkingRequestModal, _React$Component7);
-
-	function CreateNetworkingRequestModal(props) {
-		_classCallCheck(this, CreateNetworkingRequestModal);
-
-		var _this45 = _possibleConstructorReturn(this, (CreateNetworkingRequestModal.__proto__ || Object.getPrototypeOf(CreateNetworkingRequestModal)).call(this, props));
-
-		_this45.state = {
-			with_message: false,
-			fade_in: true
-		};
-		_this45.inputs = [];
-		_this45.modal = null;
-		_this45.modal_wrapper = $('.ModalsWrapper').get(0);
-
-		_this45.handleClickOutside = _this45.handleClickOutside.bind(_this45);
-		return _this45;
-	}
-
-	_createClass(CreateNetworkingRequestModal, [{
-		key: 'componentWillMount',
-		value: function componentWillMount() {
-			$('body').addClass('-open_modal');
-		}
-	}, {
-		key: 'componentDidMount',
-		value: function componentDidMount() {
-			this.bindClickOutside();
-			this.setState({
-				fade_in: false
-			});
-		}
-	}, {
-		key: 'componentWillUnmount',
-		value: function componentWillUnmount() {
-			this.unbindClickOutside();
-			$('body').removeClass('-open_modal');
-		}
-	}, {
-		key: 'bindClickOutside',
-		value: function bindClickOutside() {
-			if (!this.props.canHide) {
-				document.addEventListener('mousedown', this.handleClickOutside);
-			}
-		}
-	}, {
-		key: 'unbindClickOutside',
-		value: function unbindClickOutside() {
-			if (!this.props.canHide) {
-				document.removeEventListener('mousedown', this.handleClickOutside);
-			}
-		}
-	}, {
-		key: 'handleClickOutside',
-		value: function handleClickOutside(event) {
-			if (this.modal && !this.modal.contains(event.target)) {
-				this.setState({
-					fade_in: false
-				}, this.props.hideModalHandler);
-			}
-		}
-	}, {
-		key: 'render',
-		value: function render() {
-			var _this46 = this;
-
-			var profile = this.props.profile,
-			    with_message = this.state.with_message;
-
-
-			return ReactDOM.createPortal(React.createElement(
-				'div',
-				{
-					className: 'modal_unit material -floating_material ' + (this.state.fade_in ? '-faded' : ''),
-					ref: function ref(node) {
-						return _this46.modal = node;
-					},
-					style: { width: 370 }
-				},
-				React.createElement(
-					'header',
-					{ className: 'modal_header' },
-					React.createElement(
-						'span',
-						null,
-						'\u041E\u0442\u043F\u0440\u0430\u0432\u043A\u0430 \u0437\u0430\u044F\u0432\u043A\u0438'
-					),
-					React.createElement(
-						RippleButton,
-						{ className: 'modal_destroy_button CloseModal', onClick: function onClick(e) {
-								_this46.props.hideModalHandler();
-							} },
-						'\xD7'
-					)
-				),
-				React.createElement(
-					'div',
-					{ className: 'modal_content' },
-					React.createElement(
-						'header',
-						{ className: 'create_networking_request_modal_head' },
-						React.createElement(
-							'aside',
-							{ className: 'create_networking_request_modal_head_side' },
-							React.createElement(Avatar, { entity: profile.user, className: new HtmlClassesArray(__C.CLASSES.UNIVERSAL_STATES.ROUNDED, __C.CLASSES.SIZES.X55) })
-						),
-						React.createElement(
-							'div',
-							{ className: 'create_networking_request_modal_head_body' },
-							React.createElement(
-								'h5',
-								{ className: 'create_networking_request_modal_title' },
-								profile.user.full_name
-							),
-							React.createElement(
-								'span',
-								{ className: 'create_networking_request_modal_subtitle' },
-								profile.company_name
-							)
-						)
-					),
-					with_message && React.createElement(
-						'div',
-						{ className: 'form_unit' },
-						React.createElement('textarea', {
-							className: 'form_textarea',
-							name: 'message',
-							placeholder: '\u0412\u0432\u0435\u0434\u0438\u0442\u0435 \u0441\u043E\u043E\u0431\u0449\u0435\u043D\u0438\u0435 (\u043D\u0435\u043E\u0431\u044F\u0437\u0430\u0442\u0435\u043B\u044C\u043D\u043E)',
-							ref: 'message'
-						})
-					),
-					React.createElement(
-						'div',
-						{ className: 'form_group -parts_e_2' },
-						React.createElement(
-							'div',
-							{ className: 'form_unit' },
-							with_message || React.createElement(
-								Action,
-								{
-									className: 'fa_icon fa-commenting',
-									onClick: function onClick(e) {
-										_this46.setState({
-											with_message: true
-										});
-									}
-								},
-								'\u041F\u0440\u0438\u043A\u0440\u0435\u043F\u0438\u0442\u044C \u0441\u043E\u043E\u0431\u0449\u0435\u043D\u0438\u0435'
-							)
-						),
-						React.createElement(
-							'div',
-							{ className: 'form_unit' },
-							React.createElement(
-								RippleButton,
-								{
-									className: new HtmlClassesArray(__C.CLASSES.COLORS.ACCENT),
-									onClick: function onClick(e) {
-										profile.request.create({
-											event_id: profile.event_id,
-											user_id: profile.user_id,
-											sender_user_id: __APP.USER.id,
-											message: with_message ? _this46.refs.message.value : null
-										}).then(function (data) {
-											_this46.props.hideModalHandler();
-
-											return data;
-										});
-									}
-								},
-								'\u041E\u0442\u043F\u0440\u0430\u0432\u0438\u0442\u044C \u0437\u0430\u044F\u0432\u043A\u0443'
-							)
-						)
-					)
-				)
-			), this.modal_wrapper);
-		}
-	}]);
-
-	return CreateNetworkingRequestModal;
-}(React.Component);
-
-CreateNetworkingRequestModal.propTypes = {
-	profile: PropTypes.instanceOf(OneEventNetworkingProfile),
-	canHide: PropTypes.bool,
-	hideModalHandler: PropTypes.func
-};
 /**
  *
  * @param {object} options
@@ -17125,51 +17383,51 @@ function asyncPage(
 /**
  * @template {object} pageProps
  */
-_ref20, PageClass) {
-	var _ref20$constructPage = _ref20.constructPage,
-	    constructPage = _ref20$constructPage === undefined ? function (args) {
+_ref, PageClass) {
+	var _ref$constructPage = _ref.constructPage,
+	    constructPage = _ref$constructPage === undefined ? function (args) {
 		return {};
-	} : _ref20$constructPage,
-	    _ref20$fetchData = _ref20.fetchData,
-	    fetchData = _ref20$fetchData === undefined ? function (props) {
+	} : _ref$constructPage,
+	    _ref$fetchData = _ref.fetchData,
+	    fetchData = _ref$fetchData === undefined ? function (props) {
 		return Promise.resolve();
-	} : _ref20$fetchData,
-	    _ref20$pageTitle = _ref20.pageTitle,
-	    pageTitle = _ref20$pageTitle === undefined ? function (props) {
+	} : _ref$fetchData,
+	    _ref$pageTitle = _ref.pageTitle,
+	    pageTitle = _ref$pageTitle === undefined ? function (props) {
 		return null;
-	} : _ref20$pageTitle,
-	    _ref20$headerTabs = _ref20.headerTabs,
-	    headerTabs = _ref20$headerTabs === undefined ? false : _ref20$headerTabs,
-	    _ref20$is_admin_page = _ref20.is_admin_page,
-	    is_admin_page = _ref20$is_admin_page === undefined ? false : _ref20$is_admin_page,
-	    _ref20$is_auth_requir = _ref20.is_auth_required,
-	    is_auth_required = _ref20$is_auth_requir === undefined ? false : _ref20$is_auth_requir,
-	    _ref20$state_name = _ref20.state_name,
-	    state_name = _ref20$state_name === undefined ? '' : _ref20$state_name;
+	} : _ref$pageTitle,
+	    _ref$headerTabs = _ref.headerTabs,
+	    headerTabs = _ref$headerTabs === undefined ? false : _ref$headerTabs,
+	    _ref$is_admin_page = _ref.is_admin_page,
+	    is_admin_page = _ref$is_admin_page === undefined ? false : _ref$is_admin_page,
+	    _ref$is_auth_required = _ref.is_auth_required,
+	    is_auth_required = _ref$is_auth_required === undefined ? false : _ref$is_auth_required,
+	    _ref$state_name = _ref.state_name,
+	    state_name = _ref$state_name === undefined ? '' : _ref$state_name;
 
-	var AsyncPageAdapter = function (_React$Component8) {
-		_inherits(AsyncPageAdapter, _React$Component8);
+	var AsyncPageAdapter = function (_React$Component) {
+		_inherits(AsyncPageAdapter, _React$Component);
 
 		function AsyncPageAdapter(props) {
 			_classCallCheck(this, AsyncPageAdapter);
 
-			var _this47 = _possibleConstructorReturn(this, (AsyncPageAdapter.__proto__ || Object.getPrototypeOf(AsyncPageAdapter)).call(this, props));
+			var _this = _possibleConstructorReturn(this, (AsyncPageAdapter.__proto__ || Object.getPrototypeOf(AsyncPageAdapter)).call(this, props));
 
 			__APP.HISTORY = props.history;
-			__APP.CURRENT_REACT_PAGE = _this47;
-			_this47.pageProps = _extends({}, props.match.params, constructPage.call(_this47, props.match.params));
-			_this47.origin_page = null;
-			_this47.state = {
+			__APP.CURRENT_REACT_PAGE = _this;
+			_this.pageProps = _extends({}, props.match.params, constructPage.call(_this, props.match.params));
+			_this.origin_page = null;
+			_this.state = {
 				is_data_fetching: !(is_auth_required && __APP.USER.isLoggedOut()),
 				fetched_data: null
 			};
-			return _this47;
+			return _this;
 		}
 
 		_createClass(AsyncPageAdapter, [{
 			key: 'componentWillMount',
 			value: function componentWillMount() {
-				var _this48 = this;
+				var _this2 = this;
 
 				__APP.SERVER.abortAllConnections();
 				__APP.SIDEBAR.activateNavItem(window.location.pathname);
@@ -17205,9 +17463,9 @@ _ref20, PageClass) {
 				}
 
 				fetchData.call({ props: this.pageProps }, this.pageProps).then(function (data) {
-					__APP.changeTitle(isFunction(pageTitle) ? pageTitle.call(_this48.pageProps, _this48.pageProps) : pageTitle);
+					__APP.changeTitle(isFunction(pageTitle) ? pageTitle.call(_this2.pageProps, _this2.pageProps) : pageTitle);
 
-					_this48.setState({
+					_this2.setState({
 						is_data_fetching: false,
 						fetched_data: data
 					});
@@ -17223,7 +17481,7 @@ _ref20, PageClass) {
 		}, {
 			key: 'render',
 			value: function render() {
-				var _this49 = this;
+				var _this3 = this;
 
 				var _state = this.state,
 				    is_data_fetching = _state.is_data_fetching,
@@ -17250,7 +17508,7 @@ _ref20, PageClass) {
 					fetched_data: fetched_data
 				}, this.pageProps), {
 					ref: function ref(component) {
-						return _this49.origin_page = component;
+						return _this3.origin_page = component;
 					}
 				}));
 			}
@@ -17277,13 +17535,23 @@ function contentWrap() {
 		children
 	);
 }
+var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+
+function _defineProperty(obj, key, value) { if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
+
+function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
+
 /**
  * @requires asyncPage.js
  */
 var UserPage = asyncPage({
-	constructPage: function constructPage(_ref21) {
-		var _ref21$user_id = _ref21.user_id,
-		    user_id = _ref21$user_id === undefined ? __APP.USER.id : _ref21$user_id;
+	constructPage: function constructPage(_ref) {
+		var _ref$user_id = _ref.user_id,
+		    user_id = _ref$user_id === undefined ? __APP.USER.id : _ref$user_id;
 
 
 		return {
@@ -17307,8 +17575,8 @@ var UserPage = asyncPage({
 
 		return props.user.full_name;
 	}
-}, function (_React$Component9) {
-	_inherits(UserPage, _React$Component9);
+}, function (_React$Component) {
+	_inherits(UserPage, _React$Component);
 
 	_createClass(UserPage, null, [{
 		key: 'SidebarWrapper',
@@ -17325,13 +17593,13 @@ var UserPage = asyncPage({
    * @return {XML}
    * @constructor
    */
-		value: function SidebarWrapper(_ref22) {
-			var user = _ref22.user,
-			    title = _ref22.title,
-			    noEntitiesText = _ref22.noEntitiesText,
-			    entities = _ref22.entities,
-			    entitiesType = _ref22.entitiesType,
-			    showAllModalClass = _ref22.showAllModalClass;
+		value: function SidebarWrapper(_ref2) {
+			var user = _ref2.user,
+			    title = _ref2.title,
+			    noEntitiesText = _ref2.noEntitiesText,
+			    entities = _ref2.entities,
+			    entitiesType = _ref2.entitiesType,
+			    showAllModalClass = _ref2.showAllModalClass;
 
 			if (entities.length) {
 				var avatar_classes = [__C.CLASSES.SIZES.X30],
@@ -17392,17 +17660,17 @@ var UserPage = asyncPage({
 	}]);
 
 	function UserPage(props) {
-		var _this50$disable_uploa, _this50$block_scroll;
+		var _this$disable_uploads, _this$block_scroll;
 
 		_classCallCheck(this, UserPage);
 
-		var _this50 = _possibleConstructorReturn(this, (UserPage.__proto__ || Object.getPrototypeOf(UserPage)).call(this, props));
+		var _this = _possibleConstructorReturn(this, (UserPage.__proto__ || Object.getPrototypeOf(UserPage)).call(this, props));
 
-		_this50.disable_uploads = (_this50$disable_uploa = {}, _defineProperty(_this50$disable_uploa, __C.ENTITIES.EVENT, false), _defineProperty(_this50$disable_uploa, __C.ENTITIES.ACTIVITY, false), _this50$disable_uploa);
-		_this50.block_scroll = (_this50$block_scroll = {}, _defineProperty(_this50$block_scroll, __C.ENTITIES.EVENT, false), _defineProperty(_this50$block_scroll, __C.ENTITIES.ACTIVITY, false), _this50$block_scroll);
+		_this.disable_uploads = (_this$disable_uploads = {}, _defineProperty(_this$disable_uploads, __C.ENTITIES.EVENT, false), _defineProperty(_this$disable_uploads, __C.ENTITIES.ACTIVITY, false), _this$disable_uploads);
+		_this.block_scroll = (_this$block_scroll = {}, _defineProperty(_this$block_scroll, __C.ENTITIES.EVENT, false), _defineProperty(_this$block_scroll, __C.ENTITIES.ACTIVITY, false), _this$block_scroll);
 
-		_this50.active_tab = __C.ENTITIES.EVENT;
-		_this50.favored_fetch_data = {
+		_this.active_tab = __C.ENTITIES.EVENT;
+		_this.favored_fetch_data = {
 			fields: new Fields('image_horizontal_medium_url', 'favored_users_count', 'is_favorite', 'is_registered', 'registration_locally', 'registration_available', 'ticketing_locally', 'ticketing_available', 'dates', {
 				favored: {
 					length: 5
@@ -17411,13 +17679,13 @@ var UserPage = asyncPage({
 			order_by: 'nearest_event_date,-first_event_date',
 			length: 10
 		};
-		return _this50;
+		return _this;
 	}
 
 	_createClass(UserPage, [{
 		key: 'componentDidMount',
 		value: function componentDidMount() {
-			var _this51 = this;
+			var _this2 = this;
 
 			var user = this.props.user,
 			    promises = [];
@@ -17433,7 +17701,7 @@ var UserPage = asyncPage({
 
 			if (promises.length) {
 				Promise.race(promises).then(function () {
-					_this51.bindScrollEvents();
+					_this2.bindScrollEvents();
 				});
 			} else {
 				this.bindScrollEvents();
@@ -17479,7 +17747,7 @@ var UserPage = asyncPage({
    * @returns {Promise}
    */
 		value: function uploadEntities(type) {
-			var _this52 = this;
+			var _this3 = this;
 
 			var is_upload_disabled = this.disable_uploads[type],
 			    is_scroll_blocked = this.block_scroll[type];
@@ -17514,22 +17782,22 @@ var UserPage = asyncPage({
 			this.block_scroll[type] = true;
 
 			return fetch_promise.then(function (entities) {
-				_this52.block_scroll[type] = false;
+				_this3.block_scroll[type] = false;
 
 				if (!entities.length) {
-					_this52.disable_uploads[type] = true;
+					_this3.disable_uploads[type] = true;
 				}
 
 				switch (type) {
 					case __C.ENTITIES.EVENT:
 						{
 
-							return _this52.favored_events.unsetLoadingState().update();
+							return _this3.favored_events.unsetLoadingState().update();
 						}
 					case __C.ENTITIES.ACTIVITY:
 						{
 
-							return _this52.activities.unsetLoadingState().update();
+							return _this3.activities.unsetLoadingState().update();
 						}
 				}
 
@@ -17546,7 +17814,7 @@ var UserPage = asyncPage({
 	}, {
 		key: 'bindScrollEvents',
 		value: function bindScrollEvents() {
-			var _this53 = this;
+			var _this4 = this;
 
 			var $window = $(window);
 
@@ -17562,7 +17830,7 @@ var UserPage = asyncPage({
 
 						$window.on('scroll.uploadEntities', function () {
 							if (isScrollRemain(1000)) {
-								_this53.uploadEntities(_this53.tabs.state.selected_tab);
+								_this4.uploadEntities(_this4.tabs.state.selected_tab);
 							}
 						});
 					}
@@ -17576,7 +17844,7 @@ var UserPage = asyncPage({
 	}, {
 		key: 'render',
 		value: function render() {
-			var _this54 = this;
+			var _this5 = this;
 
 			var user = this.props.user,
 			    SidebarWrapper = UserPage.SidebarWrapper,
@@ -17633,7 +17901,7 @@ var UserPage = asyncPage({
 					Tabs,
 					{
 						ref: function ref(component) {
-							return _this54.tabs = component;
+							return _this5.tabs = component;
 						},
 						className: 'page user_page_content',
 						headerClasses: 'user_page_content_header -color_accent',
@@ -17643,14 +17911,14 @@ var UserPage = asyncPage({
 						Tab,
 						{ title: i18n(__S.ACTIVITY, 1), name: 'activity' },
 						React.createElement(UserActivities, { ref: function ref(component) {
-								return _this54.activities = component;
+								return _this5.activities = component;
 							}, user: user, activities: user.actions })
 					),
 					React.createElement(
 						Tab,
 						{ title: i18n(__S.FAVORED_EVENT, 2), name: 'event' },
 						React.createElement(EventBlocks, { ref: function ref(component) {
-								return _this54.favored_events = component;
+								return _this5.favored_events = component;
 							}, events: user.favored })
 					)
 				)
@@ -17660,6 +17928,12 @@ var UserPage = asyncPage({
 
 	return UserPage;
 }(React.Component));
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
+
+function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
+
 /**
  * @requires asyncPage.js
  * @requires UserPage.js
@@ -17690,17 +17964,24 @@ var MyProfilePage = asyncPage({
 	function MyProfilePage(props) {
 		_classCallCheck(this, MyProfilePage);
 
-		var _this55 = _possibleConstructorReturn(this, (MyProfilePage.__proto__ || Object.getPrototypeOf(MyProfilePage)).call(this, props));
+		var _this = _possibleConstructorReturn(this, (MyProfilePage.__proto__ || Object.getPrototypeOf(MyProfilePage)).call(this, props));
 
-		_this55.favored_fetch_data.fields.push('is_favorite');
-		return _this55;
+		_this.favored_fetch_data.fields.push('is_favorite');
+		return _this;
 	}
 
 	return MyProfilePage;
 }(UserPage.OriginPage));
+var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 
-var NoReactPage = function (_React$Component10) {
-	_inherits(NoReactPage, _React$Component10);
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
+
+function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
+
+var NoReactPage = function (_React$Component) {
+	_inherits(NoReactPage, _React$Component);
 
 	function NoReactPage() {
 		_classCallCheck(this, NoReactPage);
@@ -17741,8 +18022,6 @@ var NoReactPage = function (_React$Component10) {
  * @abstract
  * @class
  */
-
-
 AbstractSidebar = function () {
 	/**
   *
@@ -17864,6 +18143,8 @@ SidebarNoAuth = extending(AbstractSidebar, function () {
 
 	return SidebarNoAuth;
 }());
+var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) { return typeof obj; } : function (obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; };
+
 /**
  * @abstract
  * @class
@@ -18053,6 +18334,20 @@ TopBarNoAuth = extending(AbstractTopBar, function () {
 
 	return TopBarNoAuth;
 }());
+var _labels, _colors, _icons;
+
+var _extends = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; };
+
+var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+
+function _defineProperty(obj, key, value) { if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
+
+function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
+
 /**
  * @class ReactActionButton
  * @extends React.Component
@@ -18070,31 +18365,30 @@ TopBarNoAuth = extending(AbstractTopBar, function () {
  * @property {boolean} state.is_checked
  * @property {boolean} state.is_hovered
  */
-
-var ReactActionButton = function (_React$Component11) {
-	_inherits(ReactActionButton, _React$Component11);
+var ReactActionButton = function (_React$Component) {
+	_inherits(ReactActionButton, _React$Component);
 
 	function ReactActionButton(props, context) {
 		_classCallCheck(this, ReactActionButton);
 
-		var _this57 = _possibleConstructorReturn(this, (ReactActionButton.__proto__ || Object.getPrototypeOf(ReactActionButton)).call(this, props, context));
+		var _this = _possibleConstructorReturn(this, (ReactActionButton.__proto__ || Object.getPrototypeOf(ReactActionButton)).call(this, props, context));
 
-		_this57.state = {
+		_this.state = {
 			is_checked: props.isChecked,
 			is_hovered: false
 		};
 
-		_this57.labels = props.labels === null ? ReactActionButton.DEFAULTS.labels : _extends({}, _this57.constructor.DEFAULTS.labels, props.labels);
-		_this57.colors = props.colors === null ? ReactActionButton.DEFAULTS.colors : _extends({}, _this57.constructor.DEFAULTS.colors, props.colors);
-		_this57.icons = props.icons === null ? ReactActionButton.DEFAULTS.icons : _extends({}, _this57.constructor.DEFAULTS.icons, props.icons);
+		_this.labels = props.labels === null ? ReactActionButton.DEFAULTS.labels : _extends({}, _this.constructor.DEFAULTS.labels, props.labels);
+		_this.colors = props.colors === null ? ReactActionButton.DEFAULTS.colors : _extends({}, _this.constructor.DEFAULTS.colors, props.colors);
+		_this.icons = props.icons === null ? ReactActionButton.DEFAULTS.icons : _extends({}, _this.constructor.DEFAULTS.icons, props.icons);
 
-		_this57.mouseHoverHandler = _this57.mouseHoverHandler.bind(_this57);
-		_this57.mouseLeaveHandler = _this57.mouseLeaveHandler.bind(_this57);
-		_this57.checkedStateChange = _this57.checkedStateChange.bind(_this57);
-		_this57.onClickHandler = _this57.onClickHandler.bind(_this57);
-		_this57.clickAction = _this57.clickAction.bind(_this57);
+		_this.mouseHoverHandler = _this.mouseHoverHandler.bind(_this);
+		_this.mouseLeaveHandler = _this.mouseLeaveHandler.bind(_this);
+		_this.checkedStateChange = _this.checkedStateChange.bind(_this);
+		_this.onClickHandler = _this.onClickHandler.bind(_this);
+		_this.clickAction = _this.clickAction.bind(_this);
 
-		Object.defineProperties(_this57, {
+		Object.defineProperties(_this, {
 			classes: {
 				get: function get() {
 					var classes = new HtmlClassesArray(this.props.className);
@@ -18138,7 +18432,7 @@ var ReactActionButton = function (_React$Component11) {
 				}
 			}
 		});
-		return _this57;
+		return _this;
 	}
 
 	_createClass(ReactActionButton, [{
@@ -18251,24 +18545,37 @@ ReactActionButton.propTypes = {
 	icons: PropTypes.object,
 	onClick: PropTypes.func
 };
+var _extends = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; };
+
+var _labels, _colors, _icons;
+
+var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+
+function _defineProperty(obj, key, value) { if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
+
+function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
+
 /**
  * @requires ActionButton.js
  * @requires ../AvatarCollectionContextProvider.js
  */
-
 var ReactAddToFavoriteButton = function (_ReactActionButton) {
 	_inherits(ReactAddToFavoriteButton, _ReactActionButton);
 
 	function ReactAddToFavoriteButton(props, context) {
 		_classCallCheck(this, ReactAddToFavoriteButton);
 
-		var _this58 = _possibleConstructorReturn(this, (ReactAddToFavoriteButton.__proto__ || Object.getPrototypeOf(ReactAddToFavoriteButton)).call(this, props, context));
+		var _this = _possibleConstructorReturn(this, (ReactAddToFavoriteButton.__proto__ || Object.getPrototypeOf(ReactAddToFavoriteButton)).call(this, props, context));
 
-		_this58.event = props.event;
+		_this.event = props.event;
 		if (!isVoid(context[AvatarCollectionContextProvider.CONTEXT_NAME])) {
-			_this58.state.is_checked = context[AvatarCollectionContextProvider.CONTEXT_NAME].isSubscribed;
+			_this.state.is_checked = context[AvatarCollectionContextProvider.CONTEXT_NAME].isSubscribed;
 		}
-		return _this58;
+		return _this;
 	}
 
 	_createClass(ReactAddToFavoriteButton, [{
@@ -18292,13 +18599,13 @@ var ReactAddToFavoriteButton = function (_ReactActionButton) {
 	}, {
 		key: 'clickAction',
 		value: function clickAction() {
-			var _this59 = this;
+			var _this2 = this;
 
 			if (this.state.is_checked) {
 
 				return this.event.unfavour().then(function (data) {
-					if (!isVoid(_this59.context[AvatarCollectionContextProvider.CONTEXT_NAME])) {
-						_this59.context[AvatarCollectionContextProvider.CONTEXT_NAME].unsubscribe();
+					if (!isVoid(_this2.context[AvatarCollectionContextProvider.CONTEXT_NAME])) {
+						_this2.context[AvatarCollectionContextProvider.CONTEXT_NAME].unsubscribe();
 					}
 
 					return data;
@@ -18306,8 +18613,8 @@ var ReactAddToFavoriteButton = function (_ReactActionButton) {
 			} else {
 
 				return this.event.favour().then(function (data) {
-					if (!isVoid(_this59.context[AvatarCollectionContextProvider.CONTEXT_NAME])) {
-						_this59.context[AvatarCollectionContextProvider.CONTEXT_NAME].subscribe();
+					if (!isVoid(_this2.context[AvatarCollectionContextProvider.CONTEXT_NAME])) {
+						_this2.context[AvatarCollectionContextProvider.CONTEXT_NAME].subscribe();
 					}
 
 					return data;
@@ -18320,9 +18627,9 @@ var ReactAddToFavoriteButton = function (_ReactActionButton) {
 }(ReactActionButton);
 
 ReactAddToFavoriteButton.DEFAULTS = {
-	labels: (_labels2 = {}, _defineProperty(_labels2, ReactActionButton.STATES.CHECKED, __LOCALES.ru_RU.TEXTS.BUTTON.FAVORED), _defineProperty(_labels2, ReactActionButton.STATES.UNCHECKED, __LOCALES.ru_RU.TEXTS.BUTTON.ADD_FAVORITE), _defineProperty(_labels2, ReactActionButton.STATES.CHECKED_HOVER, __LOCALES.ru_RU.TEXTS.BUTTON.REMOVE_FAVORITE), _defineProperty(_labels2, ReactActionButton.STATES.UNCHECKED_HOVER, __LOCALES.ru_RU.TEXTS.BUTTON.ADD_FAVORITE), _labels2),
-	colors: (_colors2 = {}, _defineProperty(_colors2, ReactActionButton.STATES.CHECKED, __C.CLASSES.COLORS.ACCENT), _defineProperty(_colors2, ReactActionButton.STATES.UNCHECKED, __C.CLASSES.COLORS.DEFAULT), _defineProperty(_colors2, ReactActionButton.STATES.CHECKED_HOVER, __C.CLASSES.COLORS.ACCENT), _defineProperty(_colors2, ReactActionButton.STATES.UNCHECKED_HOVER, __C.CLASSES.COLORS.NEUTRAL_ACCENT), _colors2),
-	icons: (_icons2 = {}, _defineProperty(_icons2, ReactActionButton.STATES.CHECKED, __C.CLASSES.ICONS.STAR), _defineProperty(_icons2, ReactActionButton.STATES.UNCHECKED, __C.CLASSES.ICONS.STAR_O), _defineProperty(_icons2, ReactActionButton.STATES.CHECKED_HOVER, __C.CLASSES.ICONS.TIMES), _defineProperty(_icons2, ReactActionButton.STATES.UNCHECKED_HOVER, __C.CLASSES.ICONS.STAR_O), _icons2)
+	labels: (_labels = {}, _defineProperty(_labels, ReactActionButton.STATES.CHECKED, __LOCALES.ru_RU.TEXTS.BUTTON.FAVORED), _defineProperty(_labels, ReactActionButton.STATES.UNCHECKED, __LOCALES.ru_RU.TEXTS.BUTTON.ADD_FAVORITE), _defineProperty(_labels, ReactActionButton.STATES.CHECKED_HOVER, __LOCALES.ru_RU.TEXTS.BUTTON.REMOVE_FAVORITE), _defineProperty(_labels, ReactActionButton.STATES.UNCHECKED_HOVER, __LOCALES.ru_RU.TEXTS.BUTTON.ADD_FAVORITE), _labels),
+	colors: (_colors = {}, _defineProperty(_colors, ReactActionButton.STATES.CHECKED, __C.CLASSES.COLORS.ACCENT), _defineProperty(_colors, ReactActionButton.STATES.UNCHECKED, __C.CLASSES.COLORS.DEFAULT), _defineProperty(_colors, ReactActionButton.STATES.CHECKED_HOVER, __C.CLASSES.COLORS.ACCENT), _defineProperty(_colors, ReactActionButton.STATES.UNCHECKED_HOVER, __C.CLASSES.COLORS.NEUTRAL_ACCENT), _colors),
+	icons: (_icons = {}, _defineProperty(_icons, ReactActionButton.STATES.CHECKED, __C.CLASSES.ICONS.STAR), _defineProperty(_icons, ReactActionButton.STATES.UNCHECKED, __C.CLASSES.ICONS.STAR_O), _defineProperty(_icons, ReactActionButton.STATES.CHECKED_HOVER, __C.CLASSES.ICONS.TIMES), _defineProperty(_icons, ReactActionButton.STATES.UNCHECKED_HOVER, __C.CLASSES.ICONS.STAR_O), _icons)
 };
 
 ReactAddToFavoriteButton.propTypes = _extends({
@@ -18330,39 +18637,58 @@ ReactAddToFavoriteButton.propTypes = _extends({
 }, ReactActionButton.propTypes);
 
 ReactAddToFavoriteButton.contextTypes = AvatarCollectionContextProvider.childContextTypes;
-function Cap(_ref23) {
-	var className = _ref23.className,
-	    children = _ref23.children,
-	    rest_props = _objectWithoutProperties(_ref23, ['className', 'children']);
+var _extends = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; };
+
+function _objectWithoutProperties(obj, keys) { var target = {}; for (var i in obj) { if (keys.indexOf(i) >= 0) continue; if (!Object.prototype.hasOwnProperty.call(obj, i)) continue; target[i] = obj[i]; } return target; }
+
+function Cap(_ref) {
+	var className = _ref.className,
+	    children = _ref.children,
+	    rest_props = _objectWithoutProperties(_ref, ["className", "children"]);
 
 	return React.createElement(
-		'div',
-		_extends({ className: 'cap ' + new HtmlClassesArray(className) }, rest_props),
+		"div",
+		_extends({ className: "cap " + new HtmlClassesArray(className) }, rest_props),
 		React.createElement(
-			'span',
-			{ className: 'cap_message' },
+			"span",
+			{ className: "cap_message" },
 			children
 		)
 	);
 }
-function OverlayCap(_ref24) {
-	var className = _ref24.className,
-	    children = _ref24.children,
-	    rest_props = _objectWithoutProperties(_ref24, ['className', 'children']);
+var _extends = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; };
+
+function _objectWithoutProperties(obj, keys) { var target = {}; for (var i in obj) { if (keys.indexOf(i) >= 0) continue; if (!Object.prototype.hasOwnProperty.call(obj, i)) continue; target[i] = obj[i]; } return target; }
+
+function OverlayCap(_ref) {
+	var className = _ref.className,
+	    children = _ref.children,
+	    rest_props = _objectWithoutProperties(_ref, ["className", "children"]);
 
 	return React.createElement(
-		'div',
-		_extends({ className: 'overlay_cap -unselectable -centering OverlayCap ' + new HtmlClassesArray(className) }, rest_props),
+		"div",
+		_extends({ className: "overlay_cap -unselectable -centering OverlayCap " + new HtmlClassesArray(className) }, rest_props),
 		React.createElement(
-			'div',
-			{ className: 'overlay_cap_wrapper CapWrapper' },
+			"div",
+			{ className: "overlay_cap_wrapper CapWrapper" },
 			children
 		)
 	);
 }
+var _extends = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; };
 
-var FormCheckbox = function (_React$Component12) {
-	_inherits(FormCheckbox, _React$Component12);
+var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+
+function _objectWithoutProperties(obj, keys) { var target = {}; for (var i in obj) { if (keys.indexOf(i) >= 0) continue; if (!Object.prototype.hasOwnProperty.call(obj, i)) continue; target[i] = obj[i]; } return target; }
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
+
+function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
+
+var FormCheckbox = function (_React$Component) {
+	_inherits(FormCheckbox, _React$Component);
 
 	function FormCheckbox() {
 		_classCallCheck(this, FormCheckbox);
@@ -18371,33 +18697,33 @@ var FormCheckbox = function (_React$Component12) {
 	}
 
 	_createClass(FormCheckbox, [{
-		key: 'render',
+		key: "render",
 		value: function render() {
-			var _props7 = this.props,
-			    _props7$id = _props7.id,
-			    id = _props7$id === undefined ? guid() : _props7$id,
-			    label = _props7.label,
-			    name = _props7.name,
-			    value = _props7.value,
-			    inputRef = _props7.inputRef,
-			    rest_props = _objectWithoutProperties(_props7, ['id', 'label', 'name', 'value', 'inputRef']);
+			var _props = this.props,
+			    _props$id = _props.id,
+			    id = _props$id === undefined ? guid() : _props$id,
+			    label = _props.label,
+			    name = _props.name,
+			    value = _props.value,
+			    inputRef = _props.inputRef,
+			    rest_props = _objectWithoutProperties(_props, ["id", "label", "name", "value", "inputRef"]);
 
 			return React.createElement(
-				'div',
-				{ className: 'form_unit form_checkbox_wrapper' },
-				React.createElement('input', _extends({
+				"div",
+				{ className: "form_unit form_checkbox_wrapper" },
+				React.createElement("input", _extends({
 					id: id,
-					className: 'form_checkbox',
-					type: 'checkbox',
+					className: "form_checkbox",
+					type: "checkbox",
 					name: name,
-					tabIndex: '-1',
+					tabIndex: "-1",
 					ref: inputRef
 				}, typeof value === 'undefined' ? { value: value } : {}, rest_props)),
 				label && React.createElement(
-					'label',
-					{ className: 'form_label', htmlFor: id },
+					"label",
+					{ className: "form_label", htmlFor: id },
 					React.createElement(
-						'span',
+						"span",
 						null,
 						label
 					)
@@ -18408,34 +18734,49 @@ var FormCheckbox = function (_React$Component12) {
 
 	return FormCheckbox;
 }(React.Component);
+var _extends = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; };
 
-function LoaderBlock(_ref25) {
-	var className = _ref25.className,
-	    rest_props = _objectWithoutProperties(_ref25, ['className']);
+function _objectWithoutProperties(obj, keys) { var target = {}; for (var i in obj) { if (keys.indexOf(i) >= 0) continue; if (!Object.prototype.hasOwnProperty.call(obj, i)) continue; target[i] = obj[i]; } return target; }
+
+function LoaderBlock(_ref) {
+	var className = _ref.className,
+	    rest_props = _objectWithoutProperties(_ref, ["className"]);
 
 	return React.createElement(
-		'div',
-		_extends({ className: 'loader_block ' + new HtmlClassesArray(className) }, rest_props),
+		"div",
+		_extends({ className: "loader_block " + new HtmlClassesArray(className) }, rest_props),
 		React.createElement(
-			'div',
-			{ className: 'loader' },
-			React.createElement('div', { className: 'loader_dot' }),
-			React.createElement('div', { className: 'loader_dot' })
+			"div",
+			{ className: "loader" },
+			React.createElement("div", { className: "loader_dot" }),
+			React.createElement("div", { className: "loader_dot" })
 		)
 	);
 }
-function OverlayLoader(_ref26) {
-	var className = _ref26.className,
-	    rest_props = _objectWithoutProperties(_ref26, ['className']);
+var _extends = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; };
 
-	return React.createElement(LoaderBlock, _extends({ className: new HtmlClassesArray(className) + ' -loader_overlay' }, rest_props));
+function _objectWithoutProperties(obj, keys) { var target = {}; for (var i in obj) { if (keys.indexOf(i) >= 0) continue; if (!Object.prototype.hasOwnProperty.call(obj, i)) continue; target[i] = obj[i]; } return target; }
+
+function OverlayLoader(_ref) {
+	var className = _ref.className,
+	    rest_props = _objectWithoutProperties(_ref, ["className"]);
+
+	return React.createElement(LoaderBlock, _extends({ className: new HtmlClassesArray(className) + " -loader_overlay" }, rest_props));
 }
+var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
+
+function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
+
 /**
  * @requires ../asyncPage.js
  */
 var EventNetworkingContactsPage = asyncPage({
-	constructPage: function constructPage(_ref27) {
-		var event_id = _ref27.event_id;
+	constructPage: function constructPage(_ref) {
+		var event_id = _ref.event_id;
 
 
 		return {
@@ -18455,8 +18796,8 @@ var EventNetworkingContactsPage = asyncPage({
 
 		return [{ title: 'Участники', page: '/event/' + this.props.event_id + '/networking/participants' }, { title: 'Заявки', page: '/event/' + this.props.event_id + '/networking/requests' }, { title: 'Контакты', page: '/event/' + this.props.event_id + '/networking/contacts' }, { title: 'Мой профиль', page: '/event/' + this.props.event_id + '/networking/profile' }];
 	}
-}, function (_React$Component13) {
-	_inherits(EventNetworkingContactsPage, _React$Component13);
+}, function (_React$Component) {
+	_inherits(EventNetworkingContactsPage, _React$Component);
 
 	function EventNetworkingContactsPage() {
 		_classCallCheck(this, EventNetworkingContactsPage);
@@ -18509,13 +18850,21 @@ var EventNetworkingContactsPage = asyncPage({
 
 	return EventNetworkingContactsPage;
 }(React.Component));
+var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
+
+function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
+
 /**
  * @requires ../asyncPage.js
  */
 
 var EventNetworkingMyProfilePage = asyncPage({
-	constructPage: function constructPage(_ref28) {
-		var event_id = _ref28.event_id;
+	constructPage: function constructPage(_ref) {
+		var event_id = _ref.event_id;
 		var myProfile = this.props.myProfile;
 
 
@@ -18540,26 +18889,26 @@ var EventNetworkingMyProfilePage = asyncPage({
 
 		return [{ title: 'Участники', page: '/event/' + this.props.event_id + '/networking/participants' }, { title: 'Заявки', page: '/event/' + this.props.event_id + '/networking/requests' }, { title: 'Контакты', page: '/event/' + this.props.event_id + '/networking/contacts' }, { title: 'Мой профиль', page: '/event/' + this.props.event_id + '/networking/profile' }];
 	}
-}, function (_React$Component14) {
-	_inherits(EventNetworkingMyProfilePage, _React$Component14);
+}, function (_React$Component) {
+	_inherits(EventNetworkingMyProfilePage, _React$Component);
 
 	function EventNetworkingMyProfilePage(props) {
 		_classCallCheck(this, EventNetworkingMyProfilePage);
 
-		var _this62 = _possibleConstructorReturn(this, (EventNetworkingMyProfilePage.__proto__ || Object.getPrototypeOf(EventNetworkingMyProfilePage)).call(this, props));
+		var _this = _possibleConstructorReturn(this, (EventNetworkingMyProfilePage.__proto__ || Object.getPrototypeOf(EventNetworkingMyProfilePage)).call(this, props));
 
-		_this62.state = {
+		_this.state = {
 			redirect_to: null
 		};
 
-		_this62.saveHandler = _this62.saveHandler.bind(_this62);
-		return _this62;
+		_this.saveHandler = _this.saveHandler.bind(_this);
+		return _this;
 	}
 
 	_createClass(EventNetworkingMyProfilePage, [{
 		key: 'saveHandler',
 		value: function saveHandler() {
-			var _this63 = this;
+			var _this2 = this;
 
 			this.props.my_profile.update({
 				first_name: this.refs.first_name.value,
@@ -18574,9 +18923,9 @@ var EventNetworkingMyProfilePage = asyncPage({
 				instagram_url: this.refs.instagram_url.value,
 				github_url: this.refs.github_url.value
 			}).then(function (data) {
-				_this63.props.my_profile.signed_up = true;
-				_this63.setState({
-					redirect_to: _this63.props.match.url.replace('profile', 'participants')
+				_this2.props.my_profile.signed_up = true;
+				_this2.setState({
+					redirect_to: _this2.props.match.url.replace('profile', 'participants')
 				});
 
 				return data;
@@ -18764,12 +19113,22 @@ var EventNetworkingMyProfilePage = asyncPage({
 
 	return EventNetworkingMyProfilePage;
 }(React.Component));
+var _extends = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; };
+
+var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
+
+function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
+
 /**
  * @requires ../asyncPage.js
  */
 var EventNetworkingPage = asyncPage({
-	constructPage: function constructPage(_ref29) {
-		var event_id = _ref29.event_id;
+	constructPage: function constructPage(_ref) {
+		var event_id = _ref.event_id;
 
 		var parsed_uri = parseUri(window.location);
 
@@ -18780,10 +19139,10 @@ var EventNetworkingPage = asyncPage({
 		};
 	},
 	fetchData: function fetchData() {
-		var _props8 = this.props,
-		    my_profile = _props8.my_profile,
-		    my_profile_fields = _props8.my_profile_fields,
-		    code = _props8.code;
+		var _props = this.props,
+		    my_profile = _props.my_profile,
+		    my_profile_fields = _props.my_profile_fields,
+		    code = _props.code;
 
 
 		if (!isVoid(code)) {
@@ -18799,8 +19158,8 @@ var EventNetworkingPage = asyncPage({
 
 
 	is_auth_required: true
-}, function (_React$Component15) {
-	_inherits(EventNetworkingPage, _React$Component15);
+}, function (_React$Component) {
+	_inherits(EventNetworkingPage, _React$Component);
 
 	function EventNetworkingPage() {
 		_classCallCheck(this, EventNetworkingPage);
@@ -18809,31 +19168,31 @@ var EventNetworkingPage = asyncPage({
 	}
 
 	_createClass(EventNetworkingPage, [{
-		key: 'render',
+		key: "render",
 		value: function render() {
-			var _this65 = this;
+			var _this2 = this;
 
-			var _ReactRouter2 = ReactRouter,
-			    Switch = _ReactRouter2.Switch,
-			    Route = _ReactRouter2.Route,
-			    Redirect = _ReactRouter2.Redirect;
+			var _ReactRouter = ReactRouter,
+			    Switch = _ReactRouter.Switch,
+			    Route = _ReactRouter.Route,
+			    Redirect = _ReactRouter.Redirect;
 
 
-			if (this.props.my_profile.signed_up === false && window.location.pathname !== this.props.match.url + '/profile') {
+			if (this.props.my_profile.signed_up === false && window.location.pathname !== this.props.match.url + "/profile") {
 
-				return React.createElement(Redirect, { to: this.props.match.url + '/profile' });
+				return React.createElement(Redirect, { to: this.props.match.url + "/profile" });
 			}
 
 			return React.createElement(
 				Switch,
 				null,
-				React.createElement(Route, { exact: true, path: '/event/:event_id/networking/participants', component: EventNetworkingParticipantsPage }),
-				React.createElement(Route, { exact: true, path: '/event/:event_id/networking/requests', component: EventNetworkingRequestsPage }),
-				React.createElement(Route, { exact: true, path: '/event/:event_id/networking/contacts', component: EventNetworkingContactsPage }),
-				React.createElement(Route, { exact: true, path: '/event/:event_id/networking/profile', component: function component(props) {
-						return React.createElement(EventNetworkingMyProfilePage, _extends({}, props, { myProfile: _this65.props.my_profile }));
+				React.createElement(Route, { exact: true, path: "/event/:event_id/networking/participants", component: EventNetworkingParticipantsPage }),
+				React.createElement(Route, { exact: true, path: "/event/:event_id/networking/requests", component: EventNetworkingRequestsPage }),
+				React.createElement(Route, { exact: true, path: "/event/:event_id/networking/contacts", component: EventNetworkingContactsPage }),
+				React.createElement(Route, { exact: true, path: "/event/:event_id/networking/profile", component: function component(props) {
+						return React.createElement(EventNetworkingMyProfilePage, _extends({}, props, { myProfile: _this2.props.my_profile }));
 					} }),
-				React.createElement(Redirect, { strict: true, from: '/event/:event_id/networking', to: this.props.match.url + '/participants' })
+				React.createElement(Redirect, { strict: true, from: "/event/:event_id/networking", to: this.props.match.url + "/participants" })
 			);
 		}
 	}]);
@@ -18841,52 +19200,62 @@ var EventNetworkingPage = asyncPage({
 	return EventNetworkingPage;
 }(React.Component));
 
-EventNetworkingPage.NetworkingProfileUnit = function (_ref30) {
-	var profile = _ref30.profile,
-	    children = _ref30.children;
+EventNetworkingPage.NetworkingProfileUnit = function (_ref2) {
+	var profile = _ref2.profile,
+	    children = _ref2.children;
 	return React.createElement(
-		'div',
-		{ className: 'networking_profile_block' },
+		"div",
+		{ className: "networking_profile_block" },
 		React.createElement(
-			'aside',
-			{ className: 'networking_profile_block_avatar', onClick: function onClick(e) {
+			"aside",
+			{ className: "networking_profile_block_avatar", onClick: function onClick(e) {
 					new NetworkingProfileAppInspector(profile).show();
 				} },
 			React.createElement(Avatar, { entity: profile.user, className: new HtmlClassesArray(__C.CLASSES.UNIVERSAL_STATES.ROUNDED, __C.CLASSES.SIZES.X55) })
 		),
 		React.createElement(
-			'div',
-			{ className: 'networking_profile_block_main' },
+			"div",
+			{ className: "networking_profile_block_main" },
 			React.createElement(
-				'header',
-				{ className: 'networking_profile_block_header', onClick: function onClick(e) {
+				"header",
+				{ className: "networking_profile_block_header", onClick: function onClick(e) {
 						new NetworkingProfileAppInspector(profile).show();
 					} },
 				React.createElement(
-					'h4',
-					{ className: 'networking_profile_block_title' },
+					"h4",
+					{ className: "networking_profile_block_title" },
 					profile.user.full_name
 				),
 				profile.company_name && React.createElement(
-					'span',
-					{ className: 'networking_profile_block_org' },
+					"span",
+					{ className: "networking_profile_block_org" },
 					profile.company_name
 				)
 			),
 			React.createElement(
-				'div',
-				{ className: 'networking_profile_block_body' },
+				"div",
+				{ className: "networking_profile_block_body" },
 				children
 			)
 		)
 	);
 };
+var _extends = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; };
+
+var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
+
+function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
+
 /**
  * @requires ../asyncPage.js
  */
 var EventNetworkingParticipantsPage = asyncPage({
-	constructPage: function constructPage(_ref31) {
-		var event_id = _ref31.event_id;
+	constructPage: function constructPage(_ref) {
+		var event_id = _ref.event_id;
 
 
 		return {
@@ -18906,24 +19275,24 @@ var EventNetworkingParticipantsPage = asyncPage({
 
 		return [{ title: 'Участники', page: '/event/' + this.props.event_id + '/networking/participants' }, { title: 'Заявки', page: '/event/' + this.props.event_id + '/networking/requests' }, { title: 'Контакты', page: '/event/' + this.props.event_id + '/networking/contacts' }, { title: 'Мой профиль', page: '/event/' + this.props.event_id + '/networking/profile' }];
 	}
-}, function (_React$Component16) {
-	_inherits(EventNetworkingParticipantsPage, _React$Component16);
+}, function (_React$Component) {
+	_inherits(EventNetworkingParticipantsPage, _React$Component);
 
 	function EventNetworkingParticipantsPage(props) {
 		_classCallCheck(this, EventNetworkingParticipantsPage);
 
-		var _this66 = _possibleConstructorReturn(this, (EventNetworkingParticipantsPage.__proto__ || Object.getPrototypeOf(EventNetworkingParticipantsPage)).call(this, props));
+		var _this = _possibleConstructorReturn(this, (EventNetworkingParticipantsPage.__proto__ || Object.getPrototypeOf(EventNetworkingParticipantsPage)).call(this, props));
 
-		_this66.state = {
+		_this.state = {
 			is_fetching: false,
 			current_modal: null,
 			modal_props: null
 		};
 
-		_this66.disable_upload = false;
+		_this.disable_upload = false;
 
-		_this66.hideModal = _this66.hideModal.bind(_this66);
-		return _this66;
+		_this.hideModal = _this.hideModal.bind(_this);
+		return _this;
 	}
 
 	_createClass(EventNetworkingParticipantsPage, [{
@@ -18946,7 +19315,7 @@ var EventNetworkingParticipantsPage = asyncPage({
 	}, {
 		key: 'bindScrollEvents',
 		value: function bindScrollEvents() {
-			var _this67 = this;
+			var _this2 = this;
 
 			var $window = $(window);
 
@@ -18958,14 +19327,14 @@ var EventNetworkingParticipantsPage = asyncPage({
 
 			$window.on('scroll.uploadEntities', function () {
 				if (isScrollRemain(1000)) {
-					_this67.uploadEntities();
+					_this2.uploadEntities();
 				}
 			});
 		}
 	}, {
 		key: 'uploadEntities',
 		value: function uploadEntities() {
-			var _this68 = this;
+			var _this3 = this;
 
 			if (!this.disable_upload) {
 				this.disable_upload = true;
@@ -18974,9 +19343,9 @@ var EventNetworkingParticipantsPage = asyncPage({
 				});
 				this.props.profiles.fetch(this.props.profiles_fields).then(function (data) {
 					if (data.length) {
-						_this68.disable_upload = false;
+						_this3.disable_upload = false;
 					}
-					_this68.setState({
+					_this3.setState({
 						is_fetching: false
 					});
 
@@ -18995,7 +19364,7 @@ var EventNetworkingParticipantsPage = asyncPage({
 	}, {
 		key: 'render',
 		value: function render() {
-			var _this69 = this;
+			var _this4 = this;
 
 			var CurrentModal = this.state.current_modal;
 
@@ -19052,7 +19421,7 @@ var EventNetworkingParticipantsPage = asyncPage({
 								Action,
 								{
 									onClick: function onClick(e) {
-										_this69.setState({
+										_this4.setState({
 											current_modal: CreateNetworkingRequestModal,
 											modal_props: { profile: profile }
 										});
@@ -19071,12 +19440,22 @@ var EventNetworkingParticipantsPage = asyncPage({
 
 	return EventNetworkingParticipantsPage;
 }(React.Component));
+var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+
+function _toConsumableArray(arr) { if (Array.isArray(arr)) { for (var i = 0, arr2 = Array(arr.length); i < arr.length; i++) { arr2[i] = arr[i]; } return arr2; } else { return Array.from(arr); } }
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
+
+function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
+
 /**
  * @requires ../asyncPage.js
  */
 var EventNetworkingRequestsPage = asyncPage({
-	constructPage: function constructPage(_ref32) {
-		var event_id = _ref32.event_id;
+	constructPage: function constructPage(_ref) {
+		var event_id = _ref.event_id;
 
 
 		return {
@@ -19098,32 +19477,33 @@ var EventNetworkingRequestsPage = asyncPage({
 
 		return [{ title: 'Участники', page: '/event/' + this.props.event_id + '/networking/participants' }, { title: 'Заявки', page: '/event/' + this.props.event_id + '/networking/requests' }, { title: 'Контакты', page: '/event/' + this.props.event_id + '/networking/contacts' }, { title: 'Мой профиль', page: '/event/' + this.props.event_id + '/networking/profile' }];
 	}
-}, function (_React$Component17) {
-	_inherits(EventNetworkingRequestsPage, _React$Component17);
+}, function (_React$Component) {
+	_inherits(EventNetworkingRequestsPage, _React$Component);
 
 	function EventNetworkingRequestsPage(props) {
 		_classCallCheck(this, EventNetworkingRequestsPage);
 
-		var _this70 = _possibleConstructorReturn(this, (EventNetworkingRequestsPage.__proto__ || Object.getPrototypeOf(EventNetworkingRequestsPage)).call(this, props));
+		var _this = _possibleConstructorReturn(this, (EventNetworkingRequestsPage.__proto__ || Object.getPrototypeOf(EventNetworkingRequestsPage)).call(this, props));
 
-		_this70.state = {
+		_this.state = {
 			pending: props.pending_requests_profiles.length,
 			accepted: props.accepted_requests_profiles.length,
 			rejected: props.rejected_requests_profiles.length
 		};
-		return _this70;
+		return _this;
 	}
 
 	_createClass(EventNetworkingRequestsPage, [{
 		key: 'render',
 		value: function render() {
-			var _this71 = this;
+			var _this2 = this;
 
-			var _props9 = this.props,
-			    pending_requests_profiles = _props9.pending_requests_profiles,
-			    accepted_requests_profiles = _props9.accepted_requests_profiles,
-			    rejected_requests_profiles = _props9.rejected_requests_profiles,
-			    NetworkingProfileUnit = EventNetworkingPage.NetworkingProfileUnit;
+			var _props = this.props,
+			    pending_requests_profiles = _props.pending_requests_profiles,
+			    accepted_requests_profiles = _props.accepted_requests_profiles,
+			    rejected_requests_profiles = _props.rejected_requests_profiles,
+			    _EventNetworkingPage = EventNetworkingPage,
+			    NetworkingProfileUnit = _EventNetworkingPage.NetworkingProfileUnit;
 
 
 			return contentWrap(React.createElement(
@@ -19186,7 +19566,7 @@ var EventNetworkingRequestsPage = asyncPage({
 											onClick: function onClick(e) {
 												profile.request.acceptRequest().then(function (data) {
 													accepted_requests_profiles.push(pending_requests_profiles.pull(profile.user_id));
-													_this71.setState({
+													_this2.setState({
 														pending: pending_requests_profiles.length,
 														accepted: accepted_requests_profiles.length
 													});
@@ -19208,7 +19588,7 @@ var EventNetworkingRequestsPage = asyncPage({
 											onClick: function onClick(e) {
 												profile.request.cancelRequest().then(function (data) {
 													rejected_requests_profiles.push(pending_requests_profiles.pull(profile.user_id));
-													_this71.setState({
+													_this2.setState({
 														pending: pending_requests_profiles.length,
 														rejected: rejected_requests_profiles.length
 													});
@@ -21250,6 +21630,8 @@ ModalsCollection = extending(Array, function () {
 
 	return ModalsCollection;
 }());
+var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) { return typeof obj; } : function (obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; };
+
 /**
  * @requires Class.ModalsCollection.js
  */
@@ -22139,6 +22521,8 @@ CityChooseModal = extending(AbstractModal, function () {
 
 	return CityChooseModal;
 }());
+var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) { return typeof obj; } : function (obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; };
+
 /**
  * @requires Class.AbstractModal.js
  */
@@ -22679,6 +23063,8 @@ AbstractListModal = extending(AbstractModal, function () {
 
 	return AbstractListModal;
 }());
+var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) { return typeof obj; } : function (obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; };
+
 /**
  * @requires Class.AbstractListModal.js
  */
@@ -22761,13 +23147,13 @@ SubscriptionsListModal = extending(AbstractListModal, function () {
   * @return {Promise}
   */
 	SubscriptionsListModal.prototype.uploadEntities = function () {
-		var _this72 = this;
+		var _this = this;
 
 		return this.entity.fetchSubscriptions({ length: 20 }).then(function (organizations) {
 			if (organizations.length) {
-				_this72.content.append(_this72.buildEntities(organizations));
+				_this.content.append(_this.buildEntities(organizations));
 			} else {
-				_this72.is_upload_disabled = true;
+				_this.is_upload_disabled = true;
 			}
 		});
 	};
@@ -23222,7 +23608,6 @@ EditorsModal = extending(AbstractUsersModal, function () {
 
 	return EditorsModal;
 }());
-
 /**
  * @requires Class.AbstractUsersModal.js
  */
@@ -23268,7 +23653,6 @@ FavoredModal = extending(AbstractUsersModal, function () {
 
 	return FavoredModal;
 }());
-
 /**
  * @requires Class.AbstractUsersModal.js
  */
@@ -23315,6 +23699,9 @@ SubscribersModal = extending(AbstractUsersModal, function () {
 
 	return SubscribersModal;
 }());
+var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
 /**
  *
@@ -23335,7 +23722,6 @@ SubscribersModal = extending(AbstractUsersModal, function () {
  * @property {Promise} rendering_defer
  * @property {Promise} fetching_data_defer
  */
-
 var Page = function () {
 	function Page() {
 		_classCallCheck(this, Page);
@@ -23512,8 +23898,6 @@ var Page = function () {
  * @class AdminPage
  * @extends Page
  */
-
-
 AdminPage = extending(Page, function () {
 	/**
   *
@@ -24269,7 +24653,16 @@ AdminAbstractDispatchPage = extending(AdminPage, function () {
 		});
 
 		bindControlSwitch(this.$wrapper);
-		initWysiwyg(this.$wrapper);
+		initWysiwyg(this.$wrapper, {
+			btnsDef: {
+				dropdownButtonName: {
+					dropdown: ['Фамилия', 'Имя'],
+					title: 'Добавить персонализацию',
+					ico: 'iconName',
+					hasIcon: екгу
+				}
+			}
+		});
 	};
 
 	AdminAbstractDispatchPage.prototype.render = function () {
@@ -27298,7 +27691,6 @@ EventPage = extending(Page, function () {
 
 	return EventPage;
 }());
-
 /**
  * @requires ../Class.Page.js
  */
@@ -28517,171 +28909,6 @@ NotAvailableOrderPage = extending(AbstractFeedbackPage, function () {
  */
 /**
  *
- * @class SearchPage
- * @extends Page
- */
-SearchPage = extending(Page, function () {
-	/**
-  *
-  * @param {string} search
-  * @constructor
-  * @constructs SearchPage
-  */
-	function SearchPage(search) {
-		Page.call(this);
-
-		this.page_title = 'Поиск';
-		this.$search_bar_input = $('#search_bar_input');
-		this.search_string = decodeURIComponent(search);
-		this.events_ajax_data = {
-			length: 10,
-			fields: FeedPage.fields.copy(),
-			order_by: 'nearest_event_date,-first_event_date'
-		};
-		this.organizations_ajax_data = {
-			length: 30,
-			fields: new Fields(['subscribed_count', 'img_small_url'])
-		};
-		this.past_events = false;
-		this.search_results = new SearchResults(this.search_string);
-	}
-	/**
-  *
-  * @param {(OneOrganization|Array<OneOrganization>|OrganizationsCollection)} organizations
-  * @returns {jQuery}
-  */
-	SearchPage.buildOrganizationItems = function (organizations) {
-		return __APP.BUILD.organizationItems(organizations, {
-			block_classes: ['-show'],
-			avatar_classes: ['-size_50x50', '-rounded'],
-			counter_classes: [__C.CLASSES.HIDDEN]
-		});
-	};
-	/**
-  *
-  * @param {(OneEvent|Array<OneEvent>|EventsCollection)} events
-  * @returns {jQuery}
-  */
-	SearchPage.buildEventCards = function (events) {
-		var $events = $();
-		if (events.length == 0) {
-			$events = tmpl('search-no-events', {});
-		} else {
-			events.forEach(function (event) {
-				if (event.nearest_event_date == undefined && !this.past_events) {
-					$events = $events.add(tmpl('divider', { title: 'Прошедшие события' }));
-					this.past_events = true;
-				}
-				$events = $events.add(__APP.BUILD.eventCards(event));
-			});
-		}
-		return $events;
-	};
-
-	SearchPage.prototype.fetchData = function () {
-		return this.fetching_data_defer = this.search_results.fetchEventsAndOrganizations(this.events_ajax_data, this.organizations_ajax_data);
-	};
-
-	SearchPage.prototype.init = function () {
-		var PAGE = this,
-		    $window = $(window),
-		    $organizations_scrollbar;
-
-		function bindFeedEvents($parent) {
-			trimAvatarsCollection($parent);
-			bindRippleEffect($parent);
-			__APP.MODALS.bindCallModal($parent);
-			bindPageLinks($parent);
-
-			$parent.find('.HideEvent').remove();
-		}
-
-		$organizations_scrollbar = this.$wrapper.find('.SearchOrganizationsScrollbar').scrollbar({
-			disableBodyScroll: true,
-			onScroll: function onScroll(y) {
-				if (y.scroll == y.maxScroll) {
-					PAGE.search_results.fetchOrganizations(PAGE.organizations_ajax_data, function (organizations) {
-						if (organizations.length) {
-							$organizations_scrollbar.append(SearchPage.buildOrganizationItems(organizations));
-						} else {
-							$organizations_scrollbar.off('scroll.onScroll');
-						}
-						bindPageLinks($organizations_scrollbar);
-					});
-				}
-			}
-		});
-		$window.off('scroll.upload' + PAGE.constructor.name);
-		$window.on('scroll.upload' + PAGE.constructor.name, function () {
-			if ($window.height() + $window.scrollTop() + 200 >= $(document).height() && !PAGE.block_scroll) {
-				PAGE.block_scroll = true;
-				PAGE.search_results.fetchEvents(PAGE.events_ajax_data, function (events) {
-					var $events;
-					if (events.length) {
-						$events = SearchPage.buildEventCards(PAGE.search_results.events.__last_pushed);
-						PAGE.$wrapper.find('.SearchEvents').append($events);
-						bindFeedEvents($events);
-						PAGE.block_scroll = false;
-					} else {
-						$window.off('scroll.upload' + PAGE.constructor.name);
-					}
-				});
-			}
-		});
-		bindFeedEvents(this.$wrapper);
-	};
-
-	SearchPage.prototype.render = function () {
-		var data = {};
-
-		$('.TopBarOverlay').addClass('-open_search_bar');
-		this.$search_bar_input.val(this.search_string);
-
-		data.events = SearchPage.buildEventCards(this.search_results.events);
-		if (this.search_results.organizations.length == 0) {
-			data.no_organizations = __C.CLASSES.HIDDEN;
-		} else {
-			data.organizations = SearchPage.buildOrganizationItems(this.search_results.organizations);
-		}
-
-		this.$wrapper.append(tmpl('search-wrapper', data));
-		this.init();
-	};
-
-	SearchPage.prototype.destroy = function () {
-		$('.TopBarOverlay').removeClass('-open_search_bar');
-		this.$search_bar_input.val('');
-	};
-
-	return SearchPage;
-}());
-/**
- * @requires Class.SearchPage.js
- */
-/**
- *
- * @class SearchByTagPage
- * @extends SearchPage
- */
-SearchByTagPage = extending(SearchPage, function () {
-	/**
-  *
-  * @constructor
-  * @constructs SearchByTagPage
-  */
-	function SearchByTagPage(search) {
-		SearchPage.call(this, search);
-		this.search_string = '#' + decodeURIComponent(search);
-		this.search_results = new SearchResults(this.search_string);
-	}
-
-	return SearchByTagPage;
-}());
-/**
- * @requires ../Class.Page.js
- */
-/**
- *
  * @class AbstractEditOrganizationPage
  * @extends Page
  */
@@ -29515,6 +29742,171 @@ OrganizationPage = extending(Page, function () {
 	return OrganizationPage;
 }());
 /**
+ * @requires ../Class.Page.js
+ */
+/**
+ *
+ * @class SearchPage
+ * @extends Page
+ */
+SearchPage = extending(Page, function () {
+	/**
+  *
+  * @param {string} search
+  * @constructor
+  * @constructs SearchPage
+  */
+	function SearchPage(search) {
+		Page.call(this);
+
+		this.page_title = 'Поиск';
+		this.$search_bar_input = $('#search_bar_input');
+		this.search_string = decodeURIComponent(search);
+		this.events_ajax_data = {
+			length: 10,
+			fields: FeedPage.fields.copy(),
+			order_by: 'nearest_event_date,-first_event_date'
+		};
+		this.organizations_ajax_data = {
+			length: 30,
+			fields: new Fields(['subscribed_count', 'img_small_url'])
+		};
+		this.past_events = false;
+		this.search_results = new SearchResults(this.search_string);
+	}
+	/**
+  *
+  * @param {(OneOrganization|Array<OneOrganization>|OrganizationsCollection)} organizations
+  * @returns {jQuery}
+  */
+	SearchPage.buildOrganizationItems = function (organizations) {
+		return __APP.BUILD.organizationItems(organizations, {
+			block_classes: ['-show'],
+			avatar_classes: ['-size_50x50', '-rounded'],
+			counter_classes: [__C.CLASSES.HIDDEN]
+		});
+	};
+	/**
+  *
+  * @param {(OneEvent|Array<OneEvent>|EventsCollection)} events
+  * @returns {jQuery}
+  */
+	SearchPage.buildEventCards = function (events) {
+		var $events = $();
+		if (events.length == 0) {
+			$events = tmpl('search-no-events', {});
+		} else {
+			events.forEach(function (event) {
+				if (event.nearest_event_date == undefined && !this.past_events) {
+					$events = $events.add(tmpl('divider', { title: 'Прошедшие события' }));
+					this.past_events = true;
+				}
+				$events = $events.add(__APP.BUILD.eventCards(event));
+			});
+		}
+		return $events;
+	};
+
+	SearchPage.prototype.fetchData = function () {
+		return this.fetching_data_defer = this.search_results.fetchEventsAndOrganizations(this.events_ajax_data, this.organizations_ajax_data);
+	};
+
+	SearchPage.prototype.init = function () {
+		var PAGE = this,
+		    $window = $(window),
+		    $organizations_scrollbar;
+
+		function bindFeedEvents($parent) {
+			trimAvatarsCollection($parent);
+			bindRippleEffect($parent);
+			__APP.MODALS.bindCallModal($parent);
+			bindPageLinks($parent);
+
+			$parent.find('.HideEvent').remove();
+		}
+
+		$organizations_scrollbar = this.$wrapper.find('.SearchOrganizationsScrollbar').scrollbar({
+			disableBodyScroll: true,
+			onScroll: function onScroll(y) {
+				if (y.scroll == y.maxScroll) {
+					PAGE.search_results.fetchOrganizations(PAGE.organizations_ajax_data, function (organizations) {
+						if (organizations.length) {
+							$organizations_scrollbar.append(SearchPage.buildOrganizationItems(organizations));
+						} else {
+							$organizations_scrollbar.off('scroll.onScroll');
+						}
+						bindPageLinks($organizations_scrollbar);
+					});
+				}
+			}
+		});
+		$window.off('scroll.upload' + PAGE.constructor.name);
+		$window.on('scroll.upload' + PAGE.constructor.name, function () {
+			if ($window.height() + $window.scrollTop() + 200 >= $(document).height() && !PAGE.block_scroll) {
+				PAGE.block_scroll = true;
+				PAGE.search_results.fetchEvents(PAGE.events_ajax_data, function (events) {
+					var $events;
+					if (events.length) {
+						$events = SearchPage.buildEventCards(PAGE.search_results.events.__last_pushed);
+						PAGE.$wrapper.find('.SearchEvents').append($events);
+						bindFeedEvents($events);
+						PAGE.block_scroll = false;
+					} else {
+						$window.off('scroll.upload' + PAGE.constructor.name);
+					}
+				});
+			}
+		});
+		bindFeedEvents(this.$wrapper);
+	};
+
+	SearchPage.prototype.render = function () {
+		var data = {};
+
+		$('.TopBarOverlay').addClass('-open_search_bar');
+		this.$search_bar_input.val(this.search_string);
+
+		data.events = SearchPage.buildEventCards(this.search_results.events);
+		if (this.search_results.organizations.length == 0) {
+			data.no_organizations = __C.CLASSES.HIDDEN;
+		} else {
+			data.organizations = SearchPage.buildOrganizationItems(this.search_results.organizations);
+		}
+
+		this.$wrapper.append(tmpl('search-wrapper', data));
+		this.init();
+	};
+
+	SearchPage.prototype.destroy = function () {
+		$('.TopBarOverlay').removeClass('-open_search_bar');
+		this.$search_bar_input.val('');
+	};
+
+	return SearchPage;
+}());
+/**
+ * @requires Class.SearchPage.js
+ */
+/**
+ *
+ * @class SearchByTagPage
+ * @extends SearchPage
+ */
+SearchByTagPage = extending(SearchPage, function () {
+	/**
+  *
+  * @constructor
+  * @constructs SearchByTagPage
+  */
+	function SearchByTagPage(search) {
+		SearchPage.call(this, search);
+		this.search_string = '#' + decodeURIComponent(search);
+		this.search_results = new SearchResults(this.search_string);
+	}
+
+	return SearchByTagPage;
+}());
+/**
  *
  * @class TicketPage
  * @extends Page
@@ -29837,6 +30229,18 @@ MyOrdersPage = extending(Page, function () {
 
 	return MyOrdersPage;
 }());
+var _extends = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; };
+
+var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+
+function _defineProperty(obj, key, value) { if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
+
+function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
+
 /**
  * @requires ../Class.Page.js
  */
@@ -29845,7 +30249,6 @@ MyOrdersPage = extending(Page, function () {
  * @class OldUserPage
  * @extends Page
  */
-
 var OldUserPage = function (_Page) {
 	_inherits(OldUserPage, _Page);
 
@@ -29855,21 +30258,21 @@ var OldUserPage = function (_Page) {
   * @constructs OldUserPage
   */
 	function OldUserPage(user_id) {
-		var _this73$disable_uploa, _this73$block_scroll;
+		var _this$disable_uploads, _this$block_scroll;
 
 		_classCallCheck(this, OldUserPage);
 
-		var _this73 = _possibleConstructorReturn(this, (OldUserPage.__proto__ || Object.getPrototypeOf(OldUserPage)).call(this));
+		var _this = _possibleConstructorReturn(this, (OldUserPage.__proto__ || Object.getPrototypeOf(OldUserPage)).call(this));
 
-		_this73.user_id = user_id;
-		_this73.user = new OneUser(user_id);
-		_this73.events_metadata = { last_date: '' };
+		_this.user_id = user_id;
+		_this.user = new OneUser(user_id);
+		_this.events_metadata = { last_date: '' };
 
-		_this73.disable_uploads = (_this73$disable_uploa = {}, _defineProperty(_this73$disable_uploa, __C.ENTITIES.EVENT, false), _defineProperty(_this73$disable_uploa, __C.ENTITIES.ACTIVITY, false), _this73$disable_uploa);
-		_this73.block_scroll = (_this73$block_scroll = {}, _defineProperty(_this73$block_scroll, __C.ENTITIES.EVENT, false), _defineProperty(_this73$block_scroll, __C.ENTITIES.ACTIVITY, false), _this73$block_scroll);
+		_this.disable_uploads = (_this$disable_uploads = {}, _defineProperty(_this$disable_uploads, __C.ENTITIES.EVENT, false), _defineProperty(_this$disable_uploads, __C.ENTITIES.ACTIVITY, false), _this$disable_uploads);
+		_this.block_scroll = (_this$block_scroll = {}, _defineProperty(_this$block_scroll, __C.ENTITIES.EVENT, false), _defineProperty(_this$block_scroll, __C.ENTITIES.ACTIVITY, false), _this$block_scroll);
 
-		_this73.active_tab = __C.ENTITIES.EVENT;
-		_this73.favored_fetch_data = {
+		_this.active_tab = __C.ENTITIES.EVENT;
+		_this.favored_fetch_data = {
 			fields: new Fields('image_horizontal_medium_url', 'favored_users_count', 'is_favorite', 'is_registered', 'registration_locally', 'registration_available', 'ticketing_locally', 'ticketing_available', 'dates', {
 				favored: {
 					length: 5
@@ -29878,11 +30281,11 @@ var OldUserPage = function (_Page) {
 			order_by: 'nearest_event_date,-first_event_date',
 			length: 10
 		};
-		_this73.pageTitle = function () {
+		_this.pageTitle = function () {
 
-			return _this73.user.full_name;
+			return _this.user.full_name;
 		};
-		return _this73;
+		return _this;
 	}
 
 	_createClass(OldUserPage, [{
@@ -29931,10 +30334,10 @@ var OldUserPage = function (_Page) {
 	}, {
 		key: 'buildActivities',
 		value: function buildActivities(activities) {
-			var _this74 = this;
+			var _this2 = this;
 
 			return __APP.BUILD.activity(activities.map(function (activity) {
-				activity.user = _this74.user;
+				activity.user = _this2.user;
 
 				return activity;
 			}));
@@ -29956,7 +30359,7 @@ var OldUserPage = function (_Page) {
    * @returns {Promise}
    */
 		value: function uploadEntities(type) {
-			var _this75 = this;
+			var _this3 = this;
 
 			var is_upload_disabled = this.disable_uploads[type],
 			    is_scroll_blocked = this.block_scroll[type];
@@ -29988,7 +30391,7 @@ var OldUserPage = function (_Page) {
 				$loader = __APP.BUILD.loaderBlock($wrapper);
 
 				return fetch_promise.then(function (entities) {
-					_this75.block_scroll[type] = false;
+					_this3.block_scroll[type] = false;
 					$loader.remove();
 
 					if (entities.length) {
@@ -29998,11 +30401,11 @@ var OldUserPage = function (_Page) {
 							case __C.ENTITIES.EVENT:
 								{
 
-									return _this75.page_component.favored_events.appendEvents(entities);
+									return _this3.page_component.favored_events.appendEvents(entities);
 								}
 							case __C.ENTITIES.ACTIVITY:
 								{
-									$entities = _this75.buildActivities(entities);
+									$entities = _this3.buildActivities(entities);
 									break;
 								}
 						}
@@ -30012,7 +30415,7 @@ var OldUserPage = function (_Page) {
 					} else {
 						if (!$wrapper.children().length) {
 							$wrapper.append(__APP.BUILD.cap('Активности нет'));
-							_this75.disable_uploads[type] = true;
+							_this3.disable_uploads[type] = true;
 						}
 					}
 				});
@@ -30038,7 +30441,7 @@ var OldUserPage = function (_Page) {
 	}, {
 		key: 'init',
 		value: function init() {
-			var _this76 = this;
+			var _this4 = this;
 
 			var $wrapper = this.$wrapper;
 
@@ -30047,15 +30450,15 @@ var OldUserPage = function (_Page) {
 			OldUserPage.bindEvents($wrapper);
 
 			$wrapper.find('.Tabs').on('tabs:change', function () {
-				_this76.active_tab = $wrapper.find('.TabsBody').filter('.' + __C.CLASSES.ACTIVE).data('tab_body_type');
-				_this76.bindScrollEvents();
+				_this4.active_tab = $wrapper.find('.TabsBody').filter('.' + __C.CLASSES.ACTIVE).data('tab_body_type');
+				_this4.bindScrollEvents();
 			});
 		}
 	}, {
 		key: 'bindScrollEvents',
 		value: function bindScrollEvents() {
 			var _event_names,
-			    _this77 = this;
+			    _this5 = this;
 
 			var $window = $(window),
 			    event_names = (_event_names = {}, _defineProperty(_event_names, __C.ENTITIES.EVENT, 'scroll.uploadEvents'), _defineProperty(_event_names, __C.ENTITIES.ACTIVITY, 'scroll.uploadActivities'), _event_names);
@@ -30072,9 +30475,9 @@ var OldUserPage = function (_Page) {
 						}
 
 						return new Promise(function (resolve) {
-							$window.on(event_names[_this77.active_tab], function () {
+							$window.on(event_names[_this5.active_tab], function () {
 								if (isScrollRemain(1000)) {
-									resolve(_this77.uploadEntities(_this77.active_tab));
+									resolve(_this5.uploadEntities(_this5.active_tab));
 								}
 							});
 						});
@@ -30089,7 +30492,7 @@ var OldUserPage = function (_Page) {
 	}, {
 		key: 'render',
 		value: function render() {
-			var _this78 = this;
+			var _this6 = this;
 
 			var user = this.user,
 			    is_another_user = this instanceof OldMyProfilePage === false,
@@ -30128,7 +30531,7 @@ var OldUserPage = function (_Page) {
 
 			if (promises.length) {
 				Promise.race(promises).then(function () {
-					_this78.bindScrollEvents();
+					_this6.bindScrollEvents();
 				});
 			} else {
 				this.bindScrollEvents();
@@ -30160,13 +30563,13 @@ var OldUserPage = function (_Page) {
    * @return {XML}
    * @constructor
    */
-		value: function SidebarWrapper(_ref33) {
-			var user = _ref33.user,
-			    title = _ref33.title,
-			    noEntitiesText = _ref33.noEntitiesText,
-			    entities = _ref33.entities,
-			    entitiesType = _ref33.entitiesType,
-			    showAllModalClass = _ref33.showAllModalClass;
+		value: function SidebarWrapper(_ref) {
+			var user = _ref.user,
+			    title = _ref.title,
+			    noEntitiesText = _ref.noEntitiesText,
+			    entities = _ref.entities,
+			    entitiesType = _ref.entitiesType,
+			    showAllModalClass = _ref.showAllModalClass;
 
 			if (entities.length) {
 				var avatar_classes = [__C.CLASSES.SIZES.X30],
@@ -30235,10 +30638,10 @@ var OldUserPage = function (_Page) {
 
 	}, {
 		key: 'PageComponent',
-		value: function PageComponent(_ref34) {
-			var _this79 = this;
+		value: function PageComponent(_ref2) {
+			var _this7 = this;
 
-			var user = _ref34.user;
+			var user = _ref2.user;
 			var SidebarWrapper = OldUserPage.SidebarWrapper,
 			    is_another_user = __APP.USER.id !== parseInt(user.id),
 			    logoutClickHandler = function logoutClickHandler(e) {
@@ -30310,7 +30713,7 @@ var OldUserPage = function (_Page) {
 							'div',
 							{ className: 'tab_body TabsBody -active', 'data-tab_body_type': 'event' },
 							React.createElement(EventBlocks, { ref: function ref(component) {
-									return _this79.favored_events = component;
+									return _this7.favored_events = component;
 								}, events: user.favored })
 						)
 					)
@@ -30321,23 +30724,29 @@ var OldUserPage = function (_Page) {
 
 	return OldUserPage;
 }(Page);
+var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
+
+function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
+
 /**
  * @requires Class.UserPage.js
  */
-
-
 var OldMyProfilePage = function (_OldUserPage) {
 	_inherits(OldMyProfilePage, _OldUserPage);
 
 	function OldMyProfilePage() {
 		_classCallCheck(this, OldMyProfilePage);
 
-		var _this80 = _possibleConstructorReturn(this, (OldMyProfilePage.__proto__ || Object.getPrototypeOf(OldMyProfilePage)).call(this, __APP.USER.id));
+		var _this = _possibleConstructorReturn(this, (OldMyProfilePage.__proto__ || Object.getPrototypeOf(OldMyProfilePage)).call(this, __APP.USER.id));
 
-		_this80.favored_fetch_data.fields.push('is_favorite');
-		_this80.user = __APP.USER;
-		_this80.page_title = 'Мой профиль';
-		return _this80;
+		_this.favored_fetch_data.fields.push('is_favorite');
+		_this.user = __APP.USER;
+		_this.page_title = 'Мой профиль';
+		return _this;
 	}
 
 	_createClass(OldMyProfilePage, [{
@@ -30365,8 +30774,6 @@ var OldMyProfilePage = function (_OldUserPage) {
  * @class MyTicketsPage
  * @extends Page
  */
-
-
 MyTicketsPage = extending(Page, function () {
 	/**
   *
@@ -31920,24 +32327,11 @@ AdminEventUTMTagsPage = extending(AdminEventPage, function () {
 	AdminEventUTMTagsPage.prototype.initUTMTable = function () {
 		this.utmTable = this.$wrapper.find('.UTMTable').DataTable({
 			paging: false,
-			columns: [{ data: 'utm_source' }, { data: 'utm_medium' }, { data: 'utm_campaign' }, { data: 'utm_content' }, { data: 'utm_term' }, { data: 'open_count' }, {
+			columns: [{ data: 'utm_source' }, { data: 'utm_medium' }, { data: 'utm_campaign' }, { data: 'utm_content' }, { data: 'utm_term' }, { data: 'open_count' }, { data: 'tickets_count' }, { data: 'orders_count' }, {
 				data: function data(utm, type, val, meta) {
 					switch (type) {
 						case 'display':
 							{
-
-								return formatCurrency(utm.conversion, ' ', '.', '', '%');
-							}
-					}
-
-					return utm.conversion;
-				}
-			}, {
-				data: function data(utm, type, val, meta) {
-					switch (type) {
-						case 'display':
-							{
-
 								return formatCurrency(utm.orders_sum, ' ', '.', '', '₽');
 							}
 					}
@@ -34073,6 +34467,11 @@ TimelineEventsPage = extending(FeedPage, function () {
 
 	return TimelineEventsPage;
 }());
+var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+
+function _toConsumableArray(arr) { if (Array.isArray(arr)) { for (var i = 0, arr2 = Array(arr.length); i < arr.length; i++) { arr2[i] = arr[i]; } return arr2; } else { return Array.from(arr); } }
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
 var AbstractEvendateApplication = function () {
 	function AbstractEvendateApplication() {
@@ -34266,10 +34665,10 @@ var AbstractEvendateApplication = function () {
 		value: function renderReact() {
 			var _ReactRouterDOM = ReactRouterDOM,
 			    BrowserRouter = _ReactRouterDOM.BrowserRouter,
-			    _ReactRouter3 = ReactRouter,
-			    Switch = _ReactRouter3.Switch,
-			    Route = _ReactRouter3.Route,
-			    Redirect = _ReactRouter3.Redirect;
+			    _ReactRouter = ReactRouter,
+			    Switch = _ReactRouter.Switch,
+			    Route = _ReactRouter.Route,
+			    Redirect = _ReactRouter.Redirect;
 
 
 			ReactDOM.render(React.createElement(
@@ -34290,25 +34689,33 @@ var AbstractEvendateApplication = function () {
 
 	return AbstractEvendateApplication;
 }();
+var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) { return typeof obj; } : function (obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; };
+
+var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
+
+function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
+
 /**
  * @requires AbstractEvendateApplication.js
  */
-
-
 var EvendateApplication = function (_AbstractEvendateAppl) {
 	_inherits(EvendateApplication, _AbstractEvendateAppl);
 
 	function EvendateApplication() {
 		_classCallCheck(this, EvendateApplication);
 
-		var _this81 = _possibleConstructorReturn(this, (EvendateApplication.__proto__ || Object.getPrototypeOf(EvendateApplication)).call(this));
+		var _this = _possibleConstructorReturn(this, (EvendateApplication.__proto__ || Object.getPrototypeOf(EvendateApplication)).call(this));
 
-		_this81.EXPORT = new ServerExports();
-		_this81.TOP_BAR = new AbstractTopBar();
-		_this81.SIDEBAR = new AbstractSidebar();
-		_this81.IS_WIDGET = false;
-		_this81.POST_MESSAGE = new AppPostMessageConnection(window);
-		_this81.ROUTING = {
+		_this.EXPORT = new ServerExports();
+		_this.TOP_BAR = new AbstractTopBar();
+		_this.SIDEBAR = new AbstractSidebar();
+		_this.IS_WIDGET = false;
+		_this.POST_MESSAGE = new AppPostMessageConnection(window);
+		_this.ROUTING = {
 			'admin': {
 				'organization': {
 					'^([0-9]+)': {
@@ -34444,7 +34851,7 @@ var EvendateApplication = function (_AbstractEvendateAppl) {
 			},
 			'': ActualEventsPage
 		};
-		return _this81;
+		return _this;
 	}
 	/**
   *
@@ -34457,13 +34864,13 @@ var EvendateApplication = function (_AbstractEvendateAppl) {
 	_createClass(EvendateApplication, [{
 		key: 'repaint',
 		value: function repaint(colors) {
-			var _this82 = this;
+			var _this2 = this;
 
 			AbstractEvendateApplication.prototype.repaint.call(this, colors);
 
 			if (colors.header) {
 				(function (hex) {
-					var main_header_style = _this82.TOP_BAR.$main_header.get(0).style,
+					var main_header_style = _this2.TOP_BAR.$main_header.get(0).style,
 					    contrast_hex = getContrastColor(hex);
 
 					main_header_style.setProperty('--color_primary', hex);
@@ -34533,8 +34940,6 @@ var EvendateApplication = function (_AbstractEvendateAppl) {
 /**
  * @requires EvendateApplication.js
  */
-
-
 __APP = new EvendateApplication();
 window.paceOptions = {
 	ajax: false, // disabled
@@ -34688,7 +35093,7 @@ if (checkRedirect()) {
 			$.trumbowyg.defaultOptions.lang = 'ru';
 			$.trumbowyg.defaultOptions.autogrow = true;
 			$.trumbowyg.defaultOptions.autogrowOnEnter = true;
-			$.trumbowyg.defaultOptions.btns = [['viewHTML'], ['undo', 'redo'], ['formatting'], ['strong', 'em'], ['link'], ['insertImage'], ['justifyLeft', 'justifyCenter', 'justifyRight', 'justifyFull'], ['unorderedList', 'orderedList'], ['horizontalRule'], ['removeformat']];
+			$.trumbowyg.defaultOptions.btns = [['viewHTML'], ['undo', 'redo'], ['formatting'], ['strong', 'em'], ['link'], ['insertImage'], ['table'], ['justifyLeft', 'justifyCenter', 'justifyRight', 'justifyFull'], ['unorderedList', 'orderedList'], ['horizontalRule'], ['removeformat', 'emoji']];
 		}();
 
 		+function configI18N() {
@@ -34753,3 +35158,4 @@ if (checkRedirect()) {
 		}, 5000);
 	});
 }
+//# sourceMappingURL=app.js.map

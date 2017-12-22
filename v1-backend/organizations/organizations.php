@@ -237,13 +237,22 @@ $__modules['organizations'] = array(
 						$ip = $_SERVER['REMOTE_ADDR'];
 					}
 					try {
-						$geo_data = @file_get_contents('https://freegeoip.net/json/' . $ip);
+						$ctx = stream_context_create(array('http'=>
+							array(
+								'timeout' => 1,  //in seconds
+							)
+						));
+
+						$geo_data = @file_get_contents('http://localhost:16101?ip=' . $ip, false, $ctx);
 						$geo_data = json_decode($geo_data, true);
 						if (!isset($geo_data['latitude']) || !isset($geo_data['longitude'])) throw new InvalidArgumentException('CANT_GET_GEO_FROM_IP');
 						$__request['latitude'] = $geo_data['latitude'];
 						$__request['longitude'] = $geo_data['longitude'];
 					} catch (Exception $e) {
-						throw new InvalidArgumentException('CANT_GET_GEO_FROM_IP');
+//						throw new InvalidArgumentException('CANT_GET_GEO_FROM_IP');
+						$__request['latitude'] = 55.75;
+						$__request['longitude'] = 37.61;
+
 					}
 				}
 			}
