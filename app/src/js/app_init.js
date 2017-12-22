@@ -156,7 +156,7 @@ if (checkRedirect()) {
 			}();
 			
 			+function configTrumbowyg() {
-				$.trumbowyg.svgPath = '/app/src/vendor/trumbowyg/icons.svg';
+                $.trumbowyg.svgPath = '/app/src/vendor/trumbowyg/icons.svg';
 				$.trumbowyg.defaultOptions.lang = 'ru';
 				$.trumbowyg.defaultOptions.autogrow = true;
 				$.trumbowyg.defaultOptions.autogrowOnEnter = true;
@@ -167,11 +167,12 @@ if (checkRedirect()) {
 					['strong', 'em'],
 					['link'],
 					['insertImage'],
+					['table'],
 					['justifyLeft', 'justifyCenter', 'justifyRight', 'justifyFull'],
 					['unorderedList', 'orderedList'],
 					['horizontalRule'],
-					['removeformat']
-				];
+					['removeformat', 'emoji']
+                ];
 			}();
 			
 			+function configI18N() {

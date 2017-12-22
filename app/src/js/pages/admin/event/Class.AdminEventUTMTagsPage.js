@@ -53,23 +53,12 @@ AdminEventUTMTagsPage = extending(AdminEventPage, (function() {
 				{data: 'utm_content'},
 				{data: 'utm_term'},
 				{data: 'open_count'},
+                {data: 'tickets_count'},
+                {data: 'orders_count'},
 				{
 					data: function(utm, type, val, meta) {
 						switch (type) {
 							case 'display': {
-								
-								return formatCurrency(utm.conversion, ' ', '.', '', '%');
-							}
-						}
-						
-						return utm.conversion;
-					}
-				},
-				{
-					data: function(utm, type, val, meta) {
-						switch (type) {
-							case 'display': {
-								
 								return formatCurrency(utm.orders_sum, ' ', '.', '', '₽');
 							}
 						}

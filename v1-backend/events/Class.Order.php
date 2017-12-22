@@ -183,9 +183,9 @@ class Order extends AbstractEntity
 		$q_get_event_info = 'SELECT 
 			view_tickets_orders.final_sum,
 			view_tickets_orders.sum,
-			ticketing_locally,
- 			registration_approvement_required,
-			registration_locally,
+			view_all_events.ticketing_locally,
+ 			view_all_events.registration_approvement_required,
+			view_all_events.registration_locally,
 			view_tickets_orders.promocode_id
 			FROM
 			 view_tickets_orders
