@@ -33,7 +33,8 @@ OneUTMStat = extending(OneEntity, (function() {
 		this.utm_content = null;
 		this.utm_term = null;
 		this.open_count = null;
-		this.conversion = null;
+		this.tickets_count = null;
+		this.orders_count = null;
 		this.orders_sum = null;
 		
 		Object.defineProperty(this, 'uuid', {

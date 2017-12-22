@@ -224,7 +224,8 @@ class EventsStatistics extends AbstractAggregator
 			'utm_content',
 			'utm_term',
 			'open_count',
-			'conversion',
+			'orders_count',
+			'tickets_count',
 			'orders_sum'
 		))
 			->from('view_stats_utm')
