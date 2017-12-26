@@ -132,7 +132,7 @@ class Notifications {
             ' uuid IS NOT NULL' +
             ' AND view_notifications.done = FALSE' +
             ' AND view_notifications.status = TRUE' +
-            ' AND DATE_PART(\'epoch\', view_notifications.notification_time_original::TIMESTAMPTZ) <= DATE_PART(\'epoch\', NOW())::INT', function (err, res) {
+            ' AND DATE_PART(\'epoch\', view_notifications.notification_time_original::TIMESTAMP) <= DATE_PART(\'epoch\', NOW())::INT', function (err, res) {
             if (err) {
                 _this.logger.error(err);
                 return;
@@ -205,7 +205,7 @@ class Notifications {
             ' INNER JOIN view_events ON events_notifications.event_id = view_events.id' +
             ' INNER JOIN notification_types ON notification_types.id = events_notifications.notification_type_id ' +
             ' INNER JOIN organizations ON organizations.id = view_events.organization_id' +
-            ' WHERE notification_time::TIMESTAMPTZ <= NOW() AND done = FALSE LIMIT 5', function (err, result) {
+            ' WHERE notification_time::TIMESTAMP <= NOW() AND done = FALSE LIMIT 5', function (err, result) {
 
             if (err) {
                 console.log('HERE IS ERROR');
