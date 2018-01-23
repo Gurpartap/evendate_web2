@@ -658,8 +658,8 @@ class Organization extends AbstractEntity
 		}
 
 		if (!isset($data['description'])) throw new InvalidArgumentException('ORGANIZATION_DESCRIPTION_REQUIRED');
-		if (mb_strlen($data['description']) <= 50) throw new InvalidArgumentException('TOO_SHORT_DESCRIPTION');
-		if (mb_strlen($data['description']) > 250) throw new InvalidArgumentException('TOO_LARGE_DESCRIPTION');
+		if (mb_strlen($data['description']) <= 50) throw new InvalidArgumentException('ORG_TOO_SHORT_DESCRIPTION');
+		if (mb_strlen($data['description']) > 500) throw new InvalidArgumentException('ORG_TOO_LARGE_DESCRIPTION');
 		$data['description'] = trim($data['description']);
 
 		if (isset($data['default_address'])) {
