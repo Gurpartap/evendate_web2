@@ -6,17 +6,18 @@ require_once $BACKEND_FULL_PATH . '/events/Class.Ticket.php';
 class TicketsCollection extends AbstractCollection
 {
 
-	public static function filter(ExtendedPDO $db,
-																AbstractUser $user = null,
-																array $filters = null,
-																array $fields = null,
-																array $pagination = null,
-																array $order_by = array('uuid'))
-	{
 
+	public static function getStatement(ExtendedPDO $db,
+																			AbstractUser $user = null,
+																			array $filters = null,
+																			array $fields = null,
+																			array $pagination = null,
+																			array $order_by = array('uuid'))
+	{
 		$q_get_tickets = App::queryFactory()->newSelect();
 		$is_one_ticket = false;
 		$from_table = 'view_tickets';
+		$statements_array = array();
 
 		$cols = Fields::mergeFields(Ticket::getAdditionalCols(), $fields, Ticket::getDefaultCols());
 
@@ -33,76 +34,111 @@ class TicketsCollection extends AbstractCollection
 
 		foreach ($filters as $name => $value) {
 			switch ($name) {
-				case 'id': {
-					$q_get_tickets->where('id = ?', $value);
-					$is_one_ticket = true;
-					break;
-				}
-				case 'uuid': {
-					$q_get_tickets->where('uuid = ?', $value);
-					$is_one_ticket = true;
-					break;
-				}
-				case 'event': {
-					if ($value instanceof Event) {
-						$q_get_tickets->where('event_id = ?', $value->getId());
+				case 'id':
+					{
+						$q_get_tickets->where('id = :id');
+						$statements_array[':id'] = $value;
+						$is_one_ticket = true;
+						break;
 					}
-					break;
-				}
-				case 'user_name': {
-					$value = '%' . trim($value) . '%';
-					$q_get_tickets->where('user_id IN (SELECT id FROM view_users_names WHERE LOWER(first_last_name) LIKE LOWER(:query) OR LOWER(last_first_name) LIKE LOWER(:query) OR LOWER(last_name) LIKE LOWER(:query) OR LOWER(first_name) LIKE LOWER(:query) OR LOWER(email) = LOWER(:query))')
-						->bindValue('query', $value);
-					$getting_statistics = true;
-					break;
-				}
-				case 'event_id': {
-					$event = EventsCollection::one($db, $user, intval($value), array());
+				case 'uuid':
+					{
+						$q_get_tickets->where('uuid = :uuid');
+						$statements_array[':uuid'] = $value;
+						$is_one_ticket = true;
+						break;
+					}
+				case 'event':
+					{
+						if ($value instanceof Event) {
+							$q_get_tickets->where('event_id = :event_id');
+							$statements_array[':event_id'] = $value->getId();
+						}
+						break;
+					}
+				case 'user_name':
+					{
+						$value = '%' . trim($value) . '%';
+						$q_get_tickets->where('user_id IN (SELECT id FROM view_users_names WHERE LOWER(first_last_name) LIKE LOWER(:query) OR LOWER(last_first_name) LIKE LOWER(:query) OR LOWER(last_name) LIKE LOWER(:query) OR LOWER(first_name) LIKE LOWER(:query) OR LOWER(email) = LOWER(:query))');
+						$statements_array[':query'] = $value;
 
-					$q_get_tickets->where('event_id = ?', $event->getId());
-					$q_get_tickets->where('user_id = ?', $user->getId());
-					break;
-				}
-				case 'statistics_event': {
-					if ($value instanceof Event) {
-						$q_get_tickets->where('event_id = ?', $value->getId());
 						$getting_statistics = true;
+						break;
 					}
-					break;
-				}
-				case 'order': {
-					if ($value instanceof Order) {
-						$q_get_tickets->where('ticket_order_uuid = ?', $value->getUUID());
+				case 'event_id':
+					{
+						$event = EventsCollection::one($db, $user, intval($value), array());
+
+						$q_get_tickets->where('event_id = :event_id');
+						$q_get_tickets->where('user_id = :user_id');
+						$statements_array[':event_id'] = $event->getId();
+						$statements_array[':user_id'] = $user->getId();
+						break;
 					}
-					break;
-				}
-				case 'statistics_order': {
-					if ($value instanceof Order) {
-						$q_get_tickets->where('ticket_order_uuid = ?', $value->getUUID());
+				case 'statistics_event':
+					{
+						if ($value instanceof Event) {
+							$q_get_tickets->where('event_id = :event_id');
+							$statements_array[':event_id'] = $value->getId();
+							$getting_statistics = true;
+						}
+						break;
+					}
+				case 'order':
+					{
+						if ($value instanceof Order) {
+							$q_get_tickets->where('ticket_order_uuid = :ticket_order_uuid');
+							$statements_array[':ticket_order_uuid'] = $value->getUUID();
+						}
+						break;
+					}
+				case 'statistics_order':
+					{
+						if ($value instanceof Order) {
+							$q_get_tickets->where('ticket_order_uuid = :ticket_order_uuid');
+							$statements_array[':ticket_order_uuid'] = $value->getUUID();
+							$getting_statistics = true;
+						}
+						break;
+					}
+				case 'statistics_order_placeholder':
+					{
+						if ($value === true) {
+							$q_get_tickets->where('ticket_order_uuid = :statistics_order_placeholder');
+							$getting_statistics = true;
+						}
+						break;
+					}
+				case 'number':
+					{
 						$getting_statistics = true;
+						$value = '%' . intval(preg_replace("/[^0-9,.]/", "", $value)) . '%';
+						$q_get_tickets->where('number LIKE :query');
+						$statements_array[':query'] = $value;
+
+						break;
 					}
-					break;
-				}
-				case 'number': {
-					$getting_statistics = true;
-					$value = '%' . intval(preg_replace("/[^0-9,.]/", "", $value)) . '%';
-					$q_get_tickets->where('number LIKE :query')->bindValue('query', $value);
-					break;
-				}
-				case 'user': {
-					if ($value instanceof User) {
-						$q_get_tickets->where('user_id = ?', $user->getId());
+				case 'user':
+					{
+						if ($value instanceof User) {
+							$q_get_tickets->where('user_id = :user_id');
+							$statements_array[':user_id'] = $user->getId();
+
+						}
+						break;
 					}
-					break;
-				}
-				case 'checkout': {
-					$val = filter_var($value, FILTER_VALIDATE_BOOLEAN) ? 'true' : 'false';
-					$q_get_tickets->where('checked_out = ?', $val);
-					break;
-				}
-				case 'order_status_type': {
-					$q_get_tickets->where('order_status_type = ?', $value);
-				}
+				case 'checkout':
+					{
+						$val = filter_var($value, FILTER_VALIDATE_BOOLEAN) ? 'true' : 'false';
+						$q_get_tickets->where('checked_out = :checked_out', $val);
+						$statements_array[':checked_out'] = $val;
+						break;
+					}
+				case 'order_status_type':
+					{
+						$q_get_tickets->where('order_status_type = :order_status_type');
+						$statements_array[':order_status_type'] = $value;
+					}
 			}
 		}
 
@@ -112,9 +148,11 @@ class TicketsCollection extends AbstractCollection
 					INNER JOIN view_all_events ON view_all_events.id = view_tickets.event_id 
 						AND users_organizations.organization_id = view_all_events.organization_id 
 					WHERE users_organizations.role_id = 1
-					AND users_organizations.user_id = ?
+					AND users_organizations.user_id = :user_id::INT
 					AND users_organizations.status = TRUE
-					) > 0', $user->getId());
+					) > 0');
+			$statements_array[':user_id'] = $user->getId();
+
 		} else {
 			if (isset($filters['uuid']) || (isset($filters['order']) && $filters['order'] instanceof Order)) {
 //				$q_get_tickets->where('(SELECT COUNT(users_organizations.user_id)
@@ -128,7 +166,9 @@ class TicketsCollection extends AbstractCollection
 //					AND view_tickets.uuid = ?
 //					) > 0', $user->getId(), $filters['uuid']);
 			} else {
-				$q_get_tickets->where('user_id = ?', $user->getId());
+				$q_get_tickets->where('user_id = :user_id::INT');
+				$statements_array[':user_id'] = $user->getId();
+
 			}
 		}
 
@@ -137,7 +177,25 @@ class TicketsCollection extends AbstractCollection
 			->cols($cols)
 			->orderBy($order_by);
 
-		$tickets = $db->prepareExecute($q_get_tickets)->fetchAll(PDO::FETCH_CLASS, 'Ticket');
+		return array(
+			'query' => $q_get_tickets,
+			'is_one' => $is_one_ticket,
+			'statements' => $statements_array
+		);
+	}
+
+	public static function filter(ExtendedPDO $db,
+																AbstractUser $user = null,
+																array $filters = null,
+																array $fields = null,
+																array $pagination = null,
+																array $order_by = array('uuid'))
+	{
+		$q_res = self::getStatement($db, $user, $filters, $fields, $pagination, $order_by);
+		$q_get_tickets = $q_res['query'];
+		$statements = $q_res['statements'];
+		$is_one_ticket = $q_res['is_one'];
+		$tickets = $db->prepareExecute($q_get_tickets, '', $statements)->fetchAll(PDO::FETCH_CLASS, 'Ticket');
 		if (count($tickets) == 0 && $is_one_ticket) throw new LogicException('CANT_FIND_TICKET');
 		if ($is_one_ticket) return $tickets[0];
 		$result = array();
@@ -229,8 +287,8 @@ class TicketsCollection extends AbstractCollection
 			if (is_array($ticket['order']['registration_fields'])) {
 				foreach ($ticket['order']['registration_fields'] as $field) {
 					$_row[$field['form_field_label']] = $field['value'];
-					if (!in_array($field['form_field_label'], $headers)){
-					$headers[] = $field['form_field_label'];
+					if (!in_array($field['form_field_label'], $headers)) {
+						$headers[] = $field['form_field_label'];
 					}
 				}
 				$index++;
@@ -238,9 +296,9 @@ class TicketsCollection extends AbstractCollection
 			$rows[] = $_row;
 		}
 		$res = array($headers);
-		foreach($rows as &$user){
+		foreach ($rows as &$user) {
 			$_row = array();
-			foreach($headers as $col){
+			foreach ($headers as $col) {
 				$_row[] = $user[$col] ?? '';
 			}
 			$res[] = $_row;

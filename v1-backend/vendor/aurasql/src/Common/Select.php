@@ -49,6 +49,15 @@ class Select extends AbstractQuery implements SelectInterface, SubselectInterfac
 
     /**
      *
+     * The columns to do distinct on.
+     *
+     * @var array
+     *
+     */
+    protected $distinct_on_cols = array();
+
+    /**
+     *
      * Select from these tables; includes JOIN clauses.
      *
      * @var array
@@ -761,6 +770,7 @@ class Select extends AbstractQuery implements SelectInterface, SubselectInterfac
     {
         return 'SELECT'
             . $this->buildFlags()
+						. $this->buildDistinctOn()
             . $this->buildCols()
             . $this->buildFrom() // includes JOIN
             . $this->buildWhere()
@@ -955,4 +965,23 @@ class Select extends AbstractQuery implements SelectInterface, SubselectInterfac
     {
         return $this->addOrderBy($spec);
     }
+
+	/**
+	 *
+	 * Makes the select DISTINCT ON (columns).
+	 *
+	 * @param array $cols
+	 * @return self
+	 */
+	public function distinctOn(array $cols)
+	{
+		$this->distinct_on_cols = $cols;
+		return $this;
+	}
+
+	private function buildDistinctOn()
+	{
+		if (count($this->distinct_on_cols) == 0) return '';
+		return ' DISTINCT ON (' . implode(', ', $this->distinct_on_cols). ') ';
+	}
 }

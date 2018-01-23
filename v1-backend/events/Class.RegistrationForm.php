@@ -25,7 +25,7 @@ class RegistrationForm
 
 	private static function addFormField(int $event_id, string $type, string $label = null, bool $required, ExtendedPDO $db, array $values = null, $order_number = null)
 	{
-		if (!is_numeric($order_number)){
+		if (!is_numeric($order_number)) {
 			$order_number = null;
 		}
 		$q_ins_field = App::queryFactory()->newInsert();
@@ -157,7 +157,7 @@ class RegistrationForm
 		}
 	}
 
-	public static function getFilledFields(ExtendedPDO $db, Order $order)
+	public static function getFilledFieldsQuery()
 	{
 		$q_get = App::queryFactory()->newSelect();
 		$q_get->from('view_registration_field_values')
@@ -172,10 +172,15 @@ class RegistrationForm
 				'created_at',
 				'updated_at',
 				'order_number'
-			))->where('ticket_order_uuid = ?', $order->getUUID())
-		->orderBy(array('order_number'));
+			))->where('ticket_order_uuid = :ticket_order_uuid')
+			->orderBy(array('order_number'));
+		return $q_get;
+	}
 
-		$result = $db->prepareExecute($q_get, 'CANT_GET_FILLED_FIELDS')->fetchAll();
+	public static function getFilledFields(ExtendedPDO $db, Order $order)
+	{
+		$q_get = self::getFilledFieldsQuery();
+		$result = $db->prepareExecute($q_get, 'CANT_GET_FILLED_FIELDS', array(':ticket_order_uuid' => $order->getUUID()))->fetchAll();
 		foreach ($result as &$item) {
 			$item['values'] = json_decode($item['values'], true);
 		}

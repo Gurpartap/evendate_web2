@@ -676,7 +676,7 @@ pg.connect(pg_conn_string, function (err, client, done) {
         scheduler.scheduleOrderWaitingPayment();
     }
 
-    var ioHandlers = function (socket) {
+    var ioHandlers = function (socket)  {
 
         socket.on(CONSTANTS.CONNECTION.ERROR, function (err) {
             logger.error(err);

@@ -124,7 +124,7 @@ class Order extends AbstractEntity
 		'ticket_pricing_rule_discount',
 		'status_id',
 		self::BITCOIN_ADDRESS_FIELD_NAME => '(SELECT address FROM bitcoin_addresses WHERE ticket_order_id = view_tickets_orders.id ORDER BY id DESC LIMIT 1) AS ' . self::BITCOIN_ADDRESS_FIELD_NAME,
-		self::BITCOIN_AMOUNT_FIELD_NAME => '(SELECT waiting_amount FROM bitcoin_addresses WHERE ticket_order_id = view_tickets_orders.id ORDER BY id DESC LIMIT 1) AS ' . self::BITCOIN_AMOUNT_FIELD_NAME,
+		self::BITCOIN_AMOUNT_FIELD_NAME => '(SELECT waiting_amount FROM bitcoin_addresses WHERE ticket_order_id = view_tickets_orders.id ORDER BY id DESC LIMIT 1) AS ' . self::BITCOIN_AMOUNT_FIELD_NAME
 	);
 
 
@@ -266,29 +266,12 @@ class Order extends AbstractEntity
 		$result = parent::getParams($user, $fields)->getData();
 
 		if (isset($fields[self::TICKETS_FIELD_NAME]) && $user instanceof User) {
-			$result[self::TICKETS_FIELD_NAME] = TicketsCollection::filter(
-				App::DB(),
-				$user,
-				array('statistics_order' => $this),
-				Fields::parseFields($fields[self::TICKETS_FIELD_NAME]['fields'] ?? ''),
-				array(
-					'length' => $fields[self::TICKETS_FIELD_NAME]['length'] ?? App::DEFAULT_LENGTH,
-					'offset' => $fields[self::TICKETS_FIELD_NAME]['offset'] ?? App::DEFAULT_OFFSET
-				),
-				Fields::parseOrderBy($fields[self::TICKETS_FIELD_NAME]['order_by'] ?? ''))->getData();
+			$result[self::TICKETS_FIELD_NAME] = json_decode($this->tickets, false);
+
 		}
 
 		if (isset($fields[self::USER_FIELD_NAME]) && $user instanceof User) {
-			$user_fields = Fields::parseFields($fields[self::USER_FIELD_NAME]['fields'] ?? '');
-			$result[self::USER_FIELD_NAME] = UsersCollection::filter(App::DB(),
-				$user,
-				array('id' => $this->user_id),
-				$user_fields,
-				array(
-					'length' => $fields[self::USER_FIELD_NAME]['length'] ?? App::DEFAULT_LENGTH,
-					'offset' => $fields[self::USER_FIELD_NAME]['offset'] ?? App::DEFAULT_OFFSET
-				),
-				Fields::parseOrderBy($fields[self::USER_FIELD_NAME]['order_by'] ?? ''))->getParams($user, $user_fields)->getData();
+			$result[self::USER_FIELD_NAME] = json_decode($this->user, false);
 		}
 
 		if (isset($fields[self::EVENT_FIELD_NAME]) && $user instanceof User) {
@@ -323,9 +306,9 @@ class Order extends AbstractEntity
 		}
 
 		if (isset($fields[self::REGISTRATION_FIELDS_FIELD_NAME]) && $user instanceof User) {
-			$result[self::REGISTRATION_FIELDS_FIELD_NAME] = RegistrationForm::getFilledFields(App::DB(),
-				$this)->getData();
+			$result[self::REGISTRATION_FIELDS_FIELD_NAME] = json_decode($this->registration_fields, true);
 		}
+
 		if (isset($fields[self::PAYER_LEGAL_ENTITY_FIELD_NAME]) && $user instanceof User) {
 			$result[self::PAYER_LEGAL_ENTITY_FIELD_NAME] = $this->getLegalEntityData();
 		}

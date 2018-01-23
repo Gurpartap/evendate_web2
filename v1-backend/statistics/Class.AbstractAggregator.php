@@ -21,12 +21,11 @@ class AbstractAggregator
 	protected function replaceScale($query, $scale)
 	{
 		$scale = mb_strtolower($scale);
-		if (!in_array($scale, self::$scales)) {
-			$scale = self::SCALE_WEEK;
-		}
 
 		if ($scale == 'overall') {
 			$scale = 'century';
+		}elseif (!in_array($scale, self::$scales)) {
+			$scale = self::SCALE_WEEK;
 		}
 		$query = str_replace('{SCALE}', $scale, $query);
 		return $query;

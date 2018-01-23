@@ -17,8 +17,47 @@ class OrdersCollection extends AbstractCollection
 		$q_get_orders = App::queryFactory()->newSelect();
 		$is_one_order = false;
 		$from_table = 'view_tickets_orders';
+		$statements_array = array();
 
 		$cols = Fields::mergeFields(Order::getAdditionalCols(), $fields, Order::getDefaultCols());
+
+		if (isset($fields['user'])) {
+			$user_fields = Fields::parseFields($fields[Order::USER_FIELD_NAME]['fields'] ?? '');
+			$_user_st = UsersCollection::getStatement(App::DB(),
+				$user,
+				array('id' => $user->getId()),
+				$user_fields,
+				array(
+					'length' => $fields[Order::USER_FIELD_NAME]['length'] ?? App::DEFAULT_LENGTH,
+					'offset' => $fields[Order::USER_FIELD_NAME]['offset'] ?? App::DEFAULT_OFFSET
+				),
+				Fields::parseOrderBy($fields[Order::USER_FIELD_NAME]['order_by'] ?? ''));
+			$user_query = str_replace('= :id',' = view_tickets_orders.user_id',$_user_st['query']);
+			$cols[] = "(select row_to_json(t) from ({$user_query}) t) AS "  . Order::USER_FIELD_NAME;
+		}
+
+		if (isset($fields['registration_fields'])) {
+			$fields_query = RegistrationForm::getFilledFieldsQuery();
+			$fields_query = str_replace('= :ticket_order_uuid',' = view_tickets_orders.uuid', $fields_query->getStatement());
+			$cols[] = "(select array_to_json(array_agg(row_to_json(f))) from ({$fields_query}) f) AS "  . Order::REGISTRATION_FIELDS_FIELD_NAME;
+		}
+
+
+		if (isset($fields['tickets'])) {
+			$user_fields = Fields::parseFields($fields[Order::TICKETS_FIELD_NAME]['fields'] ?? '');
+			$_user_st = TicketsCollection::getStatement(App::DB(),
+				$user,
+				array('statistics_order_placeholder' => true),
+				$user_fields,
+				array(
+					'length' => $fields[Order::TICKETS_FIELD_NAME]['length'] ?? App::DEFAULT_LENGTH,
+					'offset' => $fields[Order::TICKETS_FIELD_NAME]['offset'] ?? App::DEFAULT_OFFSET
+				),
+				Fields::parseOrderBy($fields[Order::TICKETS_FIELD_NAME]['order_by'] ?? ''));
+			$tickets_query = str_replace('= :statistics_order_placeholder',' = view_tickets_orders.uuid', $_user_st['query']);
+			$cols[] = "(select array_to_json(array_agg(row_to_json(tickets_t))) from ({$tickets_query}) tickets_t) AS "  . Order::TICKETS_FIELD_NAME;
+		}
+
 
 
 		if (isset($pagination['offset'])) {
@@ -31,46 +70,60 @@ class OrdersCollection extends AbstractCollection
 
 		foreach ($filters as $name => $value) {
 			switch ($name) {
-				case 'uuid': {
-					$q_get_orders->where('uuid = ?', $value);
-					$is_one_order = true;
-					break;
-				}
-				case 'event': {
-					if ($value instanceof Event) {
-						$q_get_orders->where('event_id = ?', $value->getId());
+				case 'uuid':
+					{
+						$q_get_orders->where('uuid = :uuid');
+						$statements_array[':uuid'] = $value;
+						$is_one_order = true;
+						break;
 					}
-					break;
-				}
-				case 'statistics_event': {
-					if ($value instanceof Event) {
-						$q_get_orders->where('event_id = ?', $value->getId());
-						$getting_statistics = true;
+				case 'event':
+					{
+						if ($value instanceof Event) {
+							$q_get_orders->where('event_id = :event_id');
+							$statements_array[':event_id'] = $value->getId();
+						}
+						break;
 					}
-					break;
-				}
-				case 'user': {
-					if ($value instanceof User) {
-						$q_get_orders->where('user_id = ?', $value->getId());
+				case 'statistics_event':
+					{
+						if ($value instanceof Event) {
+							$q_get_orders->where('event_id = :event_id');
+							$statements_array[':event_id'] = $value->getId();
+							$getting_statistics = true;
+						}
+						break;
 					}
-					break;
-				}
-				case 'subscriber': {
-					if ($value instanceof Friend
-						&& isset($filters['organization'])
-						&& $filters['organization'] instanceof Organization
-						&& $user->isAdmin($filters['organization'])
-					) {
-						$q_get_orders->where('user_id = ?', $value->getId());
-						$q_get_orders->where('event_id IN (SELECT id FROM events WHERE organization_id = ?)', $filters['organization']->getId());
-						$getting_statistics = true;
+				case 'user':
+					{
+						if ($value instanceof User) {
+							$q_get_orders->where('user_id = :user_id');
+							$statements_array[':user_id'] = $value->getId();
+						}
+						break;
+					}
+				case 'subscriber':
+					{
+						if ($value instanceof Friend
+							&& isset($filters['organization'])
+							&& $filters['organization'] instanceof Organization
+							&& $user->isAdmin($filters['organization'])
+						) {
+							$q_get_orders->where('user_id = :user_id');
+							$q_get_orders->where('event_id IN (SELECT id FROM events WHERE organization_id = :organization_id)');
+							$statements_array[':user_id'] = $value->getId();
+							$statements_array[':organization_id'] = $filters['organization']->getId();
+							$getting_statistics = true;
+
+						}
+						break;
+					}
+				case 'status_type':
+					{
+						$q_get_orders->where('ticket_order_status_type = ?', $value);
+						$statements_array[':ticket_order_status_type'] = $value;
 
 					}
-					break;
-				}
-				case 'status_type': {
-					$q_get_orders->where('ticket_order_status_type = ?', $value);
-				}
 			}
 		}
 
@@ -81,23 +134,26 @@ class OrdersCollection extends AbstractCollection
 					INNER JOIN view_all_events ON view_all_events.id = view_tickets_orders.event_id 
 						AND users_organizations.organization_id = view_all_events.organization_id 
 					WHERE users_organizations.role_id = 1
-					AND users_organizations.user_id = ?
+					AND users_organizations.user_id::INT = :user_id::INT
 					AND users_organizations.status = TRUE
-					) > 0 OR (user_id = ?))', $user->getId(), $user->getId());
+					) > 0 OR (user_id = :user_id::INT))');
+			$statements_array[':user_id'] = $user->getId();
 		} elseif (!isset($filters['uuid'])) {
-			$q_get_orders->where('user_id = ?', $user->getId());
+			$q_get_orders->where('user_id = :user_id::INT');
+			$statements_array[':user_id'] = $user->getId();
 		}
 
 
 		// must get promocode_id
 		$cols[] = 'promocode_id';
 		$cols[] = 'id';
-		$q_get_orders->distinct()
+		$q_get_orders
+//			->distinctOn(array('uuid'))
 			->from($from_table)
 			->cols($cols)
 			->orderBy($order_by);
 
-		$tickets = $db->prepareExecute($q_get_orders)->fetchAll(PDO::FETCH_CLASS, 'Order');
+		$tickets = $db->prepareExecute($q_get_orders, '', $statements_array)->fetchAll(PDO::FETCH_CLASS, 'Order');
 		if (count($tickets) == 0 && $is_one_order) throw new LogicException('CANT_FIND_ORDER');
 		if ($is_one_order) return $tickets[0];
 		$result = array();
