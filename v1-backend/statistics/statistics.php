@@ -144,7 +144,7 @@ $__modules['statistics'] = array(
 			$stats = new OrganizationsStatistics($__db, $organization, $__user);
 			return $stats->get($__fields,
 				$__request['scale'] ?? Statistics::SCALE_MONTH,
-				new DateTime($__request['since'] ?? null),
+				new DateTime($__request['since'] ?? '1970-01-01 00:00:01'),
 				new DateTime($__request['till'] ?? null));
 		},
 		'{/events/(id:[0-9]+)/orders/export}' => function ($event_id) use ($__db, $__request, $__offset, $__pagination, $__length, $__user, $__fields, $__order_by) {
@@ -210,7 +210,7 @@ $__modules['statistics'] = array(
 			$stats = new EventsStatistics($__db, $event, $__user);
 			return $stats->get($__fields,
 				$__request['scale'] ?? Statistics::SCALE_MONTH,
-				new DateTime($__request['since'] ?? null),
+				new DateTime($__request['since'] ?? '1970-01-01 00:00:01'),
 				new DateTime($__request['till'] ?? null)
 			);
 		},
