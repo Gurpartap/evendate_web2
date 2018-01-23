@@ -575,7 +575,7 @@ class Event extends AbstractEntity
 
 		if (isset($data['title'])) {
 			if (mb_strlen($data['title']) < 3) throw new InvalidArgumentException('TOO_SHORT_TITLE');
-			if (mb_strlen($data['title']) > 150) throw new InvalidArgumentException('TOO_LARGE_TITLE');
+			if (mb_strlen($data['title']) > 200) throw new InvalidArgumentException('TOO_LARGE_TITLE');
 		}
 
 		function sortByStartTime($a, $b)
