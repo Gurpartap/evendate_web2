@@ -63,6 +63,15 @@ interface SelectInterface extends QueryInterface, WhereInterface, OrderByInterfa
      */
     public function distinct($enable = true);
 
+	/**
+	 *
+	 * Makes the select DISTINCT ON (columns).
+	 *
+	 * @param array $cols
+	 * @return self
+	 */
+    public function distinctOn(array $cols);
+
     /**
      *
      * Adds columns to the query.
